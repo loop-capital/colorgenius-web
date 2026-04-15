@@ -1,0 +1,30 @@
+{
+  "name": "colorgenius",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered hair color formulation system for beauty professionals",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present",
+    "db:migrate": "npm run db:migrate -w @colorgenius/api",
+    "db:seed": "npm run db:seed -w @colorgenius/api"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clawstudio/colorgenius.git"
+  }
+}

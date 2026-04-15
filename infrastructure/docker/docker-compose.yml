@@ -1,0 +1,101 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: colorgenius-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: colorgenius
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d colorgenius"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: colorgenius-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # API Service (Node.js/Fastify)
+  api:
+    build:
+      context: ../packages/api
+      dockerfile: ../../../infrastructure/docker/Dockerfile.api
+    container_name: colorgenius-api
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/colorgenius
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev-secret-change-in-production-min-32chars
+      PORT: 3000
+      LOG_LEVEL: info
+      LOG_PRETTY: "true"
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../packages/api:/app
+      - /app/node_modules
+      - /app/dist
+    command: npm run dev
+
+  # Color Science Engine (Python/FastAPI)
+  engine:
+    build:
+      context: ../packages/engine
+      dockerfile: ../../../infrastructure/docker/Dockerfile.engine
+    container_name: colorgenius-engine
+    environment:
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../packages/engine:/app
+      - /app/.venv
+    command: uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
+
+  # Web (Next.js) - Development
+  web:
+    build:
+      context: ../packages/web
+      dockerfile: ../../../infrastructure/docker/Dockerfile.web
+    container_name: colorgenius-web
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+      NEXT_PUBLIC_COLOR_ENGINE_URL: http://localhost:8000
+    ports:
+      - "3001:3001"
+    depends_on:
+      - api
+    volumes:
+      - ../packages/web:/app
+      - /app/node_modules
+      - /app/.next
+
+volumes:
+  postgres_data:
+  redis_data:
