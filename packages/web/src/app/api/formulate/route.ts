@@ -52,10 +52,10 @@ function normalizeTone(tone: string): string {
     'ASH': 'A', 'A': 'A',
     'GOLD': 'G', 'GOLDEN': 'G', 'G': 'G',
     'RED': 'R', 'R': 'R',
-    'COPPER': 'K', 'K': 'K', 'C': 'K',
+    'COPPER': 'K', 'C': 'K', 'K': 'K',
     'BEIGE': 'B', 'B': 'B',
-    'VIOLET': 'V', 'V': 'V', 'P': 'V',
-    'PEARL': 'A', 'P': 'A',
+    'VIOLET': 'V', 'V': 'V',
+    'PEARL': 'A',
   };
   return map[tone.toUpperCase()] || tone.toUpperCase();
 }
