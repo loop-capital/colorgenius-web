@@ -1,23 +1,64 @@
-import { NextRequest } from 'next/server'
-import { successResponse } from '@/lib/api/response'
+/**
+ * GET /api/gallery/public
+ * Public consumer gallery — NO auth required
+ */
 
-export async function GET(req: NextRequest) {
-  const searchParams = req.nextUrl.searchParams
-  const page = parseInt(searchParams.get('page') || '1')
-  const pageSize = Math.min(parseInt(searchParams.get('pageSize') || '24'), 50)
+import { NextRequest, NextResponse } from 'next/server';
+import { validateOrThrow, galleryQuerySchema } from '@/lib/api/validation';
+import { galleryItems } from '@/lib/api/mock-data';
+import { GalleryItem, ApiResponse } from '@/lib/api/types';
 
-  const posts = Array.from({ length: pageSize }, (_, i) => ({
-    id: `gallery-${(page-1)*pageSize + i}`,
-    before_photo_url: `https://picsum.photos/400/500?random=${i*2}`,
-    after_photo_url: `https://picsum.photos/400/500?random=${i*2+1}`,
-    caption: ['Before & After: Summer Balayage', 'Root Touch-Up Transformation', 'Ash Blonde Correction', 'Golden Highlights'][i % 4],
-    stylist_name: ['Eiza at Pleij', 'Maria at Salon X', 'Jen at Studio Y', 'Sam at Hair Co'][i % 4],
-    stylist_uplook_profile_url: 'https://getuplook.com/professional/eiza',
-    consumer_likes_count: Math.floor(Math.random() * 500),
-    consumer_saves_count: Math.floor(Math.random() * 100),
-    tags: ['balayage', 'blonde', 'transformation'],
-    created_at: new Date(Date.now() - i * 86400000).toISOString(),
-  }))
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const raw = {
+      cursor: searchParams.get('cursor') || undefined,
+      limit: searchParams.get('limit') || undefined,
+      season: searchParams.get('season') || undefined,
+      color_family: searchParams.get('color_family') || undefined,
+    };
+    const query = validateOrThrow(galleryQuerySchema, raw);
 
-  return successResponse(posts, { page, pageSize, total: 500 })
+    let items = [...galleryItems];
+
+    // Apply filters
+    if (query.season) {
+      items = items.filter(i => i.season === query.season);
+    }
+    if (query.color_family) {
+      items = items.filter(
+        i => i.formulation_snapshot.color_family.toLowerCase() === query.color_family!.toLowerCase()
+      );
+    }
+
+    // Sort by newest
+    items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    // Cursor pagination
+    let startIdx = 0;
+    if (query.cursor) {
+      const idx = items.findIndex(i => i.id === query.cursor);
+      if (idx >= 0) startIdx = idx + 1;
+    }
+
+    const page = items.slice(startIdx, startIdx + query.limit);
+    const nextCursor = page.length === query.limit && startIdx + query.limit < items.length
+      ? page[page.length - 1].id
+      : undefined;
+
+    return NextResponse.json<ApiResponse<GalleryItem[]>>({
+      success: true,
+      data: page,
+      meta: {
+        cursor: nextCursor,
+        total: items.length,
+      },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to fetch gallery';
+    return NextResponse.json<ApiResponse>({
+      success: false,
+      error: { code: 'GALLERY_FAILED', message },
+    }, { status: 500 });
+  }
 }

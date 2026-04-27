@@ -1,27 +1,37 @@
-import { NextRequest } from 'next/server'
-import { successResponse, Errors } from '@/lib/api/response'
+/**
+ * GET /api/gallery/stylist/[id]
+ * Stylist portfolio — NO auth required
+ * NOTE: Next.js App Router uses [id] param. This file handles /api/gallery/stylist/:id
+ */
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+import { NextRequest, NextResponse } from 'next/server';
+import { stylistPortfolios } from '@/lib/api/mock-data';
+import { StylistPortfolio, ApiResponse } from '@/lib/api/types';
 
-  return successResponse({
-    stylist: {
-      id,
-      name: 'Eiza at Pleij Salon',
-      bio: 'Senior colorist specializing in balayage and dimensional color. 15+ years experience.',
-      specialties: ['Balayage', 'Color Correction', 'Gray Coverage'],
-      uplook_profile_url: `https://getuplook.com/professional/${id}?ref=colorgenius`,
-      total_posts: 47,
-      total_likes: 3241,
-      follower_count: 892,
-    },
-    portfolio: Array.from({ length: 6 }, (_, i) => ({
-      id: `portfolio-${i}`,
-      before_photo_url: `https://picsum.photos/400/500?random=${i*2+200}`,
-      after_photo_url: `https://picsum.photos/400/500?random=${i*2+201}`,
-      caption: ['Summer balayage', 'Root touch-up', 'Ash blonde', 'Golden highlights', 'Color correction', 'Dimensional color'][i],
-      likes_count: Math.floor(Math.random() * 200),
-      created_at: new Date(Date.now() - i * 86400000 * 7).toISOString(),
-    })),
-  })
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<Record<string, string>> }
+) {
+  try {
+    const { id } = await params;
+
+    const portfolio = stylistPortfolios.find(p => p.stylist_id === id);
+    if (!portfolio) {
+      return NextResponse.json<ApiResponse>({
+        success: false,
+        error: { code: 'STYLIST_NOT_FOUND', message: 'Stylist portfolio not found' },
+      }, { status: 404 });
+    }
+
+    return NextResponse.json<ApiResponse<StylistPortfolio>>({
+      success: true,
+      data: portfolio,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to fetch stylist portfolio';
+    return NextResponse.json<ApiResponse>({
+      success: false,
+      error: { code: 'STYLIST_FAILED', message },
+    }, { status: 500 });
+  }
 }
