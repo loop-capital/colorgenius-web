@@ -1,22 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['@colorgenius/shared'],
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '20mb',
-    },
-  },
+  outputFileTracingRoot: '/home/jason/.openclaw/workspaces/colorgenius',
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn.colorgenius.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.amazonaws.com',
-      },
-    ],
+    unoptimized: true,
+    domains: ['localhost', 'cdn.colorgenius.com'],
   },
 };
 

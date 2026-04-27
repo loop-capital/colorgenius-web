@@ -1,0 +1,428 @@
+// =====================================================
+// COLORGENIUS BETA PRISMA SCHEMA
+// Production-ready PostgreSQL schema for 50-stylist beta
+// Target: August 15, 2026
+// =====================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================================================
+// CORE: STYLISTS & SALONS
+// =====================================================
+
+model Salon {
+  id                     String   @id @default(uuid())
+  name                   String   @db.VarChar(200)
+  slug                   String   @unique @db.VarChar(200)
+
+  address_line1          String?  @db.VarChar(200)
+  address_line2          String?  @db.VarChar(200)
+  city                   String?  @db.VarChar(100)
+  state                  String?  @db.VarChar(2)
+  postal_code            String?  @db.VarChar(20)
+  country                String   @default("US") @db.VarChar(2)
+  timezone               String   @default("America/New_York") @db.VarChar(50)
+
+  phone                  String?  @db.VarChar(50)
+  email                  String?  @db.VarChar(255)
+
+  subscription_tier      String   @default("beta") @db.VarChar(20)
+  subscription_seats     Int      @default(5)
+  subscription_expires_at DateTime?
+
+  preferred_brands       String[] // e.g., ['Redken', 'Wella']
+
+  stylists               Stylist[]
+  clients                Client[]
+
+  created_at             DateTime @default(now())
+  updated_at             DateTime @default(now()) @updatedAt
+
+  @@index([subscription_tier])
+}
+
+model Stylist {
+  id                String   @id @default(uuid())
+
+  // Auth
+  email             String   @unique @db.VarChar(255)
+  password_hash     String   @db.VarChar(255)
+
+  first_name        String   @db.VarChar(100)
+  last_name         String   @db.VarChar(100)
+  display_name      String?  @db.VarChar(100)
+
+  license_number    String?  @db.VarChar(50)
+  license_state     String?  @db.VarChar(2)
+  years_experience  Int      @default(0)
+
+  salon_id          String?
+  salon             Salon?   @relation(fields: [salon_id], references: [id], onDelete: SetNull)
+
+  role              String   @default("stylist") @db.VarChar(50) // owner, manager, senior, stylist, assistant
+
+  // Preferences (JSONB for flexibility)
+  preferences       Json     @default("{\"default_brand\": null, \"preferred_developer\": 20, \"theme\": \"light\"}")
+
+  formulations_count Int     @default(0)
+  last_login_at     DateTime?
+
+  is_active         Boolean  @default(true)
+  is_verified       Boolean  @default(false)
+
+  clients           Client[] @relation("PrimaryStylist")
+  formulations      Formulation[]
+  photos            Photo[]
+  client_visits     ClientVisit[]
+
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  @@index([salon_id])
+  @@index([email])
+  @@index([is_active])
+}
+
+// =====================================================
+// CORE: CLIENTS
+// =====================================================
+
+model Client {
+  id                 String   @id @default(uuid())
+
+  first_name         String   @db.VarChar(100)
+  last_name          String   @db.VarChar(100)
+  email              String?  @db.VarChar(255)
+  phone              String?  @db.VarChar(50)
+  date_of_birth      DateTime? @db.Date
+
+  primary_stylist_id String?
+  primary_stylist    Stylist? @relation("PrimaryStylist", fields: [primary_stylist_id], references: [id], onDelete: SetNull)
+
+  salon_id           String?
+  salon              Salon?   @relation(fields: [salon_id], references: [id], onDelete: SetNull)
+
+  // Hair profile (cached from latest analysis)
+  hair_texture       String?  @db.VarChar(20) // fine, medium, coarse
+  hair_density       String?  @db.VarChar(20) // thin, medium, thick
+  natural_level      Int?
+  natural_tone       String?  @db.VarChar(10)
+  porosity           String   @default("normal") @db.VarChar(20) // low, normal, high
+  scalp_condition    String   @default("normal") @db.VarChar(20) // sensitive, normal, dry, oily
+
+  // Medical / sensitivities (critical for safety)
+  allergies          Json     @default("{\"ppd\": false, \"ammonia\": false, \"fragrance\": false, \"known_allergens\": []}")
+
+  has_straightening  Boolean  @default(false)
+  has_permed_hair    Boolean  @default(false)
+  has_metallic_dye   Boolean  @default(false)
+  has_henna          Boolean  @default(false)
+  has_previous_color Boolean  @default(false)
+  last_color_service_date DateTime? @db.Date
+
+  general_notes      String?
+
+  total_visits       Int      @default(0)
+  last_visit_at      DateTime?
+
+  formulations       Formulation[]
+  photos             Photo[]
+  client_visits      ClientVisit[]
+
+  created_at         DateTime @default(now())
+  updated_at         DateTime @default(now()) @updatedAt
+
+  @@index([primary_stylist_id])
+  @@index([salon_id])
+  @@index([email])
+  @@index([last_visit_at])
+}
+
+// =====================================================
+// COLOR LINES: BRANDS, LINES, SHADES, DEVELOPERS
+// =====================================================
+
+model Brand {
+  id              String        @id @default(uuid())
+  name            String        @unique @db.VarChar(100)
+  slug            String        @unique @db.VarChar(100)
+  manufacturer    String?       @db.VarChar(100)
+  origin_country  String        @default("US") @db.VarChar(2)
+  tier            String        @db.VarChar(20)
+  is_active       Boolean       @default(true)
+
+  product_lines   ProductLine[]
+  developers      Developer[]
+
+  created_at      DateTime      @default(now())
+
+  @@index([is_active])
+}
+
+model ProductLine {
+  id                  String   @id @default(uuid())
+  brand_id            String
+  brand               Brand    @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+
+  name                String   @db.VarChar(100)
+  code                String?  @unique @db.VarChar(20)
+  slug                String   @db.VarChar(100)
+
+  color_type          String   @db.VarChar(50)
+
+  ammonia_free        Boolean  @default(false)
+  plex_technology     String?  @db.VarChar(50)
+
+  alkaline_agent      String?  @db.VarChar(20)
+
+  max_gray_coverage   Int?
+  max_lift_levels     Int?
+
+  mixing_ratio        String   @db.VarChar(10)
+  developer_options   Int[]
+
+  base_processing_time Int?
+  max_processing_time  Int?
+  can_use_heat        Boolean  @default(true)
+
+  is_active           Boolean  @default(true)
+
+  shades              Shade[]
+
+  created_at          DateTime @default(now())
+
+  @@unique([brand_id, name])
+  @@index([brand_id])
+  @@index([color_type])
+  @@index([is_active])
+}
+
+model Shade {
+  id                    String   @id @default(uuid())
+  product_line_id       String
+  product_line          ProductLine @relation(fields: [product_line_id], references: [id], onDelete: Cascade)
+
+  shade_code            String   @db.VarChar(20)
+  shade_name            String?  @db.VarChar(100)
+
+  level                 Int?
+
+  primary_tone          String?  @db.VarChar(10)
+  secondary_tone        String?  @db.VarChar(10)
+
+  is_natural            Boolean  @default(false)
+  is_high_lift          Boolean  @default(false)
+  is_clear              Boolean  @default(false)
+
+  undertone             String?  @db.VarChar(50)
+
+  rgb_representation    Int[]
+  lab_representation    Float[]
+
+  best_for              String[]
+  not_recommended_for   String[]
+
+  swatch_image_url      String?
+  result_image_urls     String[]
+
+  is_active             Boolean  @default(true)
+
+  created_at            DateTime @default(now())
+
+  @@unique([product_line_id, shade_code])
+  @@index([product_line_id])
+  @@index([level])
+  @@index([primary_tone])
+  @@index([is_natural])
+  @@index([level, primary_tone])
+}
+
+model Developer {
+  id                String   @id @default(uuid())
+  brand_id          String?
+  brand             Brand?   @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+
+  name              String   @db.VarChar(100)
+  volume            Int
+
+  h2o2_percentage   Decimal? @db.Decimal(4, 2)
+  viscosity         String?  @db.VarChar(20)
+
+  special_properties String[]
+
+  is_active         Boolean  @default(true)
+
+  created_at        DateTime @default(now())
+
+  @@unique([brand_id, volume])
+  @@index([brand_id])
+}
+
+// =====================================================
+// FORMULATIONS (The Core)
+// =====================================================
+
+model Formulation {
+  id                String   @id @default(uuid())
+
+  stylist_id        String
+  stylist           Stylist  @relation(fields: [stylist_id], references: [id])
+
+  client_id         String?
+  client            Client?  @relation(fields: [client_id], references: [id], onDelete: SetNull)
+
+  // Input context (denormalized for performance)
+  input_data        Json
+
+  // Result
+  action_type       String?  @db.VarChar(50)
+
+  brand             String?  @db.VarChar(50)
+  product_line      String?  @db.VarChar(100)
+
+  primary_formula   Json
+  toning_formula    Json?
+
+  processing_instructions Json
+
+  // Warnings and validation
+  warnings          String[]
+  confidence_score  Decimal? @db.Decimal(4, 3)
+
+  // Status
+  status            String   @default("generated") @db.VarChar(20)
+
+  // Scoring (filled after result)
+  score_accuracy    Int?
+  score_condition   Int?
+  score_evenness    Int?
+  score_overall     Int?
+
+  stylist_notes     String?
+
+  photos            Photo[]
+  client_visits     ClientVisit[]
+
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  @@index([stylist_id])
+  @@index([client_id])
+  @@index([status])
+  @@index([created_at])
+  @@index([brand])
+  @@index([confidence_score])
+}
+
+// =====================================================
+// PHOTOS (Before/After, Analysis)
+// =====================================================
+
+model Photo {
+  id                String   @id @default(uuid())
+
+  formulation_id  String?
+  formulation       Formulation? @relation(fields: [formulation_id], references: [id], onDelete: Cascade)
+
+  client_id         String?
+  client            Client?  @relation(fields: [client_id], references: [id], onDelete: SetNull)
+
+  stylist_id        String?
+  stylist           Stylist? @relation(fields: [stylist_id], references: [id])
+
+  photo_type        String   @db.VarChar(20)
+  photo_label       String?  @db.VarChar(50)
+
+  // Storage
+  original_url      String
+  processed_url     String?
+  thumbnail_url     String?
+
+  // Metadata
+  file_size_bytes   Int?
+  width             Int?
+  height            Int?
+  format            String?  @db.VarChar(10)
+
+  // Analysis results (if processed)
+  analysis_results  Json?
+
+  processing_status String   @default("pending") @db.VarChar(20)
+
+  created_at        DateTime @default(now())
+
+  @@index([formulation_id])
+  @@index([client_id])
+  @@index([photo_type])
+  @@index([processing_status])
+}
+
+// =====================================================
+// CLIENT VISITS (History tracking)
+// =====================================================
+
+model ClientVisit {
+  id                String   @id @default(uuid())
+
+  client_id         String
+  client            Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+
+  stylist_id        String
+  stylist           Stylist  @relation(fields: [stylist_id], references: [id])
+
+  formulation_id    String?
+  formulation       Formulation? @relation(fields: [formulation_id], references: [id], onDelete: SetNull)
+
+  visit_date        DateTime
+  service_type      String?  @db.VarChar(50)
+
+  // Snapshot of hair state at visit
+  hair_state        Json?
+
+  // Outcome
+  client_satisfaction Int?
+  stylist_notes     String?
+
+  photos            Json?
+
+  created_at        DateTime @default(now())
+
+  @@index([client_id])
+  @@index([stylist_id])
+  @@index([visit_date])
+  @@index([formulation_id])
+}
+
+// =====================================================
+// AUDIT LOGS
+// =====================================================
+
+model AuditLog {
+  id              String   @id @default(uuid())
+
+  actor_type      String?  @db.VarChar(20)
+  actor_id        String?
+
+  action          String   @db.VarChar(100)
+  resource_type   String   @db.VarChar(50)
+  resource_id     String?
+
+  details         Json?
+
+  ip_address      String?  @db.Inet
+  user_agent      String?
+
+  created_at      DateTime @default(now())
+
+  @@index([actor_type, actor_id])
+  @@index([action])
+  @@index([resource_type, resource_id])
+  @@index([created_at])
+}

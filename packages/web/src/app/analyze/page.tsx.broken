@@ -1,0 +1,425 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Upload } from '@/components/PhotoUploader';
+import { AnalysisResult } from '@/types';
+import { getAnalysisApi } from '@/lib/api';
+import { Spinner } from '@/components/ui/spinner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { AlertTriangle, Camera, Image, Sparkles, Trash2, User } from 'lucide-react';
+
+export default function AnalyzePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string>('');
+
+  const analysisId = searchParams.get('id');
+
+  // Load existing analysis if ID provided
+  useEffect(() => {
+    if (analysisId) {
+      loadAnalysis(analysisId);
+    }
+  }, [analysisId]);
+
+  const loadAnalysis = async (id: string) => {
+    setIsAnalyzing(true);
+    try {
+      const response = await getAnalysisApi(id);
+      if (!response.error && response.data) {
+        setAnalysis(response.data);
+      } else {
+        setError(response.error?.message || 'Failed to load analysis');
+      }
+    } catch (err) {
+      setError('Failed to connect to server');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleUpload = async (url: string) => {
+    setPhotoUrl(url);
+    setError(null);
+    setIsAnalyzing(true);
+    
+    try {
+      // In a real app, you'd get clientId from session or context
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          photo_url: url,
+          client_id: clientId || undefined,
+          questionnaire: {} // Would come from questionnaire state in real implementation
+        })
+      });
+      
+      const data = await data.json();
+      
+      if (!data.error) {
+        setAnalysis(data.data);
+        // Redirect to results page with analysis ID
+        router.push(`/results?id=${data.data.analysis_id}`);
+      } else {
+        setError(data.error.message || 'Analysis failed');
+      }
+    } catch (err) {
+      setError('Failed to analyze photo');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleRetake = () => {
+    setPhotoUrl(null);
+    setAnalysis(null);
+    setError(null);
+  };
+
+  if (isAnalyzing && !analysis) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center bg-background">
+        <Spinner label="Analyzing your hair..." />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[calc(100vh-64px)] bg-background">
+      {/* Header */}
+      <div className="flex h-16 items-center justify-between px-4 bg-border/50 dark:bg-border/20">
+        <div className="flex items-center gap-3">
+          <Camera className="h-5 w-5" />
+          <h1 className="text-xl font-semibold">Hair Analysis</h1>
+        </div>
+        {analysisId && (
+          <Button variant="outline" size="icon" onClick={handleRetake}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+
+      {/* Main Content */}
+      <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden">
+        {/* Upload Section */}
+        {!photoUrl && !analysis ? (
+          <div className="flex-1 flex flex-col items-center justify-center py-12">
+            <div className="rounded-lg border-2 border-dashed border-border/50 p-10 text-center">
+              <Image className="h-12 w-12 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-2">Upload Hair Photo</h2>
+              <p className="text-sm text-muted-foreground max-w-xl">
+                Take a clear, well-lit photo of your hair in natural light for the most accurate analysis
+              </p>
+              <Upload 
+                onUploadComplete={handleUpload} 
+                accept="image/*"
+                maxSizeMB={5}
+              />
+              <p className="mt-4 text-xs text-muted-foreground">
+                Supported formats: JPG, PNG, HEIC • Max 5MB
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Photo Preview */}
+            {photoUrl && (
+              <div className="relative h-[40vh] w-full overflow-hidden">
+                <img 
+                  src={photoUrl} 
+                  alt="Hair analysis" 
+                  className="h-full w-full object-cover"
+                />
+                {!analysis && (
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <Spinner className="h-8 w-8" />
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Analysis Results */}
+            {analysis && (
+              <div className="flex-1 overflow-y-auto p-6">
+                <AnalysisResults analysis={analysis} />
+              </div>
+            )}
+            
+            {/* Error State */}
+            {error && !analysis && (
+              <div className="flex-1 flex items-center justify-center py-12">
+                <AlertTriangle className="h-6 w-6 mr-3" />
+                <div className="text-center">
+                  <h2 className="text-lg font-semibold mb-2">Analysis Failed</h2>
+                  <p className="text-sm text-destructive">{error}</p>
+                  <Button variant="outline" onClick={handleRetake} className="mt-4">
+                    Try Again
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Footer Actions */}
+      {!photoUrl && !analysis && (
+        <div className="h-12 flex items-center justify-center px-4 bg-border/50 dark:bg-border/20">
+          <Button 
+            variant="outline" 
+            onClick={() => router.push('/questionnaire')}
+            size="icon"
+          >
+            <User className="h-4 w-4" />
+            Start Consultation
+          </Button>
+        </div>
+      )}
+      
+      {photoUrl && !isAnalyzing && !error && (
+        <div className="h-12 flex items-center justify-center px-4 bg-border/50 dark:bg-border/20">
+          {analysis ? (
+            <>
+              <Button 
+                onClick={() => router.push(`/results?id=${analysis.analysis_id}`)}
+                variant="default"
+              >
+                View Results
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleRetake}
+                className="ml-3"
+              >
+                New Analysis
+              </Button>
+            </>
+          ) : (
+            <Button 
+              onClick={handleUpload} 
+              disabled={!photoUrl}
+              className="ml-3"
+            >
+              Analyze Photo
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Analysis Results Component
+function AnalysisResults({ analysis }: { analysis: AnalysisResult }) {
+  const { detected_color, condition, hair_type, warnings, recommendations } = analysis;
+  
+  const getLevelDescription = (level: number): string => {
+    const descriptions: Record<number, string> = {
+      1: 'Black',
+      2: 'Darkest Brown',
+      3: 'Dark Brown',
+      4: 'Dark Chestnut',
+      5: 'Chestnut Brown',
+      6: 'Medium Brown',
+      7: 'Dark Blonde',
+      8: 'Medium Blonde',
+      9: 'Light Blonde',
+      10: 'Lightest Blonde',
+    };
+    return descriptions[level] || `Level ${level}`;
+  };
+            <div className="flex items-center space-x-6">
+              {/* Color visualization */}
+              <div className="relative h-24 w-24">
+                <div 
+                  className="h-full w-full rounded-xl border-2 border-border/50"
+                  style={{ backgroundColor: `rgb(${r}, ${g}, ${b})` }}
+                />
+                <div className="absolute inset-0 rounded-xl border-2 border-primary/20" />
+              </div>
+              <div className="text-center space-y-1">
+                <p className="font-medium">Level {detected_color.level}</p>
+                <p className="text-sm">{getLevelDescription(detected_color.level)}</p>
+                <p className="text-xs text-muted-foreground">
+                  {detected_color.tone_name || detected_color.tone}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  #{r.toString(16).padStart(2, '0)}${g.toString(16).padStart(2, '0)}${b.toString(16).padStart(2, '0)}
+                </p>
+              </div>
+                  {detected_color.tone_name || detected_color.tone}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  #{r.toString(16).padStart(2, '0)}${g.toString(16).padStart(2, '0)}${b.toString(16).padStart(2, '0)}
+                </p>
+              </div>
+  const rgb = detected_color.rgb || [0, 0, 0];
+  
+  
+  return (
+    <div className="space-y-6">
+      {/* Color Analysis Card */}
+      <Card className="w-full">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold">Detected Hair Color</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            {detected_color.confidence?.toFixed(0)}% confidence
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center space-y-4">
+          <div className="flex items-center space-x-6">
+            <div className="relative h-24 w-24">
+              <div 
+                className="h-full w-full rounded-xl border-2 border-border/50"
+                style={{ backgroundColor: `rgb(${r}, ${g}, ${b})` }}
+              />
+              <div className="absolute inset-0 rounded-xl border-2 border-primary/20" />
+            </div>
+            <div className="text-center space-y-1">
+              <p className="font-medium">Level {detected_color.level}</p>
+              <p className="text-sm">{getLevelDescription(detected_color.level)}</p>
+              <p className="text-xs text-muted-foreground">
+                {detected_color.tone_name || detected_color.tone}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                #{r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}
+              </p>
+            </div>
+          </div>
+          
+          {/* Confidence Meter */}
+          {detected_color.confidence && (
+            <div className="w-full">
+              <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                <span>Confidence</span>
+                <span>{(detected_color.confidence * 100).toFixed(0)}%</span>
+              </div>
+              <div className="w-full bg-border/50 h-2 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary" 
+                  style={{ width: `${detected_color.confidence * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Hair Condition */}
+      <Card className="w-full">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold">Hair Condition</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="font-medium">Porosity</p>
+              <p className="text-muted-foreground">{condition.porosity}</p>
+            </div>
+            <div>
+              <p className="font-medium">Damage Score</p>
+              <p className="text-muted-foreground">{condition.damage_score?.toFixed(2)}/1.00</p>
+            </div>
+            <div>
+              <p className="font-medium">Elasticity</p>
+              <p className="text-muted-foreground">{condition.elasticity} ({condition.elasticity_percent}%)</p>
+            </div>
+            <div>
+              <p className="font-medium">Hair Texture</p>
+              <p className="text-muted-foreground">{hair_type.texture}</p>
+            </div>
+            <div>
+              <p className="font-medium">Density</p>
+              <p className="text-muted-foreground">{hair_type.density}</p>
+            </div>
+            <div>
+              <p className="font-medium">Virgin Hair</p>
+              <p className="text-muted-foreground">{hair_type.is_virgin ? 'Yes' : 'No'}</p>
+            </div>
+          </div>
+          
+          {/* Flags */}
+          {condition.flagged_concerns?.length && (
+            <div className="mt-3 p-3 bg-warning/50 rounded-border">
+              <p className="font-medium text-warning">⚠️ Important Notes:</p>
+              <ul className="mt-2 space-y-1 text-sm text-warning/80">
+                {condition.flagged_concerns.map((concern, index) => (
+                  <li key={index}>&bull; {concern}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Warnings */}
+      {warnings?.length && (
+        <Card className="w-full">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-semibold">Warnings & Precautions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {warnings.map((warning, index) => (
+              <div key={index} className="p-3 rounded-border" 
+                   className={warning.type === 'critical' 
+                     ? 'bg-destructive/50 border-destructive/50' 
+                     : warning.type === 'warning'
+                     ? 'bg-warning/50 border-warning/50'
+                     : 'bg-muted/50 border-muted/50'}>
+                <div className="flex items-start gap-3">
+                  {warning.type === 'critical' && (
+                    <AlertTriangle className="h-4 w-4 flex-shrink-0 text-destructive mt-0.5" />
+                  )}
+                  {warning.type === 'warning' && (
+                    <AlertTriangle className="h-4 w-4 flex-shrink-0 text-warning mt-0.5" />
+                  )}
+                  <div>
+                    <p className="font-medium">{warning.message}</p>
+                    {warning.code && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Code: {warning.code}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </Card>
+
+      {/* Recommendations */}
+      <Card className="w-full">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg font-semibold">Recommendations</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {recommendations.pretreatment && (
+            <div className="p-3 bg-warning/50 rounded-border">
+              <p className="font-medium text-warning">Pre-Treatment Required</p>
+              <p className="text-sm">{recommendations.pretreatment}</p>
+            </div>
+          )}
+          
+          <div className="space-y-2">
+            <div>
+              <p className="font-medium">Developer Recommendation</p>
+              <p className="text-muted-foreground">{recommendations.developer_recommendation}</p>
+            </div>
+            <div>
+              <p className="font-medium">Processing Notes</p>
+              <p className="text-muted-foreground">{recommendations.processing_notes}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

@@ -1,0 +1,74 @@
+// Prisma Schema for ColorGenius
+// Defines the database models for clients, formulas, and analyses
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  formulas  Formula[] @relation("ClientFormulas")
+  analyses  Analysis[] @relation("ClientAnalyses")
+  
+  @@index([name])
+  @@index([phone])
+}
+
+model Formula {
+  id            String   @id @default(uuid())
+  currentLevel  Int      @default(1)
+  currentTone   String   @default("n")
+  targetLevel   Int      @default(1)
+  targetTone    String   @default("n")
+  condition     String   @default("virgin")
+  grayPercentage Int      @default(0)
+  developerVolume Int    @default(20)
+  processingTime Int    @default(30)
+  productBrand  String
+  productLine   String
+  productShade  String
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  clientId      String?
+  client        Client?  @relation("ClientFormulas", fields: [clientId], references: [id])
+  
+  @@index([productBrand])
+  @@index([productLine])
+  @@index([targetLevel])
+  @@index([createdAt])
+}
+
+model Analysis {
+  id        String   @id @default(uuid())
+  level     Int      @default(1)
+  tone      String   @default("n")
+  underlyingPigment String @default("Red")
+  rgbR      Int      @default(0)
+  rgbG      Int      @default(0)
+  rgbB      Int      @default(0)
+  confidence Int    @default(80)
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  
+  // Relations
+  clientId  String?
+  client    Client?  @relation("ClientAnalyses", fields: [clientId], references: [id])
+  
+  @@index([level])
+  @@index([tone])
+  @@index([createdAt])
+}

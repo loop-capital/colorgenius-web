@@ -1,20 +1,42 @@
 # Dependencies
 node_modules/
-.pnpm-store/
+packages/*/node_modules/
 
 # Build outputs
+.next/
 dist/
 build/
-*.tsbuildinfo
 
 # Environment
 .env
 .env.local
 .env.*.local
 
+# Uploads (keep structure, ignore files)
+uploads/*
+!uploads/.gitkeep
+
+# Models (ML models)
+models/*
+!models/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Docker
+.docker/
+
+# Logs
+*.log
+npm-debug.log*
+
 # IDE
-.idea/
 .vscode/
+.idea/
 *.swp
 *.swo
 
@@ -22,33 +44,10 @@ build/
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-logs/
-
 # Test coverage
 coverage/
+*.lcov
 
-# Docker
-.docker/
-
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-*.egg-info/
-.Python
-.python-version
-
-# Model artifacts (keep in S3/remote)
-*.pt
-*.pth
-*.onnx
-*.h5
-models/
-
-# Credentials
-*.pem
-*.key
-credentials/
+# Misc
+*.bak
+*.tmp

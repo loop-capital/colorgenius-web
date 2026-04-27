@@ -1,35 +1,28 @@
-# Color Science Engine - Dependencies
-# Core scientific computing
+# ColorGenius Engine - Dependencies
+# Color science and hair analysis
+
+# Core numerics
 numpy>=1.24.0
 scipy>=1.11.0
-pandas>=2.0.0
+Pillow>=10.0.0
 
 # Color science
 colormath>=3.0.0
-scikit-image>=0.22.0
-Pillow>=10.0.0
+colour-science>=0.4.0
+scikit-image>=0.21.0
 
-# ML/AI (for later phases - included for architecture)
-# torch>=2.0.0
-# torchvision>=0.15.0
-# onnxruntime>=1.16.0
+# Image processing
+opencv-python-headless>=4.8.0
 
-# HTTP/API server
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
-python-multipart>=0.0.6
+# Data validation & serialization
+pydantic>=2.0.0
+pyyaml>=6.0.0
+orjson>=3.9.0
 
-# Validation
-pydantic>=2.5.0
-pydantic-settings>=2.1.0
-
-# Environment
-python-dotenv>=1.0.0
-
-# Logging
-python-json-logger>=2.0.7
-
-# Testing
+# Development
 pytest>=7.4.0
 pytest-cov>=4.1.0
-pytest-asyncio>=0.23.0
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.5.0
+ruff>=0.0.290
