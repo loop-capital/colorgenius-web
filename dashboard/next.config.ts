@@ -1,0 +1,44 @@
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  // Sentry configuration
+  // The Sentry Next.js plugin will automatically configure Sentry for you
+  // Make sure to set the SENTRY_DSN environment variable
+  // Fix for multiple lockfiles warning
+  outputFileTracingRoot: __dirname,
+};
+
+// Wrap the Next.js config with Sentry
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+const { withSentryConfig } = require("@sentry/nextjs");
+
+module.exports = withSentryConfig(nextConfig, {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+
+  // Suppresses source map uploading logs during build
+  silent: true,
+  org: "colorgenius",
+  project: "javascript",
+
+  // Only print logs for uploading source maps in debug mode
+  widenClientFileUpload: true,
+
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  // This can increase server load as well as your hosting bill.
+  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-side errors will fail.
+  tunnelRoute: "/monitoring",
+
+  // Hides source maps from generated client bundles
+  hideSourceMaps: true,
+
+  // Automatically tree-shake Sentry logger statements to reduce bundle size
+  // Note: disableLogger is deprecated, use webpack.treeshake.removeDebugLogging instead
+  // We'll leave it for now but note the deprecation
+  disableLogger: true,
+
+  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet support App Router)
+  // See the following for more information:
+  // https://docs.sentry.io/product/crons/
+  // automaticVercelMonitors: true,
+});

@@ -1,125 +1,84 @@
 # ColorGenius
 
-AI-powered hair color formulation system for beauty professionals.
+AI-powered Hair Color Formulation Engine for Professional Stylists.
 
-## Overview
-
-ColorGenius digitizes 100+ years of professional hair color science into an intelligent platform that generates precise color formulas based on visual input, hair assessment, and environmental factors.
-
-## Quick Start
-
-### Prerequisites
-
-- Node.js 20+
-- Python 3.11+
-- Docker & Docker Compose
-
-### Local Development
-
-1. **Start infrastructure:**
-   ```bash
-   cd infrastructure/docker
-   docker-compose up -d postgres redis
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   cd packages/shared && npm install && cd ../..
-   cd packages/api && npm install && cd ../..
-   cd packages/web && npm install && cd ../..
-   ```
-
-3. **Set up Python engine:**
-   ```bash
-   cd packages/engine
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-4. **Run development servers:**
-   ```bash
-   # API (Terminal 1)
-   cd packages/api && npm run dev
-
-   # Engine (Terminal 2)
-   cd packages/engine && uvicorn src.api:app --reload --port 8000
-
-   # Web (Terminal 3)
-   cd packages/web && npm run dev
-   ```
-
-5. **Access services:**
-   - API: http://localhost:3000
-   - API Docs: http://localhost:3000/docs
-   - Web: http://localhost:3001
-   - Engine: http://localhost:8000
-
-### Docker Compose (Full Stack)
-
-```bash
-cd infrastructure/docker
-docker-compose up -d
-```
-
-## Project Structure
+## Architecture
 
 ```
 colorgenius/
 ├── packages/
-│   ├── api/          # Fastify REST API
-│   ├── web/          # Next.js 14 web app
-│   ├── engine/       # Python color science engine
-│   └── shared/       # Shared TypeScript types
+│   ├── engine/          # Python color science engine (FastAPI)
+│   ├── api/             # Fastify TypeScript API server
+│   └── web/             # Next.js 14 web frontend
 ├── infrastructure/
-│   └── docker/       # Docker Compose setup
-├── docs/             # Documentation
-└── [config files]
+│   ├── docker/          # Dockerfiles for each service
+│   ├── nginx/           # Nginx reverse proxy config
+│   └── sql/             # PostgreSQL init scripts
+└── docker-compose.yml
 ```
 
-## Packages
+## Quick Start
 
-| Package | Description |
-|---------|-------------|
-| `@colorgenius/shared` | TypeScript types for all domain objects |
-| `@colorgenius/api` | Fastify API server with health checks, auth, rate limiting |
-| `@colorgenius/web` | Next.js 14 web application for stylists |
-| `@colorgenius/engine` | Python color science computations |
+```bash
+# Copy environment
+cp .env.example .env
+
+# Build all services
+npm run build
+
+# Start all services
+npm run start
+
+# View logs
+npm run logs
+```
+
+## Services
+
+| Service | Port | Description |
+|---------|------|-------------|
+| Web | 3000 | Next.js frontend |
+| API | 3001 | Fastify REST API |
+| Engine | 8000 | Python color science |
+| DB | 5432 | PostgreSQL |
+| Redis | 6379 | Redis cache |
+| Nginx | 80/443 | Reverse proxy |
 
 ## Development
 
-### Type Checking
-
 ```bash
-npm run build --workspace @colorgenius/shared
+# Run individual services
+npm run dev:api
+npm run dev:web
+npm run dev:engine
+
+# Shell into containers
+npm run shell:api
+npm run shell:web
+
+# Database access
+npm run db:shell
 ```
 
-### Linting
+## API Endpoints
 
-```bash
-npm run lint --workspace @colorgenius/api
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /auth/register | Register new user |
+| POST | /auth/login | Login user |
+| POST | /analyze | Analyze hair photo |
+| POST | /formulate | Generate color formula |
+| GET | /color-lines | List brands/shades |
+| GET | /history | User analysis history |
+| GET | /health | Health check |
 
-### Python
+## Tech Stack
 
-```bash
-# Run engine tests
-cd packages/engine && pytest
+- **Frontend**: Next.js 14, TypeScript, CSS Modules
+- **API**: Fastify, TypeScript, PostgreSQL, Redis
+- **Engine**: Python 3.11, FastAPI, PyTorch
+- **Infrastructure**: Docker Compose, PostgreSQL, Redis, Nginx
 
-# Lint
-ruff check src
-```
+## MVP Deadline: August 15
 
-## Documentation
-
-- [Build Roadmap](../memory/color-genius/build-roadmap.md)
-- [System Architecture](../memory/color-genius/system-architecture.md)
-- [API Specification](../memory/color-genius/api-spec.md)
-- [Database Schema](../memory/color-genius/database-schema.md)
-- [Formulation Algorithm](../memory/color-genius/formulation-algorithm.md)
-- [Color Science Engine](../memory/color-genius/color-science-engine.md)
-
-## License
-
-UNLICENSED - Proprietary to ClawStudio
+See [system-architecture.md](../memory/color-genius/system-architecture.md) and [api-spec.md](../memory/color-genius/api-spec.md) for full specifications.

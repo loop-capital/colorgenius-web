@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-inter);
+}
+
+:root {
+  --cg-deep: #0A0A1A;
+  --cg-dark: #0F0F2A;
+  --cg-accent: #A855F7;
+  --cg-accent2: #EC4899;
+  --cg-white: #ffffff;
+  --cg-gradient: linear-gradient(135deg, #A855F7, #EC4899);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--cg-deep);
+  color: var(--cg-white);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Custom range slider */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--cg-accent);
+  cursor: pointer;
+  box-shadow: 0 0 0 4px var(--cg-dark), 0 0 0 6px rgba(168, 85, 247, 0.27);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--cg-accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 0 4px var(--cg-dark), 0 0 0 6px rgba(168, 85, 247, 0.27);
+}

@@ -1,0 +1,478 @@
+// =====================================================
+// COLORGENIUS COMMUNITY + MARKETPLACE + PUBLIC GALLERY
+// Prisma Schema Extension
+// This file EXTENDS the main schema in schema.prisma
+// Include both files in your Prisma config or merge before migrate
+// Target: August 15, 2026 (Pleij Salon Beta)
+// =====================================================
+
+// =====================================================
+// EXTENDED: STYLIST FIELDS (additions to existing Stylist model)
+// =====================================================
+// Add these fields to the existing Stylist model in schema.prisma:
+//
+//   uplook_user_id          String?   // links to UpLook platform
+//   uplook_profile_url      String?
+//   community_posts_count   Int       @default(0)
+//   marketplace_templates_count Int   @default(0)
+//   total_template_sales    Int       @default(0)
+//   total_template_earnings_cents Int @default(0)
+//   gallery_approved        Boolean   @default(false)
+//   is_educator             Boolean   @default(false)
+//   educator_bio            String?
+//
+// Relations to add:
+//   communityPosts          CommunityPost[]
+//   marketplaceTemplates    MarketplaceTemplate[]
+//   templatePurchases       TemplatePurchase[]
+//   templateReviews         TemplateReview[]
+//   galleryPosts            GalleryPost[]
+//   communityComments       CommunityComment[]
+//   communityLikes          CommunityLike[]
+//   communitySaves          CommunitySave[]
+// =====================================================
+
+// =====================================================
+// EXTENDED: FORMULATION FIELDS (additions to existing Formulation model)
+// =====================================================
+// Add this relation to the existing Formulation model in schema.prisma:
+//
+//   communityPost         CommunityPost?
+//
+// =====================================================
+
+// =====================================================
+// EXTENDED: CLIENT FIELDS (additions to existing Client model)
+// =====================================================
+// Add this relation to the existing Client model in schema.prisma:
+//
+//   templatePurchases     TemplatePurchase[]
+//
+// =====================================================
+
+// =====================================================
+// EXTENDED: PHOTO FIELDS (additions to existing Photo model)
+// =====================================================
+// Add these relations to the existing Photo model in schema.prisma:
+//
+//   communityPosts        CommunityPost[]
+//
+// Note: Prisma does not support explicit many-to-many with extra fields
+// on existing models in separate files. In the main schema.prisma,
+// add a junction model CommunityPostPhoto or use the implicit relation:
+//
+//   community_posts       CommunityPost[] @relation("CommunityPostPhotos")
+//
+// And on CommunityPost (this file):
+//   photos                Photo[] @relation("CommunityPostPhotos")
+//
+// Alternatively, add a CommunityPostPhoto junction model in schema.prisma:
+//
+//   model CommunityPostPhoto {
+//     id            String   @id @default(uuid())
+//     community_post_id String
+//     photo_id      String
+//     sort_order    Int      @default(0)
+//     created_at    DateTime @default(now())
+//     communityPost CommunityPost @relation(fields: [community_post_id], references: [id], onDelete: Cascade)
+//     photo         Photo   @relation(fields: [photo_id], references: [id], onDelete: Cascade)
+//     @@unique([community_post_id, photo_id])
+//     @@index([photo_id])
+//   }
+//
+// =====================================================
+
+// =====================================================
+// COMMUNITY: POSTS, COMMENTS, LIKES, SAVES
+// =====================================================
+
+model CommunityPost {
+  id                String   @id @default(uuid())
+
+  // Ownership & linking
+  stylist_id        String
+  stylist           Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+
+  formulation_id    String?
+  formulation         Formulation? @relation(fields: [formulation_id], references: [id], onDelete: SetNull)
+
+  // Photos (direct URLs for quick access)
+  before_photo_url  String?
+  after_photo_url   String?
+
+  // Content
+  caption           String?  @db.VarChar(2000)
+  hair_description  String?  @db.VarChar(1000)
+  tags              String[] // e.g., ['balayage', 'blonde', 'transformation']
+
+  // Engagement counters (denormalized for performance)
+  likes_count       Int      @default(0)
+  saves_count       Int      @default(0)
+  comments_count    Int      @default(0)
+  trend_score       Float    @default(0)
+
+  // Visibility & moderation
+  is_public         Boolean  @default(true)
+  moderation_status String   @default("pending") @db.VarChar(20) // pending | approved | rejected
+  rejection_reason  String?  @db.VarChar(500)
+
+  // Timestamps
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  // Relations
+  photos            Photo[]  @relation("CommunityPostPhotos")
+  comments          CommunityComment[]
+  likes             CommunityLike[]
+  saves             CommunitySave[]
+  marketplaceTemplate MarketplaceTemplate?
+  galleryPost       GalleryPost?
+
+  @@index([stylist_id])
+  @@index([formulation_id])
+  @@index([moderation_status])
+  @@index([is_public])
+  @@index([created_at])
+  @@index([trend_score])
+  @@index([tags])
+  @@index([stylist_id, moderation_status])
+  @@index([created_at, trend_score])
+}
+
+model CommunityComment {
+  id                String   @id @default(uuid())
+
+  post_id           String
+  post              CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  author_id         String
+  author            Stylist  @relation(fields: [author_id], references: [id], onDelete: Cascade)
+
+  // Self-referential for reply threads
+  parent_id         String?
+  parent            CommunityComment? @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: SetNull)
+  replies           CommunityComment[] @relation("CommentReplies")
+
+  content           String   @db.VarChar(2000)
+  is_deleted        Boolean  @default(false)
+
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  @@index([post_id])
+  @@index([author_id])
+  @@index([parent_id])
+  @@index([created_at])
+  @@index([post_id, created_at])
+}
+
+model CommunityLike {
+  id                String   @id @default(uuid())
+
+  post_id           String
+  post              CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  stylist_id        String
+  stylist           Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+
+  created_at        DateTime @default(now())
+
+  @@unique([post_id, stylist_id])
+  @@index([post_id])
+  @@index([stylist_id])
+  @@index([created_at])
+}
+
+model CommunitySave {
+  id                String   @id @default(uuid())
+
+  post_id           String
+  post              CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+
+  stylist_id        String
+  stylist           Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+
+  created_at        DateTime @default(now())
+
+  @@unique([post_id, stylist_id])
+  @@index([post_id])
+  @@index([stylist_id])
+  @@index([created_at])
+}
+
+// =====================================================
+// MARKETPLACE: TEMPLATES, PURCHASES, REVIEWS, REVENUE
+// =====================================================
+
+model MarketplaceTemplate {
+  id                      String   @id @default(uuid())
+
+  // Source community post (one-to-one)
+  community_post_id       String   @unique
+  communityPost           CommunityPost @relation(fields: [community_post_id], references: [id], onDelete: Cascade)
+
+  // Ownership
+  stylist_id              String
+  stylist                 Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+
+  // Pricing
+  price_cents             Int      @default(0)
+
+  // Adaptation & preview data
+  adaptation_params       Json     // e.g., hair_level_range, porosity_compatible, etc.
+  preview_data            Json     // cached preview for storefront
+
+  // Listing content
+  title                   String   @db.VarChar(200)
+  description             String?  @db.VarChar(2000)
+  category                String   @db.VarChar(50)
+  tags                    String[]
+
+  // Stats
+  review_count            Int      @default(0)
+  avg_rating              Float    @default(0)
+  sales_count             Int      @default(0)
+  total_earnings_cents    Int      @default(0)
+
+  // Status
+  status                  String   @default("pending_review") @db.VarChar(20) // pending_review | approved | rejected | paused
+
+  // ByondEdu educator integration
+  is_premium              Boolean  @default(false)
+  educator_id             String?  // ByondEdu educator ID if premium template
+
+  created_at              DateTime @default(now())
+  updated_at              DateTime @default(now()) @updatedAt
+
+  // Relations
+  purchases               TemplatePurchase[]
+  reviews                 TemplateReview[]
+  trendingFeeds           TrendingFeed[]
+
+  @@index([stylist_id])
+  @@index([status])
+  @@index([category])
+  @@index([tags])
+  @@index([price_cents])
+  @@index([avg_rating])
+  @@index([sales_count])
+  @@index([is_premium])
+  @@index([educator_id])
+  @@index([status, avg_rating])
+  @@index([status, sales_count])
+  @@index([created_at, trend_score])
+}
+
+model TemplatePurchase {
+  id                String   @id @default(uuid())
+
+  buyer_stylist_id  String
+  buyer             Stylist  @relation(fields: [buyer_stylist_id], references: [id], onDelete: Cascade)
+
+  template_id       String
+  template          MarketplaceTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
+
+  // Optional: target client for adaptation
+  client_id         String?
+  client            Client?  @relation(fields: [client_id], references: [id], onDelete: SetNull)
+
+  // Financial
+  price_paid_cents  Int
+
+  // Adaptation result
+  adaptation_result Json?
+  confidence_score  Float?
+
+  // Status lifecycle
+  status            String   @default("purchased") @db.VarChar(20) // purchased | adapted | applied | refunded
+
+  purchased_at      DateTime @default(now())
+  adapted_at        DateTime?
+  applied_at        DateTime?
+  refunded_at       DateTime?
+
+  // Relations
+  revenueSplits     RevenueSplit[]
+
+  @@index([buyer_stylist_id])
+  @@index([template_id])
+  @@index([client_id])
+  @@index([status])
+  @@index([purchased_at])
+  @@index([buyer_stylist_id, status])
+}
+
+model TemplateReview {
+  id                    String   @id @default(uuid())
+
+  template_id           String
+  template              MarketplaceTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
+
+  reviewer_stylist_id   String
+  reviewer              Stylist  @relation(fields: [reviewer_stylist_id], references: [id], onDelete: Cascade)
+
+  rating                Int      // 1-5
+  comment               String?  @db.VarChar(2000)
+
+  is_verified_purchase  Boolean  @default(false)
+
+  created_at            DateTime @default(now())
+  updated_at            DateTime @default(now()) @updatedAt
+
+  @@index([template_id])
+  @@index([reviewer_stylist_id])
+  @@index([rating])
+  @@index([created_at])
+  @@index([template_id, is_verified_purchase])
+  @@index([template_id, created_at])
+}
+
+model RevenueSplit {
+  id                  String   @id @default(uuid())
+
+  purchase_id         String
+  purchase            TemplatePurchase @relation(fields: [purchase_id], references: [id], onDelete: Cascade)
+
+  recipient_type      String   @db.VarChar(30) // creator | platform | transaction_fee | byondedu
+  recipient_id        String   // Stripe account ID or internal platform ID
+
+  amount_cents        Int
+
+  status              String   @default("pending") @db.VarChar(20) // pending | paid | failed
+
+  paid_at             DateTime?
+  stripe_transfer_id  String?  @db.VarChar(100)
+
+  created_at          DateTime @default(now())
+
+  @@index([purchase_id])
+  @@index([recipient_type])
+  @@index([recipient_id])
+  @@index([status])
+  @@index([paid_at])
+  @@index([purchase_id, recipient_type])
+}
+
+// =====================================================
+// TRENDING & DISCOVERY
+// =====================================================
+
+model TrendingFeed {
+  id                String   @id @default(uuid())
+
+  feed_type         String   @db.VarChar(30) // trending | seasonal | editors_pick | new_arrivals
+
+  // Optional seasonal context
+  season            String?  @db.VarChar(20) // spring | summer | fall | winter
+
+  template_id       String
+  template          MarketplaceTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
+
+  rank_position     Int      // 1 = top of feed
+  score             Float    @default(0)
+
+  featured_until    DateTime?
+
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+
+  @@index([feed_type])
+  @@index([season])
+  @@index([template_id])
+  @@index([rank_position])
+  @@index([feed_type, rank_position])
+  @@index([feed_type, season, rank_position])
+  @@index([featured_until])
+  @@index([score])
+}
+
+// =====================================================
+// PUBLIC GALLERY (Consumer-facing)
+// =====================================================
+
+model GalleryPost {
+  id                        String   @id @default(uuid())
+
+  // One-to-one with community post
+  community_post_id         String   @unique
+  communityPost             CommunityPost @relation(fields: [community_post_id], references: [id], onDelete: Cascade)
+
+  stylist_id                String
+  stylist                   Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+
+  // Consumer engagement (denormalized)
+  consumer_likes_count      Int      @default(0)
+  consumer_saves_count      Int      @default(0)
+
+  // Featured curation
+  featured_rank             Int?
+  featured_until            DateTime?
+
+  // UpLook profile linkage
+  stylist_uplook_profile_url String
+  stylist_uplook_user_id   String?
+
+  // Seasonal curation
+  is_featured               Boolean  @default(false)
+  is_seasonal_pick          Boolean  @default(false)
+  season_tag                String?  @db.VarChar(20)
+
+  created_at                DateTime @default(now())
+  updated_at                DateTime @default(now()) @updatedAt
+
+  // Relations
+  consumerLikes             ConsumerLike[]
+  consumerSaves             ConsumerSave[]
+
+  @@index([stylist_id])
+  @@index([featured_rank])
+  @@index([is_featured])
+  @@index([is_seasonal_pick])
+  @@index([season_tag])
+  @@index([consumer_likes_count])
+  @@index([created_at])
+  @@index([is_featured, featured_rank])
+  @@index([is_seasonal_pick, season_tag])
+}
+
+model ConsumerLike {
+  id                    String   @id @default(uuid())
+
+  gallery_post_id       String
+  galleryPost           GalleryPost @relation(fields: [gallery_post_id], references: [id], onDelete: Cascade)
+
+  // Anonymous or authenticated
+  consumer_fingerprint  String?  @db.VarChar(64) // browser fingerprint for anonymous
+  consumer_email        String?  @db.VarChar(255)
+
+  created_at            DateTime @default(now())
+
+  // One like per anonymous fingerprint OR per email
+  @@unique([gallery_post_id, consumer_fingerprint])
+  @@unique([gallery_post_id, consumer_email])
+  @@index([gallery_post_id])
+  @@index([consumer_fingerprint])
+  @@index([consumer_email])
+  @@index([created_at])
+}
+
+model ConsumerSave {
+  id                    String   @id @default(uuid())
+
+  gallery_post_id       String
+  galleryPost           GalleryPost @relation(fields: [gallery_post_id], references: [id], onDelete: Cascade)
+
+  // Anonymous or authenticated
+  consumer_fingerprint  String?  @db.VarChar(64)
+  consumer_email        String?  @db.VarChar(255)
+
+  created_at            DateTime @default(now())
+
+  // One save per anonymous fingerprint OR per email
+  @@unique([gallery_post_id, consumer_fingerprint])
+  @@unique([gallery_post_id, consumer_email])
+  @@index([gallery_post_id])
+  @@index([consumer_fingerprint])
+  @@index([consumer_email])
+  @@index([created_at])
+}

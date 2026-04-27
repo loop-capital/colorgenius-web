@@ -110,8 +110,8 @@ async function start() {
   const app = await buildServer();
 
   try {
-    await app.listen({ port: config.port, host: '0.0.0.0' });
-    app.log.info(`ColorGenius API running on port ${config.port}`);
+    await app.listen({ port: config.server.port, host: '0.0.0.0' });
+    app.log.info(`ColorGenius API running on port ${config.server.port}`);
   } catch (err) {
     app.log.error(err);
     process.exit(1);

@@ -1,0 +1,80 @@
+2026-04-27 01:36:00.454 EDT [1562595] LOG:  starting PostgreSQL 16.13 (Homebrew) on x86_64-pc-linux-gnu, compiled by gcc-12 (Ubuntu 12.3.0-1ubuntu1~22.04.3) 12.3.0, 64-bit
+2026-04-27 01:36:00.456 EDT [1562595] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2026-04-27 01:36:00.466 EDT [1562595] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2026-04-27 01:36:00.470 EDT [1562604] LOG:  database system was shut down at 2026-04-27 01:35:56 EDT
+2026-04-27 01:36:00.474 EDT [1562595] LOG:  database system is ready to accept connections
+2026-04-27 01:36:11.208 EDT [1564718] FATAL:  database "jason" does not exist
+2026-04-27 01:36:16.938 EDT [1565945] ERROR:  syntax error at or near "user" at character 13
+2026-04-27 01:36:16.938 EDT [1565945] STATEMENT:  CREATE USER user WITH PASSWORD 'password';
+2026-04-27 01:36:38.263 EDT [1571412] ERROR:  relation "_prisma_migrations" does not exist at character 126
+2026-04-27 01:36:38.263 EDT [1571412] STATEMENT:  SELECT "id", "checksum", "finished_at", "migration_name", "logs", "rolled_back_at", "started_at", "applied_steps_count" FROM "_prisma_migrations" ORDER BY "started_at" ASC
+2026-04-27 01:36:38.264 EDT [1571412] ERROR:  permission denied to create database
+2026-04-27 01:36:38.264 EDT [1571412] STATEMENT:  CREATE DATABASE "prisma_migrate_shadow_db_7b682bd1-b418-49cc-b280-dbcfdbc49a51"
+2026-04-27 01:36:47.063 EDT [1573793] ERROR:  relation "_prisma_migrations" does not exist at character 126
+2026-04-27 01:36:47.063 EDT [1573793] STATEMENT:  SELECT "id", "checksum", "finished_at", "migration_name", "logs", "rolled_back_at", "started_at", "applied_steps_count" FROM "_prisma_migrations" ORDER BY "started_at" ASC
+2026-04-27 01:36:47.213 EDT [1562602] LOG:  checkpoint starting: immediate force wait
+2026-04-27 01:36:47.300 EDT [1562602] LOG:  checkpoint complete: wrote 935 buffers (5.7%); 1 WAL file(s) added, 0 removed, 0 recycled; write=0.018 s, sync=0.041 s, total=0.087 s; sync files=308, longest=0.003 s, average=0.001 s; distance=8570 kB, estimate=8570 kB; lsn=0/1D550C0, redo lsn=0/1D55088
+2026-04-27 01:36:47.441 EDT [1562602] LOG:  checkpoint starting: immediate force wait
+2026-04-27 01:36:47.455 EDT [1562602] LOG:  checkpoint complete: wrote 7 buffers (0.0%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.002 s, sync=0.003 s, total=0.014 s; sync files=7, longest=0.002 s, average=0.001 s; distance=4284 kB, estimate=8141 kB; lsn=0/2184428, redo lsn=0/21843F0
+2026-04-27 01:36:47.463 EDT [1573793] ERROR:  permission denied for schema public at character 14
+2026-04-27 01:36:47.463 EDT [1573793] STATEMENT:  CREATE TABLE _prisma_migrations (
+	    id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+	    checksum                VARCHAR(64) NOT NULL,
+	    finished_at             TIMESTAMPTZ,
+	    migration_name          VARCHAR(255) NOT NULL,
+	    logs                    TEXT,
+	    rolled_back_at          TIMESTAMPTZ,
+	    started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+	    applied_steps_count     INTEGER NOT NULL DEFAULT 0
+	);
+	
+2026-04-27 01:37:03.383 EDT [1577469] ERROR:  relation "_prisma_migrations" does not exist at character 126
+2026-04-27 01:37:03.383 EDT [1577469] STATEMENT:  SELECT "id", "checksum", "finished_at", "migration_name", "logs", "rolled_back_at", "started_at", "applied_steps_count" FROM "_prisma_migrations" ORDER BY "started_at" ASC
+2026-04-27 01:37:03.473 EDT [1562602] LOG:  checkpoint starting: immediate force wait
+2026-04-27 01:37:03.482 EDT [1562602] LOG:  checkpoint complete: wrote 9 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.003 s, total=0.010 s; sync files=9, longest=0.002 s, average=0.001 s; distance=4286 kB, estimate=7755 kB; lsn=0/25B3DA8, redo lsn=0/25B3D70
+2026-04-27 01:37:03.595 EDT [1562602] LOG:  checkpoint starting: immediate force wait
+2026-04-27 01:37:03.614 EDT [1562602] LOG:  checkpoint complete: wrote 7 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.007 s, sync=0.003 s, total=0.020 s; sync files=7, longest=0.002 s, average=0.001 s; distance=4285 kB, estimate=7408 kB; lsn=0/29E3438, redo lsn=0/29E3400
+2026-04-27 01:37:03.622 EDT [1577469] ERROR:  permission denied for schema public at character 14
+2026-04-27 01:37:03.622 EDT [1577469] STATEMENT:  CREATE TABLE _prisma_migrations (
+	    id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+	    checksum                VARCHAR(64) NOT NULL,
+	    finished_at             TIMESTAMPTZ,
+	    migration_name          VARCHAR(255) NOT NULL,
+	    logs                    TEXT,
+	    rolled_back_at          TIMESTAMPTZ,
+	    started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+	    applied_steps_count     INTEGER NOT NULL DEFAULT 0
+	);
+	
+2026-04-27 01:37:12.703 EDT [1580063] ERROR:  relation "_prisma_migrations" does not exist at character 126
+2026-04-27 01:37:12.703 EDT [1580063] STATEMENT:  SELECT "id", "checksum", "finished_at", "migration_name", "logs", "rolled_back_at", "started_at", "applied_steps_count" FROM "_prisma_migrations" ORDER BY "started_at" ASC
+2026-04-27 01:37:12.790 EDT [1562602] LOG:  checkpoint starting: immediate force wait
+2026-04-27 01:37:12.802 EDT [1562602] LOG:  checkpoint complete: wrote 7 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.003 s, total=0.012 s; sync files=7, longest=0.002 s, average=0.001 s; distance=4285 kB, estimate=7096 kB; lsn=0/2E12C28, redo lsn=0/2E12BF0
+2026-04-27 01:37:12.907 EDT [1562602] LOG:  checkpoint starting: immediate force wait
+2026-04-27 01:37:12.921 EDT [1562602] LOG:  checkpoint complete: wrote 7 buffers (0.0%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.002 s, sync=0.003 s, total=0.015 s; sync files=7, longest=0.002 s, average=0.001 s; distance=4286 kB, estimate=6815 kB; lsn=0/3242588, redo lsn=0/3242550
+2026-04-27 01:37:12.928 EDT [1580063] ERROR:  permission denied for schema public at character 14
+2026-04-27 01:37:12.928 EDT [1580063] STATEMENT:  CREATE TABLE _prisma_migrations (
+	    id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+	    checksum                VARCHAR(64) NOT NULL,
+	    finished_at             TIMESTAMPTZ,
+	    migration_name          VARCHAR(255) NOT NULL,
+	    logs                    TEXT,
+	    rolled_back_at          TIMESTAMPTZ,
+	    started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+	    applied_steps_count     INTEGER NOT NULL DEFAULT 0
+	);
+	
+2026-04-27 01:37:52.728 EDT [1588751] ERROR:  relation "_prisma_migrations" does not exist at character 126
+2026-04-27 01:37:52.728 EDT [1588751] STATEMENT:  SELECT "id", "checksum", "finished_at", "migration_name", "logs", "rolled_back_at", "started_at", "applied_steps_count" FROM "_prisma_migrations" ORDER BY "started_at" ASC
+2026-04-27 01:37:52.822 EDT [1562602] LOG:  checkpoint starting: immediate force wait
+2026-04-27 01:37:52.835 EDT [1562602] LOG:  checkpoint complete: wrote 47 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.004 s, total=0.014 s; sync files=17, longest=0.002 s, average=0.001 s; distance=4573 kB, estimate=6591 kB; lsn=0/36B9AA0, redo lsn=0/36B9A68
+2026-04-27 01:37:52.943 EDT [1562602] LOG:  checkpoint starting: immediate force wait
+2026-04-27 01:37:52.953 EDT [1562602] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.003 s, total=0.011 s; sync files=4, longest=0.002 s, average=0.001 s; distance=4333 kB, estimate=6365 kB; lsn=0/3AF4FC8, redo lsn=0/3AF4F90
+2026-04-27 01:42:53.054 EDT [1562602] LOG:  checkpoint starting: time
+2026-04-27 01:43:11.985 EDT [1562602] LOG:  checkpoint complete: wrote 189 buffers (1.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=18.852 s, sync=0.068 s, total=18.932 s; sync files=148, longest=0.005 s, average=0.001 s; distance=941 kB, estimate=5823 kB; lsn=0/3BE04B8, redo lsn=0/3BE0480
+2026-04-27 08:09:43.390 EDT [1562595] LOG:  received smart shutdown request
+2026-04-27 08:09:43.461 EDT [1562595] LOG:  background worker "logical replication launcher" (PID 1562608) exited with exit code 1
+2026-04-27 08:09:43.463 EDT [1562602] LOG:  shutting down
+2026-04-27 08:09:43.467 EDT [1562602] LOG:  checkpoint starting: shutdown immediate
+2026-04-27 08:09:43.550 EDT [1562602] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.061 s, sync=0.001 s, total=0.086 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=5240 kB; lsn=0/3BE0568, redo lsn=0/3BE0568
+2026-04-27 08:09:43.567 EDT [1562595] LOG:  database system is shut down

@@ -1,62 +1,99 @@
-# ColorGenius Color Science Engine
+# ColorGenius Engine
 
-Scientific computing engine for hair color analysis and formulation.
+Professional hair color science engine for ColorGenius.
 
-## Features
+## Installation
 
-- Level system calculations (1-10 scale)
-- Developer volume recommendations
-- Tone neutralization logic
-- Gray coverage formulation
-- Lift and deposit calculations
-- Color difference (Delta E) calculations
+```bash
+pip install -e .
+```
 
 ## Quick Start
 
-```bash
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Linux/Mac
-# or: .venv\Scripts\activate  # Windows
+```python
+from colorgenius.engine import HairAnalyzer, FormulationEngine, ColorConverter
+from colorgenius.engine.formulation.models import (
+    FormulationInput, TargetColor, CurrentHairState, 
+    HairProfile, ClientFactors, FormulationPreferences
+)
 
-# Install dependencies
-pip install -r requirements.txt
+# Analyze hair from photo
+analyzer = HairAnalyzer()
+result = analyzer.analyze(image_array)
 
-# Run the API server
-uvicorn src.api:app --reload --port 8000
+# Generate formulation
+engine = FormulationEngine()
+input_data = FormulationInput(
+    target=TargetColor(level=6, primary_tone="N"),
+    current=CurrentHairState(level=3, tone="N", is_virgin=True),
+    hair_profile=HairProfile(texture="medium", density="medium"),
+    client=ClientFactors(gray_percentage=0),
+    preferences=FormulationPreferences(preferred_brand="wella")
+)
+formula = engine.formulate(input_data)
 ```
 
-## API Endpoints
+## Modules
 
-- `GET /health` - Health check
-- `POST /analyze/color` - Extract color from image region
-- `POST /formulate/developer` - Recommend developer volume
-- `POST /formulate/level` - Calculate level changes
-- `POST /color/delta-e` - Calculate color difference
+### Color Science (`color_science/`)
 
-## Architecture
+- `conversions.py` - RGB, Lab, LCH, HSL conversions using colormath
+- `models.py` - Color level (1-10), tone families, shade profiles
 
-```
-engine/
-├── src/
-│   ├── api/           # FastAPI endpoints
-│   ├── core/          # Core color science logic
-│   ├── color/         # Color theory implementations
-│   └── models/        # Data models
-├── data/              # Reference data (shade databases)
-├── tests/             # Unit tests
-└── notebooks/         # Research notebooks
-```
+### Hair Analysis (`hair_analysis/`)
 
-## Development
+- `analyzer.py` - Main orchestrator for photo analysis
+- `color_extract.py` - Dominant color extraction from hair regions
+- `undertone.py` - Undertone detection (warm/cool/neutral)
 
-```bash
-# Run tests
-pytest
+### Formulation (`formulation/`)
 
-# Type check
-mypy src
+- `engine.py` - Main formulation algorithm
+- `database.py` - Color line database (Schwarzkopf, Redken, Wella, Matrix)
+- `models.py` - Formulation input/output models
 
-# Lint
-ruff check src
-```
+## Color Levels (1-10 Scale)
+
+| Level | Description | Melanin % |
+|-------|-------------|-----------|
+| 1 | Black | ~95% |
+| 2 | Very Dark Brown | ~85% |
+| 3 | Dark Brown | ~75% |
+| 4 | Medium Brown | ~60% |
+| 5 | Light Brown | ~45% |
+| 6 | Dark Blonde | ~30% |
+| 7 | Medium Blonde | ~20% |
+| 8 | Light Blonde | ~12% |
+| 9 | Very Light Blonde | ~6% |
+| 10 | Platinum/Lightest | ~2% |
+
+## Tone Families
+
+- **N** - Natural/Neutral
+- **A** - Ash (cool)
+- **G** - Gold (warm)
+- **C** - Copper
+- **R** - Red
+- **V** - Violet
+- **B** - Beige
+- **P** - Pearl
+
+## Supported Brands
+
+- Schwarzkopf (IGORA ROYAL, BlondMe)
+- Wella (Koleston Perfect ME+, Illumina Color)
+- Redken (Shades EQ, Color Gels Lacquers)
+- Matrix (SoColor, Color Sync)
+- Joico, Goldwell, Kenra
+
+## Dependencies
+
+- numpy, scipy
+- Pillow
+- colormath, colour-science
+- scikit-image, opencv-python-headless
+- pydantic, pyyaml
+
+## License
+
+MIT - ClawStudio
