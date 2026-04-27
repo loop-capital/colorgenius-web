@@ -1,20 +1,72 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { FormulaCard } from '@/components/ui/formula-card'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { TreatmentCard } from '@/components/custom'
+import { GlassCard } from '@/components/custom'
+import { ColorWheel3D } from '@/components/custom'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Search, Save, Edit3, Trash2, X, FlaskConical, Filter, Grid3X3, LayoutList } from 'lucide-react'
+  Search, Save, Edit3, Trash2, X, FlaskConical, Filter,
+  Grid3X3, LayoutList, ChevronRight,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+/* Inline custom components — no shadcn Card/Badge/Button */
+
+function ActionButton({
+  children,
+  onClick,
+  variant = 'primary',
+  disabled = false,
+  className,
+}: {
+  children: React.ReactNode
+  onClick?: (e?: any) => void
+  variant?: 'primary' | 'outline' | 'ghost'
+  disabled?: boolean
+  className?: string
+}) {
+  const base = 'inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+  const styles = {
+    primary: 'text-[#0A0A0A] hover:opacity-90 active:scale-[0.98]',
+    outline: 'bg-transparent border hover:text-[#F5F5F7] active:scale-[0.98]',
+    ghost: 'bg-transparent hover:bg-white/[0.04] active:scale-[0.98]',
+  }
+  const bg = variant === 'primary'
+    ? { background: 'var(--cg-gradient-teal)' }
+    : variant === 'outline'
+      ? { borderColor: 'rgba(255,255,255,0.12)', color: 'var(--cg-text-secondary)' }
+      : { color: 'var(--cg-text-secondary)' }
+
+  return (
+    <motion.button
+      className={cn(base, styles[variant], className)}
+      style={bg}
+      onClick={onClick}
+      disabled={disabled}
+      whileHover={{ y: -1 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      {children}
+    </motion.button>
+  )
+}
+
+function TagPill({ label }: { label: string }) {
+  return (
+    <div
+      className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border"
+      style={{
+        color: 'var(--cg-text-tertiary)',
+        borderColor: 'rgba(255,255,255,0.08)',
+        background: 'rgba(255,255,255,0.03)',
+      }}
+    >
+      {label}
+    </div>
+  )
+}
 
 interface Formula {
   id: string
@@ -50,7 +102,7 @@ const MOCK_FORMULAS: Formula[] = [
     processingTime: '35 minutes',
     application: 'Balayage',
     coverage: 'Partial',
-    notes: 'Apply to mid-lengths and ends using balayage technique. Process for 30-40 minutes depending on desired lift. Tone if necessary with Wella Color Touch 10VG.',
+    notes: 'Apply to mid-lengths and ends using balayage technique. Process for 30-40 minutes.',
     shades: [
       { code: '7/73', name: 'Golden Blonde', hex: '#C08C5A' },
       { code: '8/73', name: 'Light Golden Blonde', hex: '#D4AA7D' },
@@ -71,7 +123,7 @@ const MOCK_FORMULAS: Formula[] = [
     processingTime: '30 minutes',
     application: 'Root application',
     coverage: 'Full',
-    notes: 'Section hair into quadrants. Apply directly to regrowth only. Process 25-30 minutes for resistant grays. Shampoo and condition with color-safe products.',
+    notes: 'Section hair into quadrants. Apply directly to regrowth only.',
     shades: [
       { code: '5-0', name: 'Light Brown Natural', hex: '#7D5038' },
     ],
@@ -91,7 +143,7 @@ const MOCK_FORMULAS: Formula[] = [
     processingTime: '20 minutes',
     application: 'Global',
     coverage: 'Full',
-    notes: 'Pre-lighten to level 8 before applying. Mix equal parts Rose and Pink. Process under low heat for 15-20 minutes. Rinse in cool water.',
+    notes: 'Pre-lighten to level 8 before applying. Mix equal parts Rose and Pink.',
     shades: [
       { code: 'R', name: 'Vivid Red', hex: '#D44444' },
       { code: 'P', name: 'Pink', hex: '#E892A0' },
@@ -112,7 +164,7 @@ const MOCK_FORMULAS: Formula[] = [
     processingTime: '45 minutes',
     application: 'Zone application',
     coverage: 'Partial',
-    notes: 'Pre-tone with 9V to neutralize warmth. Apply ash formula to mid-lengths first, then roots. Process 40-45 minutes. Use bonding additive for compromised hair.',
+    notes: 'Pre-tone with 9V to neutralize warmth. Apply ash formula to mid-lengths first.',
     shades: [
       { code: '8A', name: 'Light Blonde Ash', hex: '#C4B0A0' },
       { code: '7A', name: 'Medium Blonde Ash', hex: '#A89080' },
@@ -132,12 +184,24 @@ const LINES_BY_BRAND: Record<string, string[]> = MOCK_FORMULAS.reduce(
   {} as Record<string, string[]>
 )
 
+const TONE_OPTIONS = [
+  { value: 'neutral', label: 'Natural', color: '#9C8B7A' },
+  { value: 'ash', label: 'Ash', color: '#8A7D6E' },
+  { value: 'golden', label: 'Golden', color: '#C4A35A' },
+  { value: 'copper', label: 'Copper', color: '#B87333' },
+  { value: 'red', label: 'Red', color: '#A03030' },
+  { value: 'violet', label: 'Violet', color: '#7B68A6' },
+  { value: 'pearl', label: 'Pearl', color: '#B8B0C4' },
+  { value: 'beige', label: 'Beige', color: '#C4B5A0' },
+]
+
 type ViewMode = 'grid' | 'table'
 
 export default function LibraryPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterBrand, setFilterBrand] = useState('')
   const [filterLine, setFilterLine] = useState('')
+  const [filterTone, setFilterTone] = useState('')
   const [selectedFormula, setSelectedFormula] = useState<Formula | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
@@ -155,133 +219,254 @@ export default function LibraryPage() {
     }
     if (filterBrand) result = result.filter((f) => f.brand === filterBrand)
     if (filterLine) result = result.filter((f) => f.line === filterLine)
+    if (filterTone) {
+      result = result.filter((f) =>
+        f.tags.some((t) => t.toLowerCase().includes(filterTone.toLowerCase())) ||
+        f.name.toLowerCase().includes(filterTone.toLowerCase())
+      )
+    }
     return result
-  }, [searchTerm, filterBrand, filterLine])
+  }, [searchTerm, filterBrand, filterLine, filterTone])
 
   const linesForBrand = filterBrand ? LINES_BY_BRAND[filterBrand] || [] : []
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8" style={{ background: 'var(--cg-bg-deep)' }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <motion.div
+          className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6"
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F5]">Formula Library</h1>
-            <p className="text-sm text-[#A3A3A3] mt-1">Browse, search, and manage your color formulas</p>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
+              Formula <span className="gradient-text-gold">Library</span>
+            </h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--cg-text-secondary)' }}>
+              Browse, search, and manage your color formulas
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button
+            <ActionButton
               variant="outline"
-              size="sm"
               onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
-              className="bg-transparent border-[#2A2A2A] text-[#A3A3A3] hover:text-[#F5F5F5] hover:border-[#3A3A3A]"
             >
               {viewMode === 'grid' ? <LayoutList className="w-4 h-4 mr-1.5" /> : <Grid3X3 className="w-4 h-4 mr-1.5" />}
               {viewMode === 'grid' ? 'Table' : 'Grid'}
-            </Button>
-            <Button
-              size="sm"
-              className="bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF] text-[#0A0A0A] font-semibold hover:opacity-90"
-            >
+            </ActionButton>
+            <ActionButton>
               <Save className="mr-1.5 h-4 w-4" />
               Save Formula
-            </Button>
+            </ActionButton>
           </div>
-        </div>
+        </motion.div>
 
         {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-3 mb-6">
+        <motion.div
+          className="flex flex-col md:flex-row gap-3 mb-6"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          {/* Custom search bar — no shadcn Input */}
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#737373]" />
-            <Input
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+              style={{ color: 'var(--cg-text-tertiary)' }}
+            />
+            <input
+              type="text"
               placeholder="Search formulas by name, client, or notes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 bg-[#1A1A1A] border-[#2A2A2A] text-[#F5F5F5] placeholder:text-[#737373] focus-visible:ring-[#14B8A6]/40"
+              className={cn(
+                'w-full pl-9 pr-4 py-2.5 rounded-xl text-sm transition-all duration-200',
+                'placeholder:text-[#71717A]',
+                'focus:outline-none focus:ring-2'
+              )}
+              style={{
+                background: 'var(--cg-surface)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'var(--cg-text-primary)',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(20,184,166,0.4)'
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20,184,166,0.1)'
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Select
               value={filterBrand}
               onValueChange={(value) => { setFilterBrand(value); setFilterLine('') }}
             >
-              <SelectTrigger className="w-40 bg-[#1A1A1A] border-[#2A2A2A] text-[#F5F5F5]">
-                <Filter className="w-3.5 h-3.5 mr-1.5 text-[#737373]" />
+              <SelectTrigger
+                className="w-40"
+                style={{
+                  background: 'var(--cg-surface)',
+                  borderColor: 'rgba(255,255,255,0.08)',
+                  color: 'var(--cg-text-primary)',
+                }}
+              >
+                <Filter className="w-3.5 h-3.5 mr-1.5" style={{ color: 'var(--cg-text-tertiary)' }} />
                 <SelectValue placeholder="All brands" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+              <SelectContent style={{ background: 'var(--cg-surface)', borderColor: 'rgba(255,255,255,0.08)' }}>
                 <SelectItem value="">All brands</SelectItem>
                 {BRANDS.map((brand) => (
-                  <SelectItem key={brand} value={brand} className="text-[#F5F5F5]">{brand}</SelectItem>
+                  <SelectItem key={brand} value={brand} className="text-[#F5F5F7]">{brand}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
             <Select value={filterLine} onValueChange={setFilterLine} disabled={!filterBrand}>
-              <SelectTrigger className="w-40 bg-[#1A1A1A] border-[#2A2A2A] text-[#F5F5F5]">
+              <SelectTrigger
+                className="w-40"
+                style={{
+                  background: 'var(--cg-surface)',
+                  borderColor: 'rgba(255,255,255,0.08)',
+                  color: 'var(--cg-text-primary)',
+                }}
+              >
                 <SelectValue placeholder="All lines" />
               </SelectTrigger>
-              <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+              <SelectContent style={{ background: 'var(--cg-surface)', borderColor: 'rgba(255,255,255,0.08)' }}>
                 <SelectItem value="">All lines</SelectItem>
                 {linesForBrand.map((line) => (
-                  <SelectItem key={line} value={line} className="text-[#F5F5F5]">{line}</SelectItem>
+                  <SelectItem key={line} value={line} className="text-[#F5F5F7]">{line}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-        </div>
+        </motion.div>
+
+        {/* Tone filter — ColorWheel3D */}
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+        >
+          <p className="text-[10px] uppercase tracking-wider font-semibold mb-3" style={{ color: 'var(--cg-text-tertiary)' }}>
+            Filter by Tone
+          </p>
+          <div className="flex items-center gap-4">
+            <ColorWheel3D
+              tones={TONE_OPTIONS}
+              selected={filterTone as any}
+              onSelect={(val) => setFilterTone(filterTone === val ? '' : val)}
+            />
+            <div className="flex flex-wrap gap-2">
+              {TONE_OPTIONS.map((tone) => (
+                <motion.button
+                  key={tone.value}
+                  onClick={() => setFilterTone(filterTone === tone.value ? '' : tone.value)}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200'
+                  )}
+                  style={{
+                    backgroundColor: filterTone === tone.value ? `${tone.color}15` : 'rgba(255,255,255,0.03)',
+                    borderColor: filterTone === tone.value ? `${tone.color}40` : 'rgba(255,255,255,0.06)',
+                    color: filterTone === tone.value ? tone.color : 'var(--cg-text-secondary)',
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: tone.color }} />
+                  {tone.label}
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        </motion.div>
 
         {/* Results count */}
         <div className="flex items-center justify-between mb-4">
-          <p className="text-xs text-[#737373]">
-            Showing <span className="text-[#F5F5F5] font-medium">{filteredFormulas.length}</span> of {MOCK_FORMULAS.length} formulas
+          <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
+            Showing <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>{filteredFormulas.length}</span> of {MOCK_FORMULAS.length} formulas
           </p>
         </div>
 
         {filteredFormulas.length === 0 ? (
-          <div className="text-center py-16">
-            <FlaskConical className="h-12 w-12 text-[#2A2A2A] mx-auto mb-4" />
-            <p className="text-[#737373]">No formulas found. Save your first formula to build your library.</p>
-          </div>
+          <motion.div
+            className="text-center py-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <FlaskConical className="h-12 w-12 mx-auto mb-4" style={{ color: 'rgba(255,255,255,0.06)' }} />
+            <p style={{ color: 'var(--cg-text-tertiary)' }}>No formulas found. Save your first formula to build your library.</p>
+          </motion.div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredFormulas.map((formula) => (
-              <FormulaCard
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {filteredFormulas.map((formula, i) => (
+              <motion.div
                 key={formula.id}
-                {...formula}
-                mixRatio="1:1"
-                onClick={() => setSelectedFormula(formula)}
-              />
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06 }}
+              >
+                <TreatmentCard
+                  name={formula.name}
+                  brand={formula.brand}
+                  line={formula.line}
+                  shades={formula.shades}
+                  developer={formula.developer}
+                  developerVolume={formula.developerVolume}
+                  mixRatio="1:1"
+                  processingTime={formula.processingTime}
+                  application={formula.application}
+                  confidence={formula.confidence}
+                  notes={formula.notes}
+                  onClick={() => setSelectedFormula(formula)}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-[#2A2A2A] bg-[#171717]">
+          <motion.div
+            className="overflow-x-auto rounded-xl"
+            style={{ border: '1px solid rgba(255,255,255,0.06)', background: 'var(--cg-surface)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
             <table className="w-full text-sm">
-              <thead className="bg-[#1A1A1A]">
+              <thead style={{ background: 'rgba(255,255,255,0.02)' }}>
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#737373] uppercase tracking-wider">Formula Name</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#737373] uppercase tracking-wider">Client</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#737373] uppercase tracking-wider">Brand / Line</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[#737373] uppercase tracking-wider">Shades</th>
-                  <th className="text-center px-4 py-3 text-xs font-semibold text-[#737373] uppercase tracking-wider">Confidence</th>
-                  <th className="text-center px-4 py-3 text-xs font-semibold text-[#737373] uppercase tracking-wider">Actions</th>
+                  {['Formula Name', 'Client', 'Brand / Line', 'Shades', 'Confidence', 'Actions'].map((h) => (
+                    <th
+                      key={h}
+                      className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider"
+                      style={{ color: 'var(--cg-text-tertiary)' }}
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2A2A2A]">
+              <tbody className="divide-y" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                 {filteredFormulas.map((formula) => (
                   <tr
                     key={formula.id}
-                    className="hover:bg-[#1A1A1A]/50 transition-colors cursor-pointer"
+                    className="hover:bg-white/[0.02] transition-colors cursor-pointer"
                     onClick={() => setSelectedFormula(formula)}
                   >
                     <td className="px-4 py-3">
-                      <p className="font-medium text-[#F5F5F5]">{formula.name}</p>
-                      <p className="text-xs text-[#737373]">{formula.application} · {formula.processingTime}</p>
+                      <p className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>{formula.name}</p>
+                      <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>{formula.application} · {formula.processingTime}</p>
                     </td>
-                    <td className="px-4 py-3 text-[#A3A3A3]">{formula.clientName || '-'}</td>
-                    <td className="px-4 py-3 text-[#A3A3A3]">
-                      {formula.brand} <span className="text-[#737373]">·</span> {formula.line}
+                    <td className="px-4 py-3" style={{ color: 'var(--cg-text-secondary)' }}>{formula.clientName || '-'}</td>
+                    <td className="px-4 py-3" style={{ color: 'var(--cg-text-secondary)' }}>
+                      {formula.brand} <span style={{ color: 'var(--cg-text-tertiary)' }}>·</span> {formula.line}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
@@ -292,119 +477,184 @@ export default function LibraryPage() {
                               style={{ backgroundColor: shade.hex }}
                               title={shade.name}
                             />
-                            <span className="text-[10px] text-[#737373] font-mono">{shade.code}</span>
+                            <span className="text-[10px] font-mono" style={{ color: 'var(--cg-text-tertiary)' }}>{shade.code}</span>
                           </div>
                         ))}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          'text-xs border-0',
-                          formula.confidence >= 90 ? 'bg-emerald-400/10 text-emerald-400' : 'bg-[#F59E0B]/10 text-[#F59E0B]'
-                        )}
+                      <div
+                        className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border"
+                        style={{
+                          color: formula.confidence >= 90 ? '#14B8A6' : '#F59E0B',
+                          borderColor: formula.confidence >= 90 ? 'rgba(20,184,166,0.3)' : 'rgba(245,158,11,0.3)',
+                          backgroundColor: formula.confidence >= 90 ? 'rgba(20,184,166,0.08)' : 'rgba(245,158,11,0.08)',
+                        }}
                       >
                         {formula.confidence}%
-                      </Badge>
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-[#737373] hover:text-[#F5F5F5]">
+                        <ActionButton variant="ghost" className="!p-2 !rounded-lg" onClick={(e) => e.stopPropagation()}>
                           <Edit3 className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-[#737373] hover:text-red-400">
+                        </ActionButton>
+                        <ActionButton variant="ghost" className="!p-2 !rounded-lg" onClick={(e) => e.stopPropagation()}>
                           <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                        </ActionButton>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </motion.div>
         )}
       </div>
 
       {/* Detail Modal */}
-      {selectedFormula && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-[#171717] rounded-xl border border-[#2A2A2A] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-[#171717] border-b border-[#2A2A2A] px-6 py-4 flex justify-between items-start z-10">
-              <div>
-                <h2 className="text-lg font-bold text-[#F5F5F5]">{selectedFormula.name}</h2>
-                <p className="text-xs text-[#737373]">{selectedFormula.brand} · {selectedFormula.line}</p>
+      <AnimatePresence>
+        {selectedFormula && (
+          <motion.div
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+            style={{ backdropFilter: 'blur(8px)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              style={{
+                background: 'var(--cg-bg-primary)',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            >
+              {/* Modal header */}
+              <div
+                className="sticky top-0 px-6 py-4 flex justify-between items-start z-10"
+                style={{
+                  background: 'var(--cg-bg-primary)',
+                  borderBottom: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <div>
+                  <h2 className="text-lg font-bold" style={{ color: 'var(--cg-text-primary)' }}>{selectedFormula.name}</h2>
+                  <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>{selectedFormula.brand} · {selectedFormula.line}</p>
+                </div>
+                <ActionButton variant="ghost" className="!p-2 !rounded-lg" onClick={() => setSelectedFormula(null)}>
+                  <X className="h-4 w-4" />
+                </ActionButton>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setSelectedFormula(null)} className="text-[#737373] hover:text-[#F5F5F5]">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
 
-            <div className="px-6 py-4 space-y-5">
-              <div className="grid grid-cols-2 gap-3">
-                <Card className="bg-[#1A1A1A] border-[#2A2A2A]">
-                  <CardContent className="p-4 space-y-1 text-sm">
-                    <p><span className="text-[#737373]">Client:</span> <span className="text-[#F5F5F5]">{selectedFormula.clientName}</span></p>
-                    <p><span className="text-[#737373]">Created:</span> <span className="text-[#F5F5F5]">{new Date(selectedFormula.createdAt).toLocaleDateString()}</span></p>
-                    <p><span className="text-[#737373]">Application:</span> <span className="text-[#F5F5F5]">{selectedFormula.application}</span></p>
-                    <p><span className="text-[#737373]">Coverage:</span> <span className="text-[#F5F5F5]">{selectedFormula.coverage}</span></p>
-                  </CardContent>
-                </Card>
+              <div className="px-6 py-4 space-y-5">
+                {/* Info cards */}
+                <div className="grid grid-cols-2 gap-3">
+                  <GlassCard className="p-4 space-y-1 text-sm">
+                    <p>
+                      <span style={{ color: 'var(--cg-text-tertiary)' }}>Client:</span>{' '}
+                      <span style={{ color: 'var(--cg-text-primary)' }}>{selectedFormula.clientName}</span>
+                    </p>
+                    <p>
+                      <span style={{ color: 'var(--cg-text-tertiary)' }}>Created:</span>{' '}
+                      <span style={{ color: 'var(--cg-text-primary)' }}>{new Date(selectedFormula.createdAt).toLocaleDateString()}</span>
+                    </p>
+                    <p>
+                      <span style={{ color: 'var(--cg-text-tertiary)' }}>Application:</span>{' '}
+                      <span style={{ color: 'var(--cg-text-primary)' }}>{selectedFormula.application}</span>
+                    </p>
+                    <p>
+                      <span style={{ color: 'var(--cg-text-tertiary)' }}>Coverage:</span>{' '}
+                      <span style={{ color: 'var(--cg-text-primary)' }}>{selectedFormula.coverage}</span>
+                    </p>
+                  </GlassCard>
 
-                <Card className="bg-[#1A1A1A] border-[#2A2A2A]">
-                  <CardContent className="p-4 space-y-1 text-sm">
-                    <p><span className="text-[#737373]">Developer:</span> <span className="text-[#F5F5F5]">{selectedFormula.developer} ({selectedFormula.developerVolume})</span></p>
-                    <p><span className="text-[#737373]">Total Volume:</span> <span className="text-[#F5F5F5]">{selectedFormula.totalVolume}</span></p>
-                    <p><span className="text-[#737373]">Processing:</span> <span className="text-[#F5F5F5]">{selectedFormula.processingTime}</span></p>
-                    <p><span className="text-[#737373]">Confidence:</span> <span className="text-[#14B8A6] font-medium">{selectedFormula.confidence}%</span></p>
-                  </CardContent>
-                </Card>
-              </div>
+                  <GlassCard className="p-4 space-y-1 text-sm">
+                    <p>
+                      <span style={{ color: 'var(--cg-text-tertiary)' }}>Developer:</span>{' '}
+                      <span style={{ color: 'var(--cg-text-primary)' }}>{selectedFormula.developer} ({selectedFormula.developerVolume})</span>
+                    </p>
+                    <p>
+                      <span style={{ color: 'var(--cg-text-tertiary)' }}>Total Volume:</span>{' '}
+                      <span style={{ color: 'var(--cg-text-primary)' }}>{selectedFormula.totalVolume}</span>
+                    </p>
+                    <p>
+                      <span style={{ color: 'var(--cg-text-tertiary)' }}>Processing:</span>{' '}
+                      <span style={{ color: 'var(--cg-text-primary)' }}>{selectedFormula.processingTime}</span>
+                    </p>
+                    <p>
+                      <span style={{ color: 'var(--cg-text-tertiary)' }}>Confidence:</span>{' '}
+                      <span className="font-medium" style={{ color: 'var(--cg-teal)' }}>{selectedFormula.confidence}%</span>
+                    </p>
+                  </GlassCard>
+                </div>
 
-              {/* Shade swatches in modal */}
-              <div>
-                <h3 className="text-xs text-[#737373] uppercase tracking-wider font-semibold mb-2">Shades</h3>
-                <div className="flex gap-3">
-                  {selectedFormula.shades.map((shade) => (
-                    <div key={shade.code} className="flex items-center gap-2 p-2 rounded-lg bg-[#1A1A1A] border border-[#2A2A2A]">
-                      <div className="w-8 h-8 rounded-md border border-white/[0.08]" style={{ backgroundColor: shade.hex }} />
-                      <div>
-                        <p className="text-xs font-medium text-[#F5F5F5]">{shade.code}</p>
-                        <p className="text-[10px] text-[#737373]">{shade.name}</p>
+                {/* Shade swatches */}
+                <div>
+                  <h3 className="text-xs uppercase tracking-wider font-semibold mb-2" style={{ color: 'var(--cg-text-tertiary)' }}>
+                    Shades
+                  </h3>
+                  <div className="flex gap-3">
+                    {selectedFormula.shades.map((shade) => (
+                      <div
+                        key={shade.code}
+                        className="flex items-center gap-2 p-2 rounded-xl"
+                        style={{
+                          background: 'var(--cg-surface)',
+                          border: '1px solid rgba(255,255,255,0.06)',
+                        }}
+                      >
+                        <div
+                          className="w-8 h-8 rounded-md border border-white/[0.08]"
+                          style={{ backgroundColor: shade.hex }}
+                        />
+                        <div>
+                          <p className="text-xs font-medium" style={{ color: 'var(--cg-text-primary)' }}>{shade.code}</p>
+                          <p className="text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>{shade.name}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tags */}
+                <div>
+                  <h3 className="text-xs uppercase tracking-wider font-semibold mb-2" style={{ color: 'var(--cg-text-tertiary)' }}>
+                    Tags
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedFormula.tags.map((tag) => (
+                      <TagPill key={tag} label={tag} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div className="pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  <h3 className="text-xs uppercase tracking-wider font-semibold mb-2" style={{ color: 'var(--cg-text-tertiary)' }}>
+                    Application Notes
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--cg-text-secondary)' }}>
+                    {selectedFormula.notes}
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex justify-end gap-3 pt-2">
+                  <ActionButton variant="outline" onClick={() => setSelectedFormula(null)}>
+                    Close
+                  </ActionButton>
+                  <ActionButton onClick={() => {}}>
+                    Use Formula <ChevronRight className="h-4 w-4 ml-1" />
+                  </ActionButton>
                 </div>
               </div>
-
-              <div>
-                <h3 className="text-xs text-[#737373] uppercase tracking-wider font-semibold mb-2">Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedFormula.tags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="bg-[#1A1A1A] border-[#2A2A2A] text-[#A3A3A3] text-[10px]">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-[#2A2A2A]">
-                <h3 className="text-xs text-[#737373] uppercase tracking-wider font-semibold mb-2">Application Notes</h3>
-                <p className="text-sm text-[#A3A3A3] leading-relaxed">{selectedFormula.notes}</p>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-2">
-                <Button variant="outline" onClick={() => setSelectedFormula(null)} className="bg-transparent border-[#2A2A2A] text-[#A3A3A3] hover:text-[#F5F5F5]">
-                  Close
-                </Button>
-                <Button className="bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF] text-[#0A0A0A] font-semibold hover:opacity-90">
-                  Use Formula
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
