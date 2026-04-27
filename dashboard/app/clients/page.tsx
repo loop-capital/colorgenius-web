@@ -1,191 +1,101 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { GlassCard } from '@/components/custom/glass-card'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { useToast } from '@/components/ui/use-toast'
-import { UserPlus, Trash2, Edit3, ChevronRight, Search } from 'lucide-react'
+import { Plus, Search, ChevronRight, FlaskConical, Star } from 'lucide-react'
 
-interface Client {
-  id: string
-  name: string
-  email?: string
-  phone?: string
-  notes?: string
-  createdAt: string
-  lastVisit?: string
-  favoriteBrand?: string
-  conditions?: Array<{
-    type: string
-    porosity: string
-    grayPercent: number
-    date: string
-  }>
-}
+const clients = [
+  { id: '1', name: 'Maria Garcia', phone: '212-555-0142', email: 'maria.g@email.com', visits: 12, lastVisit: '2026-04-20', avatar: 'MG', color: '#14B8A6', notes: 'Prefers ash tones, sensitive scalp' },
+  { id: '2', name: 'Jennifer Liu', phone: '212-555-0198', email: 'jennifer.l@email.com', visits: 8, lastVisit: '2026-04-15', avatar: 'JL', color: '#F59E0B', notes: 'Wants balayage for summer, level 7 natural' },
+  { id: '3', name: 'Sarah Thompson', phone: '212-555-0123', email: 'sarah.t@email.com', visits: 5, lastVisit: '2026-04-10', avatar: 'ST', color: '#8B5CF6', notes: 'First time color, virgin hair, nervous' },
+  { id: '4', name: 'Amanda Chen', phone: '212-555-0187', email: 'amanda.c@email.com', visits: 15, lastVisit: '2026-04-08', avatar: 'AC', color: '#EC4899', notes: 'Regular root touch-up, level 4 natural' },
+  { id: '5', name: 'Rachel Kim', phone: '212-555-0165', email: 'rachel.k@email.com', visits: 3, lastVisit: '2026-04-05', avatar: 'RK', color: '#14B8A6', notes: 'Color correction needed, previously box-dyed' },
+]
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState<Client[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const { toast } = useToast()
-  const router = useRouter()
-
-  useEffect(() => {
-    fetchClients()
-  }, [searchTerm])
-
-  const fetchClients = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/clients${searchTerm ? `?search=${searchTerm}` : ''}`)
-      if (!response.ok) throw new Error('Failed to fetch clients')
-      const data = await response.json()
-      setClients(data.clients || [])
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to load clients',
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this client?')) return
-    try {
-      const response = await fetch(`/api/clients?id=${id}`, { method: 'DELETE' })
-      if (!response.ok) throw new Error('Failed to delete client')
-      toast({ title: 'Client Deleted', description: 'Client has been removed successfully' })
-      fetchClients()
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to delete client',
-        variant: 'destructive',
-      })
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[var(--cg-deep)] text-white p-4 min-w-[768px]">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Client Management</h1>
-          <Button variant="outline" onClick={() => router.push('/questionnaire')}>
-            <UserPlus className="mr-2 h-4 w-4" /> New Consultation
-          </Button>
-        </div>
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--cg-accent)] mx-auto mb-4" />
-          <p className="text-white/60">Loading clients...</p>
-        </div>
-      </div>
-    )
-  }
+  const [search, setSearch] = useState('')
+  const filtered = clients.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search))
 
   return (
-    <div className="min-h-screen bg-[var(--cg-deep)] text-white p-4 min-w-[768px]">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Client Management</h1>
-          <p className="text-white/60 mt-1">Manage client profiles and formulation history</p>
-        </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => router.push('/questionnaire')}>
-            <UserPlus className="mr-2 h-4 w-4" /> New Consultation
-          </Button>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#0A0A0F]">
+      <div className="p-4 md:p-8 max-w-7xl mx-auto">
 
-      <div className="mb-4 relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
-        <Input
-          placeholder="Search clients by name, email, or phone..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full max-w-md pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/40"
-        />
-      </div>
+        {/* Header */}
+        <motion.div className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F7] tracking-tight">Clients</h1>
+          <p className="text-sm text-[#A1A1AA] mt-1">Manage client profiles and visit history</p>
+        </motion.div>
 
-      {clients.length === 0 && !searchTerm ? (
-        <Card className="card-glass text-center py-12">
-          <CardContent>
-            <p className="text-white/60 mb-4">No clients found.</p>
-            <Button variant="outline" onClick={() => router.push('/questionnaire')}>
-              <UserPlus className="mr-2 h-4 w-4" /> Start First Consultation
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          {clients.map((client) => (
-            <Card
-              key={client.id}
-              className="card-glass hover:bg-white/[0.06] transition-colors cursor-pointer group"
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <Link href={`/clients/${client.id}`} className="flex-1 flex items-center gap-4 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--cg-accent)] to-[var(--cg-accent2)] flex items-center justify-center text-sm font-bold shrink-0">
-                      {client.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-white truncate">{client.name}</p>
-                      <p className="text-sm text-white/50 truncate">
-                        {client.email || client.phone || 'No contact info'}
-                        {client.favoriteBrand && ` · ${client.favoriteBrand}`}
-                      </p>
-                    </div>
-                  </Link>
-                  <div className="flex items-center gap-2 shrink-0 ml-4">
-                    {client.lastVisit && (
-                      <span className="text-xs text-white/40 hidden md:inline">
-                        Last visit: {new Date(client.lastVisit).toLocaleDateString()}
-                      </span>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-white/60 hover:text-white"
-                      onClick={() => router.push(`/clients/${client.id}`)}
-                      title="View client"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-white/60 hover:text-white"
-                      onClick={(e) => { e.stopPropagation(); router.push(`/questionnaire?clientId=${client.id}`) }}
-                      title="New consultation"
-                    >
-                      <Edit3 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-white/60 hover:text-red-400"
-                      onClick={(e) => { e.stopPropagation(); handleDelete(client.id) }}
-                      title="Delete client"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-
-          <div className="flex justify-between items-center text-sm text-white/40 pt-2">
-            <span>Showing {clients.length} client{clients.length !== 1 ? 's' : ''}</span>
+        {/* Search + Add */}
+        <motion.div className="flex flex-col sm:flex-row gap-3 mb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#71717A]" />
+            <Input
+              value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Search clients..."
+              className="pl-10 bg-[#161620] border-white/[0.06] text-[#F5F5F7] placeholder:text-[#52525B] focus:border-[#14B8A6]/50 focus:ring-[#14B8A6]/20"
+            />
           </div>
+          <Button className="bg-[#14B8A6] hover:bg-[#2DD4BF] text-[#0A0A0F] font-semibold">
+            <Plus className="w-4 h-4 mr-2" /> New Client
+          </Button>
+        </motion.div>
+
+        {/* Client List */}
+        <div className="space-y-3">
+          {filtered.map((client, i) => (
+            <motion.div key={client.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.06 }}>
+              <Link href={`/clients/${client.id}`}>
+                <GlassCard className="group cursor-pointer hover:border-[#14B8A6]/20 transition-all duration-200">
+                  <div className="p-4 flex items-center gap-4">
+                    {/* Avatar */}
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold shrink-0"
+                      style={{ backgroundColor: `${client.color}18`, color: client.color }}
+                    >{client.avatar}</div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-[#F5F5F7] truncate">{client.name}</h3>
+                        {client.visits >= 10 && <Star className="w-3.5 h-3.5 text-[#F59E0B] shrink-0" />}
+                      </div>
+                      <p className="text-xs text-[#71717A]">{client.phone}</p>
+                      <p className="text-xs text-[#52525B] mt-0.5 truncate">{client.notes}</p>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="hidden sm:flex flex-col items-end gap-1">
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <FlaskConical className="w-3 h-3 text-[#71717A]" />
+                        <span className="text-[#A1A1AA]">{client.visits} visits</span>
+                      </div>
+                      <span className="text-[10px] text-[#52525B]">Last: {client.lastVisit}</span>
+                    </div>
+
+                    <ChevronRight className="w-4 h-4 text-[#52525B] group-hover:text-[#14B8A6] transition-colors shrink-0" />
+                  </div>
+                </GlassCard>
+              </Link>
+            </motion.div>
+          ))}
         </div>
-      )}
+
+        {/* Empty state */}
+        {filtered.length === 0 && (
+          <GlassCard>
+            <div className="p-8 text-center">
+              <Search className="w-10 h-10 text-[#52525B] mx-auto mb-3" />
+              <p className="text-sm text-[#A1A1AA]">No clients found</p>
+              <p className="text-xs text-[#52525B] mt-1">Try a different search term</p>
+            </div>
+          </GlassCard>
+        )}
+
+      </div>
     </div>
   )
 }

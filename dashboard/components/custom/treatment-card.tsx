@@ -21,6 +21,7 @@ export interface TreatmentCardProps {
   }[]
   notes?: string
   onClick?: () => void
+  showActions?: boolean
   className?: string
 }
 
@@ -94,6 +95,7 @@ export function TreatmentCard({
   confidence,
   confidenceScores,
   notes,
+  showActions = true,
   onClick,
   className,
 }: TreatmentCardProps) {
