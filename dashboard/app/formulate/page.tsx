@@ -2,21 +2,20 @@
 
 import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { motion } from 'framer-motion'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Input, InputNumber } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { HairSwatch } from '@/components/ui/hair-swatch'
 import { ColorCircle } from '@/components/ui/color-circle'
 import { ConfidenceBadge } from '@/components/ui/confidence-badge'
-import { cn } from '@/lib/utils'
+import { GlassCard, StepTransition, ColorWheel3D, TreatmentCard, ConfidenceBreakdown } from '@/components/custom'
 import { HAIR_LEVELS } from '@/lib/products'
 import type { ToneFamily } from '@/lib/products'
 import {
   FlaskConical, ChevronRight, ChevronLeft, Save, RotateCcw,
-  Sparkles, Droplets, Clock, AlertTriangle, CheckCircle2,
+  Sparkles, Droplets, Clock, AlertTriangle,
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const STEPS = [
   { id: 1, title: 'Hair Assessment', description: 'Current color level & tone' },
@@ -58,33 +57,46 @@ const BRAND_OPTIONS = ['Wella', 'Schwarzkopf', 'Redken', 'Matrix', 'Joico', 'Pau
 function StepIndicator({ currentStep }: { currentStep: number }) {
   return (
     <div className="mb-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         {STEPS.map((step, idx) => {
           const isActive = step.id === currentStep
           const isCompleted = step.id < currentStep
           return (
             <div key={step.id} className="flex items-center flex-1">
               <div className="flex flex-col items-center gap-2">
-                <div className={cn(
-                  'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300',
-                  isActive && 'bg-[#14B8A6] text-[#0A0A0A] shadow-lg shadow-[#14B8A6]/20',
-                  isCompleted && 'bg-[#14B8A6]/20 text-[#14B8A6] border border-[#14B8A6]/40',
-                  !isActive && !isCompleted && 'bg-[#1A1A1A] text-[#737373] border border-[#2A2A2A]'
-                )}>
-                  {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : step.id}
-                </div>
+                <motion.div
+                  className={cn(
+                    'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300',
+                    isActive && 'shadow-lg',
+                    isCompleted && 'border border-[#14B8A6]/40',
+                    !isActive && !isCompleted && 'border border-white/[0.08]'
+                  )}
+                  style={{
+                    backgroundColor: isActive ? '#14B8A6' : isCompleted ? 'rgba(20,184,166,0.15)' : 'rgba(255,255,255,0.03)',
+                    color: isActive ? '#0A0A0A' : isCompleted ? '#14B8A6' : 'var(--cg-text-tertiary)',
+                    boxShadow: isActive ? '0 0 20px rgba(20,184,166,0.3)' : undefined,
+                  }}
+                  animate={isActive ? { scale: [1, 1.05, 1] } : {}}
+                  transition={{ duration: 0.5 }}
+                >
+                  {isCompleted ? <ChevronRight className="w-5 h-5" /> : step.id}
+                </motion.div>
                 <div className="text-center hidden md:block">
-                  <p className={cn('text-xs font-semibold', isActive ? 'text-[#F5F5F5]' : 'text-[#737373]')}>
+                  <p className={cn('text-xs font-semibold', isActive ? 'text-[#F5F5F7]' : 'text-[#71717A]')}>
                     {step.title}
                   </p>
-                  <p className="text-[10px] text-[#737373]">{step.description}</p>
+                  <p className="text-[10px] text-[#71717A]">{step.description}</p>
                 </div>
               </div>
               {idx < STEPS.length - 1 && (
-                <div className={cn(
-                  'h-[2px] flex-1 mx-3 transition-all duration-500',
-                  isCompleted ? 'bg-[#14B8A6]/40' : 'bg-[#2A2A2A]'
-                )} />
+                <motion.div
+                  className={cn('h-[2px] flex-1 mx-3 rounded-full')}
+                  style={{
+                    backgroundColor: isCompleted ? 'rgba(20,184,166,0.4)' : 'rgba(255,255,255,0.06)',
+                  }}
+                  initial={false}
+                  animate={isCompleted ? { scaleX: 1 } : { scaleX: 1 }}
+                />
               )}
             </div>
           )
@@ -94,8 +106,59 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
   )
 }
 
+// Custom button component inline
+function ActionButton({
+  children,
+  onClick,
+  variant = 'primary',
+  disabled = false,
+  className,
+}: {
+  children: React.ReactNode
+  onClick?: () => void
+  variant?: 'primary' | 'outline' | 'danger'
+  disabled?: boolean
+  className?: string
+}) {
+  const base = 'inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+  const styles = {
+    primary: 'text-[#0A0A0A] hover:opacity-90 active:scale-[0.98]',
+    outline: 'bg-transparent border hover:text-[#F5F5F7] active:scale-[0.98]',
+    danger: 'bg-red-500/90 text-white hover:bg-red-500 active:scale-[0.98]',
+  }
+  const bg = variant === 'primary'
+    ? { background: 'var(--cg-gradient-teal)' }
+    : variant === 'outline'
+      ? { borderColor: 'rgba(255,255,255,0.12)', color: 'var(--cg-text-secondary)' }
+      : {}
+
+  return (
+    <motion.button
+      className={cn(base, styles[variant], className)}
+      style={bg}
+      onClick={onClick}
+      disabled={disabled}
+      whileHover={{ y: -1 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      {children}
+    </motion.button>
+  )
+}
+
+// Custom section header
+function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-6">
+      {icon}
+      <h2 className="text-lg font-bold" style={{ color: 'var(--cg-text-primary)' }}>{title}</h2>
+    </div>
+  )
+}
+
 function FormulatePageContent() {
   const [step, setStep] = useState(1)
+  const [direction, setDirection] = useState<'forward' | 'back'>('forward')
   const [formData, setFormData] = useState({
     currentLevel: 5,
     currentTone: 'N' as string,
@@ -136,8 +199,8 @@ function FormulatePageContent() {
     }))
   }, [searchParams])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault()
     setIsFormulating(true)
     try {
       const response = await fetch('/api/formulate', {
@@ -148,6 +211,7 @@ function FormulatePageContent() {
       if (!response.ok) throw new Error('Formulation failed')
       const data = await response.json()
       setResult(data.data)
+      setDirection('forward')
       setStep(4)
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Formulation failed')
@@ -156,30 +220,28 @@ function FormulatePageContent() {
     }
   }
 
-  const currentToneData = TONE_OPTIONS.find(t => {
-    const map: Record<string, ToneFamily> = { N: 'neutral', A: 'ash', G: 'golden', R: 'red', V: 'violet', K: 'copper', B: 'beige', W: 'warm', C: 'cool', P: 'pearl', M: 'mahogany', Ch: 'chocolate' }
-    return t.value === (map[formData.currentTone] || 'neutral')
-  })
-
-  const targetToneData = TONE_OPTIONS.find(t => {
-    const map: Record<string, ToneFamily> = { N: 'neutral', A: 'ash', G: 'golden', R: 'red', V: 'violet', K: 'copper', B: 'beige', W: 'warm', C: 'cool', P: 'pearl', M: 'mahogany', Ch: 'chocolate' }
-    return t.value === (map[formData.targetTone] || 'neutral')
-  })
+  const goToStep = (nextStep: number) => {
+    setDirection(nextStep > step ? 'forward' : 'back')
+    setStep(nextStep)
+  }
 
   const levelDiff = formData.targetLevel - formData.currentLevel
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8" style={{ background: 'var(--cg-bg-deep)' }}>
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F5]">Create Formulation</h1>
-            <p className="text-sm text-[#A3A3A3] mt-1">Build a professional color formula in 4 steps</p>
+            <h1 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
+              Create <span className="gradient-text-teal">Formulation</span>
+            </h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--cg-text-secondary)' }}>
+              Build a professional color formula in 4 steps
+            </p>
           </div>
-          <Button
+          <ActionButton
             variant="outline"
-            size="sm"
             onClick={() => {
               setFormData({
                 currentLevel: 5, currentTone: 'N',
@@ -188,30 +250,30 @@ function FormulatePageContent() {
                 brandPreference: '',
               })
               setResult(null)
-              setStep(1)
+              goToStep(1)
             }}
-            className="bg-transparent border-[#2A2A2A] text-[#A3A3A3] hover:text-[#F5F5F5] hover:border-[#3A3A3A]"
           >
             <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Reset
-          </Button>
+          </ActionButton>
         </div>
 
         <StepIndicator currentStep={step} />
 
         {/* Step 1: Hair Assessment */}
         {step === 1 && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <Card className="bg-[#171717] border-[#2A2A2A]">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-[#14B8A6]" />
-                  Current Hair Color
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-8">
+          <StepTransition stepKey="step1" direction={direction}>
+            <GlassCard className="p-6 md:p-8">
+              <SectionHeader
+                icon={<Sparkles className="w-5 h-5 text-[#14B8A6]" />}
+                title="Current Hair Color"
+              />
+
+              <div className="space-y-8">
                 {/* Current Level */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-[#F5F5F5]">Current Level</Label>
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>
+                    Current Level
+                  </Label>
                   <div className="flex flex-wrap gap-3">
                     {Object.entries(HAIR_LEVELS).map(([level, info]) => (
                       <HairSwatch
@@ -226,66 +288,93 @@ function FormulatePageContent() {
                   </div>
                 </div>
 
-                {/* Current Tone */}
+                {/* Current Tone - ColorWheel3D */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-[#F5F5F5]">Current Tone</Label>
-                  <div className="flex flex-wrap gap-3">
-                    {[
-                      { value: 'N', label: 'Natural', color: '#9C8B7A' },
-                      { value: 'A', label: 'Ash', color: '#8A7D6E' },
-                      { value: 'G', label: 'Gold', color: '#C4A35A' },
-                      { value: 'R', label: 'Red', color: '#A03030' },
-                      { value: 'V', label: 'Violet', color: '#7B68A6' },
-                      { value: 'K', label: 'Copper', color: '#B87333' },
-                      { value: 'B', label: 'Beige', color: '#C4B5A0' },
-                    ].map((tone) => (
-                      <ColorCircle
-                        key={tone.value}
-                        color={tone.color}
-                        label={tone.label}
-                        isActive={formData.currentTone === tone.value}
-                        onClick={() => setFormData(p => ({ ...p, currentTone: tone.value }))}
-                      />
-                    ))}
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>
+                    Current Tone
+                  </Label>
+                  <div className="flex flex-col md:flex-row gap-8 items-center">
+                    <ColorWheel3D
+                      tones={TONE_OPTIONS}
+                      selected={(() => {
+                        const map: Record<string, ToneFamily> = { N: 'neutral', A: 'ash', G: 'golden', R: 'red', V: 'violet', K: 'copper', B: 'beige', W: 'warm', C: 'cool', P: 'pearl', M: 'mahogany', Ch: 'chocolate' }
+                        return map[formData.currentTone] || 'neutral'
+                      })()}
+                      onSelect={(val) => {
+                        const revMap: Record<ToneFamily, string> = { neutral: 'N', ash: 'A', golden: 'G', red: 'R', violet: 'V', copper: 'K', beige: 'B', warm: 'W', cool: 'C', pearl: 'P', mahogany: 'M', chocolate: 'Ch' }
+                        setFormData(p => ({ ...p, currentTone: revMap[val as ToneFamily] || 'N' }))
+                      }}
+                    />
+                    {/* Fallback tone circles */}
+                    <div className="flex flex-wrap gap-3">
+                      {[
+                        { value: 'N', label: 'Natural', color: '#9C8B7A' },
+                        { value: 'A', label: 'Ash', color: '#8A7D6E' },
+                        { value: 'G', label: 'Gold', color: '#C4A35A' },
+                        { value: 'R', label: 'Red', color: '#A03030' },
+                        { value: 'V', label: 'Violet', color: '#7B68A6' },
+                        { value: 'K', label: 'Copper', color: '#B87333' },
+                        { value: 'B', label: 'Beige', color: '#C4B5A0' },
+                      ].map((tone) => (
+                        <ColorCircle
+                          key={tone.value}
+                          color={tone.color}
+                          label={tone.label}
+                          isActive={formData.currentTone === tone.value}
+                          onClick={() => setFormData(p => ({ ...p, currentTone: tone.value }))}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
 
                 {/* Preview */}
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A]">
-                  <div className="w-16 h-16 rounded-xl border-2 border-[#2A2A2A]" style={{ backgroundColor: HAIR_LEVELS[formData.currentLevel]?.hex }} />
+                <motion.div
+                  className="flex items-center gap-4 p-4 rounded-xl"
+                  style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <div
+                    className="w-16 h-16 rounded-xl border-2 border-white/[0.08]"
+                    style={{ backgroundColor: HAIR_LEVELS[formData.currentLevel]?.hex }}
+                  />
                   <div>
-                    <p className="text-sm font-medium text-[#F5F5F5]">{HAIR_LEVELS[formData.currentLevel]?.name}</p>
-                    <p className="text-xs text-[#A3A3A3]">Level {formData.currentLevel} · {formData.currentTone} tone</p>
+                    <p className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>
+                      {HAIR_LEVELS[formData.currentLevel]?.name}
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--cg-text-secondary)' }}>
+                      Level {formData.currentLevel} · {formData.currentTone} tone
+                    </p>
                   </div>
-                </div>
+                </motion.div>
 
                 <div className="flex justify-end">
-                  <Button
-                    onClick={() => setStep(2)}
-                    className="bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF] text-[#0A0A0A] font-semibold hover:opacity-90"
-                  >
+                  <ActionButton onClick={() => goToStep(2)}>
                     Next: Target Look <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
+                  </ActionButton>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </GlassCard>
+          </StepTransition>
         )}
 
         {/* Step 2: Target Look */}
         {step === 2 && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <Card className="bg-[#171717] border-[#2A2A2A]">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-[#F59E0B]" />
-                  Target Look
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-8">
+          <StepTransition stepKey="step2" direction={direction}>
+            <GlassCard className="p-6 md:p-8">
+              <SectionHeader
+                icon={<Sparkles className="w-5 h-5 text-[#F59E0B]" />}
+                title="Target Look"
+              />
+
+              <div className="space-y-8">
                 {/* Target Level */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-[#F5F5F5]">Target Level</Label>
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>
+                    Target Level
+                  </Label>
                   <div className="flex flex-wrap gap-3">
                     {Object.entries(HAIR_LEVELS).map(([level, info]) => (
                       <HairSwatch
@@ -302,7 +391,9 @@ function FormulatePageContent() {
 
                 {/* Target Tone */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-[#F5F5F5]">Target Tone</Label>
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>
+                    Target Tone
+                  </Label>
                   <div className="flex flex-wrap gap-3">
                     {[
                       { value: 'N', label: 'Natural', color: '#9C8B7A' },
@@ -326,127 +417,134 @@ function FormulatePageContent() {
 
                 {/* Brand Preference */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-[#F5F5F5]">Brand Preference (Optional)</Label>
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>
+                    Brand Preference (Optional)
+                  </Label>
                   <Select
                     value={formData.brandPreference}
                     onValueChange={(value) => setFormData(p => ({ ...p, brandPreference: value }))}
                   >
-                    <SelectTrigger className="w-full bg-[#1A1A1A] border-[#2A2A2A] text-[#F5F5F5]">
+                    <SelectTrigger className="w-full" style={{ background: 'var(--cg-surface)', borderColor: 'rgba(255,255,255,0.08)', color: 'var(--cg-text-primary)' }}>
                       <SelectValue placeholder="Select a brand or leave empty for any" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1A1A1A] border-[#2A2A2A]">
+                    <SelectContent style={{ background: 'var(--cg-surface)', borderColor: 'rgba(255,255,255,0.08)' }}>
                       <SelectItem value="">Any brand</SelectItem>
                       {BRAND_OPTIONS.map(b => (
-                        <SelectItem key={b} value={b} className="text-[#F5F5F5]">{b}</SelectItem>
+                        <SelectItem key={b} value={b} className="text-[#F5F5F7]">{b}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 {/* Level Change Visual */}
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A]">
+                <motion.div
+                  className="flex items-center gap-4 p-4 rounded-xl"
+                  style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                >
                   <div className="text-center">
-                    <div className="w-12 h-12 rounded-lg border-2 border-[#2A2A2A] mx-auto mb-1" style={{ backgroundColor: HAIR_LEVELS[formData.currentLevel]?.hex }} />
-                    <p className="text-[10px] text-[#737373]">From</p>
-                    <p className="text-xs font-medium text-[#A3A3A3]">Level {formData.currentLevel}</p>
+                    <div
+                      className="w-12 h-12 rounded-lg border-2 border-white/[0.08] mx-auto mb-1"
+                      style={{ backgroundColor: HAIR_LEVELS[formData.currentLevel]?.hex }}
+                    />
+                    <p className="text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>From</p>
+                    <p className="text-xs font-medium" style={{ color: 'var(--cg-text-secondary)' }}>Level {formData.currentLevel}</p>
                   </div>
                   <div className="flex-1 flex items-center gap-2">
-                    <div className="h-[2px] flex-1 bg-[#2A2A2A]" />
-                    <div className={cn(
-                      'px-2 py-1 rounded-full text-[10px] font-bold',
-                      levelDiff > 0 ? 'bg-[#F59E0B]/10 text-[#F59E0B]' : levelDiff < 0 ? 'bg-[#14B8A6]/10 text-[#14B8A6]' : 'bg-[#2A2A2A] text-[#737373]'
-                    )}>
+                    <div className="h-[2px] flex-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                    <div
+                      className={cn('px-2 py-1 rounded-full text-[10px] font-bold')}
+                      style={{
+                        backgroundColor: levelDiff > 0 ? 'rgba(245,158,11,0.1)' : levelDiff < 0 ? 'rgba(20,184,166,0.1)' : 'rgba(255,255,255,0.06)',
+                        color: levelDiff > 0 ? '#F59E0B' : levelDiff < 0 ? '#14B8A6' : 'var(--cg-text-tertiary)',
+                      }}
+                    >
                       {levelDiff > 0 ? `+${levelDiff} levels` : levelDiff < 0 ? `${levelDiff} levels` : 'Same level'}
                     </div>
-                    <div className="h-[2px] flex-1 bg-[#2A2A2A]" />
+                    <div className="h-[2px] flex-1" style={{ background: 'rgba(255,255,255,0.06)' }} />
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 rounded-lg border-2 border-[#14B8A6]/40 mx-auto mb-1" style={{ backgroundColor: HAIR_LEVELS[formData.targetLevel]?.hex }} />
-                    <p className="text-[10px] text-[#737373]">To</p>
-                    <p className="text-xs font-medium text-[#14B8A6]">Level {formData.targetLevel}</p>
+                    <div
+                      className="w-12 h-12 rounded-lg border-2 mx-auto mb-1"
+                      style={{ backgroundColor: HAIR_LEVELS[formData.targetLevel]?.hex, borderColor: 'rgba(20,184,166,0.4)' }}
+                    />
+                    <p className="text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>To</p>
+                    <p className="text-xs font-medium" style={{ color: 'var(--cg-teal)' }}>Level {formData.targetLevel}</p>
                   </div>
-                </div>
+                </motion.div>
 
                 <div className="flex justify-between">
-                  <Button
-                    variant="outline"
-                    onClick={() => setStep(1)}
-                    className="bg-transparent border-[#2A2A2A] text-[#A3A3A3] hover:text-[#F5F5F5]"
-                  >
+                  <ActionButton variant="outline" onClick={() => goToStep(1)}>
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back
-                  </Button>
-                  <Button
-                    onClick={() => setStep(3)}
-                    className="bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF] text-[#0A0A0A] font-semibold hover:opacity-90"
-                  >
+                  </ActionButton>
+                  <ActionButton onClick={() => goToStep(3)}>
                     Next: Condition <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
+                  </ActionButton>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </GlassCard>
+          </StepTransition>
         )}
 
         {/* Step 3: Condition & History */}
         {step === 3 && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <Card className="bg-[#171717] border-[#2A2A2A]">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Droplets className="w-5 h-5 text-[#14B8A6]" />
-                  Hair Condition & History
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
+          <StepTransition stepKey="step3" direction={direction}>
+            <GlassCard className="p-6 md:p-8">
+              <SectionHeader
+                icon={<Droplets className="w-5 h-5 text-[#14B8A6]" />}
+                title="Hair Condition & History"
+              />
+
+              <div className="space-y-6">
                 {/* Hair Type */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-[#F5F5F5]">Hair Type</Label>
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Hair Type</Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {CONDITION_OPTIONS.map(opt => (
-                      <button
+                      <motion.button
                         key={opt.value}
                         type="button"
                         onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, type: opt.value } }))}
-                        className={cn(
-                          'p-4 rounded-xl border text-left transition-all duration-200',
-                          formData.condition.type === opt.value
-                            ? 'border-[#14B8A6]/40 bg-[#14B8A6]/5'
-                            : 'border-[#2A2A2A] bg-[#1A1A1A] hover:border-[#3A3A3A]'
-                        )}
+                        className={cn('p-4 rounded-xl border text-left transition-all duration-200')}
+                        style={{
+                          backgroundColor: formData.condition.type === opt.value ? 'rgba(20,184,166,0.05)' : 'var(--cg-surface)',
+                          borderColor: formData.condition.type === opt.value ? 'rgba(20,184,166,0.3)' : 'rgba(255,255,255,0.06)',
+                        }}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        <p className={cn('text-sm font-medium', formData.condition.type === opt.value ? 'text-[#14B8A6]' : 'text-[#F5F5F5]')}>
+                        <p className={cn('text-sm font-medium', formData.condition.type === opt.value ? 'text-[#14B8A6]' : 'text-[#F5F5F7]')}>
                           {opt.label}
                         </p>
-                        <p className="text-xs text-[#737373] mt-1">{opt.desc}</p>
-                      </button>
+                        <p className="text-xs mt-1" style={{ color: 'var(--cg-text-tertiary)' }}>{opt.desc}</p>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
 
                 {/* Porosity */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-[#F5F5F5]">Porosity</Label>
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Porosity</Label>
                   <div className="flex gap-3">
                     {POROSITY_OPTIONS.map(opt => (
-                      <button
+                      <motion.button
                         key={opt.value}
                         type="button"
                         onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, porosity: opt.value } }))}
-                        className={cn(
-                          'flex-1 p-4 rounded-xl border text-center transition-all duration-200',
-                          formData.condition.porosity === opt.value
-                            ? 'border-[#14B8A6]/40 bg-[#14B8A6]/5'
-                            : 'border-[#2A2A2A] bg-[#1A1A1A] hover:border-[#3A3A3A]'
-                        )}
+                        className={cn('flex-1 p-4 rounded-xl border text-center transition-all duration-200')}
+                        style={{
+                          backgroundColor: formData.condition.porosity === opt.value ? 'rgba(20,184,166,0.05)' : 'var(--cg-surface)',
+                          borderColor: formData.condition.porosity === opt.value ? 'rgba(20,184,166,0.3)' : 'rgba(255,255,255,0.06)',
+                        }}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        <div
-                          className="w-4 h-4 rounded-full mx-auto mb-2"
-                          style={{ backgroundColor: opt.color }}
-                        />
-                        <p className={cn('text-sm font-medium', formData.condition.porosity === opt.value ? 'text-[#F5F5F5]' : 'text-[#A3A3A3]')}>
+                        <div className="w-4 h-4 rounded-full mx-auto mb-2" style={{ backgroundColor: opt.color }} />
+                        <p className={cn('text-sm font-medium', formData.condition.porosity === opt.value ? 'text-[#F5F5F7]' : 'text-[#A1A1AA]')}>
                           {opt.label.split('—')[0]}
                         </p>
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -454,8 +552,8 @@ function FormulatePageContent() {
                 {/* Gray Coverage */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-[#F5F5F5]">Gray Coverage</Label>
-                    <span className="text-sm font-bold text-[#F5F5F5]">{formData.condition.grayPercent}%</span>
+                    <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Gray Coverage</Label>
+                    <span className="text-sm font-bold" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.grayPercent}%</span>
                   </div>
                   <input
                     type="range"
@@ -465,7 +563,7 @@ function FormulatePageContent() {
                     onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, grayPercent: Number(e.target.value) } }))}
                     className="w-full"
                   />
-                  <div className="flex justify-between text-[10px] text-[#737373]">
+                  <div className="flex justify-between text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>
                     <span>No gray</span>
                     <span>Partial</span>
                     <span>Full coverage needed</span>
@@ -480,17 +578,21 @@ function FormulatePageContent() {
                       id="highlights"
                       checked={formData.condition.highlights}
                       onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlights: e.target.checked } }))}
-                      className="w-4 h-4 rounded border-[#2A2A2A] bg-[#1A1A1A] accent-[#14B8A6]"
+                      className="w-4 h-4 rounded border-[rgba(255,255,255,0.12)] bg-[var(--cg-surface)] accent-[#14B8A6]"
                     />
-                    <Label htmlFor="highlights" className="text-sm font-medium text-[#F5F5F5] cursor-pointer">
+                    <Label htmlFor="highlights" className="text-sm font-medium cursor-pointer" style={{ color: 'var(--cg-text-primary)' }}>
                       Highlights Present
                     </Label>
                   </div>
                   {formData.condition.highlights && (
-                    <div className="pl-7 space-y-2">
+                    <motion.div
+                      className="pl-7 space-y-2"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                    >
                       <div className="flex items-center justify-between">
-                        <Label className="text-xs text-[#A3A3A3]">Highlighted Area</Label>
-                        <span className="text-xs font-bold text-[#F5F5F5]">{formData.condition.highlightedPercent}%</span>
+                        <Label className="text-xs" style={{ color: 'var(--cg-text-secondary)' }}>Highlighted Area</Label>
+                        <span className="text-xs font-bold" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.highlightedPercent}%</span>
                       </div>
                       <input
                         type="range"
@@ -500,46 +602,45 @@ function FormulatePageContent() {
                         onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlightedPercent: Number(e.target.value) } }))}
                         className="w-full"
                       />
-                    </div>
+                    </motion.div>
                   )}
                 </div>
 
                 {/* Summary preview */}
-                <div className="p-4 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A]">
-                  <p className="text-[10px] text-[#737373] uppercase tracking-wider font-semibold mb-2">Consultation Summary</p>
+                <motion.div
+                  className="p-4 rounded-xl"
+                  style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <p className="text-[10px] uppercase tracking-wider font-semibold mb-2" style={{ color: 'var(--cg-text-tertiary)' }}>
+                    Consultation Summary
+                  </p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                     <div>
-                      <span className="text-[#737373] block text-xs">Current</span>
-                      <span className="text-[#F5F5F5] font-medium">Level {formData.currentLevel} {formData.currentTone}</span>
+                      <span className="block text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Current</span>
+                      <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>Level {formData.currentLevel} {formData.currentTone}</span>
                     </div>
                     <div>
-                      <span className="text-[#737373] block text-xs">Target</span>
-                      <span className="text-[#14B8A6] font-medium">Level {formData.targetLevel} {formData.targetTone}</span>
+                      <span className="block text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Target</span>
+                      <span className="font-medium" style={{ color: 'var(--cg-teal)' }}>Level {formData.targetLevel} {formData.targetTone}</span>
                     </div>
                     <div>
-                      <span className="text-[#737373] block text-xs">Condition</span>
-                      <span className="text-[#F5F5F5] font-medium capitalize">{formData.condition.type.replace('_', ' ')}</span>
+                      <span className="block text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Condition</span>
+                      <span className="font-medium capitalize" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.type.replace('_', ' ')}</span>
                     </div>
                     <div>
-                      <span className="text-[#737373] block text-xs">Gray</span>
-                      <span className="text-[#F5F5F5] font-medium">{formData.condition.grayPercent}%</span>
+                      <span className="block text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Gray</span>
+                      <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.grayPercent}%</span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 <div className="flex justify-between">
-                  <Button
-                    variant="outline"
-                    onClick={() => setStep(2)}
-                    className="bg-transparent border-[#2A2A2A] text-[#A3A3A3] hover:text-[#F5F5F5]"
-                  >
+                  <ActionButton variant="outline" onClick={() => goToStep(2)}>
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back
-                  </Button>
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={isFormulating}
-                    className="bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF] text-[#0A0A0A] font-semibold hover:opacity-90"
-                  >
+                  </ActionButton>
+                  <ActionButton onClick={handleSubmit} disabled={isFormulating}>
                     {isFormulating ? (
                       <>
                         <Sparkles className="w-4 h-4 mr-2 animate-spin" /> Generating...
@@ -549,111 +650,67 @@ function FormulatePageContent() {
                         Generate Formula <FlaskConical className="w-4 h-4 ml-2" />
                       </>
                     )}
-                  </Button>
+                  </ActionButton>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </GlassCard>
+          </StepTransition>
         )}
 
         {/* Step 4: Results */}
         {step === 4 && result && (
-          <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-4">
-            {/* Main formula card */}
-            <Card className="bg-[#171717] border-[#2A2A2A] overflow-hidden">
-              <div className="h-1 w-full bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF]" />
-              <CardContent className="p-6 space-y-6">
-                {/* Header */}
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h2 className="text-xl font-bold text-[#F5F5F5]">{result.name || 'Custom Formula'}</h2>
-                      <ConfidenceBadge score={result.score || 92} size="sm" />
-                    </div>
-                    <p className="text-sm text-[#A3A3A3]">{result.formulation?.brand} · {result.formulation?.line}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="bg-transparent border-[#2A2A2A] text-[#A3A3A3] hover:text-[#F5F5F5]">
-                      <Save className="w-3.5 h-3.5 mr-1.5" /> Save
-                    </Button>
-                  </div>
-                </div>
+          <StepTransition stepKey="step4" direction={direction}>
+            <div className="space-y-4">
+              {/* Main formula card using TreatmentCard */}
+              <TreatmentCard
+                name={result.name || 'Custom Formula'}
+                brand={result.formulation?.brand}
+                line={result.formulation?.line}
+                shades={result.formulation?.shades?.map((s: any) => ({
+                  code: s.code,
+                  name: s.name || s.code,
+                  hex: s.hex || HAIR_LEVELS[result.formulation?.targetLevel]?.hex,
+                })) || []}
+                developer={result.formulation?.developer}
+                developerVolume={result.formulation?.developerVolume}
+                mixRatio={result.formulation?.mixRatio || '1:1'}
+                processingTime={result.formulation?.processingTime}
+                application={result.formulation?.application}
+                confidence={result.score || 92}
+                notes={result.notes}
+              />
 
-                {/* Shade swatches */}
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A]">
-                  <span className="text-xs text-[#737373] uppercase tracking-wider font-medium">Formula</span>
-                  <div className="flex items-center gap-2">
-                    {result.formulation?.shades?.map((shade: any, i: number) => (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <div
-                          className="w-8 h-8 rounded-lg border border-white/[0.08]"
-                          style={{ backgroundColor: shade.hex || HAIR_LEVELS[result.formulation?.targetLevel]?.hex }}
-                        />
-                        <div>
-                          <p className="text-xs font-medium text-[#F5F5F5]">{shade.code}</p>
-                          <p className="text-[10px] text-[#737373]">{shade.name || shade.code}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {/* Confidence breakdown */}
+              <GlassCard className="p-6">
+                <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--cg-text-primary)' }}>
+                  Confidence Analysis
+                </h3>
+                <ConfidenceBreakdown
+                  overall={result.score || 92}
+                  scores={[
+                    { label: 'Warmth accuracy', value: Math.min((result.score || 92) + 3, 100), color: '#14B8A6' },
+                    { label: 'Coverage', value: Math.min((result.score || 92) - 2, 100), color: '#F59E0B' },
+                    { label: 'Damage risk', value: Math.min((result.score || 92) + 5, 100), color: '#A78BFA' },
+                    { label: 'Lift accuracy', value: Math.min((result.score || 92) - 1, 100), color: '#10B981' },
+                  ]}
+                />
+              </GlassCard>
 
-                {/* Mix ratio visual */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="p-4 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A] text-center">
-                    <Droplets className="w-5 h-5 text-[#14B8A6] mx-auto mb-2" />
-                    <p className="text-[10px] text-[#737373] uppercase tracking-wider">Developer</p>
-                    <p className="text-lg font-bold text-[#F5F5F5]">{result.formulation?.developer}</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A] text-center">
-                    <FlaskConical className="w-5 h-5 text-[#F59E0B] mx-auto mb-2" />
-                    <p className="text-[10px] text-[#737373] uppercase tracking-wider">Mix Ratio</p>
-                    <p className="text-lg font-bold text-[#F5F5F5]">{result.formulation?.mixRatio || '1:1'}</p>
-                  </div>
-                  <div className="p-4 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A] text-center">
-                    <Clock className="w-5 h-5 text-[#14B8A6] mx-auto mb-2" />
-                    <p className="text-[10px] text-[#737373] uppercase tracking-wider">Processing</p>
-                    <p className="text-lg font-bold text-[#F5F5F5]">{result.formulation?.processingTime} min</p>
-                  </div>
-                </div>
-
-                {/* Application */}
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-[#1A1A1A] border border-[#2A2A2A]">
-                  <div className="w-8 h-8 rounded-lg bg-[#14B8A6]/10 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-[#14B8A6]" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-[#737373]">Application</p>
-                    <p className="text-sm font-medium text-[#F5F5F5]">{result.formulation?.application}</p>
-                  </div>
-                </div>
-
-                {/* Notes */}
-                {result.notes && (
-                  <div className="p-4 rounded-xl bg-[#F59E0B]/5 border border-[#F59E0B]/10">
-                    <p className="text-xs text-[#F59E0B] font-medium mb-1 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" /> Colorist Notes
-                    </p>
-                    <p className="text-sm text-[#A3A3A3] leading-relaxed">{result.notes}</p>
-                  </div>
-                )}
-
-                {/* Action buttons */}
-                <div className="flex gap-3 pt-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1 bg-transparent border-[#2A2A2A] text-[#A3A3A3] hover:text-[#F5F5F5]"
-                    onClick={() => setStep(1)}
-                  >
-                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> New Formula
-                  </Button>
-                  <Button className="flex-1 bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF] text-[#0A0A0A] font-semibold hover:opacity-90">
-                    <Save className="w-3.5 h-3.5 mr-1.5" /> Save to Library
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              {/* Action buttons */}
+              <div className="flex gap-3 pt-2">
+                <ActionButton
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => goToStep(1)}
+                >
+                  <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> New Formula
+                </ActionButton>
+                <ActionButton className="flex-1" onClick={() => {}}>
+                  <Save className="w-3.5 h-3.5 mr-1.5" /> Save to Library
+                </ActionButton>
+              </div>
+            </div>
+          </StepTransition>
         )}
       </div>
     </div>
@@ -663,11 +720,11 @@ function FormulatePageContent() {
 export default function FormulatePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#0F0F0F] p-8">
+      <div className="min-h-screen p-8" style={{ background: 'var(--cg-bg-deep)' }}>
         <div className="max-w-5xl mx-auto">
-          <div className="skeleton-shimmer h-8 w-64 rounded-lg mb-4" />
-          <div className="skeleton-shimmer h-4 w-96 rounded-lg mb-8" />
-          <div className="skeleton-shimmer h-[400px] rounded-xl" />
+          <div className="cg-shimmer h-8 w-64 rounded-lg mb-4" />
+          <div className="cg-shimmer h-4 w-96 rounded-lg mb-8" />
+          <div className="cg-shimmer h-[400px] rounded-xl" />
         </div>
       </div>
     }>

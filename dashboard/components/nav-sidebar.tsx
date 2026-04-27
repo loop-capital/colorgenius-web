@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import {
-  LayoutDashboard, FlaskConical, Camera, BookOpen,
+  LayoutDashboard, FlaskConical, Camera, ImageIcon, MessageCircle, BookOpen,
   Users, History, ClipboardList, Sparkles,
 } from 'lucide-react'
 
@@ -10,6 +10,8 @@ const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/formulate', label: 'Formulate', icon: FlaskConical },
   { href: '/analyze', label: 'Analyze', icon: Camera },
+  { href: '/gallery', label: 'Gallery', icon: ImageIcon },
+  { href: '/community', label: 'Community', icon: MessageCircle },
   { href: '/library', label: 'Library', icon: BookOpen },
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/history', label: 'History', icon: History },
@@ -69,7 +71,7 @@ export function Sidebar() {
             <span className="font-bold text-sm" style={{ color: '#F5F5F7' }}>ColorGenius</span>
           </Link>
           <div className="flex items-center gap-3 overflow-x-auto">
-            {navItems.slice(0, 4).map((item) => (
+            {navItems.slice(0, 5).map((item) => (
               <Link key={item.href} href={item.href}
                 className="p-2 transition-colors hover:text-[#14B8A6] hover:bg-[#161620]"
                 style={{ color: '#A1A1AA', borderRadius: '8px' }}
