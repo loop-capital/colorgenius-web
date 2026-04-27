@@ -71,7 +71,8 @@ model Stylist {
   // Preferences (JSONB for flexibility)
   preferences       Json     @default("{\"default_brand\": null, \"preferred_developer\": 20, \"theme\": \"light\"}")
   uplook_profile_url  String?
-  creator_stats       Json     @default("{}")
+  creator_stats       Json     @default({})
+  educator_id         String?
 
   // Community & marketplace fields
   uplook_user_id          String?
@@ -381,7 +382,6 @@ model Photo {
   analysis_results  Json?
 
   processing_status String   @default("pending") @db.VarChar(20)
-  community_posts  CommunityPost[] @relation("CommunityPostPhotos")
 
   created_at        DateTime @default(now())
 
@@ -404,7 +404,7 @@ model ClientVisit {
   stylist_id        String
   stylist           Stylist  @relation(fields: [stylist_id], references: [id])
 
-  formulation_id    String?   @unique
+  formulation_id    String?
   formulation       Formulation? @relation(fields: [formulation_id], references: [id], onDelete: SetNull)
 
   visit_date        DateTime
@@ -465,7 +465,7 @@ model CommunityPost {
   stylist_id        String
   stylist           Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
 
-  formulation_id    String?   @unique
+  formulation_id    String?
   formulation         Formulation? @relation(fields: [formulation_id], references: [id], onDelete: SetNull)
 
   // Photos (direct URLs for quick access)
@@ -508,6 +508,7 @@ model CommunityPost {
   @@index([trend_score])
   @@index([tags])
   @@index([stylist_id, moderation_status])
+  @@index([created_at, trend_score])
 }
 
 model CommunityComment {
@@ -631,6 +632,7 @@ model MarketplaceTemplate {
   @@index([educator_id])
   @@index([status, avg_rating])
   @@index([status, sales_count])
+  @@index([created_at, trend_score])
 }
 
 model TemplatePurchase {
