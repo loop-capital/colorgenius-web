@@ -1,36 +1,38 @@
-import { NextRequest } from 'next/server'
-import { successResponse } from '@/lib/api/response'
+/**
+ * GET /api/gallery/seasonal
+ * Seasonal color collections — NO auth required
+ */
 
-export async function GET(req: NextRequest) {
-  const season = req.nextUrl.searchParams.get('season') || 'summer'
+import { NextRequest, NextResponse } from 'next/server';
+import { seasonalCollections } from '@/lib/api/mock-data';
+import { SeasonalCollection, ApiResponse } from '@/lib/api/types';
 
-  const collections: Record<string, any[]> = {
-    spring: [
-      { name: 'Pastel Dreams', hex: '#E8D5C4', description: 'Soft rose gold and champagne tones' },
-      { name: 'Honey Balayage', hex: '#C9A96E', description: 'Warm honey with soft highlights' },
-      { name: 'Fresh Brunette', hex: '#6B4226', description: 'Rich brown with caramel ribbons' },
-    ],
-    summer: [
-      { name: 'Sun-Kissed Blonde', hex: '#D4AA7D', description: 'Golden blonde with beachy texture' },
-      { name: 'Bronze Goddess', hex: '#B8860B', description: 'Deep bronze with golden undertones' },
-      { name: 'Coral Pink', hex: '#E9967A', description: 'Vibrant coral with pink highlights' },
-    ],
-    fall: [
-      { name: 'Auburn Spice', hex: '#8B4513', description: 'Rich auburn with copper dimension' },
-      { name: 'Chestnut Glow', hex: '#954535', description: 'Warm chestnut with amber lights' },
-      { name: 'Burgundy Wine', hex: '#722F37', description: 'Deep burgundy with violet undertones' },
-    ],
-    winter: [
-      { name: 'Icy Platinum', hex: '#E8E0D5', description: 'Cool platinum with silver dimension' },
-      { name: 'Midnight Blue', hex: '#2C3E50', description: 'Deep navy with midnight blue undertones' },
-      { name: 'Smoky Quartz', hex: '#6B6B6B', description: 'Cool gray with smoky undertones' },
-    ],
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const season = searchParams.get('season');
+
+    let collections = [...seasonalCollections];
+
+    if (season) {
+      collections = collections.filter(
+        c => c.season.toLowerCase() === season.toLowerCase()
+      );
+    }
+
+    // Sort by newest first
+    collections.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    return NextResponse.json<ApiResponse<SeasonalCollection[]>>({
+      success: true,
+      data: collections,
+      meta: { total: collections.length },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to fetch seasonal collections';
+    return NextResponse.json<ApiResponse>({
+      success: false,
+      error: { code: 'SEASONAL_FAILED', message },
+    }, { status: 500 });
   }
-
-  return successResponse({
-    season,
-    title: `${season.charAt(0).toUpperCase() + season.slice(1)} Collection`,
-    description: `Trending colors for ${season} 2026`,
-    colors: collections[season] || collections.summer,
-  })
 }

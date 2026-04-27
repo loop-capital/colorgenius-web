@@ -1,15 +1,26 @@
-import { successResponse } from '@/lib/api/response'
+/**
+ * GET /api/gallery/trending
+ * Trending colors — NO auth required
+ */
+
+import { NextResponse } from 'next/server';
+import { trendingColors } from '@/lib/api/mock-data';
+import { TrendingColor, ApiResponse } from '@/lib/api/types';
 
 export async function GET() {
-  const colors = [
-    { name: 'Golden Blonde', hex: '#D4AA7D', count: 1247 },
-    { name: 'Ash Brown', hex: '#8B7355', count: 982 },
-    { name: 'Rose Gold', hex: '#C4956A', count: 876 },
-    { name: 'Platinum', hex: '#E8E0D5', count: 743 },
-    { name: 'Caramel Balayage', hex: '#B8956A', count: 621 },
-    { name: 'Chocolate Brown', hex: '#5C3A21', count: 598 },
-    { name: 'Copper Red', hex: '#B8623A', count: 445 },
-    { name: 'Smoky Silver', hex: '#9E9E9E', count: 312 },
-  ]
-  return successResponse(colors)
+  try {
+    const colors = [...trendingColors].sort((a, b) => b.trend_score - a.trend_score);
+
+    return NextResponse.json<ApiResponse<TrendingColor[]>>({
+      success: true,
+      data: colors,
+      meta: { total: colors.length },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to fetch trending colors';
+    return NextResponse.json<ApiResponse>({
+      success: false,
+      error: { code: 'TRENDING_COLORS_FAILED', message },
+    }, { status: 500 });
+  }
 }
