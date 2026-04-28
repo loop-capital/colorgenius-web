@@ -1,0 +1,35 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'ios-app/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: ios-app/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ios-app
+        run: npm ci
+      
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      
+      - name: Build iOS
+        working-directory: ios-app
+        run: npx eas build --platform ios --profile preview --non-interactive
