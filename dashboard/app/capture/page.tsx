@@ -31,13 +31,6 @@ import {
   CoilyHairIcon,
 } from '@/components/icons/hair-types';
 
-import {
-  StraightHairIcon,
-  WavyHairIcon,
-  CurlyHairIcon,
-  CoilyHairIcon,
-} from '@/components/icons/hair-types';
-
 /* ─── Sub-components ─── */
 
 function HairTypeSelector({
