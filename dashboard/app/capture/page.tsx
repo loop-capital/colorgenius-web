@@ -42,7 +42,7 @@ function HairTypeSelector({
   const options: { type: HairType; label: string; icon: React.ReactNode; color: string }[] = [
     { type: 'straight', label: 'Straight', icon: '➖', color: '#D8A6FF' },
     { type: 'wavy', label: 'Wavy', icon: '〰️', color: '#B57AED' },
-    { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} />, color: '#924EDA' },
+    { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} />, color: '#6E22C8' },
     { type: 'coily', label: 'Coily', icon: '🌀', color: '#6E22C8' },
   ];
 
@@ -67,7 +67,11 @@ function HairTypeSelector({
               border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <span className="text-3xl" style={{ color }}>{icon}</span>
+            {typeof icon === 'string' ? (
+              <span style={{ fontSize: 32, color, lineHeight: 1 }}>{icon}</span>
+            ) : (
+              React.cloneElement(icon, { color, size: 32 })
+            )}
             <span className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>
               {label}
             </span>
