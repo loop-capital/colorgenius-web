@@ -32,9 +32,9 @@ function HairTypeSelector({
   onSelect: (type: HairType) => void;
 }) {
   const options: { type: HairType; label: string; icon: string }[] = [
-    { type: 'straight', label: 'Straight', icon: '〰️' },
+    { type: 'straight', label: 'Straight', icon: '➖' },
     { type: 'wavy', label: 'Wavy', icon: '〰️' },
-    { type: 'curly', label: 'Curly', icon: '🦋' },
+    { type: 'curly', label: 'Curly', icon: '🌀' },
     { type: 'coily', label: 'Coily', icon: '🌀' },
   ];
 
