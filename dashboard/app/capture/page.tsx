@@ -66,7 +66,7 @@ function HairTypeSelector({
               border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <span className="text-3xl" style={{ color }}>{icon}</span>
+            {React.cloneElement(icon, { color, size: 32 })}
             <span className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>
               {label}
             </span>
