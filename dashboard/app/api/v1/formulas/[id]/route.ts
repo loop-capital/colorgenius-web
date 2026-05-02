@@ -24,7 +24,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid input", issues: parsed.error.issues }, { status: 400 });
     }
-    const formula = await prisma.formula.update({ where: { id }, data: parsed.data });
+    const formula = await prisma.formulation.update({ where: { id }, data: parsed.data });
     return NextResponse.json(formula, { status: 200 });
   } catch (e: any) {
     if (e?.code === "P2025") {
@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    await prisma.formula.delete({ where: { id } });
+    await prisma.formulation.delete({ where: { id } });
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (e: any) {
     if (e?.code === "P2025") {
