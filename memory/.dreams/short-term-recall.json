@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-27T12:07:14.292Z",
+  "updatedAt": "2026-05-02T11:51:34.400Z",
   "entries": {
     "memory:memory/standups/2026-04-25.md:1:39": {
       "key": "memory:memory/standups/2026-04-25.md:1:39",
@@ -9,19 +9,34 @@
       "endLine": 39,
       "source": "memory",
       "snippet": "# Daily Standup — April 25, 2026 ## Lucy (CEO) **Yesterday:** N/A (sprint kickoff) **Today:** Mobilized all 4 agents for 4-week beta sprint. Created sprint plan and updated project status. **Blockers:** None --- ## colorgenius-dev **Status:** 🔄 RUNNING **Task:** Design system + core APIs (Week 1) **Started:** Apr 25, 19:25 EDT --- ## colorgenius-research **Status:** 🔄 RUNNING **Task:** Photo analysis approach + formulation rules **Started:** Apr 25, 19:25 EDT --- ## colorgenius-architect **Status:** 🔄 RUNNING **Task:** DB schema + deployment plan + API contract **Started:** Apr 25, 19:25 EDT --- ## colorgenius-marketing **Status:** 🔄 RUNNING **Task:** Onboarding guide + manufact",
-      "recallCount": 2,
+      "recallCount": 12,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.7667597681283951,
-      "maxScore": 0.39773317277431486,
+      "totalScore": 5.410744074184079,
+      "maxScore": 0.5220389634370803,
       "firstRecalledAt": "2026-04-27T11:33:09.174Z",
-      "lastRecalledAt": "2026-04-27T11:33:36.831Z",
+      "lastRecalledAt": "2026-05-02T11:51:34.400Z",
       "queryHashes": [
         "9ce1e83154ca",
-        "60a68e268f36"
+        "60a68e268f36",
+        "5dbe0576b517",
+        "761ad13d3594",
+        "47a321f6a4d6",
+        "5f599f55d0ec",
+        "accf5ec0517b",
+        "1528c0ddd62f",
+        "fe748df3d14e",
+        "c94ab43e2ed2",
+        "05aa66324901",
+        "d9d131cb8f39"
       ],
       "recallDays": [
-        "2026-04-27"
+        "2026-04-27",
+        "2026-04-28",
+        "2026-04-29",
+        "2026-04-30",
+        "2026-05-01",
+        "2026-05-02"
       ],
       "conceptTags": [
         "n/a",
@@ -41,18 +56,28 @@
       "endLine": 53,
       "source": "memory",
       "snippet": "# Daily Standup — April 26, 2026 ## URGENT SPRINT MODE — Beta Delivery Accelerated **Sprint Goal:** Working beta for manufacturer demos + stylist hands-on **Deadline:** ASAP (pushed from May 23) **Status:** 🔴 CRITICAL — Accelerating to 24/7 delivery --- ## Immediate Priorities (Next 24 Hours) ### 1. Formulation Engine — MUST DELIVER TODAY **Owner:** colorgenius-dev + colorgenius-research **Status:** 🟡 In Progress **Blockers:** - Need shade database structured (Wella Koleston) - Need level/tone matching logic **Actions:** - [ ] Structure color-lines markdown into JSON database - [ ] Implement basic shade matching (target level → closest available) - [ ] Wire /api/formulate to real dat",
-      "recallCount": 1,
+      "recallCount": 8,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.393213751912117,
-      "maxScore": 0.393213751912117,
+      "totalScore": 4.069687297829823,
+      "maxScore": 0.823040512834894,
       "firstRecalledAt": "2026-04-27T11:33:36.831Z",
-      "lastRecalledAt": "2026-04-27T11:33:36.831Z",
+      "lastRecalledAt": "2026-05-01T17:21:46.152Z",
       "queryHashes": [
-        "60a68e268f36"
+        "60a68e268f36",
+        "761ad13d3594",
+        "47a321f6a4d6",
+        "accf5ec0517b",
+        "1528c0ddd62f",
+        "3c1b38b25ddc",
+        "c94ab43e2ed2",
+        "05aa66324901"
       ],
       "recallDays": [
-        "2026-04-27"
+        "2026-04-27",
+        "2026-04-29",
+        "2026-04-30",
+        "2026-05-01"
       ],
       "conceptTags": [
         "hands-on",
@@ -72,18 +97,26 @@
       "endLine": 110,
       "source": "memory",
       "snippet": "| colorgenius-ceo (me) | Coordination + Blocker removal | Updated status | --- ## Blockers to Remove 1. **Color database needs structuring** → Dev + Research pair on this TODAY 2. **Photo ML not ready** → Build manual fallback NOW, automate later 3. **No beta testers identified** → Marketing creates outreach list TODAY --- ## Success Criteria (End of Day) - [ ] Formulation endpoint returns real shade recommendations - [ ] Photo upload + manual analysis works - [ ] Client CRUD complete - [ ] Onboarding guide ready - [ ] App deploys successfully to Vercel --- **Next standup:** April 27, 00:00 EDT **Emergency contact:** Jason ( Telegram: 8540865337 ) *This is a sprint to the finish. Ev",
-      "recallCount": 1,
+      "recallCount": 6,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.3826823443174362,
-      "maxScore": 0.3826823443174362,
+      "totalScore": 2.923650586827244,
+      "maxScore": 0.5243433888818696,
       "firstRecalledAt": "2026-04-27T11:33:36.831Z",
-      "lastRecalledAt": "2026-04-27T11:33:36.831Z",
+      "lastRecalledAt": "2026-05-01T17:21:46.152Z",
       "queryHashes": [
-        "60a68e268f36"
+        "60a68e268f36",
+        "761ad13d3594",
+        "47a321f6a4d6",
+        "accf5ec0517b",
+        "c94ab43e2ed2",
+        "05aa66324901"
       ],
       "recallDays": [
-        "2026-04-27"
+        "2026-04-27",
+        "2026-04-29",
+        "2026-04-30",
+        "2026-05-01"
       ],
       "conceptTags": [
         "colorgenius-ceo",
@@ -103,18 +136,23 @@
       "endLine": 97,
       "source": "memory",
       "snippet": "**Deliverable:** Photo upload + manual analysis workflow (even if automated ML isn't ready) --- ### 3. Client CRUD — MUST DELIVER TODAY **Owner:** colorgenius-dev + colorgenius-architect **Status:** 🟢 Ready to implement **Blockers:** None **Actions:** - [ ] POST /api/clients endpoint - [ ] Client detail page (/clients/[id]) - [ ] Edit client inline - [ ] Connect client to formulation history **Deliverable:** Full client management UI + API --- ### 4. Beta Onboarding — MUST DELIVER TODAY **Owner:** colorgenius-marketing **Status:** 🟢 Ready to implement **Blockers:** None **Actions:** - [ ] Stylist onboarding guide (PDF) - [ ] First-time user tutorial - [ ] Manufacturer outreach email",
-      "recallCount": 1,
+      "recallCount": 4,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.3632321536540985,
-      "maxScore": 0.3632321536540985,
+      "totalScore": 1.7557458758354187,
+      "maxScore": 0.5057339131832123,
       "firstRecalledAt": "2026-04-27T12:07:14.292Z",
-      "lastRecalledAt": "2026-04-27T12:07:14.292Z",
+      "lastRecalledAt": "2026-04-30T09:21:43.391Z",
       "queryHashes": [
-        "493371016b39"
+        "493371016b39",
+        "761ad13d3594",
+        "47a321f6a4d6",
+        "accf5ec0517b"
       ],
       "recallDays": [
-        "2026-04-27"
+        "2026-04-27",
+        "2026-04-29",
+        "2026-04-30"
       ],
       "conceptTags": [
         "colorgenius-dev",
@@ -125,6 +163,130 @@
         "deliverable",
         "photo",
         "upload"
+      ]
+    },
+    "memory:memory/2026-04-27.md:46:72": {
+      "key": "memory:memory/2026-04-27.md:46:72",
+      "path": "memory/2026-04-27.md",
+      "startLine": 46,
+      "endLine": 72,
+      "source": "memory",
+      "snippet": "- ✅ TreatmentCard — Full-bleed gradient cards with visual mix ratio diagram - ✅ StepTransition — Framer Motion wizard step animations - ✅ GlassCard + StatCard — Glass morphism stat cards - Dev subagent working on page integration (separate task) ### 7. Parallel Agent Tasks (IN PROGRESS) - DevOps: Prisma migration + Redis setup - Architect: 12 API endpoint implementation - Research: Failed (gateway restart), face shape research done by Iris directly - Meta: Failed (no deliverables written), memory/SOP work done by Iris directly ## Decisions Made 1. **Single brand, dual experience for consumers** — \"ColorGenius Discover\" (sub-brand) not \"StyleGenius\" (separate brand). Rebrand to \"Look",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.37675130069255824,
+      "maxScore": 0.37675130069255824,
+      "firstRecalledAt": "2026-04-28T09:22:11.839Z",
+      "lastRecalledAt": "2026-04-28T09:22:11.839Z",
+      "queryHashes": [
+        "b8fa29cc3ab8"
+      ],
+      "recallDays": [
+        "2026-04-28"
+      ],
+      "conceptTags": [
+        "gateway",
+        "full-bleed",
+        "memory/sop",
+        "sub-brand",
+        "treatmentcard",
+        "full",
+        "bleed",
+        "gradient"
+      ]
+    },
+    "memory:memory/2026-04-27.md:22:52": {
+      "key": "memory:memory/2026-04-27.md:22:52",
+      "path": "memory/2026-04-27.md",
+      "startLine": 22,
+      "endLine": 52,
+      "source": "memory",
+      "snippet": "- V1: face shape analysis, skin tone matcher, AR try-on - V2: product recommendations, premium tier, e-commerce ### 4. Face Shape AI Research (COMPLETE) - `docs/face-shape-analysis-research.md` - Recommended: MediaPipe Face Mesh (468 landmarks, ~15ms inference, 2.5MB WASM) - 6 face shapes classified via landmark ratios - Style recommendation matrix by face shape ### 5. Design Elevation v1 (COMPLETE — NOT REFA LEVEL) - First pass: dark theme, teal/gold accents, shadcn-based components - Pages: dashboard home, 4-step formulate wizard, photo analysis, color library - Deployed to Vercel: https://dashboard-tau-five-16.vercel.app - Vercel framework preset fixed (was \"Other\" → now \"Next.js\") - De",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.3936768174171448,
+      "maxScore": 0.3936768174171448,
+      "firstRecalledAt": "2026-04-28T17:03:55.967Z",
+      "lastRecalledAt": "2026-04-28T17:03:55.967Z",
+      "queryHashes": [
+        "fe3c9e57663c"
+      ],
+      "recallDays": [
+        "2026-04-28"
+      ],
+      "conceptTags": [
+        "try-on",
+        "e-commerce",
+        "2.5mb",
+        "teal/gold",
+        "shadcn-based",
+        "4-step",
+        "dashboard-tau-five-16.vercel.app",
+        "next.js"
+      ]
+    },
+    "memory:memory/2026-04-25.md:1:15": {
+      "key": "memory:memory/2026-04-25.md:1:15",
+      "path": "memory/2026-04-25.md",
+      "startLine": 1,
+      "endLine": 15,
+      "source": "memory",
+      "snippet": "# 2026-04-25 — Week 1 Sprint Complete ## What Got Done ### Design System - **`globals.css`** — complete dark-mode-first CSS variable system. Primary teal `174 72% 47%`, background `225 25% 8%` (very dark blue-slate), card/surface layers, destructive/warning/success tokens, border radius, custom scrollbar, selection colors - **`tailwind.config.js`** — enabled `darkMode: 'class'`, bound all palette tokens to CSS variables. Added brand hair colors (rose, cream, gold, mahogany, violet) - **`AppShell.tsx`** — fully rewritten. Dark sidebar with teal logo, nav links with active state (teal bg), user info section. Mobile hamburger with overlay drawer. Responsive two-column layout (sidebar for desk",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4022864729166031,
+      "maxScore": 0.4022864729166031,
+      "firstRecalledAt": "2026-04-29T12:08:26.220Z",
+      "lastRecalledAt": "2026-04-29T12:08:26.220Z",
+      "queryHashes": [
+        "761ad13d3594"
+      ],
+      "recallDays": [
+        "2026-04-29"
+      ],
+      "conceptTags": [
+        "globals.css",
+        "dark-mode-first",
+        "blue-slate",
+        "card/surface",
+        "destructive/warning/success",
+        "tailwind.config.js",
+        "appshell.tsx",
+        "two-column"
+      ]
+    },
+    "memory:memory/standups/2026-04-27.md:68:110": {
+      "key": "memory:memory/standups/2026-04-27.md:68:110",
+      "path": "memory/standups/2026-04-27.md",
+      "startLine": 68,
+      "endLine": 110,
+      "source": "memory",
+      "snippet": "Warning: \"Target level requires 6 levels of lift, but only 3 achievable in one session. Consider a two-step process.\" ``` --- ## Formulation Accuracy: HIGH - ✅ Correct brand/line/shade code in every test - ✅ Correct mixing ratios per product type - ✅ Correct developer volumes based on lift required - ✅ Correct processing times (35-45 min permanent, would be 10-20 for demi) - ✅ Correct undertone correction logic - ✅ Correct application notes per virgin vs retouch - ✅ Correct gray coverage handling (>25% adds neutral additive) - ✅ Warnings when lift is unachievable in one session --- ## Current Database Coverage | Brand | Line | Shades | |-------|------|--------| | Wella | Koleston Perfe",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 0.4088302433490753,
+      "maxScore": 0.4088302433490753,
+      "firstRecalledAt": "2026-04-30T09:24:13.398Z",
+      "lastRecalledAt": "2026-04-30T09:24:13.398Z",
+      "queryHashes": [
+        "4f6312f17f00"
+      ],
+      "recallDays": [
+        "2026-04-30"
+      ],
+      "conceptTags": [
+        "two-step",
+        "brand/line/shade",
+        "35-45",
+        "10-20",
+        "warning",
+        "target",
+        "level",
+        "requires"
       ]
     }
   }

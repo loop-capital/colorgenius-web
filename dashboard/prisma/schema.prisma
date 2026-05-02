@@ -18,92 +18,93 @@ datasource db {
 // =====================================================
 
 model Salon {
-  id                     String   @id @default(uuid())
-  name                   String   @db.VarChar(200)
-  slug                   String   @unique @db.VarChar(200)
+  id   String @id @default(uuid())
+  name String @db.VarChar(200)
+  slug String @unique @db.VarChar(200)
 
-  address_line1          String?  @db.VarChar(200)
-  address_line2          String?  @db.VarChar(200)
-  city                   String?  @db.VarChar(100)
-  state                  String?  @db.VarChar(2)
-  postal_code            String?  @db.VarChar(20)
-  country                String   @default("US") @db.VarChar(2)
-  timezone               String   @default("America/New_York") @db.VarChar(50)
+  address_line1 String? @db.VarChar(200)
+  address_line2 String? @db.VarChar(200)
+  city          String? @db.VarChar(100)
+  state         String? @db.VarChar(2)
+  postal_code   String? @db.VarChar(20)
+  country       String  @default("US") @db.VarChar(2)
+  timezone      String  @default("America/New_York") @db.VarChar(50)
 
-  phone                  String?  @db.VarChar(50)
-  email                  String?  @db.VarChar(255)
+  phone String? @db.VarChar(50)
+  email String? @db.VarChar(255)
 
-  subscription_tier      String   @default("beta") @db.VarChar(20)
-  subscription_seats     Int      @default(5)
+  subscription_tier       String    @default("beta") @db.VarChar(20)
+  subscription_seats      Int       @default(5)
   subscription_expires_at DateTime?
 
-  preferred_brands       String[] // e.g., ['Redken', 'Wella']
+  preferred_brands String[] // e.g., ['Redken', 'Wella']
 
-  stylists               Stylist[]
-  clients                Client[]
+  stylists Stylist[]
+  clients  Client[]
 
-  created_at             DateTime @default(now())
-  updated_at             DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@index([subscription_tier])
 }
 
 model Stylist {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
   // Auth
-  email             String   @unique @db.VarChar(255)
-  password_hash     String   @db.VarChar(255)
+  email         String @unique @db.VarChar(255)
+  password_hash String @db.VarChar(255)
 
-  first_name        String   @db.VarChar(100)
-  last_name         String   @db.VarChar(100)
-  display_name      String?  @db.VarChar(100)
+  first_name   String  @db.VarChar(100)
+  last_name    String  @db.VarChar(100)
+  display_name String? @db.VarChar(100)
 
-  license_number    String?  @db.VarChar(50)
-  license_state     String?  @db.VarChar(2)
-  years_experience  Int      @default(0)
+  license_number   String? @db.VarChar(50)
+  license_state    String? @db.VarChar(2)
+  years_experience Int     @default(0)
 
-  salon_id          String?
-  salon             Salon?   @relation(fields: [salon_id], references: [id], onDelete: SetNull)
+  salon_id String?
+  salon    Salon?  @relation(fields: [salon_id], references: [id], onDelete: SetNull)
 
-  role              String   @default("stylist") @db.VarChar(50) // owner, manager, senior, stylist, assistant
+  role String @default("stylist") @db.VarChar(50) // owner, manager, senior, stylist, assistant
 
   // Preferences (JSONB for flexibility)
-  preferences       Json     @default("{\"default_brand\": null, \"preferred_developer\": 20, \"theme\": \"light\"}")
-  uplook_profile_url  String?
-  creator_stats       Json     @default("{}")
+  preferences        Json    @default("{\"default_brand\": null, \"preferred_developer\": 20, \"theme\": \"light\"}")
+  uplook_profile_url String?
+  creator_stats      Json    @default("{}")
 
   // Community & marketplace fields
-  uplook_user_id          String?
-  community_posts_count   Int       @default(0)
-  marketplace_templates_count Int   @default(0)
-  total_template_sales    Int       @default(0)
-  total_template_earnings_cents Int @default(0)
-  gallery_approved        Boolean   @default(false)
-  is_educator             Boolean   @default(false)
-  educator_bio            String?
+  uplook_user_id                String?
+  community_posts_count         Int     @default(0)
+  marketplace_templates_count   Int     @default(0)
+  total_template_sales          Int     @default(0)
+  total_template_earnings_cents Int     @default(0)
+  gallery_approved              Boolean @default(false)
+  is_educator                   Boolean @default(false)
+  educator_bio                  String?
 
-  formulations_count Int     @default(0)
-  last_login_at     DateTime?
+  formulations_count Int       @default(0)
+  last_login_at      DateTime?
 
-  is_active         Boolean  @default(true)
-  is_verified       Boolean  @default(false)
+  is_active   Boolean @default(true)
+  is_verified Boolean @default(false)
 
-  clients           Client[] @relation("PrimaryStylist")
-  formulations      Formulation[]
-  photos            Photo[]
-  client_visits     ClientVisit[]
-  communityPosts    CommunityPost[]
-  marketplaceTemplates    MarketplaceTemplate[]
-  templatePurchases     TemplatePurchase[]
-  templateReviews       TemplateReview[]
-  galleryPosts      GalleryPost[]
-  communityComments   CommunityComment[]
-  communityLikes    CommunityLike[]
-  communitySaves    CommunitySave[]
+  clients              Client[]              @relation("PrimaryStylist")
+  formulations         Formulation[]
+  photos               Photo[]
+  client_visits        ClientVisit[]
+  communityPosts       CommunityPost[]
+  marketplaceTemplates MarketplaceTemplate[]
+  templatePurchases    TemplatePurchase[]
+  templateReviews      TemplateReview[]
+  galleryPosts         GalleryPost[]
+  communityComments    CommunityComment[]
+  communityLikes       CommunityLike[]
+  communitySaves       CommunitySave[]
 
-  created_at        DateTime @default(now())
-  updated_at        DateTime @default(now()) @updatedAt
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @default(now()) @updatedAt
+  PhotoSession PhotoSession[]
 
   @@index([salon_id])
   @@index([email])
@@ -115,50 +116,51 @@ model Stylist {
 // =====================================================
 
 model Client {
-  id                 String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  first_name         String   @db.VarChar(100)
-  last_name          String   @db.VarChar(100)
-  email              String?  @db.VarChar(255)
-  phone              String?  @db.VarChar(50)
-  date_of_birth      DateTime? @db.Date
+  first_name    String    @db.VarChar(100)
+  last_name     String    @db.VarChar(100)
+  email         String?   @db.VarChar(255)
+  phone         String?   @db.VarChar(50)
+  date_of_birth DateTime? @db.Date
 
   primary_stylist_id String?
   primary_stylist    Stylist? @relation("PrimaryStylist", fields: [primary_stylist_id], references: [id], onDelete: SetNull)
 
-  salon_id           String?
-  salon              Salon?   @relation(fields: [salon_id], references: [id], onDelete: SetNull)
+  salon_id String?
+  salon    Salon?  @relation(fields: [salon_id], references: [id], onDelete: SetNull)
 
   // Hair profile (cached from latest analysis)
-  hair_texture       String?  @db.VarChar(20) // fine, medium, coarse
-  hair_density       String?  @db.VarChar(20) // thin, medium, thick
-  natural_level      Int?
-  natural_tone       String?  @db.VarChar(10)
-  porosity           String   @default("normal") @db.VarChar(20) // low, normal, high
-  scalp_condition    String   @default("normal") @db.VarChar(20) // sensitive, normal, dry, oily
+  hair_texture    String? @db.VarChar(20) // fine, medium, coarse
+  hair_density    String? @db.VarChar(20) // thin, medium, thick
+  natural_level   Int?
+  natural_tone    String? @db.VarChar(10)
+  porosity        String  @default("normal") @db.VarChar(20) // low, normal, high
+  scalp_condition String  @default("normal") @db.VarChar(20) // sensitive, normal, dry, oily
 
   // Medical / sensitivities (critical for safety)
-  allergies          Json     @default("{\"ppd\": false, \"ammonia\": false, \"fragrance\": false, \"known_allergens\": []}")
+  allergies Json @default("{\"ppd\": false, \"ammonia\": false, \"fragrance\": false, \"known_allergens\": []}")
 
-  has_straightening  Boolean  @default(false)
-  has_permed_hair    Boolean  @default(false)
-  has_metallic_dye   Boolean  @default(false)
-  has_henna          Boolean  @default(false)
-  has_previous_color Boolean  @default(false)
+  has_straightening       Boolean   @default(false)
+  has_permed_hair         Boolean   @default(false)
+  has_metallic_dye        Boolean   @default(false)
+  has_henna               Boolean   @default(false)
+  has_previous_color      Boolean   @default(false)
   last_color_service_date DateTime? @db.Date
 
-  general_notes      String?
+  general_notes String?
 
-  total_visits       Int      @default(0)
-  last_visit_at      DateTime?
+  total_visits  Int       @default(0)
+  last_visit_at DateTime?
 
-  formulations       Formulation[]
-  photos             Photo[]
-  client_visits      ClientVisit[]
-  templatePurchases  TemplatePurchase[]
+  formulations      Formulation[]
+  photos            Photo[]
+  client_visits     ClientVisit[]
+  templatePurchases TemplatePurchase[]
 
-  created_at         DateTime @default(now())
-  updated_at         DateTime @default(now()) @updatedAt
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @default(now()) @updatedAt
+  PhotoSession PhotoSession[]
 
   @@index([primary_stylist_id])
   @@index([salon_id])
@@ -171,53 +173,53 @@ model Client {
 // =====================================================
 
 model Brand {
-  id              String        @id @default(uuid())
-  name            String        @unique @db.VarChar(100)
-  slug            String        @unique @db.VarChar(100)
-  manufacturer    String?       @db.VarChar(100)
-  origin_country  String        @default("US") @db.VarChar(2)
-  tier            String        @db.VarChar(20)
-  is_active       Boolean       @default(true)
+  id             String  @id @default(uuid())
+  name           String  @unique @db.VarChar(100)
+  slug           String  @unique @db.VarChar(100)
+  manufacturer   String? @db.VarChar(100)
+  origin_country String  @default("US") @db.VarChar(2)
+  tier           String  @db.VarChar(20)
+  is_active      Boolean @default(true)
 
-  product_lines   ProductLine[]
-  developers      Developer[]
+  product_lines ProductLine[]
+  developers    Developer[]
 
-  created_at      DateTime      @default(now())
+  created_at DateTime @default(now())
 
   @@index([is_active])
 }
 
 model ProductLine {
-  id                  String   @id @default(uuid())
-  brand_id            String
-  brand               Brand    @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  id       String @id @default(uuid())
+  brand_id String
+  brand    Brand  @relation(fields: [brand_id], references: [id], onDelete: Cascade)
 
-  name                String   @db.VarChar(100)
-  code                String?  @unique @db.VarChar(20)
-  slug                String   @db.VarChar(100)
+  name String  @db.VarChar(100)
+  code String? @unique @db.VarChar(20)
+  slug String  @db.VarChar(100)
 
-  color_type          String   @db.VarChar(50)
+  color_type String @db.VarChar(50)
 
-  ammonia_free        Boolean  @default(false)
-  plex_technology     String?  @db.VarChar(50)
+  ammonia_free    Boolean @default(false)
+  plex_technology String? @db.VarChar(50)
 
-  alkaline_agent      String?  @db.VarChar(20)
+  alkaline_agent String? @db.VarChar(20)
 
-  max_gray_coverage   Int?
-  max_lift_levels     Int?
+  max_gray_coverage Int?
+  max_lift_levels   Int?
 
-  mixing_ratio        String   @db.VarChar(10)
-  developer_options   Int[]
+  mixing_ratio      String @db.VarChar(10)
+  developer_options Int[]
 
   base_processing_time Int?
   max_processing_time  Int?
-  can_use_heat        Boolean  @default(true)
+  can_use_heat         Boolean @default(true)
 
-  is_active           Boolean  @default(true)
+  is_active Boolean @default(true)
 
-  shades              Shade[]
+  shades Shade[]
 
-  created_at          DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@unique([brand_id, name])
   @@index([brand_id])
@@ -226,36 +228,36 @@ model ProductLine {
 }
 
 model Shade {
-  id                    String   @id @default(uuid())
-  product_line_id       String
-  product_line          ProductLine @relation(fields: [product_line_id], references: [id], onDelete: Cascade)
+  id              String      @id @default(uuid())
+  product_line_id String
+  product_line    ProductLine @relation(fields: [product_line_id], references: [id], onDelete: Cascade)
 
-  shade_code            String   @db.VarChar(20)
-  shade_name            String?  @db.VarChar(100)
+  shade_code String  @db.VarChar(20)
+  shade_name String? @db.VarChar(100)
 
-  level                 Int?
+  level Int?
 
-  primary_tone          String?  @db.VarChar(10)
-  secondary_tone        String?  @db.VarChar(10)
+  primary_tone   String? @db.VarChar(10)
+  secondary_tone String? @db.VarChar(10)
 
-  is_natural            Boolean  @default(false)
-  is_high_lift          Boolean  @default(false)
-  is_clear              Boolean  @default(false)
+  is_natural   Boolean @default(false)
+  is_high_lift Boolean @default(false)
+  is_clear     Boolean @default(false)
 
-  undertone             String?  @db.VarChar(50)
+  undertone String? @db.VarChar(50)
 
-  rgb_representation    Int[]
-  lab_representation    Float[]
+  rgb_representation Int[]
+  lab_representation Float[]
 
-  best_for              String[]
-  not_recommended_for   String[]
+  best_for            String[]
+  not_recommended_for String[]
 
-  swatch_image_url      String?
-  result_image_urls     String[]
+  swatch_image_url  String?
+  result_image_urls String[]
 
-  is_active             Boolean  @default(true)
+  is_active Boolean @default(true)
 
-  created_at            DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@unique([product_line_id, shade_code])
   @@index([product_line_id])
@@ -266,21 +268,21 @@ model Shade {
 }
 
 model Developer {
-  id                String   @id @default(uuid())
-  brand_id          String?
-  brand             Brand?   @relation(fields: [brand_id], references: [id], onDelete: Cascade)
+  id       String  @id @default(uuid())
+  brand_id String?
+  brand    Brand?  @relation(fields: [brand_id], references: [id], onDelete: Cascade)
 
-  name              String   @db.VarChar(100)
-  volume            Int
+  name   String @db.VarChar(100)
+  volume Int
 
-  h2o2_percentage   Decimal? @db.Decimal(4, 2)
-  viscosity         String?  @db.VarChar(20)
+  h2o2_percentage Decimal? @db.Decimal(4, 2)
+  viscosity       String?  @db.VarChar(20)
 
   special_properties String[]
 
-  is_active         Boolean  @default(true)
+  is_active Boolean @default(true)
 
-  created_at        DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@unique([brand_id, volume])
   @@index([brand_id])
@@ -291,53 +293,53 @@ model Developer {
 // =====================================================
 
 model Formulation {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  stylist_id        String
-  stylist           Stylist  @relation(fields: [stylist_id], references: [id])
+  stylist_id String
+  stylist    Stylist @relation(fields: [stylist_id], references: [id])
 
-  client_id         String?
-  client            Client?  @relation(fields: [client_id], references: [id], onDelete: SetNull)
+  client_id String?
+  client    Client? @relation(fields: [client_id], references: [id], onDelete: SetNull)
 
   // Input context (denormalized for performance)
-  input_data        Json
+  input_data Json
 
   // Result
-  action_type       String?  @db.VarChar(50)
+  action_type String? @db.VarChar(50)
 
-  brand             String?  @db.VarChar(50)
-  product_line      String?  @db.VarChar(100)
+  brand        String? @db.VarChar(50)
+  product_line String? @db.VarChar(100)
 
-  primary_formula   Json
-  toning_formula    Json?
+  primary_formula Json
+  toning_formula  Json?
 
   processing_instructions Json
 
   // Warnings and validation
-  warnings          String[]
-  confidence_score  Decimal? @db.Decimal(4, 3)
+  warnings         String[]
+  confidence_score Decimal? @db.Decimal(4, 3)
 
   // Status
-  status            String   @default("generated") @db.VarChar(20)
+  status String @default("generated") @db.VarChar(20)
 
   // Scoring (filled after result)
-  score_accuracy    Int?
-  score_condition   Int?
-  score_evenness    Int?
-  score_overall     Int?
+  score_accuracy  Int?
+  score_condition Int?
+  score_evenness  Int?
+  score_overall   Int?
 
-  stylist_notes     String?
+  stylist_notes String?
 
-  photos            Photo[]
-  client_visits     ClientVisit[]
-  communityPost     CommunityPost?
+  photos        Photo[]
+  client_visits ClientVisit[]
+  communityPost CommunityPost?
 
   // Community & marketplace fields
   is_shared         Boolean @default(false)
   community_post_id String?
 
-  created_at        DateTime @default(now())
-  updated_at        DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@index([stylist_id])
   @@index([client_id])
@@ -352,42 +354,57 @@ model Formulation {
 // =====================================================
 
 model Photo {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  formulation_id  String?
-  formulation       Formulation? @relation(fields: [formulation_id], references: [id], onDelete: Cascade)
+  // PhotoSession relation (camera capture)
+  sessionId String?
+  session   PhotoSession? @relation("PhotoSessionPhotos", fields: [sessionId], references: [id])
 
-  client_id         String?
-  client            Client?  @relation(fields: [client_id], references: [id], onDelete: SetNull)
+  // Existing relations (backward compatibility)
+  formulation_id String?
+  formulation    Formulation? @relation(fields: [formulation_id], references: [id], onDelete: Cascade)
 
-  stylist_id        String?
-  stylist           Stylist? @relation(fields: [stylist_id], references: [id])
+  client_id String?
+  client    Client? @relation(fields: [client_id], references: [id], onDelete: SetNull)
 
-  photo_type        String   @db.VarChar(20)
-  photo_label       String?  @db.VarChar(50)
+  stylist_id String?
+  stylist    Stylist? @relation(fields: [stylist_id], references: [id])
+
+  // Enhanced for camera capture
+  angle          String        @db.VarChar(20) // "roots", "mid", "ends"
+  url            String        // Storage URL (S3/Cloudflare R2)
+  storageKey     String?       // Object key in R2/S3 bucket
+  analysisStatus AnalysisStatus @default(pending)
+  colorProfile   Json?         // Structured color data per hair section angle
+  sizeBytes      Int?
 
   // Storage
-  original_url      String
-  processed_url     String?
-  thumbnail_url     String?
+  original_url  String
+  processed_url String?
+  thumbnail_url String?
 
   // Metadata
-  file_size_bytes   Int?
-  width             Int?
-  height            Int?
-  format            String?  @db.VarChar(10)
+  file_size_bytes Int?
+  width           Int?
+  height          Int?
+  format          String? @db.VarChar(10)
 
   // Analysis results (if processed)
-  analysis_results  Json?
+  analysis_results Json?
 
-  processing_status String   @default("pending") @db.VarChar(20)
-  community_posts  CommunityPost[] @relation("CommunityPostPhotos")
+  mimeType          String?         @db.VarChar(50)
+  processing_status String          @default("pending") @db.VarChar(20)
+  community_posts   CommunityPost[] @relation("CommunityPostPhotos")
 
-  created_at        DateTime @default(now())
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+  AnalysisResult AnalysisResult[]
 
   @@index([formulation_id])
   @@index([client_id])
-  @@index([photo_type])
+  @@index([sessionId])
+  @@index([angle])
+  @@index([analysisStatus])
   @@index([processing_status])
 }
 
@@ -396,30 +413,30 @@ model Photo {
 // =====================================================
 
 model ClientVisit {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  client_id         String
-  client            Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  client_id String
+  client    Client @relation(fields: [client_id], references: [id], onDelete: Cascade)
 
-  stylist_id        String
-  stylist           Stylist  @relation(fields: [stylist_id], references: [id])
+  stylist_id String
+  stylist    Stylist @relation(fields: [stylist_id], references: [id])
 
-  formulation_id    String?   @unique
-  formulation       Formulation? @relation(fields: [formulation_id], references: [id], onDelete: SetNull)
+  formulation_id String?      @unique
+  formulation    Formulation? @relation(fields: [formulation_id], references: [id], onDelete: SetNull)
 
-  visit_date        DateTime
-  service_type      String?  @db.VarChar(50)
+  visit_date   DateTime
+  service_type String?  @db.VarChar(50)
 
   // Snapshot of hair state at visit
-  hair_state        Json?
+  hair_state Json?
 
   // Outcome
   client_satisfaction Int?
-  stylist_notes     String?
+  stylist_notes       String?
 
-  photos            Json?
+  photos Json?
 
-  created_at        DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@index([client_id])
   @@index([stylist_id])
@@ -432,21 +449,21 @@ model ClientVisit {
 // =====================================================
 
 model AuditLog {
-  id              String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  actor_type      String?  @db.VarChar(20)
-  actor_id        String?
+  actor_type String? @db.VarChar(20)
+  actor_id   String?
 
-  action          String   @db.VarChar(100)
-  resource_type   String   @db.VarChar(50)
-  resource_id     String?
+  action        String  @db.VarChar(100)
+  resource_type String  @db.VarChar(50)
+  resource_id   String?
 
-  details         Json?
+  details Json?
 
-  ip_address      String?  @db.Inet
-  user_agent      String?
+  ip_address String? @db.Inet
+  user_agent String?
 
-  created_at      DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@index([actor_type, actor_id])
   @@index([action])
@@ -459,46 +476,46 @@ model AuditLog {
 // =====================================================
 
 model CommunityPost {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
   // Ownership & linking
-  stylist_id        String
-  stylist           Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+  stylist_id String
+  stylist    Stylist @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
 
-  formulation_id    String?   @unique
-  formulation         Formulation? @relation(fields: [formulation_id], references: [id], onDelete: SetNull)
+  formulation_id String?      @unique
+  formulation    Formulation? @relation(fields: [formulation_id], references: [id], onDelete: SetNull)
 
   // Photos (direct URLs for quick access)
-  before_photo_url  String?
-  after_photo_url   String?
+  before_photo_url String?
+  after_photo_url  String?
 
   // Content
-  caption           String?  @db.VarChar(2000)
-  hair_description  String?  @db.VarChar(1000)
-  tags              String[] // e.g., ['balayage', 'blonde', 'transformation']
+  caption          String?  @db.VarChar(2000)
+  hair_description String?  @db.VarChar(1000)
+  tags             String[] // e.g., ['balayage', 'blonde', 'transformation']
 
   // Engagement counters (denormalized for performance)
-  likes_count       Int      @default(0)
-  saves_count       Int      @default(0)
-  comments_count    Int      @default(0)
-  trend_score       Float    @default(0)
+  likes_count    Int   @default(0)
+  saves_count    Int   @default(0)
+  comments_count Int   @default(0)
+  trend_score    Float @default(0)
 
   // Visibility & moderation
-  is_public         Boolean  @default(true)
-  moderation_status String   @default("pending") @db.VarChar(20) // pending | approved | rejected
-  rejection_reason  String?  @db.VarChar(500)
+  is_public         Boolean @default(true)
+  moderation_status String  @default("pending") @db.VarChar(20) // pending | approved | rejected
+  rejection_reason  String? @db.VarChar(500)
 
   // Timestamps
-  created_at        DateTime @default(now())
-  updated_at        DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   // Relations
-  photos            Photo[]  @relation("CommunityPostPhotos")
-  comments          CommunityComment[]
-  likes             CommunityLike[]
-  saves             CommunitySave[]
+  photos              Photo[]              @relation("CommunityPostPhotos")
+  comments            CommunityComment[]
+  likes               CommunityLike[]
+  saves               CommunitySave[]
   marketplaceTemplate MarketplaceTemplate?
-  galleryPost       GalleryPost?
+  galleryPost         GalleryPost?
 
   @@index([stylist_id])
   @@index([formulation_id])
@@ -511,24 +528,24 @@ model CommunityPost {
 }
 
 model CommunityComment {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  post_id           String
-  post              CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  post_id String
+  post    CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
-  author_id         String
-  author            Stylist  @relation(fields: [author_id], references: [id], onDelete: Cascade)
+  author_id String
+  author    Stylist @relation(fields: [author_id], references: [id], onDelete: Cascade)
 
   // Self-referential for reply threads
-  parent_id         String?
-  parent            CommunityComment? @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: SetNull)
-  replies           CommunityComment[] @relation("CommentReplies")
+  parent_id String?
+  parent    CommunityComment?  @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: SetNull)
+  replies   CommunityComment[] @relation("CommentReplies")
 
-  content           String   @db.VarChar(2000)
-  is_deleted        Boolean  @default(false)
+  content    String  @db.VarChar(2000)
+  is_deleted Boolean @default(false)
 
-  created_at        DateTime @default(now())
-  updated_at        DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@index([post_id])
   @@index([author_id])
@@ -538,15 +555,15 @@ model CommunityComment {
 }
 
 model CommunityLike {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  post_id           String
-  post              CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  post_id String
+  post    CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
-  stylist_id        String
-  stylist           Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+  stylist_id String
+  stylist    Stylist @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
 
-  created_at        DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@unique([post_id, stylist_id])
   @@index([post_id])
@@ -555,15 +572,15 @@ model CommunityLike {
 }
 
 model CommunitySave {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  post_id           String
-  post              CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  post_id String
+  post    CommunityPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
 
-  stylist_id        String
-  stylist           Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+  stylist_id String
+  stylist    Stylist @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
 
-  created_at        DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@unique([post_id, stylist_id])
   @@index([post_id])
@@ -576,49 +593,49 @@ model CommunitySave {
 // =====================================================
 
 model MarketplaceTemplate {
-  id                      String   @id @default(uuid())
+  id String @id @default(uuid())
 
   // Source community post (one-to-one)
-  community_post_id       String   @unique
-  communityPost           CommunityPost @relation(fields: [community_post_id], references: [id], onDelete: Cascade)
+  community_post_id String        @unique
+  communityPost     CommunityPost @relation(fields: [community_post_id], references: [id], onDelete: Cascade)
 
   // Ownership
-  stylist_id              String
-  stylist                 Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+  stylist_id String
+  stylist    Stylist @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
 
   // Pricing
-  price_cents             Int      @default(0)
+  price_cents Int @default(0)
 
   // Adaptation & preview data
-  adaptation_params       Json     // e.g., hair_level_range, porosity_compatible, etc.
-  preview_data            Json     // cached preview for storefront
+  adaptation_params Json // e.g., hair_level_range, porosity_compatible, etc.
+  preview_data      Json // cached preview for storefront
 
   // Listing content
-  title                   String   @db.VarChar(200)
-  description             String?  @db.VarChar(2000)
-  category                String   @db.VarChar(50)
-  tags                    String[]
+  title       String   @db.VarChar(200)
+  description String?  @db.VarChar(2000)
+  category    String   @db.VarChar(50)
+  tags        String[]
 
   // Stats
-  review_count            Int      @default(0)
-  avg_rating              Float    @default(0)
-  sales_count             Int      @default(0)
-  total_earnings_cents    Int      @default(0)
+  review_count         Int   @default(0)
+  avg_rating           Float @default(0)
+  sales_count          Int   @default(0)
+  total_earnings_cents Int   @default(0)
 
   // Status
-  status                  String   @default("pending_review") @db.VarChar(20) // pending_review | approved | rejected | paused
+  status String @default("pending_review") @db.VarChar(20) // pending_review | approved | rejected | paused
 
   // ByondEdu educator integration
-  is_premium              Boolean  @default(false)
-  educator_id             String?  // ByondEdu educator ID if premium template
+  is_premium  Boolean @default(false)
+  educator_id String? // ByondEdu educator ID if premium template
 
-  created_at              DateTime @default(now())
-  updated_at              DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   // Relations
-  purchases               TemplatePurchase[]
-  reviews                 TemplateReview[]
-  trendingFeeds           TrendingFeed[]
+  purchases     TemplatePurchase[]
+  reviews       TemplateReview[]
+  trendingFeeds TrendingFeed[]
 
   @@index([stylist_id])
   @@index([status])
@@ -634,35 +651,35 @@ model MarketplaceTemplate {
 }
 
 model TemplatePurchase {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  buyer_stylist_id  String
-  buyer             Stylist  @relation(fields: [buyer_stylist_id], references: [id], onDelete: Cascade)
+  buyer_stylist_id String
+  buyer            Stylist @relation(fields: [buyer_stylist_id], references: [id], onDelete: Cascade)
 
-  template_id       String
-  template          MarketplaceTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
+  template_id String
+  template    MarketplaceTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
 
   // Optional: target client for adaptation
-  client_id         String?
-  client            Client?  @relation(fields: [client_id], references: [id], onDelete: SetNull)
+  client_id String?
+  client    Client? @relation(fields: [client_id], references: [id], onDelete: SetNull)
 
   // Financial
-  price_paid_cents  Int
+  price_paid_cents Int
 
   // Adaptation result
   adaptation_result Json?
   confidence_score  Float?
 
   // Status lifecycle
-  status            String   @default("purchased") @db.VarChar(20) // purchased | adapted | applied | refunded
+  status String @default("purchased") @db.VarChar(20) // purchased | adapted | applied | refunded
 
-  purchased_at      DateTime @default(now())
-  adapted_at        DateTime?
-  applied_at        DateTime?
-  refunded_at       DateTime?
+  purchased_at DateTime  @default(now())
+  adapted_at   DateTime?
+  applied_at   DateTime?
+  refunded_at  DateTime?
 
   // Relations
-  revenueSplits     RevenueSplit[]
+  revenueSplits RevenueSplit[]
 
   @@index([buyer_stylist_id])
   @@index([template_id])
@@ -673,21 +690,21 @@ model TemplatePurchase {
 }
 
 model TemplateReview {
-  id                    String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  template_id           String
-  template              MarketplaceTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
+  template_id String
+  template    MarketplaceTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
 
-  reviewer_stylist_id   String
-  reviewer              Stylist  @relation(fields: [reviewer_stylist_id], references: [id], onDelete: Cascade)
+  reviewer_stylist_id String
+  reviewer            Stylist @relation(fields: [reviewer_stylist_id], references: [id], onDelete: Cascade)
 
-  rating                Int      // 1-5
-  comment               String?  @db.VarChar(2000)
+  rating  Int // 1-5
+  comment String? @db.VarChar(2000)
 
-  is_verified_purchase  Boolean  @default(false)
+  is_verified_purchase Boolean @default(false)
 
-  created_at            DateTime @default(now())
-  updated_at            DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@index([template_id])
   @@index([reviewer_stylist_id])
@@ -698,22 +715,22 @@ model TemplateReview {
 }
 
 model RevenueSplit {
-  id                  String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  purchase_id         String
-  purchase            TemplatePurchase @relation(fields: [purchase_id], references: [id], onDelete: Cascade)
+  purchase_id String
+  purchase    TemplatePurchase @relation(fields: [purchase_id], references: [id], onDelete: Cascade)
 
-  recipient_type      String   @db.VarChar(30) // creator | platform | transaction_fee | byondedu
-  recipient_id        String   // Stripe account ID or internal platform ID
+  recipient_type String @db.VarChar(30) // creator | platform | transaction_fee | byondedu
+  recipient_id   String // Stripe account ID or internal platform ID
 
-  amount_cents        Int
+  amount_cents Int
 
-  status              String   @default("pending") @db.VarChar(20) // pending | paid | failed
+  status String @default("pending") @db.VarChar(20) // pending | paid | failed
 
-  paid_at             DateTime?
-  stripe_transfer_id  String?  @db.VarChar(100)
+  paid_at            DateTime?
+  stripe_transfer_id String?   @db.VarChar(100)
 
-  created_at          DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@index([purchase_id])
   @@index([recipient_type])
@@ -728,23 +745,23 @@ model RevenueSplit {
 // =====================================================
 
 model TrendingFeed {
-  id                String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  feed_type         String   @db.VarChar(30) // trending | seasonal | editors_pick | new_arrivals
+  feed_type String @db.VarChar(30) // trending | seasonal | editors_pick | new_arrivals
 
   // Optional seasonal context
-  season            String?  @db.VarChar(20) // spring | summer | fall | winter
+  season String? @db.VarChar(20) // spring | summer | fall | winter
 
-  template_id       String
-  template          MarketplaceTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
+  template_id String
+  template    MarketplaceTemplate @relation(fields: [template_id], references: [id], onDelete: Cascade)
 
-  rank_position     Int      // 1 = top of feed
-  score             Float    @default(0)
+  rank_position Int // 1 = top of feed
+  score         Float @default(0)
 
-  featured_until    DateTime?
+  featured_until DateTime?
 
-  created_at        DateTime @default(now())
-  updated_at        DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   @@index([feed_type])
   @@index([season])
@@ -761,38 +778,38 @@ model TrendingFeed {
 // =====================================================
 
 model GalleryPost {
-  id                        String   @id @default(uuid())
+  id String @id @default(uuid())
 
   // One-to-one with community post
-  community_post_id         String   @unique
-  communityPost             CommunityPost @relation(fields: [community_post_id], references: [id], onDelete: Cascade)
+  community_post_id String        @unique
+  communityPost     CommunityPost @relation(fields: [community_post_id], references: [id], onDelete: Cascade)
 
-  stylist_id                String
-  stylist                   Stylist  @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+  stylist_id String
+  stylist    Stylist @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
 
   // Consumer engagement (denormalized)
-  consumer_likes_count      Int      @default(0)
-  consumer_saves_count      Int      @default(0)
+  consumer_likes_count Int @default(0)
+  consumer_saves_count Int @default(0)
 
   // Featured curation
-  featured_rank             Int?
-  featured_until            DateTime?
+  featured_rank  Int?
+  featured_until DateTime?
 
   // UpLook profile linkage
   stylist_uplook_profile_url String
-  stylist_uplook_user_id   String?
+  stylist_uplook_user_id     String?
 
   // Seasonal curation
-  is_featured               Boolean  @default(false)
-  is_seasonal_pick          Boolean  @default(false)
-  season_tag                String?  @db.VarChar(20)
+  is_featured      Boolean @default(false)
+  is_seasonal_pick Boolean @default(false)
+  season_tag       String? @db.VarChar(20)
 
-  created_at                DateTime @default(now())
-  updated_at                DateTime @default(now()) @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 
   // Relations
-  consumerLikes             ConsumerLike[]
-  consumerSaves             ConsumerSave[]
+  consumerLikes ConsumerLike[]
+  consumerSaves ConsumerSave[]
 
   @@index([stylist_id])
   @@index([featured_rank])
@@ -806,16 +823,16 @@ model GalleryPost {
 }
 
 model ConsumerLike {
-  id                    String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  gallery_post_id       String
-  galleryPost           GalleryPost @relation(fields: [gallery_post_id], references: [id], onDelete: Cascade)
+  gallery_post_id String
+  galleryPost     GalleryPost @relation(fields: [gallery_post_id], references: [id], onDelete: Cascade)
 
   // Anonymous or authenticated
-  consumer_fingerprint  String?  @db.VarChar(64) // browser fingerprint for anonymous
-  consumer_email        String?  @db.VarChar(255)
+  consumer_fingerprint String? @db.VarChar(64) // browser fingerprint for anonymous
+  consumer_email       String? @db.VarChar(255)
 
-  created_at            DateTime @default(now())
+  created_at DateTime @default(now())
 
   // One like per anonymous fingerprint OR per email
   @@unique([gallery_post_id, consumer_fingerprint])
@@ -827,16 +844,16 @@ model ConsumerLike {
 }
 
 model ConsumerSave {
-  id                    String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  gallery_post_id       String
-  galleryPost           GalleryPost @relation(fields: [gallery_post_id], references: [id], onDelete: Cascade)
+  gallery_post_id String
+  galleryPost     GalleryPost @relation(fields: [gallery_post_id], references: [id], onDelete: Cascade)
 
   // Anonymous or authenticated
-  consumer_fingerprint  String?  @db.VarChar(64)
-  consumer_email        String?  @db.VarChar(255)
+  consumer_fingerprint String? @db.VarChar(64)
+  consumer_email       String? @db.VarChar(255)
 
-  created_at            DateTime @default(now())
+  created_at DateTime @default(now())
 
   // One save per anonymous fingerprint OR per email
   @@unique([gallery_post_id, consumer_fingerprint])
@@ -845,4 +862,155 @@ model ConsumerSave {
   @@index([consumer_fingerprint])
   @@index([consumer_email])
   @@index([created_at])
+}
+
+// =====================================================
+// VISH INTEGRATION: FORMULAS, INVENTORY, PRICING
+// =====================================================
+
+model Formula {
+  id                   String   @id @default(cuid())
+  clientId             String
+  stylistId            String
+  salonId              String
+  brand                String   @db.VarChar(100)
+  shadeCode            String   @db.VarChar(50)
+  shadeName            String   @db.VarChar(100)
+  developerVolume      Int
+  mixingRatio          String   @db.VarChar(20)
+  processingTime       Int // minutes
+  applicationTechnique String?  @db.VarChar(100)
+  notes                String?  @db.Text
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([stylistId])
+  @@index([salonId])
+  @@index([brand])
+  @@index([shadeCode])
+  @@index([createdAt])
+}
+
+model InventoryItem {
+  id                String   @id @default(cuid())
+  salonId           String
+  brand             String   @db.VarChar(100)
+  shadeCode         String   @db.VarChar(50)
+  shadeName         String   @db.VarChar(100)
+  quantity          Float
+  unit              String   @db.VarChar(10) // e.g., "oz", "g"
+  lowStockThreshold Float?
+  lastUpdated       DateTime @updatedAt
+
+  @@unique([salonId, brand, shadeCode])
+  @@index([salonId])
+  @@index([brand])
+  @@index([shadeCode])
+  @@index([quantity])
+  @@index([lowStockThreshold])
+}
+
+model PricingRule {
+  id            String   @id @default(cuid())
+  salonId       String
+  serviceType   String   @db.VarChar(50) // e.g., "single-process", "double-process", "balayage"
+  basePrice     Float
+  pricePerOz    Float?
+  minimumPrice  Float?
+  effectiveDate DateTime
+  createdAt     DateTime @default(now())
+
+  @@index([salonId])
+  @@index([serviceType])
+  @@index([effectiveDate])
+  @@index([salonId, serviceType])
+}
+
+// =====================================================
+// CAMERA CAPTURE - Photo Sessions & Analysis
+// Added for ColorGenius PWA camera functionality
+// =====================================================
+
+enum SessionStatus {
+  pending
+  capturing
+  analyzing
+  complete
+  error
+}
+
+enum AnalysisStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+model PhotoSession {
+  id        String        @id @default(uuid())
+  clientId  String?
+  client    Client?       @relation(fields: [clientId], references: [id])
+  stylistId String?
+  stylist   Stylist?      @relation(fields: [stylistId], references: [id])
+  hairType  String        @db.VarChar(50) // e.g., "4c", "3b", "2a"
+
+  /// JSON object describing lighting setup: { source: "natural"|"fluorescent"|"led"|"mixed", notes?: string }
+  lightingConditions Json?
+
+  status      SessionStatus @default(pending)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  completedAt DateTime?
+
+  photos          Photo[]          @relation("PhotoSessionPhotos")
+  analysisResults AnalysisResult[] @relation("SessionAnalysisResults")
+
+  @@index([clientId])
+  @@index([stylistId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AnalysisResult {
+  id        String        @id @default(uuid())
+  photoId   String?       @unique
+  photo     Photo?        @relation(fields: [photoId], references: [id])
+  sessionId String?
+  session   PhotoSession? @relation("SessionAnalysisResults", fields: [sessionId], references: [id])
+
+  // Core color analysis
+  dominantColor     String @db.VarChar(7) // Hex format #RRGGBB
+  dominantColorName String @db.VarChar(50) // e.g., "Dark Brown", "Light Auburn"
+  rgbR              Int
+  rgbG              Int
+  rgbB              Int
+
+  // Underlying pigment analysis
+  underlyingPigment   String  @db.VarChar(50) // "Red", "Orange", "Yellow", etc.
+  warmthCoolnessRatio Decimal @default(1.0) // >1 = warm, <1 = cool
+
+  // Hair condition metrics
+  porosityEstimate  String @db.VarChar(20) // "low", "medium", "high"
+  damageLevel       String @db.VarChar(20) // "none", "minimal", "moderate", "severe"
+  cuticleVisibility Int    @default(0) // 0-100 scale
+
+  // Confidence and quality metrics
+  confidenceScore Int    @default(80) // 0-100
+  lightingQuality String @db.VarChar(20) // "poor", "fair", "good", "excellent"
+  angleAccuracy   String @db.VarChar(20) // "poor", "fair", "good", "excellent"
+
+  // Processing metadata
+  processedAt  DateTime @default(now())
+  modelVersion String   @db.VarChar(50) // AI model version used
+
+  // Raw analysis payload for extensibility
+  analysisData Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([photoId])
+  @@index([sessionId])
+  @@index([dominantColor])
+  @@index([confidenceScore])
 }
