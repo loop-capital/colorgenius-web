@@ -39,10 +39,10 @@ function HairTypeSelector({
   onSelect: (type: HairType) => void;
 }) {
   const options: { type: HairType; label: string; icon: React.ReactNode; color: string }[] = [
-    { type: 'straight', label: 'Straight', icon: '➖', color: '#C084FC' },
-    { type: 'wavy', label: 'Wavy', icon: '〰️', color: '#A855F7' },
-    { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} />, color: '#9333EA' },
-    { type: 'coily', label: 'Coily', icon: '🌀', color: '#7C3AED' },
+    { type: 'straight', label: 'Straight', icon: '➖', color: '#D8A6FF' },
+    { type: 'wavy', label: 'Wavy', icon: '〰️', color: '#B57AED' },
+    { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} />, color: '#924EDA' },
+    { type: 'coily', label: 'Coily', icon: '🌀', color: '#6E22C8' },
   ];
 
   return (
