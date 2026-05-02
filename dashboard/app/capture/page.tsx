@@ -41,7 +41,7 @@ function HairTypeSelector({
   const options: { type: HairType; label: string; icon: string }[] = [
     { type: 'straight', label: 'Straight', icon: '➖' },
     { type: 'wavy', label: 'Wavy', icon: '〰️' },
-    { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} /> },
+    { type: 'curly', label: 'Curly', icon: '🦱' },
     { type: 'coily', label: 'Coily', icon: '🌀' },
   ];
 
