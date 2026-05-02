@@ -38,11 +38,11 @@ function HairTypeSelector({
 }: {
   onSelect: (type: HairType) => void;
 }) {
-  const options: { type: HairType; label: string; icon: React.ReactNode }[] = [
-    { type: 'straight', label: 'Straight', icon: '➖' },
-    { type: 'wavy', label: 'Wavy', icon: '〰️' },
-    { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} /> },
-    { type: 'coily', label: 'Coily', icon: '🌀' },
+  const options: { type: HairType; label: string; icon: React.ReactNode; color: string }[] = [
+    { type: 'straight', label: 'Straight', icon: '➖', color: '#C084FC' },
+    { type: 'wavy', label: 'Wavy', icon: '〰️', color: '#A855F7' },
+    { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} />, color: '#9333EA' },
+    { type: 'coily', label: 'Coily', icon: '🌀', color: '#7C3AED' },
   ];
 
   return (
@@ -54,7 +54,7 @@ function HairTypeSelector({
         Choose your client's hair texture for optimal framing guidance.
       </p>
       <div className="grid grid-cols-2 gap-3">
-        {options.map(({ type, label, icon }) => (
+        {options.map(({ type, label, icon, color }) => (
           <motion.button
             key={type}
             whileHover={{ scale: 1.02 }}
@@ -66,7 +66,7 @@ function HairTypeSelector({
               border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <span className="text-3xl" style={{ color: '#F5F5F7' }}>{icon}</span>
+            <span className="text-3xl" style={{ color }}>{icon}</span>
             <span className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>
               {label}
             </span>
