@@ -41,7 +41,7 @@ function HairTypeSelector({
 }) {
   const options: { type: HairType; label: string; icon: React.ReactNode; color: string }[] = [
     { type: 'straight', label: 'Straight', icon: '➖', color: '#D8A6FF' },
-    { type: 'wavy', label: 'Wavy', icon: '〰️', color: '#B57AED' },
+    { type: 'wavy', label: 'Wavy', icon: '〰️', color: '#D8A6FF' },
     { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} />, color: '#6E22C8' },
     { type: 'coily', label: 'Coily', icon: '🌀', color: '#6E22C8' },
   ];
