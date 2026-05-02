@@ -5,7 +5,7 @@ import { formulaUpdateSchema } from "@/lib/vish/schemas";
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const formula = await prisma.formula.findUnique({ where: { id } });
+    const formula = await prisma.formulation.findUnique({ where: { id } });
     if (!formula) {
       return NextResponse.json({ error: "Formula not found" }, { status: 404 });
     }
