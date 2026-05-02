@@ -46,6 +46,7 @@ export default {
         const body = await request.arrayBuffer();
         
         console.log(`Uploading to R2: key=${key}, size=${body.byteLength}`);
+        console.log(`R2_BUCKET binding type: ${typeof env.R2_BUCKET}`);
         
         // Upload to R2
         await env.R2_BUCKET.put(key, body, {
