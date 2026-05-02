@@ -8,38 +8,73 @@
 ## Phase 1: Foundation
 
 ### Architecture
-- [ ] ADR-001: AI recommendation approach (fine-tuned vs RAG vs rule-based)
-- [ ] ADR-002: Video/storage platform decision
-- [ ] ADR-003: Auth provider decision
-- [ ] Design color science data model (hair state, formula output, brand library schemas)
-- [ ] Write OpenAPI spec for formula API
+- [x] ADR-001: AI recommendation approach (rules-based v1, ML later)
+- [x] ADR-002: Video/storage platform decision (Cloudflare R2)
+- [x] ADR-003: Auth provider decision (JWT + Supabase)
+- [x] Design color science data model (hair state, formula output, brand library schemas)
+- [x] Write OpenAPI spec for formula API
+- [x] Database schema (550 lines, PostgreSQL, production-ready)
+- [x] Deployment plan (Vercel + Railway + Supabase + R2, ~$70-90/mo)
 
 ### Research
-- [ ] Ingest Redken shade library → `colorgenius/data/brands/redken/shades.json`
-- [ ] Ingest Wella shade library → `colorgenius/data/brands/wella/shades.json`
-- [ ] Ingest Goldwell shade library → `colorgenius/data/brands/goldwell/shades.json`
-- [ ] Document color science fundamentals (lift theory, developer ratios)
-- [ ] Document correction case studies
+- [x] Ingest Redken shade library → `colorgenius/data/brands/redken/shades.json`
+- [x] Ingest Wella shade library → `colorgenius/data/brands/wella/shades.json`
+- [x] Ingest Goldwell shade library → `colorgenius/data/brands/goldwell/shades.json`
+- [x] Ingest Schwarzkopf shade library
+- [x] Ingest Matrix shade library
+- [x] Ingest Joico shade library
+- [x] Ingest Paul Mitchell shade library
+- [x] Ingest Pulp Riot shade library
+- [x] Document color science fundamentals (lift theory, developer ratios)
+- [x] Document correction case studies
+- [x] Photo analysis approach (OpenCV + rule-based for beta)
+- [x] Formulation engine rules (developer logic, tone mapping, condition adjustments)
+- [x] Competitive analysis (Blendsor, SalonScale, Color Coach, ReFa, LG CHI)
+- [x] Face shape AI research (MediaPipe Face Mesh)
 
 ### Development
-- [ ] Set up Next.js project (mobile-first)
-- [ ] Build color level input form (iPad-optimized)
-- [ ] Build formula output display with confidence indicator
-- [ ] Build brand library browser
-- [ ] Build formula history (save/recall by client)
-- [ ] Integrate shade data from research
+- [x] Set up Next.js project (mobile-first)
+- [x] Build color level input form (iPad-optimized)
+- [x] Build formula output display with confidence indicator
+- [x] Build brand library browser
+- [x] Build formula history (save/recall by client)
+- [x] Integrate shade data from research (166 shades, 8 brands)
+- [x] Build dashboard with KPIs
+- [x] Build client CRUD + history
+- [x] Build community/marketplace API (12 endpoints)
+- [x] Build gallery page
+- [~] Custom component library (8 of 10+ done)
+- [~] Page redesigns (5 of 9 done — Dashboard, Formulate, Gallery, Community, Clients)
+- [ ] Redesign: Analyze page
+- [ ] Redesign: Library page
+- [ ] Redesign: History page
+- [ ] Redesign: Questionnaire page
+- [ ] Wire /api/formulate to real shade DB algorithm (currently rules-based)
+- [ ] Build consultation questionnaire wizard
+- [ ] Client detail page with formulation history
+- [ ] Tablet-first responsive pass (iPad primary)
 
 ### Infrastructure
-- [ ] Provision PostgreSQL (Neon)
-- [ ] Deploy backend API (Railway/Render)
-- [ ] Deploy frontend (Vercel)
+- [x] Provision PostgreSQL (Supabase)
+- [x] Deploy frontend (Vercel)
+- [x] Configure Redis helper with fallback
+- [x] Prisma schema + migration applied
+- [~] Deploy backend API (Vercel serverless functions)
 - [ ] Configure UptimeRobot health monitoring
 - [ ] Configure Sentry error tracking
+- [ ] Photo upload service (S3/R2)
 
 ---
 
 ## Phase 2: Integrations (Post-Beta)
-- [ ] UpLook "ColorGenius Certified" badge integration
+- [x] UpLook "ColorGenius Certified" badge integration spec
 - [ ] ByondEdu course module API surface
 - [ ] Pleij Salon workstation integration
 - [ ] Che Lace wig coloring recommendations
+- [ ] Consumer app: "ColorGenius Discover" (LookGenius rebrand in Month 8-10)
+
+---
+
+## Known Blockers
+- [!] Gateway restarts kill agents at ~13 minutes — need Jason/Che investigation
+- [!] Subagent LLM timeout with Kimi K2.6 on long prompts — using Qwen for small tasks
