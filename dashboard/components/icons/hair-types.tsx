@@ -27,13 +27,12 @@ export const WavyHairIcon: React.FC<HairIconProps> = ({ className = '', size = 2
 
 // Curly hair: single thick strand curling into spiral
 export const CurlyHairIcon: React.FC<HairIconProps> = ({ className = '', size = 24 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
+  <svg width={size} height={size} viewBox="0 0 120 120" fill="none" className={className}>
     <path
-      d="M3 20 C3 14, 8 10, 12 10 C16 10, 18 12, 18 14 C18 16, 16 17, 15 16 C14 15, 15 14, 16 14"
+      d="M 15 78 C 15 98, 55 112, 90 92 C 118 72, 98 42, 70 53 C 42 64, 52 85, 75 90"
       stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      stroke-width="18"
+      stroke-linecap="round"
       fill="none"
     />
   </svg>
