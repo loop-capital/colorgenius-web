@@ -38,10 +38,10 @@ function HairTypeSelector({
 }: {
   onSelect: (type: HairType) => void;
 }) {
-  const options: { type: HairType; label: string; icon: string }[] = [
+  const options: { type: HairType; label: string; icon: React.ReactNode }[] = [
     { type: 'straight', label: 'Straight', icon: '➖' },
     { type: 'wavy', label: 'Wavy', icon: '〰️' },
-    { type: 'curly', label: 'Curly', icon: '🦱' },
+    { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} /> },
     { type: 'coily', label: 'Coily', icon: '🌀' },
   ];
 
@@ -66,7 +66,7 @@ function HairTypeSelector({
               border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <span className="text-3xl">{icon}</span>
+            <span className="text-3xl" style={{ color: '#F5F5F7' }}>{icon}</span>
             <span className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>
               {label}
             </span>
