@@ -24,6 +24,13 @@ import { useCamera } from '@/hooks/useCamera';
 import { HairSection, HairType, haptic } from '@/lib/camera-types';
 import { cn } from '@/lib/utils';
 
+import {
+  StraightHairIcon,
+  WavyHairIcon,
+  CurlyHairIcon,
+  CoilyHairIcon,
+} from '@/components/icons/hair-types';
+
 /* ─── Sub-components ─── */
 
 function HairTypeSelector({
@@ -31,11 +38,11 @@ function HairTypeSelector({
 }: {
   onSelect: (type: HairType) => void;
 }) {
-  const options: { type: HairType; label: string; icon: string }[] = [
-    { type: 'straight', label: 'Straight', icon: '➖' },
-    { type: 'wavy', label: 'Wavy', icon: '〰️' },
-    { type: 'curly', label: 'Curly', icon: '🌀' },
-    { type: 'coily', label: 'Coily', icon: '🌀' },
+  const options: { type: HairType; label: string; icon: React.ReactNode }[] = [
+    { type: 'straight', label: 'Straight', icon: <StraightHairIcon size={32} /> },
+    { type: 'wavy', label: 'Wavy', icon: <WavyHairIcon size={32} /> },
+    { type: 'curly', label: 'Curly', icon: <CurlyHairIcon size={32} /> },
+    { type: 'coily', label: 'Coily', icon: <CoilyHairIcon size={32} /> },
   ];
 
   return (
@@ -59,7 +66,7 @@ function HairTypeSelector({
               border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            <span className="text-3xl">{icon}</span>
+            <span className="text-3xl" style={{ color: '#F5F5F7' }}>{icon}</span>
             <span className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>
               {label}
             </span>
