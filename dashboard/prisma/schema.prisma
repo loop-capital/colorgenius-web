@@ -322,6 +322,9 @@ model Formulation {
   // Status
   status String @default("generated") @db.VarChar(20)
 
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
   // Scoring (filled after result)
   score_accuracy  Int?
   score_condition Int?
