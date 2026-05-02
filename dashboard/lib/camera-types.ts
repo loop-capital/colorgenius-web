@@ -27,6 +27,9 @@ export interface CapturePhoto {
   width: number;
   height: number;
   fileSize: number;
+  uploadProgress: number;
+  uploadedUrl: string | null;
+  uploadError: string | null;
 }
 
 export interface CameraState {

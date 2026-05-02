@@ -229,6 +229,81 @@ export function useCamera() {
     }, 1000);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const uploadPhoto = useCallback(
+    async (photo: CapturePhoto): Promise<string | null> => {
+      // First update session with upload progress state
+      setSession((s) => ({
+        ...s,
+        photos: s.photos.map((p) =>
+          p.id === photo.id
+            ? { ...p, uploadProgress: 0, uploadedUrl: null, uploadError: null }
+            : p
+        ),
+      }));
+
+      try {
+        // Convert dataUrl to blob
+        const res = await fetch(photo.dataUrl);
+        const blob = await res.blob();
+
+        // Get presigned URL from our API
+        const apiRes = await fetch('/api/photos/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: session.id,
+            angle: photo.section,
+            contentType: 'image/jpeg',
+            contentLength: blob.size,
+          }),
+        });
+
+        if (!apiRes.ok) {
+          const err = await apiRes.json();
+          throw new Error(err.error || 'Failed to get upload URL');
+        }
+
+        const { data } = await apiRes.json();
+        const { uploadUrl, publicUrl } = data;
+
+        // Upload directly to R2 via presigned URL
+        const uploadRes = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: blob,
+          headers: { 'Content-Type': 'image/jpeg' },
+        });
+
+        if (!uploadRes.ok) {
+          throw new Error(`R2 upload failed: ${uploadRes.status}`);
+        }
+
+        // Update photo with public URL and 100% progress
+        setSession((s) => ({
+          ...s,
+          photos: s.photos.map((p) =>
+            p.id === photo.id
+              ? { ...p, uploadProgress: 100, uploadedUrl: publicUrl }
+              : p
+          ),
+        }));
+
+        return publicUrl;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Upload failed';
+        setSession((s) => ({
+          ...s,
+          photos: s.photos.map((p) =>
+            p.id === photo.id
+              ? { ...p, uploadError: msg }
+              : p
+          ),
+        }));
+        return null;
+      }
+    },
+    [session.id]
+  );
+
   const captureFrame = useCallback(async () => {
     if (!videoRef.current || !videoRef.current.srcObject) return;
 
@@ -253,6 +328,9 @@ export function useCamera() {
       width: canvas.width,
       height: canvas.height,
       fileSize: Math.round((dataUrl.length * 3) / 4), // base64 estimate
+      uploadProgress: 0,
+      uploadedUrl: null,
+      uploadError: null,
     };
 
     setSession((s) => {
@@ -262,7 +340,10 @@ export function useCamera() {
 
     haptic(50);
     setState((s) => ({ ...s, step: 'preview' }));
-  }, [session.currentSection]);
+
+    // Trigger background upload
+    uploadPhoto(photo);
+  }, [session.currentSection, uploadPhoto]);
 
   const burstCapture = useCallback(async () => {
     setState((s) => ({ ...s, step: 'burst' }));
@@ -323,5 +404,6 @@ export function useCamera() {
     getCurrentPrompt,
     saveToGallery,
     stopStream,
+    uploadPhoto,
   };
 }

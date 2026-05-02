@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { prisma } from '@/lib/prisma';
 
 /**
  * POST /api/photos/upload
@@ -59,20 +58,33 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // TODO: Generate presigned upload URL for S3/Cloudflare R2
-      // const { uploadUrl, objectKey } = await generatePresignedUrl({
-      //   sessionId,
-      //   angle,
-      //   contentType: fileContentType || 'image/jpeg',
-      // });
+      // Generate presigned upload URL using our Cloudflare Worker
+      const workerUrl = 'https://colorgenius-r2-upload.shiny-sky-8891.workers.dev/upload';
+      const workerResponse = await fetch(workerUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId,
+          angle,
+          contentType: fileContentType || 'image/jpeg',
+        }),
+      });
 
-      // TODO: Create Photo record in database
+      if (!workerResponse.ok) {
+        throw new Error(`Worker responded with status: ${workerResponse.status}`);
+      }
+
+      const workerData = await workerResponse.json();
+
+      // Create Photo record in database (commented out for now as prisma isn't set up)
       // const photo = await prisma.photo.create({
       //   data: {
       //     sessionId,
       //     angle,
-      //     url: `https://storage.example.com/photos/${objectKey}`,
-      //     original_url: `https://storage.example.com/photos/${objectKey}`,
+      //     url: workerData.publicUrl,
+      //     original_url: workerData.publicUrl,
       //     format: fileContentType?.split('/')[1] || 'jpeg',
       //     file_size_bytes: contentLength,
       //     analysisStatus: 'pending',
@@ -83,10 +95,16 @@ export async function POST(request: NextRequest) {
         id: crypto.randomUUID(),
         sessionId,
         angle,
-        uploadUrl: `https://storage.example.com/upload/presigned-${crypto.randomUUID()}`,
-        url: `https://storage.example.com/photos/${crypto.randomUUID()}.jpg`,
+        uploadUrl: workerData.uploadUrl,
+        url: workerData.publicUrl,
+        original_url: workerData.publicUrl,
+        format: (fileContentType || 'image/jpeg').split('/')[1],
+        file_size_bytes: contentLength,
+        width: null, // extracted after processing
+        height: null,
         analysisStatus: 'pending',
         createdAt: new Date().toISOString(),
+        key: workerData.key,
       };
 
       return NextResponse.json({ success: true, data: photo }, { status: 201 });
@@ -128,7 +146,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Upload to S3/Cloudflare R2
+    // For direct upload, we still use the worker to get a presigned URL
+    const workerUrl = 'https://colorgenius-r2-upload.shiny-sky-8891.workers.dev/upload';
+    const workerResponse = await fetch(workerUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sessionId,
+        angle,
+        contentType: file.type,
+      }),
+    });
+
+    if (!workerResponse.ok) {
+      throw new Error(`Worker responded with status: ${workerResponse.status}`);
+    }
+
+    const workerData = await workerResponse.json();
+
+    // TODO: Upload file directly to the presigned URL
     // TODO: Create Photo record in database
     // TODO: Generate thumbnail
 
@@ -136,14 +174,16 @@ export async function POST(request: NextRequest) {
       id: crypto.randomUUID(),
       sessionId,
       angle,
-      url: `https://storage.example.com/photos/${crypto.randomUUID()}.jpg`,
-      original_url: `https://storage.example.com/photos/${crypto.randomUUID()}.jpg`,
+      uploadUrl: workerData.uploadUrl,
+      url: workerData.publicUrl,
+      original_url: workerData.publicUrl,
       file_size_bytes: file.size,
       format: file.type.split('/')[1],
       width: null, // extracted after processing
       height: null,
       analysisStatus: 'pending',
       createdAt: new Date().toISOString(),
+      key: workerData.key,
     };
 
     return NextResponse.json({ success: true, data: photo }, { status: 201 });

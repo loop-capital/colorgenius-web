@@ -319,11 +319,21 @@ function PhotoPreview({
   onConfirm,
   section,
 }: {
-  photo: { dataUrl: string; section: HairSection };
+  photo: {
+    dataUrl: string;
+    section: HairSection;
+    uploadProgress: number;
+    uploadedUrl: string | null;
+    uploadError: string | null;
+  };
   onRetake: () => void;
   onConfirm: () => void;
   section: HairSection;
 }) {
+  const isUploading = photo.uploadProgress > 0 && photo.uploadProgress < 100;
+  const isUploaded = photo.uploadProgress === 100 && photo.uploadedUrl;
+  const hasError = !!photo.uploadError;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -338,6 +348,58 @@ function PhotoPreview({
           alt="Captured preview"
           className="w-full h-full object-contain"
         />
+
+        {/* Upload status overlay */}
+        {isUploading && (
+          <div className="absolute inset-x-0 bottom-0 p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs font-medium" style={{ color: '#14B8A6' }}>
+                ☁️ Uploading to cloud...
+              </span>
+              <span className="text-xs font-medium" style={{ color: '#14B8A6' }}>
+                {photo.uploadProgress}%
+              </span>
+            </div>
+            <div className="h-1 w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                  width: `${photo.uploadProgress}%`,
+                  background: 'linear-gradient(90deg, #14B8A6, #0D9488)',
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {isUploaded && (
+          <div
+            className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5"
+            style={{
+              background: 'rgba(34,197,94,0.15)',
+              border: '1px solid rgba(34,197,94,0.4)',
+              color: '#22C55E',
+            }}
+          >
+            <Check className="h-3.5 w-3.5" />
+            Uploaded
+          </div>
+        )}
+
+        {hasError && (
+          <div
+            className="absolute top-4 right-4 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5"
+            style={{
+              background: 'rgba(239,68,68,0.15)',
+              border: '1px solid rgba(239,68,68,0.4)',
+              color: '#EF4444',
+            }}
+          >
+            <AlertTriangle className="h-3.5 w-3.5" />
+            Upload failed
+          </div>
+        )}
+
         {/* Section badge */}
         <div
           className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-xs font-bold"
