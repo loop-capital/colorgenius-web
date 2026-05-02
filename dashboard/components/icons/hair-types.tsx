@@ -28,9 +28,9 @@ export const WavyHairIcon: React.FC<HairIconProps> = ({ className = '', size = 2
 // Curly hair: loose spiral curls with smooth rounded edges
 export const CurlyHairIcon: React.FC<HairIconProps> = ({ className = '', size = 24 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className}>
-    {/* Loose curl - smooth wave pattern */}
+    {/* Loose curl - smooth bulbous wave pattern */}
     <path
-      d="M2 12 Q4 8, 6 12 Q8 16, 10 12 Q12 8, 14 12 Q16 16, 18 12 Q20 8, 22 12"
+      d="M2 10 C4 6, 6 6, 6 10 C6 14, 8 14, 8 10 C8 6, 10 6, 10 10 C10 14, 12 14, 12 10 C12 6, 14 6, 14 10 C14 14, 16 14, 16 10 C16 6, 18 6, 18 10 C18 14, 20 14, 20 10 C20 6, 22 6, 22 10"
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
@@ -38,7 +38,7 @@ export const CurlyHairIcon: React.FC<HairIconProps> = ({ className = '', size = 
       fill="none"
     />
     <path
-      d="M2 16 Q4 12, 6 16 Q8 20, 10 16 Q12 12, 14 16 Q16 20, 18 16 Q20 12, 22 16"
+      d="M2 14 C4 10, 6 10, 6 14 C6 18, 8 18, 8 14 C8 10, 10 10, 10 14 C10 18, 12 18, 12 14 C12 10, 14 10, 14 14 C14 18, 16 18, 16 14 C16 10, 18 10, 18 14 C18 18, 20 18, 20 14 C20 10, 22 10, 22 14"
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
