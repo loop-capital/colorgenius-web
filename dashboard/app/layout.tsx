@@ -3,7 +3,7 @@ import "./globals.css"
 import { Sidebar } from "@/components/nav-sidebar"
 
 export const metadata: Metadata = {
-  title: "ColorGenius — Professional Hair Color Formulation",
+  title: "ColorGenius — Stop Guessing. Start Formulating.",
   description: "AI-powered hair color analysis and professional formulation for stylists.",
 }
 
