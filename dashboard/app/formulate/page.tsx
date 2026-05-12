@@ -15,14 +15,16 @@ import type { ToneFamily } from '@/lib/products'
 import {
   FlaskConical, ChevronRight, ChevronLeft, Save, RotateCcw,
   Sparkles, Droplets, Clock, AlertTriangle,
+  Camera, Upload, X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const STEPS = [
-  { id: 1, title: 'Hair Assessment', description: 'Current color level & tone' },
-  { id: 2, title: 'Target Look', description: 'Desired color result' },
-  { id: 3, title: 'Condition', description: 'Hair health & history' },
-  { id: 4, title: 'Results', description: 'Your custom formula' },
+  { id: 1, title: 'Photo', description: 'Capture or upload hair photo' },
+  { id: 2, title: 'Hair Assessment', description: 'Current color level & tone' },
+  { id: 3, title: 'Target Look', description: 'Desired color result' },
+  { id: 4, title: 'Condition', description: 'Hair health & history' },
+  { id: 5, title: 'Results', description: 'Your custom formula' },
 ]
 
 const TONE_OPTIONS: { value: ToneFamily; label: string; color: string }[] = [
@@ -178,6 +180,8 @@ function FormulatePageContent() {
   const [isFormulating, setIsFormulating] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [savedFormulaId, setSavedFormulaId] = useState<string | null>(null)
+  const [photo, setPhoto] = useState<string | null>(null)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
 
   const searchParams = useSearchParams()
   useEffect(() => {
@@ -215,7 +219,7 @@ function FormulatePageContent() {
       const data = await response.json()
       setResult(data.data)
       setDirection('forward')
-      setStep(4)
+      setStep(5)
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Formulation failed')
     } finally {
@@ -240,7 +244,7 @@ function FormulatePageContent() {
               Create <span className="gradient-text-teal">Formulation</span>
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--cg-text-secondary)' }}>
-              Build a professional color formula in 4 steps
+              Build a professional color formula in 5 steps
             </p>
           </div>
           <ActionButton
@@ -262,9 +266,110 @@ function FormulatePageContent() {
 
         <StepIndicator currentStep={step} />
 
-        {/* Step 1: Hair Assessment */}
+        {/* Step 1: Photo Capture */}
         {step === 1 && (
           <StepTransition stepKey="step1" direction={direction}>
+            <GlassCard className="p-6 md:p-8">
+              <SectionHeader
+                icon={<Camera className="w-5 h-5 text-[#9333EA]" />}
+                title="Capture Hair Photo"
+              />
+              <div className="space-y-6">
+                <p className="text-sm" style={{ color: 'var(--cg-text-secondary)' }}>
+                  Take a clear, well-lit photo of the client's current hair color. Wet or dry both work.
+                </p>
+
+                {photo ? (
+                  <motion.div
+                    className="relative rounded-2xl overflow-hidden border border-white/10"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                  >
+                    <img src={photo} alt="Captured hair photo" className="w-full max-h-[400px] object-cover" />
+                    <button
+                      onClick={() => { setPhoto(null); setPhotoFile(null) }}
+                      className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </motion.div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <motion.button
+                      type="button"
+                      onClick={() => {
+                        const input = document.createElement('input')
+                        input.type = 'file'
+                        input.accept = 'image/*'
+                        input.capture = 'environment'
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0]
+                          if (file) {
+                            setPhotoFile(file)
+                            const reader = new FileReader()
+                            reader.onload = (ev) => setPhoto(ev.target?.result as string)
+                            reader.readAsDataURL(file)
+                          }
+                        }
+                        input.click()
+                      }}
+                      className="relative group p-8 rounded-2xl border-2 border-dashed border-white/10 hover:border-[#9333EA]/40 bg-white/[0.02] hover:bg-[#9333EA]/5 transition-all text-center"
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#9333EA]/20 to-[#EC4899]/20 border border-[#9333EA]/30 flex items-center justify-center mx-auto mb-4">
+                        <Camera className="w-7 h-7 text-[#9333EA]" />
+                      </div>
+                      <p className="text-sm font-semibold text-white mb-1">Take Photo</p>
+                      <p className="text-xs text-white/40">Use your camera to capture hair directly</p>
+                    </motion.button>
+
+                    <motion.button
+                      type="button"
+                      onClick={() => {
+                        const input = document.createElement('input')
+                        input.type = 'file'
+                        input.accept = 'image/*'
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0]
+                          if (file) {
+                            setPhotoFile(file)
+                            const reader = new FileReader()
+                            reader.onload = (ev) => setPhoto(ev.target?.result as string)
+                            reader.readAsDataURL(file)
+                          }
+                        }
+                        input.click()
+                      }}
+                      className="relative group p-8 rounded-2xl border-2 border-dashed border-white/10 hover:border-[#F59E0B]/40 bg-white/[0.02] hover:bg-[#F59E0B]/5 transition-all text-center"
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F59E0B]/20 to-[#D97706]/20 border border-[#F59E0B]/30 flex items-center justify-center mx-auto mb-4">
+                        <Upload className="w-7 h-7 text-[#F59E0B]" />
+                      </div>
+                      <p className="text-sm font-semibold text-white mb-1">Upload Photo</p>
+                      <p className="text-xs text-white/40">Choose from your photo library or files</p>
+                    </motion.button>
+                  </div>
+                )}
+
+                <div className="flex justify-between items-center">
+                  <p className="text-xs text-white/30">
+                    {photo ? 'Photo captured ✓' : 'Photo is optional — skip to continue manually'}
+                  </p>
+                  <ActionButton onClick={() => goToStep(2)}>
+                    {photo ? 'Next: Hair Assessment' : 'Skip to Assessment'} <ChevronRight className="w-4 h-4 ml-1" />
+                  </ActionButton>
+                </div>
+              </div>
+            </GlassCard>
+          </StepTransition>
+        )}
+
+        {/* Step 2: Hair Assessment */}
+        {step === 2 && (
+          <StepTransition stepKey="step2" direction={direction}>
             <GlassCard className="p-6 md:p-8">
               <SectionHeader
                 icon={<Sparkles className="w-5 h-5 text-[#9333EA]" />}
@@ -354,7 +459,7 @@ function FormulatePageContent() {
                 </motion.div>
 
                 <div className="flex justify-end">
-                  <ActionButton onClick={() => goToStep(2)}>
+                  <ActionButton onClick={() => goToStep(3)}>
                     Next: Target Look <ChevronRight className="w-4 h-4 ml-1" />
                   </ActionButton>
                 </div>
@@ -363,9 +468,9 @@ function FormulatePageContent() {
           </StepTransition>
         )}
 
-        {/* Step 2: Target Look */}
-        {step === 2 && (
-          <StepTransition stepKey="step2" direction={direction}>
+        {/* Step 3: Target Look */}
+        {step === 3 && (
+          <StepTransition stepKey="step3" direction={direction}>
             <GlassCard className="p-6 md:p-8">
               <SectionHeader
                 icon={<Sparkles className="w-5 h-5 text-[#F59E0B]" />}
@@ -478,10 +583,10 @@ function FormulatePageContent() {
                 </motion.div>
 
                 <div className="flex justify-between">
-                  <ActionButton variant="outline" onClick={() => goToStep(1)}>
+                  <ActionButton variant="outline" onClick={() => goToStep(2)}>
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back
                   </ActionButton>
-                  <ActionButton onClick={() => goToStep(3)}>
+                  <ActionButton onClick={() => goToStep(4)}>
                     Next: Condition <ChevronRight className="w-4 h-4 ml-1" />
                   </ActionButton>
                 </div>
@@ -490,9 +595,9 @@ function FormulatePageContent() {
           </StepTransition>
         )}
 
-        {/* Step 3: Condition */}
-        {step === 3 && (
-          <StepTransition stepKey="step3" direction={direction}>
+        {/* Step 4: Condition */}
+        {step === 4 && (
+          <StepTransition stepKey="step4" direction={direction}>
             <GlassCard className="p-6 md:p-8">
               <SectionHeader
                 icon={<Droplets className="w-5 h-5 text-[#9333EA]" />}
@@ -640,7 +745,7 @@ function FormulatePageContent() {
                 </motion.div>
 
                 <div className="flex justify-between">
-                  <ActionButton variant="outline" onClick={() => goToStep(2)}>
+                  <ActionButton variant="outline" onClick={() => goToStep(3)}>
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back
                   </ActionButton>
                   <ActionButton onClick={handleSubmit} disabled={isFormulating}>
@@ -660,9 +765,9 @@ function FormulatePageContent() {
           </StepTransition>
         )}
 
-        {/* Step 4: Results */}
-        {step === 4 && result && (
-          <StepTransition stepKey="step4" direction={direction}>
+        {/* Step 5: Results */}
+        {step === 5 && result && (
+          <StepTransition stepKey="step5" direction={direction}>
             <div className="space-y-4">
               {/* Warnings if any */}
               {result.warnings && result.warnings.length > 0 && (
@@ -730,7 +835,7 @@ function FormulatePageContent() {
                       goToStep(1)
                     }}
                   >
-                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> New Formula
+                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Start Over
                   </ActionButton>
                   <ActionButton 
                     className="flex-1" 
