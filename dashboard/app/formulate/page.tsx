@@ -92,8 +92,8 @@ export default function FormulatePage() {
             <div key={s.id} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               <div style={{ textAlign: 'center', flex: 1 }}>
                 <div style={{ width: 40, height: 40, borderRadius: '50%', background: s.id === step ? '#9333EA' : s.id < step ? 'rgba(147,51,234,0.2)' : 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', margin: '0 auto', fontSize: 14 }}>{s.id < step ? '✓' : s.id}</div>
-                <p style={{ fontSize: 11, marginTop: 4, color: s.id === step ? '#F5F5F7' : '#71717A', fontWeight: s.id === step ? 600 : 400 }}>{s.title}</p>
-                <p style={{ fontSize: 9, color: '#71717A', marginTop: 1 }}>{s.desc}</p>
+                <p style={{ fontSize: 13, marginTop: 4, color: s.id === step ? '#F5F5F7' : '#71717A', fontWeight: s.id === step ? 600 : 400 }}>{s.title}</p>
+                <p style={{ fontSize: 11, color: '#71717A', marginTop: 1 }}>{s.desc}</p>
               </div>
               {i < STEPS.length - 1 && <div style={{ width: 40, height: 2, background: s.id < step ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)', flexShrink: 0, marginTop: -20 }} />}
             </div>
@@ -175,7 +175,7 @@ export default function FormulatePage() {
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Brand Preference (Optional)</Label>
               <Select value={fd.brandPreference} onValueChange={v => setFd(p => ({ ...p, brandPreference: v }))}>
                 <SelectTrigger style={{ background: 'rgba(30,30,45,0.6)', borderColor: 'rgba(255,255,255,0.08)', color: '#F5F5F7', width: '100%' }}><SelectValue placeholder="Select a brand or leave empty" /></SelectTrigger>
-                <SelectContent style={{ background: 'rgba(30,30,45,0.9)' }}><SelectItem value="">Any brand</SelectItem>{BRANDS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
+                <SelectContent style={{ background: 'rgba(30,30,45,0.9)' }}>{BRANDS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, borderRadius: 12, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', marginBottom: 24 }}>
