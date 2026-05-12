@@ -83,7 +83,7 @@ export default function FormulatePage() {
             <h1 style={{ fontSize: 24, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
             <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 5 steps</p>
           </div>
-          <button onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
+          <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
         </div>
 
         {/* Step indicators */}
@@ -108,15 +108,15 @@ export default function FormulatePage() {
             {photo ? (
               <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', marginBottom: 16 }}>
                 <img src={photo} alt="Hair" style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }} />
-                <button onClick={() => setPhoto(null)} style={{ position: 'absolute', top: 12, right: 12, width: 32, height: 32, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
+                <button type="button" onClick={() => setPhoto(null)} style={{ position: 'absolute', top: 12, right: 12, width: 32, height: 32, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-                <button onClick={() => { const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.capture='environment'; i.onchange=(e:any) => { const f = e.target.files?.[0]; if(f) { const r = new FileReader(); r.onload = (ev) => setPhoto(ev.target?.result as string); r.readAsDataURL(f) }}; i.click() }}
+                <button type="button" onClick={() => { const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.capture='environment'; i.onchange=(e:any) => { const f = e.target.files?.[0]; if(f) { const r = new FileReader(); r.onload = (ev) => setPhoto(ev.target?.result as string); r.readAsDataURL(f) }}; i.click() }}
                   style={{ padding: 32, border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 16, background: 'rgba(147,51,234,0.05)', color: '#F5F5F7', cursor: 'pointer', fontSize: 16, textAlign: 'center' }}>
                   <Camera style={{ width: 28, height: 28, color: '#9333EA', margin: '0 auto 8px', display: 'block' }} /> Take Photo
                 </button>
-                <button onClick={() => { const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.onchange=(e:any) => { const f = e.target.files?.[0]; if(f) { const r = new FileReader(); r.onload = (ev) => setPhoto(ev.target?.result as string); r.readAsDataURL(f) }}; i.click() }}
+                <button type="button" onClick={() => { const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.onchange=(e:any) => { const f = e.target.files?.[0]; if(f) { const r = new FileReader(); r.onload = (ev) => setPhoto(ev.target?.result as string); r.readAsDataURL(f) }}; i.click() }}
                   style={{ padding: 32, border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 16, background: 'rgba(245,158,11,0.05)', color: '#F5F5F7', cursor: 'pointer', fontSize: 16, textAlign: 'center' }}>
                   <Upload style={{ width: 28, height: 28, color: '#F59E0B', margin: '0 auto 8px', display: 'block' }} /> Upload Photo
                 </button>
@@ -124,7 +124,7 @@ export default function FormulatePage() {
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <p style={{ fontSize: 12, color: '#71717A' }}>{photo ? 'Photo captured ✓' : 'Photo is optional — skip to continue'}</p>
-              <button onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Skip to Assessment'} <ChevronRight size={16} /></button>
+              <button type="button" onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Skip to Assessment'} <ChevronRight size={16} /></button>
             </div>
           </div>
         )}
@@ -149,8 +149,8 @@ export default function FormulatePage() {
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
-              <button onClick={() => setStep(1)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
-              <button onClick={() => setStep(3)} style={btnPrimary}>Next: Target Look <ChevronRight size={16} /></button>
+              <button type="button" onClick={() => setStep(1)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
+              <button type="button" onClick={() => setStep(3)} style={btnPrimary}>Next: Target Look <ChevronRight size={16} /></button>
             </div>
           </div>
         )}
@@ -184,8 +184,8 @@ export default function FormulatePage() {
               <div style={{ width: 48, height: 48, borderRadius: 8, background: HAIR_LEVELS[fd.targetLevel]?.hex, border: '2px solid rgba(147,51,234,0.4)' }} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <button onClick={() => setStep(2)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
-              <button onClick={() => setStep(4)} style={btnPrimary}>Next: Condition <ChevronRight size={16} /></button>
+              <button type="button" onClick={() => setStep(2)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
+              <button type="button" onClick={() => setStep(4)} style={btnPrimary}>Next: Condition <ChevronRight size={16} /></button>
             </div>
           </div>
         )}
@@ -200,7 +200,7 @@ export default function FormulatePage() {
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Hair Type</Label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
                 {CONDITION_TYPES.map(o => (
-                  <button key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, type: o.value } }))}
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, type: o.value } }))}
                     style={{ padding: 16, borderRadius: 12, border: fd.condition.type === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.condition.type === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.condition.type === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'left' }}>
                     <p style={{ fontSize: 14, fontWeight: 600 }}>{o.label}</p>
                     <p style={{ fontSize: 12, color: '#71717A', marginTop: 4 }}>{o.desc}</p>
@@ -213,7 +213,7 @@ export default function FormulatePage() {
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Porosity</Label>
               <div style={{ display: 'flex', gap: 12 }}>
                 {POROSITY.map(o => (
-                  <button key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, porosity: o.value } }))}
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, porosity: o.value } }))}
                     style={{ flex: 1, padding: 16, borderRadius: 12, border: fd.condition.porosity === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.condition.porosity === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', cursor: 'pointer', textAlign: 'center' }}>
                     <div style={{ width: 16, height: 16, borderRadius: '50%', background: o.color, margin: '0 auto 8px' }} />
                     <p style={{ fontSize: 14, color: fd.condition.porosity === o.value ? '#F5F5F7' : '#A1A1AA' }}>{o.label}</p>
@@ -248,8 +248,8 @@ export default function FormulatePage() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <button onClick={() => setStep(3)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
-              <button onClick={handleSubmit} disabled={loading} style={btnPrimary}>
+              <button type="button" onClick={() => setStep(3)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
+              <button type="button" onClick={handleSubmit} disabled={loading} style={btnPrimary}>
                 {loading ? <><Sparkles className="animate-spin" size={16} /> Generating...</> : <>Generate Formula <FlaskConical size={16} /></>}
               </button>
             </div>
@@ -274,8 +274,8 @@ export default function FormulatePage() {
             </div>
             <ScaleWidget onWeightCapture={(g) => console.log('Weight:', g)} />
             <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-              <button onClick={() => { setResult(null); setStep(1) }} style={{ ...btnOutline, flex: 1, justifyContent: 'center' }}><RotateCcw size={14} /> New Formula</button>
-              <button onClick={() => alert('Saved!')} style={{ ...btnPrimary, flex: 1, justifyContent: 'center' }}><Save size={14} /> Save to Library</button>
+              <button type="button" onClick={() => { setResult(null); setStep(1) }} style={{ ...btnOutline, flex: 1, justifyContent: 'center' }}><RotateCcw size={14} /> New Formula</button>
+              <button type="button" onClick={() => alert('Saved!')} style={{ ...btnPrimary, flex: 1, justifyContent: 'center' }}><Save size={14} /> Save to Library</button>
             </div>
           </div>
         )}
