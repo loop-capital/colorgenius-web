@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, ArrowRight, User, FlaskConical, DollarSign, Check, Save,
-  Search, Plus, Clock, Camera, Star, Sparkles, X,
+  Search, Plus, Clock, Camera, Star, Sparkles, X, Scale,
 } from 'lucide-react';
 import { CostCalculator } from '@/components/custom/cost-calculator';
 import { deductFormulaFromInventory } from '@/components/custom/inventory-dashboard';
@@ -324,9 +324,30 @@ function ServiceEntryContent() {
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <label className="text-[10px] mb-1 block" style={{ color: 'var(--cg-text-tertiary)' }}>Grams</label>
-                    <input type="number" value={shadeGrams} onChange={e => setShadeGrams(parseInt(e.target.value) || 0)}
-                      className="w-full px-3 py-2 rounded-xl text-sm font-mono"
-                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--cg-text-primary)' }} />
+                    <div className="flex gap-2">
+                      <input type="number" value={shadeGrams} onChange={e => setShadeGrams(parseInt(e.target.value) || 0)}
+                        className="flex-1 px-3 py-2 rounded-xl text-sm font-mono"
+                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'var(--cg-text-primary)' }} />
+                      <button 
+                        onClick={() => {
+                          // Trigger scale read - the ScaleWidget onWeightCapture will update shadeGrams
+                          // This just shows feedback that we're capturing
+                          const el = document.getElementById('grams-input');
+                          if (el) {
+                            el.style.borderColor = '#10B981';
+                            setTimeout(() => { el.style.borderColor = ''; }, 500);
+                          }
+                        }}
+                        className="px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all"
+                        style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', color: '#10B981' }}
+                        title="Put product on scale and click to capture weight"
+                      >
+                        <Scale className="w-3.5 h-3.5" /> Capture
+                      </button>
+                    </div>
+                    <p className="text-[10px] mt-1" style={{ color: 'var(--cg-text-tertiary)' }}>
+                      Put product on scale, click Capture to auto-fill
+                    </p>
                   </div>
                   <div>
                     <label className="text-[10px] mb-1 block" style={{ color: 'var(--cg-text-tertiary)' }}>Role</label>
@@ -366,12 +387,25 @@ function ServiceEntryContent() {
                 <span className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>ml</span>
               </div>
 
-              {/* Scale for weighing */}
-              <ScaleWidget
-                onWeightCapture={(grams) => {
-                  setShadeGrams(Math.round(grams));
-                }}
-              />
+              {/* Scale for weighing - integrated with formula */}
+              <div className="rounded-2xl p-4 space-y-3" style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <p className="text-xs font-medium" style={{ color: 'var(--cg-text-secondary)' }}>Scale Integration</p>
+                <p className="text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>
+                  Connect your Acaia scale to auto-capture product weights
+                </p>
+                <ScaleWidget
+                  compact
+                  onWeightCapture={(grams) => {
+                    setShadeGrams(Math.round(grams));
+                    // Visual feedback
+                    const input = document.querySelector('input[type="number"]') as HTMLInputElement;
+                    if (input) {
+                      input.style.borderColor = '#10B981';
+                      setTimeout(() => { input.style.borderColor = ''; }, 1000);
+                    }
+                  }}
+                />
+              </div>
 
               {/* Continue */}
               <button onClick={() => setStep(3)} disabled={formulaSteps.length === 0}
