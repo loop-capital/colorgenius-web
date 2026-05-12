@@ -4,8 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, FlaskConical, Camera, ImageIcon, MessageCircle, BookOpen,
-  Users, History, ClipboardList,
-  Sparkles, CreditCard,
+  Users, History, ClipboardList, Package, DollarSign, Sparkles, CreditCard, Zap,
 } from 'lucide-react'
 import { LogoutButton } from '@/components/ui/logout-button'
 import { ColorGeniusLogo } from '@/components/icons/colorgenius-logo'
@@ -20,6 +19,9 @@ const navItems = [
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/history', label: 'History', icon: History },
   { href: '/questionnaire', label: 'Consultation', icon: ClipboardList },
+  { href: '/service', label: 'New Service', icon: Zap },
+  { href: '/dashboard/inventory', label: 'Inventory', icon: Package },
+  { href: '/dashboard/pricing', label: 'Pricing Rules', icon: DollarSign },
 ]
 
 export function Sidebar() {
@@ -37,8 +39,8 @@ export function Sidebar() {
         <div className="p-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #14B8A6, #2DD4BF)', borderRadius: '10px' }}>
-              <ColorGeniusLogo size={16} color="#0A0A0F" />
+              style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', borderRadius: '10px' }}>
+              <ColorGeniusLogo size={36} color="#0A0A0F" />
             </div>
             <span className="font-bold text-lg tracking-tight" style={{ color: '#F5F5F7' }}>ColorGenius</span>
           </Link>
@@ -82,15 +84,15 @@ export function Sidebar() {
         <div className="flex items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-7 h-7 flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #14B8A6, #2DD4BF)', borderRadius: '8px' }}>
-              <ColorGeniusLogo size={14} color="#0A0A0F" />
+              style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', borderRadius: '8px' }}>
+              <ColorGeniusLogo size={30} color="#0A0A0F" />
             </div>
             <span className="font-bold text-sm" style={{ color: '#F5F5F7' }}>ColorGenius</span>
           </Link>
           <div className="flex items-center gap-3 overflow-x-auto">
             {navItems.slice(0, 5).map((item) => (
               <Link key={item.href} href={item.href}
-                className="p-2 transition-colors hover:text-[#14B8A6] hover:bg-[#161620]"
+                className="p-2 transition-colors hover:text-[#9333EA] hover:bg-[#161620]"
                 style={{ color: '#A1A1AA', borderRadius: '8px' }}
               >
                 <item.icon className="w-[18px] h-[18px]" />
