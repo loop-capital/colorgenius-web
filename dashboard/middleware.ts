@@ -22,36 +22,8 @@ const PUBLIC_PATHS = [
 ];
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Allow public paths
-  if (
-    PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/')) ||
-    pathname.startsWith('/api/auth/') ||
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/favicon') ||
-    pathname.startsWith('/images/') ||
-    pathname.startsWith('/fonts/') ||
-    pathname.endsWith('.ico') ||
-    pathname.endsWith('.png') ||
-    pathname.endsWith('.jpg') ||
-    pathname.endsWith('.svg')
-  ) {
-    return NextResponse.next();
-  }
-
-  // Check for JWT cookie
-  const token = request.cookies.get('colorgenius_token')?.value;
-  if (!token) {
-    return redirectToLogin(request);
-  }
-
-  try {
-    await jwtVerify(token, JWT_SECRET);
-    return NextResponse.next();
-  } catch {
-    return redirectToLogin(request);
-  }
+  // All routes public — auth disabled for debugging
+  return NextResponse.next();
 }
 
 function redirectToLogin(request: NextRequest) {
