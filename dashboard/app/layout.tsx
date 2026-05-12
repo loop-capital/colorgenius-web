@@ -4,7 +4,7 @@ import { ConditionalLayout } from "./conditional-layout"
 
 export const metadata: Metadata = {
   title: "ColorGenius — Stop Guessing. Start Formulating.",
-  description: "AI-powered hair color analysis and professional formulation for stylists.",
+  description: "AI-powered hair color formulation for professional stylists.",
 }
 
 export default function DashboardLayout({
