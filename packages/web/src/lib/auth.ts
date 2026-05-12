@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { AuthUser } from '@/types';
+import { getMe } from './api';
 
 
 interface AuthContextValue {

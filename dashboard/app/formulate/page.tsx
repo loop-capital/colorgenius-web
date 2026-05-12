@@ -289,7 +289,7 @@ function FormulatePageContent() {
                 </div>
 
                 {/* Current Tone - ColorWheel3D */}
-                <div className="space-y-3">
+                <div className="space-y-3 pt-4">
                   <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>
                     Current Tone
                   </Label>

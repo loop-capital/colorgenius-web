@@ -56,34 +56,34 @@ export const TONE_DESCRIPTORS: Record<ToneFamily, string> = {
 // ─── WELLA PRODUCTS ────────────────────────────────────────────────────────────
 const wellaProducts: Product[] = [
   // Koleston Perfect ME+ — Level lines
-  { id: 'wella-kol-1', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '1/0', shadeName: 'Black', level: 1, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'wella-kol-2', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '2/0', shadeName: 'Darkest Brown', level: 2, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'wella-kol-3', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '3/0', shadeName: 'Dark Brown', level: 3, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'wella-kol-4', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '4/0', shadeName: 'Medium Brown', level: 4, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'wella-kol-5', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-6', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/0', shadeName: 'Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/0', shadeName: 'Medium Blonde', level: 7, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-8', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '8/0', shadeName: 'Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-9', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '9/0', shadeName: 'Very Light Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-10', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '10/0', shadeName: 'Lightest Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-20 vol', upt: 100 },
+  { id: 'wella-kol-1', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '1/0', shadeName: 'Black', level: 1, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'wella-kol-2', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '2/0', shadeName: 'Darkest Brown', level: 2, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'wella-kol-3', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '3/0', shadeName: 'Dark Brown', level: 3, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'wella-kol-4', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '4/0', shadeName: 'Medium Brown', level: 4, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'wella-kol-5', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-6', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/0', shadeName: 'Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/0', shadeName: 'Medium Blonde', level: 7, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-8', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '8/0', shadeName: 'Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-9', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '9/0', shadeName: 'Very Light Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-10', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '10/0', shadeName: 'Lightest Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '10-20 vol', upt: 100 },
   // Wella Golden tones
-  { id: 'wella-kol-4g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '4/73', shadeName: 'Medium Brown Golden', level: 4, tone: 'golden', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-5g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/73', shadeName: 'Light Brown Golden', level: 5, tone: 'golden', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-6g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/73', shadeName: 'Dark Blonde Golden', level: 6, tone: 'golden', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/73', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-8g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '8/73', shadeName: 'Light Blonde Golden', level: 8, tone: 'golden', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-4g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '4/73', shadeName: 'Medium Brown Golden', level: 4, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-5g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/73', shadeName: 'Light Brown Golden', level: 5, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-6g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/73', shadeName: 'Dark Blonde Golden', level: 6, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/73', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-8g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '8/73', shadeName: 'Light Blonde Golden', level: 8, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
   // Wella Ash tones
-  { id: 'wella-kol-4a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '4/81', shadeName: 'Medium Brown Ash', level: 4, tone: 'ash', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-5a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/81', shadeName: 'Light Brown Ash', level: 5, tone: 'ash', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-6a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/81', shadeName: 'Dark Blonde Ash', level: 6, tone: 'ash', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/81', shadeName: 'Medium Blonde Ash', level: 7, tone: 'ash', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-8a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '8/81', shadeName: 'Light Blonde Ash', level: 8, tone: 'ash', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-4a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '4/81', shadeName: 'Medium Brown Ash', level: 4, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-5a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/81', shadeName: 'Light Brown Ash', level: 5, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-6a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/81', shadeName: 'Dark Blonde Ash', level: 6, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/81', shadeName: 'Medium Blonde Ash', level: 7, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-8a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '8/81', shadeName: 'Light Blonde Ash', level: 8, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
   // Wella Red/Copper tones
-  { id: 'wella-kol-5r', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/60', shadeName: 'Light Brown Red', level: 5, tone: 'red', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-6r', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/60', shadeName: 'Dark Blonde Red', level: 6, tone: 'red', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7r', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/60', shadeName: 'Medium Blonde Red', level: 7, tone: 'red', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-6rc', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/65', shadeName: 'Dark Blonde Copper Rose', level: 6, tone: 'copper', secondaryTone: 'red', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7rc', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/46', shadeName: 'Medium Blonde Copper', level: 7, tone: 'copper', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-5r', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/60', shadeName: 'Light Brown Red', level: 5, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-6r', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/60', shadeName: 'Dark Blonde Red', level: 6, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7r', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/60', shadeName: 'Medium Blonde Red', level: 7, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-6rc', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/65', shadeName: 'Dark Blonde Copper Rose', level: 6, tone: 'copper', secondaryTone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7rc', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/46', shadeName: 'Medium Blonde Copper', level: 7, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
   // Wella Color Touch
   { id: 'wella-ct-5', brand: 'Wella', line: 'Color Touch', shadeCode: '5/0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
   { id: 'wella-ct-6', brand: 'Wella', line: 'Color Touch', shadeCode: '6/0', shadeName: 'Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
@@ -92,7 +92,60 @@ const wellaProducts: Product[] = [
   { id: 'wella-ct-8g', brand: 'Wella', line: 'Color Touch', shadeCode: '8/0', shadeName: 'Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
 ];
 
-// ─── SCHWARZKOFF PRODUCTS ────────────────────────────────────────────────────
+// ─── DAVINES PRODUCTS ─────────────────────────────────────────────────────────
+const davinesProducts: Product[] = [
+  // Davines A New Colour (Ammonia-free permanent) — 1:1.5 ratio
+  { id: 'davines-anc-1', brand: 'Davines', line: 'A New Colour', shadeCode: '1.0', shadeName: 'Black', level: 1, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-2', brand: 'Davines', line: 'A New Colour', shadeCode: '2.0', shadeName: 'Darkest Brown', level: 2, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-3', brand: 'Davines', line: 'A New Colour', shadeCode: '3.0', shadeName: 'Very Dark Brown', level: 3, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-4', brand: 'Davines', line: 'A New Colour', shadeCode: '4.0', shadeName: 'Dark Brown', level: 4, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-5', brand: 'Davines', line: 'A New Colour', shadeCode: '5.0', shadeName: 'Brown', level: 5, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-6', brand: 'Davines', line: 'A New Colour', shadeCode: '6.0', shadeName: 'Dark Brown', level: 6, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-7', brand: 'Davines', line: 'A New Colour', shadeCode: '7.0', shadeName: 'Light Brown', level: 7, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-8', brand: 'Davines', line: 'A New Colour', shadeCode: '8.0', shadeName: 'Dark Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-9', brand: 'Davines', line: 'A New Colour', shadeCode: '9.0', shadeName: 'Light Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-10', brand: 'Davines', line: 'A New Colour', shadeCode: '10.0', shadeName: 'Lightest Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-7a', brand: 'Davines', line: 'A New Colour', shadeCode: '7.1', shadeName: 'Light Ash Brown', level: 7, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-9a', brand: 'Davines', line: 'A New Colour', shadeCode: '9.1', shadeName: 'Light Ash Blonde', level: 9, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-10a', brand: 'Davines', line: 'A New Colour', shadeCode: '10.1', shadeName: 'Lightest Ash Blonde', level: 10, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-6g', brand: 'Davines', line: 'A New Colour', shadeCode: '6.3', shadeName: 'Dark Golden Brown', level: 6, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-10g', brand: 'Davines', line: 'A New Colour', shadeCode: '10.3', shadeName: 'Lightest Golden Blonde', level: 10, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-5c', brand: 'Davines', line: 'A New Colour', shadeCode: '5.4', shadeName: 'Light Copper Brown', level: 5, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-4m', brand: 'Davines', line: 'A New Colour', shadeCode: '4.5', shadeName: 'Mahogany Brown', level: 4, tone: 'mahogany', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-3r', brand: 'Davines', line: 'A New Colour', shadeCode: '3.6', shadeName: 'Dark Red Brown', level: 3, tone: 'red', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-anc-8i', brand: 'Davines', line: 'A New Colour', shadeCode: '8.2', shadeName: 'Iridescent Blonde', level: 8, tone: 'cool', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+
+  // Davines Mask with Vibrachrom (Permanent cream) — 1:1.5 ratio
+  { id: 'davines-mv-6a', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '6.1', shadeName: 'Dark Ash Brown', level: 6, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-7a', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '7.1', shadeName: 'Ash Brown', level: 7, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-5a', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '5.1', shadeName: 'Light Ash Brown', level: 5, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-7g', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '7.3', shadeName: 'Golden Brown', level: 7, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-6g', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '6.3', shadeName: 'Light Golden Brown', level: 6, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-5g', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '5.3', shadeName: 'Light Brown', level: 5, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-4g', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '4.3', shadeName: 'Light Brown', level: 4, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-6c', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '6.4', shadeName: 'Intense Copper', level: 6, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-5m', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '5.5', shadeName: 'Mahogany', level: 5, tone: 'mahogany', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-4r', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '4.6', shadeName: 'Intense Red', level: 4, tone: 'red', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+  { id: 'davines-mv-3r', brand: 'Davines', line: 'Mask with Vibrachrom', shadeCode: '3.6', shadeName: 'Dark Red', level: 3, tone: 'red', mixingRatio: '1:1.5', developerRequired: '5-40 vol', upt: 100 },
+
+  // Davines View (Tone-on-tone, acidic pH) — 1:1 ratio, 10 vol only
+  { id: 'davines-vw-1', brand: 'Davines', line: 'View', shadeCode: '1,0', shadeName: 'Black', level: 1, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-2', brand: 'Davines', line: 'View', shadeCode: '2,0', shadeName: 'Darkest Brown', level: 2, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-3', brand: 'Davines', line: 'View', shadeCode: '3,0', shadeName: 'Dark Brown', level: 3, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-4', brand: 'Davines', line: 'View', shadeCode: '4,0', shadeName: 'Brown', level: 4, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-5', brand: 'Davines', line: 'View', shadeCode: '5,0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-6', brand: 'Davines', line: 'View', shadeCode: '6,0', shadeName: 'Dark Brown', level: 6, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-7', brand: 'Davines', line: 'View', shadeCode: '7,0', shadeName: 'Light Brown', level: 7, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-8', brand: 'Davines', line: 'View', shadeCode: '8,0', shadeName: 'Dark Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-9', brand: 'Davines', line: 'View', shadeCode: '9,0', shadeName: 'Light Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-10', brand: 'Davines', line: 'View', shadeCode: '10,0', shadeName: 'Buttercream Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-10a', brand: 'Davines', line: 'View', shadeCode: '10,1', shadeName: 'Pearl Blonde', level: 10, tone: 'ash', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-9g', brand: 'Davines', line: 'View', shadeCode: '9,3', shadeName: 'Golden Blonde', level: 9, tone: 'golden', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-8g', brand: 'Davines', line: 'View', shadeCode: '8,3', shadeName: 'Honey Blonde', level: 8, tone: 'golden', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-7c', brand: 'Davines', line: 'View', shadeCode: '7,4', shadeName: 'Copper Brown', level: 7, tone: 'copper', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+  { id: 'davines-vw-6r', brand: 'Davines', line: 'View', shadeCode: '6,6', shadeName: 'Red Brown', level: 6, tone: 'red', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
+];
+
 const schwarzkopfProducts: Product[] = [
   // Igora Royal
   { id: 'skf-igora-1', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '1-0', shadeName: 'Black', level: 1, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
@@ -268,9 +321,138 @@ const goldwellProducts: Product[] = [
   { id: 'gw-duo-7r', brand: 'Goldwell', line: 'DualSenses Color', shadeCode: '7R', shadeName: 'Medium Blonde Red', level: 7, tone: 'red', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
 ];
 
+// ─── L'ANZA PRODUCTS ────────────────────────────────────────────────────────
+const lanzaProducts: Product[] = [
+  // L'ANZA Healing Color — Natural Series (N)
+  { id: 'lanza-n-1', brand: "L'ANZA", line: 'Healing Color', shadeCode: '1N', shadeName: 'Natural Black', level: 1, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'lanza-n-2', brand: "L'ANZA", line: 'Healing Color', shadeCode: '2N', shadeName: 'Natural Brown Black', level: 2, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'lanza-n-3', brand: "L'ANZA", line: 'Healing Color', shadeCode: '3N', shadeName: 'Dark Natural Brown', level: 3, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'lanza-n-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4N', shadeName: 'Medium Natural Brown', level: 4, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-n-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5N', shadeName: 'Light Natural Brown', level: 5, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-n-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6N', shadeName: 'Dark Natural Blonde', level: 6, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-n-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7N', shadeName: 'Medium Natural Blonde', level: 7, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-n-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8N', shadeName: 'Light Natural Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-n-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9N', shadeName: 'Very Light Natural Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-n-10', brand: "L'ANZA", line: 'Healing Color', shadeCode: '10N', shadeName: 'Lightest Natural Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Double Natural (NN) — Extra Gray Coverage
+  { id: 'lanza-nn-3', brand: "L'ANZA", line: 'Healing Color', shadeCode: '3NN', shadeName: 'Ultra Natural Dark Brown', level: 3, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'lanza-nn-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4NN', shadeName: 'Ultra Natural Medium Brown', level: 4, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nn-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5NN', shadeName: 'Ultra Natural Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nn-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6NN', shadeName: 'Ultra Natural Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nn-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7NN', shadeName: 'Ultra Natural Medium Blonde', level: 7, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nn-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8NN', shadeName: 'Ultra Natural Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nn-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9NN', shadeName: 'Ultra Natural Very Light Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nn-10', brand: "L'ANZA", line: 'Healing Color', shadeCode: '10NN', shadeName: 'Ultra Natural Lightest Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Natural Ash (NA)
+  { id: 'lanza-na-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4NA', shadeName: 'Natural Ash Brown', level: 4, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-na-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5NA', shadeName: 'Natural Ash Brown', level: 5, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-na-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6NA', shadeName: 'Natural Ash Blonde', level: 6, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-na-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7NA', shadeName: 'Natural Ash Blonde', level: 7, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-na-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8NA', shadeName: 'Natural Ash Blonde', level: 8, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-na-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9NA', shadeName: 'Natural Ash Blonde', level: 9, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Ash (A)
+  { id: 'lanza-a-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4A', shadeName: 'Dark Ash Brown', level: 4, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-a-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5A', shadeName: 'Medium Ash Brown', level: 5, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-a-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6A', shadeName: 'Light Ash Brown', level: 6, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-a-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7A', shadeName: 'Dark Ash Blonde', level: 7, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-a-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8A', shadeName: 'Medium Ash Blonde', level: 8, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-a-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9A', shadeName: 'Light Ash Blonde', level: 9, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-a-10', brand: "L'ANZA", line: 'Healing Color', shadeCode: '10A', shadeName: 'Very Light Ash Blonde', level: 10, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-a-100', brand: "L'ANZA", line: 'Healing Color', shadeCode: '100A', shadeName: 'Ultra Light Ash Blonde', level: 10, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 100 },
+  { id: 'lanza-a-200', brand: "L'ANZA", line: 'Healing Color', shadeCode: '200A', shadeName: 'Super Lift Ash Blonde', level: 10, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '40 vol', upt: 100 },
+  // L'ANZA Extra Ash (AX)
+  { id: 'lanza-ax-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4AX', shadeName: 'Dark Extra Ash Brown', level: 4, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-ax-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5AX', shadeName: 'Medium Extra Ash Brown', level: 5, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-ax-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6AX', shadeName: 'Light Extra Ash Brown', level: 6, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-ax-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7AX', shadeName: 'Dark Extra Ash Blonde', level: 7, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-ax-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8AX', shadeName: 'Medium Extra Ash Blonde', level: 8, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Natural Violet (NV)
+  { id: 'lanza-nv-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4NV', shadeName: 'Natural Violet Brown', level: 4, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nv-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5NV', shadeName: 'Natural Violet Brown', level: 5, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nv-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6NV', shadeName: 'Natural Violet Blonde', level: 6, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nv-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7NV', shadeName: 'Natural Violet Blonde', level: 7, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nv-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8NV', shadeName: 'Natural Violet Blonde', level: 8, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-nv-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9NV', shadeName: 'Natural Violet Blonde', level: 9, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Pearl (P)
+  { id: 'lanza-p-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6P', shadeName: 'Dark Pearl Blonde', level: 6, tone: 'pearl', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-p-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7P', shadeName: 'Medium Pearl Blonde', level: 7, tone: 'pearl', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-p-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8P', shadeName: 'Light Pearl Blonde', level: 8, tone: 'pearl', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-p-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9P', shadeName: 'Very Light Pearl Blonde', level: 9, tone: 'pearl', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-p-10', brand: "L'ANZA", line: 'Healing Color', shadeCode: '10P', shadeName: 'Lightest Pearl Blonde', level: 10, tone: 'pearl', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-p-100', brand: "L'ANZA", line: 'Healing Color', shadeCode: '100P', shadeName: 'Ultra Pearl Blonde', level: 10, tone: 'pearl', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 100 },
+  // L'ANZA Beige (B)
+  { id: 'lanza-b-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6B', shadeName: 'Light Beige Brown', level: 6, tone: 'beige', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-b-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7B', shadeName: 'Dark Beige Blonde', level: 7, tone: 'beige', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-b-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8B', shadeName: 'Medium Beige Blonde', level: 8, tone: 'beige', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-b-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9B', shadeName: 'Light Beige Blonde', level: 9, tone: 'beige', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-b-100', brand: "L'ANZA", line: 'Healing Color', shadeCode: '100B', shadeName: 'Ultra Beige Blonde', level: 10, tone: 'beige', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 100 },
+  // L'ANZA Beige Copper (BC)
+  { id: 'lanza-bc-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4BC', shadeName: 'Dark Beige Copper Brown', level: 4, tone: 'beige', secondaryTone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-bc-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6BC', shadeName: 'Light Beige Copper Brown', level: 6, tone: 'beige', secondaryTone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Copper (C)
+  { id: 'lanza-c-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4C', shadeName: 'Dark Copper Brown', level: 4, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-c-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5C', shadeName: 'Medium Copper Brown', level: 5, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-c-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6C', shadeName: 'Light Copper Brown', level: 6, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-c-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7C', shadeName: 'Dark Copper Blonde', level: 7, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-c-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8C', shadeName: 'Medium Copper Blonde', level: 8, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-c-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9C', shadeName: 'Light Copper Blonde', level: 9, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Copper Gold (CG)
+  { id: 'lanza-cg-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4CG', shadeName: 'Dark Copper Gold Brown', level: 4, tone: 'copper', secondaryTone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-cg-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5CG', shadeName: 'Medium Copper Gold Brown', level: 5, tone: 'copper', secondaryTone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-cg-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6CG', shadeName: 'Light Copper Gold Brown', level: 6, tone: 'copper', secondaryTone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-cg-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7CG', shadeName: 'Dark Copper Gold Blonde', level: 7, tone: 'copper', secondaryTone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Red (R)
+  { id: 'lanza-r-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4R', shadeName: 'Dark Red Brown', level: 4, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-r-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5R', shadeName: 'Medium Red Brown', level: 5, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-r-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6R', shadeName: 'Light Red Brown', level: 6, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-r-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7R', shadeName: 'Medium Red Blonde', level: 7, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Ultra Red (RR)
+  { id: 'lanza-rr-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5RR', shadeName: 'Medium Ultra Red Brown', level: 5, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-rr-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6RR', shadeName: 'Dark Ultra Red Blonde', level: 6, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-rr-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7RR', shadeName: 'Medium Ultra Red Blonde', level: 7, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-rr-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8RR', shadeName: 'Light Ultra Red Blonde', level: 8, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-rr-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9RR', shadeName: 'Very Light Ultra Red Blonde', level: 9, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Red Copper (RRC)
+  { id: 'lanza-rrc-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4RRC', shadeName: 'Dark Red Copper Brown', level: 4, tone: 'red', secondaryTone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-rrc-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5RRC', shadeName: 'Medium Red Copper Brown', level: 5, tone: 'red', secondaryTone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-rrc-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6RRC', shadeName: 'Light Red Copper Brown', level: 6, tone: 'red', secondaryTone: 'copper', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Red Violet (RV)
+  { id: 'lanza-rv-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4RV', shadeName: 'Dark Red Violet Brown', level: 4, tone: 'red', secondaryTone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-rv-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5RV', shadeName: 'Medium Red Violet Brown', level: 5, tone: 'red', secondaryTone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Violet (V)
+  { id: 'lanza-v-3', brand: "L'ANZA", line: 'Healing Color', shadeCode: '3V', shadeName: 'Dark Violet Brown', level: 3, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'lanza-v-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4V', shadeName: 'Medium Violet Brown', level: 4, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-v-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5V', shadeName: 'Light Violet Brown', level: 5, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-v-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6V', shadeName: 'Dark Violet Blonde', level: 6, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-v-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7V', shadeName: 'Medium Violet Blonde', level: 7, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-v-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8V', shadeName: 'Light Violet Blonde', level: 8, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-v-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9V', shadeName: 'Very Light Violet Blonde', level: 9, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-v-100', brand: "L'ANZA", line: 'Healing Color', shadeCode: '100V', shadeName: 'Ultra Violet Blonde', level: 10, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 100 },
+  // L'ANZA Gold (G)
+  { id: 'lanza-g-4', brand: "L'ANZA", line: 'Healing Color', shadeCode: '4G', shadeName: 'Dark Golden Brown', level: 4, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-g-5', brand: "L'ANZA", line: 'Healing Color', shadeCode: '5G', shadeName: 'Medium Golden Brown', level: 5, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-g-6', brand: "L'ANZA", line: 'Healing Color', shadeCode: '6G', shadeName: 'Light Golden Brown', level: 6, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-g-7', brand: "L'ANZA", line: 'Healing Color', shadeCode: '7G', shadeName: 'Medium Golden Blonde', level: 7, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-g-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8G', shadeName: 'Light Golden Blonde', level: 8, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'lanza-g-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9G', shadeName: 'Very Light Golden Blonde', level: 9, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  // L'ANZA Titanium (T)
+  { id: 'lanza-t-8', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8T', shadeName: 'Silver', level: 8, tone: 'cool', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+  { id: 'lanza-t-9', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9T', shadeName: 'Chrome', level: 9, tone: 'cool', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+  // L'ANZA Specialty Shades
+  { id: 'lanza-spec-8gn', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8Gn', shadeName: 'Ivy', level: 8, tone: 'cool', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+  { id: 'lanza-spec-8v', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8V', shadeName: 'Iridescent Quartz', level: 8, tone: 'violet', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+  { id: 'lanza-spec-8wg', brand: "L'ANZA", line: 'Healing Color', shadeCode: '8Wg', shadeName: 'Golden Apricot', level: 8, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+  { id: 'lanza-spec-9aa', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9Aa', shadeName: 'Papaya', level: 9, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+  { id: 'lanza-spec-9gi', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9GI', shadeName: 'Hamptons', level: 9, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+  { id: 'lanza-spec-9nw', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9NW', shadeName: 'Cream Soda', level: 9, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+  { id: 'lanza-spec-9nb', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9Nb', shadeName: 'Irish Creme', level: 9, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+  { id: 'lanza-spec-9rb', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9Rb', shadeName: 'Blush', level: 9, tone: 'red', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
+];
+
 // ─── ALL PRODUCTS ─────────────────────────────────────────────────────────────
 export const ALL_PRODUCTS: Product[] = [
   ...wellaProducts,
+  ...davinesProducts,
   ...schwarzkopfProducts,
   ...redkenProducts,
   ...matrixProducts,
@@ -278,6 +460,7 @@ export const ALL_PRODUCTS: Product[] = [
   ...paulMitchellProducts,
   ...pulpRiotProducts,
   ...goldwellProducts,
+  ...lanzaProducts,
 ];
 
 export const BRANDS = [...new Set(ALL_PRODUCTS.map(p => p.brand))];

@@ -1,0 +1,30 @@
+Rate limiting successfully implemented for ColorGenius API routes.
+
+## Summary of Changes:
+1. Created `/lib/rate-limit.ts` - Rate limiting utility with IP-based client identification
+2. Added rate limiting to 6 key API routes:
+   - `/app/api/analyze/route.ts` - 5 requests/minute
+   - `/app/api/formulate/route.ts` - 15 requests/minute  
+   - `/app/api/clients/route.ts` - 30 requests/minute (POST)
+   - `/app/api/formulas/route.ts` - 20 requests/minute (POST)
+   - `/app/api/v1/formulas/route.ts` - 10 requests/minute
+   - `/app/api/photos/upload/route.ts` - 20 requests/minute
+
+## Features:
+- IP-based client identification with header fallbacks
+- Fixed window algorithm with automatic cleanup
+- Standard rate limit response headers (X-RateLimit-*)
+- HTTP 429 responses when limits exceeded
+- Configurable limits per endpoint type
+
+## Files Modified:
+- M dashboard/app/api/analyze/route.ts
+- M dashboard/app/api/clients/route.ts  
+- M dashboard/app/api/formulas/route.ts
+- M dashboard/app/api/formulate/route.ts
+- M dashboard/app/api/photos/upload/route.ts
+- M dashboard/app/api/v1/formulas/route.ts
+- A lib/rate-limit.ts
+- A RATE_LIMITING_SUMMARY.md
+
+The implementation provides basic request throttling to prevent abuse while allowing legitimate usage. For production, consider upgrading to a distributed store like Redis and adding user-based limits for authenticated clients.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-02T11:51:34.400Z",
+  "updatedAt": "2026-05-03T16:59:47.977Z",
   "entries": {
     "memory:memory/standups/2026-04-25.md:1:39": {
       "key": "memory:memory/standups/2026-04-25.md:1:39",
@@ -9,13 +9,13 @@
       "endLine": 39,
       "source": "memory",
       "snippet": "# Daily Standup — April 25, 2026 ## Lucy (CEO) **Yesterday:** N/A (sprint kickoff) **Today:** Mobilized all 4 agents for 4-week beta sprint. Created sprint plan and updated project status. **Blockers:** None --- ## colorgenius-dev **Status:** 🔄 RUNNING **Task:** Design system + core APIs (Week 1) **Started:** Apr 25, 19:25 EDT --- ## colorgenius-research **Status:** 🔄 RUNNING **Task:** Photo analysis approach + formulation rules **Started:** Apr 25, 19:25 EDT --- ## colorgenius-architect **Status:** 🔄 RUNNING **Task:** DB schema + deployment plan + API contract **Started:** Apr 25, 19:25 EDT --- ## colorgenius-marketing **Status:** 🔄 RUNNING **Task:** Onboarding guide + manufact",
-      "recallCount": 12,
+      "recallCount": 13,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 5.410744074184079,
+      "totalScore": 5.816223785893179,
       "maxScore": 0.5220389634370803,
       "firstRecalledAt": "2026-04-27T11:33:09.174Z",
-      "lastRecalledAt": "2026-05-02T11:51:34.400Z",
+      "lastRecalledAt": "2026-05-03T13:12:13.170Z",
       "queryHashes": [
         "9ce1e83154ca",
         "60a68e268f36",
@@ -28,7 +28,8 @@
         "fe748df3d14e",
         "c94ab43e2ed2",
         "05aa66324901",
-        "d9d131cb8f39"
+        "d9d131cb8f39",
+        "26367ff46b79"
       ],
       "recallDays": [
         "2026-04-27",
@@ -36,7 +37,8 @@
         "2026-04-29",
         "2026-04-30",
         "2026-05-01",
-        "2026-05-02"
+        "2026-05-02",
+        "2026-05-03"
       ],
       "conceptTags": [
         "n/a",
@@ -56,13 +58,13 @@
       "endLine": 53,
       "source": "memory",
       "snippet": "# Daily Standup — April 26, 2026 ## URGENT SPRINT MODE — Beta Delivery Accelerated **Sprint Goal:** Working beta for manufacturer demos + stylist hands-on **Deadline:** ASAP (pushed from May 23) **Status:** 🔴 CRITICAL — Accelerating to 24/7 delivery --- ## Immediate Priorities (Next 24 Hours) ### 1. Formulation Engine — MUST DELIVER TODAY **Owner:** colorgenius-dev + colorgenius-research **Status:** 🟡 In Progress **Blockers:** - Need shade database structured (Wella Koleston) - Need level/tone matching logic **Actions:** - [ ] Structure color-lines markdown into JSON database - [ ] Implement basic shade matching (target level → closest available) - [ ] Wire /api/formulate to real dat",
-      "recallCount": 8,
+      "recallCount": 9,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 4.069687297829823,
+      "totalScore": 4.479966305369641,
       "maxScore": 0.823040512834894,
       "firstRecalledAt": "2026-04-27T11:33:36.831Z",
-      "lastRecalledAt": "2026-05-01T17:21:46.152Z",
+      "lastRecalledAt": "2026-05-03T13:12:13.170Z",
       "queryHashes": [
         "60a68e268f36",
         "761ad13d3594",
@@ -71,13 +73,15 @@
         "1528c0ddd62f",
         "3c1b38b25ddc",
         "c94ab43e2ed2",
-        "05aa66324901"
+        "05aa66324901",
+        "26367ff46b79"
       ],
       "recallDays": [
         "2026-04-27",
         "2026-04-29",
         "2026-04-30",
-        "2026-05-01"
+        "2026-05-01",
+        "2026-05-03"
       ],
       "conceptTags": [
         "hands-on",
@@ -265,18 +269,20 @@
       "endLine": 110,
       "source": "memory",
       "snippet": "Warning: \"Target level requires 6 levels of lift, but only 3 achievable in one session. Consider a two-step process.\" ``` --- ## Formulation Accuracy: HIGH - ✅ Correct brand/line/shade code in every test - ✅ Correct mixing ratios per product type - ✅ Correct developer volumes based on lift required - ✅ Correct processing times (35-45 min permanent, would be 10-20 for demi) - ✅ Correct undertone correction logic - ✅ Correct application notes per virgin vs retouch - ✅ Correct gray coverage handling (>25% adds neutral additive) - ✅ Warnings when lift is unachievable in one session --- ## Current Database Coverage | Brand | Line | Shades | |-------|------|--------| | Wella | Koleston Perfe",
-      "recallCount": 1,
+      "recallCount": 2,
       "dailyCount": 0,
       "groundedCount": 0,
-      "totalScore": 0.4088302433490753,
-      "maxScore": 0.4088302433490753,
+      "totalScore": 0.8841920801417644,
+      "maxScore": 0.4753618367926892,
       "firstRecalledAt": "2026-04-30T09:24:13.398Z",
-      "lastRecalledAt": "2026-04-30T09:24:13.398Z",
+      "lastRecalledAt": "2026-05-03T16:59:47.977Z",
       "queryHashes": [
-        "4f6312f17f00"
+        "4f6312f17f00",
+        "c3811ed8605f"
       ],
       "recallDays": [
-        "2026-04-30"
+        "2026-04-30",
+        "2026-05-03"
       ],
       "conceptTags": [
         "two-step",

@@ -1,0 +1,326 @@
+{
+  "brand": "L'ANZA",
+  "product_line": "Healing Color Cream",
+  "type": "permanent",
+  "features": [
+    "Keratin Healing System",
+    "Flower Shield Complex",
+    "3-in-1 versatile formulation",
+    "Gray coverage up to 100%"
+  ],
+  "mix_ratio": "1:1.5",
+  "processing_time": "30 minutes",
+  "gray_processing_time": "30-40 minutes",
+  "developers": [
+    {"volume": 10, "percentage": "3%", "use": "Deposit only, gray coverage"},
+    {"volume": 20, "percentage": "6%", "use": "Standard lift (1-2 levels)"},
+    {"volume": 30, "percentage": "9%", "use": "Maximum lift (2-3 levels)"},
+    {"volume": 40, "percentage": "12%", "use": "Super lift"}
+  ],
+  "series": [
+    {
+      "code": "N",
+      "name": "Natural",
+      "description": "Pure neutral tones for natural-looking results",
+      "gray_coverage": "0-25%",
+      "shades": [
+        {"code": "1N", "name": "Natural Black", "level": 1, "tone": "Natural", "description": "Deepest natural black"},
+        {"code": "2N", "name": "Natural Brown Black", "level": 2, "tone": "Natural", "description": "Natural brown-black"},
+        {"code": "3N", "name": "Dark Natural Brown", "level": 3, "tone": "Natural", "description": "Dark natural brown"},
+        {"code": "4N", "name": "Medium Natural Brown", "level": 4, "tone": "Natural", "description": "Medium natural brown"},
+        {"code": "5N", "name": "Light Natural Brown", "level": 5, "tone": "Natural", "description": "Light natural brown"},
+        {"code": "6N", "name": "Dark Natural Blonde", "level": 6, "tone": "Natural", "description": "Dark natural blonde"},
+        {"code": "7N", "name": "Medium Natural Blonde", "level": 7, "tone": "Natural", "description": "Medium natural blonde"},
+        {"code": "8N", "name": "Light Natural Blonde", "level": 8, "tone": "Natural", "description": "Light natural blonde"},
+        {"code": "9N", "name": "Very Light Natural Blonde", "level": 9, "tone": "Natural", "description": "Very light natural blonde"},
+        {"code": "10N", "name": "Lightest Natural Blonde", "level": 10, "tone": "Natural", "description": "Lightest natural blonde"}
+      ]
+    },
+    {
+      "code": "NN",
+      "name": "Double Natural / Ultra Natural",
+      "description": "Extra coverage for resistant gray hair (50%+ gray)",
+      "gray_coverage": "50-100%",
+      "mixing": "Equal parts NN + N shade",
+      "shades": [
+        {"code": "3NN", "name": "Ultra Natural Dark Brown", "level": 3, "tone": "Natural", "description": "Extra coverage dark brown"},
+        {"code": "4NN", "name": "Ultra Natural Medium Brown", "level": 4, "tone": "Natural", "description": "Extra coverage medium brown"},
+        {"code": "5NN", "name": "Ultra Natural Light Brown", "level": 5, "tone": "Natural", "description": "Extra coverage light brown"},
+        {"code": "6NN", "name": "Ultra Natural Dark Blonde", "level": 6, "tone": "Natural", "description": "Extra coverage dark blonde"},
+        {"code": "7NN", "name": "Ultra Natural Medium Blonde", "level": 7, "tone": "Natural", "description": "Extra coverage medium blonde"},
+        {"code": "8NN", "name": "Ultra Natural Light Blonde", "level": 8, "tone": "Natural", "description": "Extra coverage light blonde"},
+        {"code": "9NN", "name": "Ultra Natural Very Light Blonde", "level": 9, "tone": "Natural", "description": "Extra coverage very light blonde"},
+        {"code": "10NN", "name": "Ultra Natural Lightest Blonde", "level": 10, "tone": "Natural", "description": "Extra coverage lightest blonde"}
+      ]
+    },
+    {
+      "code": "NA",
+      "name": "Natural Ash",
+      "description": "Cool natural tones with ash reflect",
+      "gray_coverage": "25-50%",
+      "shades": [
+        {"code": "4NA", "name": "Natural Ash Brown", "level": 4, "tone": "Ash", "description": "Cool medium brown"},
+        {"code": "5NA", "name": "Natural Ash Brown", "level": 5, "tone": "Ash", "description": "Cool light brown"},
+        {"code": "6NA", "name": "Natural Ash Blonde", "level": 6, "tone": "Ash", "description": "Cool dark blonde"},
+        {"code": "7NA", "name": "Natural Ash Blonde", "level": 7, "tone": "Ash", "description": "Cool medium blonde"},
+        {"code": "8NA", "name": "Natural Ash Blonde", "level": 8, "tone": "Ash", "description": "Cool light blonde"},
+        {"code": "9NA", "name": "Natural Ash Blonde", "level": 9, "tone": "Ash", "description": "Cool very light blonde"}
+      ]
+    },
+    {
+      "code": "A",
+      "name": "Ash",
+      "description": "Cool ash tones for neutralizing warmth",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4A", "name": "Dark Ash Brown", "level": 4, "tone": "Ash", "description": "Rich dark ash brown"},
+        {"code": "5A", "name": "Medium Ash Brown", "level": 5, "tone": "Ash", "description": "Medium ash brown"},
+        {"code": "6A", "name": "Light Ash Brown", "level": 6, "tone": "Ash", "description": "Light ash brown"},
+        {"code": "7A", "name": "Dark Ash Blonde", "level": 7, "tone": "Ash", "description": "Dark ash blonde"},
+        {"code": "8A", "name": "Medium Ash Blonde", "level": 8, "tone": "Ash", "description": "Medium ash blonde"},
+        {"code": "9A", "name": "Light Ash Blonde", "level": 9, "tone": "Ash", "description": "Light ash blonde"},
+        {"code": "10A", "name": "Very Light Ash Blonde", "level": 10, "tone": "Ash", "description": "Very light ash blonde"},
+        {"code": "100A", "name": "Ultra Light Ash Blonde", "level": 10, "tone": "Ash", "description": "Ultra light ash blonde"},
+        {"code": "200A", "name": "Super Lift Ash Blonde", "level": 10, "tone": "Ash", "description": "Maximum lift ash blonde"}
+      ]
+    },
+    {
+      "code": "AX",
+      "name": "Extra Ash",
+      "description": "Extra cool ash tones for maximum warmth neutralization",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4AX", "name": "Dark Extra Ash Brown", "level": 4, "tone": "Ash", "description": "Extra cool dark brown"},
+        {"code": "5AX", "name": "Medium Extra Ash Brown", "level": 5, "tone": "Ash", "description": "Extra cool medium brown"},
+        {"code": "6AX", "name": "Light Extra Ash Brown", "level": 6, "tone": "Ash", "description": "Extra cool light brown"},
+        {"code": "7AX", "name": "Dark Extra Ash Blonde", "level": 7, "tone": "Ash", "description": "Extra cool dark blonde"},
+        {"code": "8AX", "name": "Medium Extra Ash Blonde", "level": 8, "tone": "Ash", "description": "Extra cool medium blonde"}
+      ]
+    },
+    {
+      "code": "NV",
+      "name": "Natural Violet",
+      "description": "Cool violet tones with natural base",
+      "gray_coverage": "25-50%",
+      "shades": [
+        {"code": "4NV", "name": "Natural Violet Brown", "level": 4, "tone": "Violet", "description": "Cool violet brown"},
+        {"code": "5NV", "name": "Natural Violet Brown", "level": 5, "tone": "Violet", "description": "Cool violet light brown"},
+        {"code": "6NV", "name": "Natural Violet Blonde", "level": 6, "tone": "Violet", "description": "Cool violet dark blonde"},
+        {"code": "7NV", "name": "Natural Violet Blonde", "level": 7, "tone": "Violet", "description": "Cool violet medium blonde"},
+        {"code": "8NV", "name": "Natural Violet Blonde", "level": 8, "tone": "Violet", "description": "Cool violet light blonde"},
+        {"code": "9NV", "name": "Natural Violet Blonde", "level": 9, "tone": "Violet", "description": "Cool violet very light blonde"}
+      ]
+    },
+    {
+      "code": "P",
+      "name": "Pearl",
+      "description": "Iridescent pearl tones for sophisticated shine",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "6P", "name": "Dark Pearl Blonde", "level": 6, "tone": "Pearl", "description": "Pearl dark blonde"},
+        {"code": "7P", "name": "Medium Pearl Blonde", "level": 7, "tone": "Pearl", "description": "Pearl medium blonde"},
+        {"code": "8P", "name": "Light Pearl Blonde", "level": 8, "tone": "Pearl", "description": "Pearl light blonde"},
+        {"code": "9P", "name": "Very Light Pearl Blonde", "level": 9, "tone": "Pearl", "description": "Pearl very light blonde"},
+        {"code": "10P", "name": "Lightest Pearl Blonde", "level": 10, "tone": "Pearl", "description": "Pearl lightest blonde"},
+        {"code": "100P", "name": "Ultra Pearl Blonde", "level": 10, "tone": "Pearl", "description": "Ultra pearl blonde"}
+      ]
+    },
+    {
+      "code": "B",
+      "name": "Beige",
+      "description": "Warm neutral beige tones",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "6B", "name": "Light Beige Brown", "level": 6, "tone": "Beige", "description": "Warm beige dark blonde"},
+        {"code": "7B", "name": "Dark Beige Blonde", "level": 7, "tone": "Beige", "description": "Warm beige medium blonde"},
+        {"code": "8B", "name": "Medium Beige Blonde", "level": 8, "tone": "Beige", "description": "Warm beige light blonde"},
+        {"code": "9B", "name": "Light Beige Blonde", "level": 9, "tone": "Beige", "description": "Warm beige very light blonde"},
+        {"code": "100B", "name": "Ultra Beige Blonde", "level": 10, "tone": "Beige", "description": "Ultra beige blonde"}
+      ]
+    },
+    {
+      "code": "BC",
+      "name": "Beige Copper",
+      "description": "Beige tones with copper warmth",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4BC", "name": "Dark Beige Copper Brown", "level": 4, "tone": "Beige/Copper", "description": "Rich beige with copper tones"},
+        {"code": "6BC", "name": "Light Beige Copper Brown", "level": 6, "tone": "Beige/Copper", "description": "Light beige with copper tones"}
+      ]
+    },
+    {
+      "code": "C",
+      "name": "Copper",
+      "description": "Warm copper tones for vibrant richness",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4C", "name": "Dark Copper Brown", "level": 4, "tone": "Copper", "description": "Rich dark copper brown"},
+        {"code": "5C", "name": "Medium Copper Brown", "level": 5, "tone": "Copper", "description": "Medium copper brown"},
+        {"code": "6C", "name": "Light Copper Brown", "level": 6, "tone": "Copper", "description": "Light copper brown/dark copper blonde"},
+        {"code": "7C", "name": "Dark Copper Blonde", "level": 7, "tone": "Copper", "description": "Dark copper blonde"},
+        {"code": "8C", "name": "Medium Copper Blonde", "level": 8, "tone": "Copper", "description": "Medium copper blonde"},
+        {"code": "9C", "name": "Light Copper Blonde", "level": 9, "tone": "Copper", "description": "Light copper blonde"}
+      ]
+    },
+    {
+      "code": "CG",
+      "name": "Copper Gold",
+      "description": "Warm copper-gold combination tones",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4CG", "name": "Dark Copper Gold Brown", "level": 4, "tone": "Copper/Gold", "description": "Rich copper-gold brown"},
+        {"code": "5CG", "name": "Medium Copper Gold Brown", "level": 5, "tone": "Copper/Gold", "description": "Medium copper-gold brown"},
+        {"code": "6CG", "name": "Light Copper Gold Brown", "level": 6, "tone": "Copper/Gold", "description": "Light copper-gold brown"},
+        {"code": "7CG", "name": "Dark Copper Gold Blonde", "level": 7, "tone": "Copper/Gold", "description": "Dark copper-gold blonde"}
+      ]
+    },
+    {
+      "code": "R",
+      "name": "Red",
+      "description": "Rich red tones for vibrant color",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4R", "name": "Dark Red Brown", "level": 4, "tone": "Red", "description": "Rich dark red brown"},
+        {"code": "5R", "name": "Medium Red Brown", "level": 5, "tone": "Red", "description": "Medium red brown"},
+        {"code": "6R", "name": "Light Red Brown", "level": 6, "tone": "Red", "description": "Light red brown/dark red blonde"},
+        {"code": "7R", "name": "Medium Red Blonde", "level": 7, "tone": "Red", "description": "Medium red blonde"}
+      ]
+    },
+    {
+      "code": "RR",
+      "name": "Ultra Red",
+      "description": "Intense red tones for maximum vibrancy",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "5RR", "name": "Medium Ultra Red Brown", "level": 5, "tone": "Red", "description": "Intense medium red brown"},
+        {"code": "6RR", "name": "Dark Ultra Red Blonde", "level": 6, "tone": "Red", "description": "Intense dark red blonde"},
+        {"code": "7RR", "name": "Medium Ultra Red Blonde", "level": 7, "tone": "Red", "description": "Intense medium red blonde"},
+        {"code": "8RR", "name": "Light Ultra Red Blonde", "level": 8, "tone": "Red", "description": "Intense light red blonde"},
+        {"code": "9RR", "name": "Very Light Ultra Red Blonde", "level": 9, "tone": "Red", "description": "Intense very light red blonde"}
+      ]
+    },
+    {
+      "code": "RRC",
+      "name": "Red Copper",
+      "description": "Red-copper combination for warm richness",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4RRC", "name": "Dark Red Copper Brown", "level": 4, "tone": "Red/Copper", "description": "Rich red-copper brown"},
+        {"code": "5RRC", "name": "Medium Red Copper Brown", "level": 5, "tone": "Red/Copper", "description": "Medium red-copper brown"},
+        {"code": "6RRC", "name": "Light Red Copper Brown", "level": 6, "tone": "Red/Copper", "description": "Light red-copper brown"}
+      ]
+    },
+    {
+      "code": "RV",
+      "name": "Red Violet",
+      "description": "Red-violet combination for sophisticated depth",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4RV", "name": "Dark Red Violet Brown", "level": 4, "tone": "Red/Violet", "description": "Rich red-violet brown"},
+        {"code": "5RV", "name": "Medium Red Violet Brown", "level": 5, "tone": "Red/Violet", "description": "Medium red-violet brown"}
+      ]
+    },
+    {
+      "code": "V",
+      "name": "Violet",
+      "description": "Cool violet tones for neutralizing yellow",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "3V", "name": "Dark Violet Brown", "level": 3, "tone": "Violet", "description": "Deep violet brown-black"},
+        {"code": "4V", "name": "Medium Violet Brown", "level": 4, "tone": "Violet", "description": "Medium violet brown"},
+        {"code": "5V", "name": "Light Violet Brown", "level": 5, "tone": "Violet", "description": "Light violet brown"},
+        {"code": "6V", "name": "Dark Violet Blonde", "level": 6, "tone": "Violet", "description": "Dark violet blonde"},
+        {"code": "7V", "name": "Medium Violet Blonde", "level": 7, "tone": "Violet", "description": "Medium violet blonde"},
+        {"code": "8V", "name": "Light Violet Blonde", "level": 8, "tone": "Violet", "description": "Light violet blonde"},
+        {"code": "9V", "name": "Very Light Violet Blonde", "level": 9, "tone": "Violet", "description": "Very light violet blonde"},
+        {"code": "100V", "name": "Ultra Violet Blonde", "level": 10, "tone": "Violet", "description": "Ultra light violet blonde"}
+      ]
+    },
+    {
+      "code": "G",
+      "name": "Gold",
+      "description": "Warm golden tones for sun-kissed results",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4G", "name": "Dark Golden Brown", "level": 4, "tone": "Gold", "description": "Rich dark golden brown"},
+        {"code": "5G", "name": "Medium Golden Brown", "level": 5, "tone": "Gold", "description": "Medium golden brown"},
+        {"code": "6G", "name": "Light Golden Brown", "level": 6, "tone": "Gold", "description": "Light golden brown/dark golden blonde"},
+        {"code": "7G", "name": "Medium Golden Blonde", "level": 7, "tone": "Gold", "description": "Medium golden blonde"},
+        {"code": "8G", "name": "Light Golden Blonde", "level": 8, "tone": "Gold", "description": "Light golden blonde"},
+        {"code": "9G", "name": "Very Light Golden Blonde", "level": 9, "tone": "Gold", "description": "Very light golden blonde"}
+      ]
+    },
+    {
+      "code": "T",
+      "name": "Titanium",
+      "description": "Metallic silver/chrome tones for fashion color",
+      "gray_coverage": "0%",
+      "shades": [
+        {"code": "8T", "name": "Silver", "level": 8, "tone": "Silver", "description": "Silver blonde"},
+        {"code": "9T", "name": "Chrome", "level": 9, "tone": "Chrome", "description": "Chrome/platinum metallic"}
+      ]
+    },
+    {
+      "code": "SPECIALTY",
+      "name": "Specialty/Fashion Shades",
+      "description": "Unique fashion-forward specialty shades",
+      "gray_coverage": "0%",
+      "shades": [
+        {"code": "8Gn", "name": "Ivy", "level": 8, "tone": "Green", "description": "Green-toned blonde"},
+        {"code": "8V", "name": "Iridescent Quartz", "level": 8, "tone": "Violet", "description": "Violet iridescent blonde"},
+        {"code": "8Wg", "name": "Golden Apricot", "level": 8, "tone": "Gold/Warm", "description": "Warm golden apricot blonde"},
+        {"code": "9Aa", "name": "Papaya", "level": 9, "tone": "Ash/Ash", "description": "Ash blonde with papaya tones"},
+        {"code": "9GI", "name": "Hamptons", "level": 9, "tone": "Gold/Iridescent", "description": "Gold iridescent blonde"},
+        {"code": "9NW", "name": "Cream Soda", "level": 9, "tone": "Natural/Warm", "description": "Warm natural vanilla blonde"},
+        {"code": "9Nb", "name": "Irish Creme", "level": 9, "tone": "Neutral/Beige", "description": "Creamy neutral blonde"},
+        {"code": "9Rb", "name": "Blush", "level": 9, "tone": "Red", "description": "Soft red-pink blonde"}
+      ]
+    },
+    {
+      "code": "KICKER",
+      "name": "Kicker Series",
+      "description": "Mix tones to intensify or correct color",
+      "gray_coverage": "N/A",
+      "usage": "Add 1/4 to 1/2 oz to formula",
+      "shades": [
+        {"code": "OK", "name": "Orange Kicker", "level": null, "tone": "Orange", "description": "Intensifies orange/copper tones"},
+        {"code": "RK", "name": "Red Kicker", "level": null, "tone": "Red", "description": "Intensifies red tones"},
+        {"code": "VK", "name": "Violet Kicker", "level": null, "tone": "Violet", "description": "Intensifies violet/ash tones"},
+        {"code": "YK", "name": "Yellow Kicker", "level": null, "tone": "Yellow", "description": "Intensifies golden/yellow tones"}
+      ]
+    }
+  ],
+  "formulation_guidelines": {
+    "gray_coverage": {
+      "0_25_percent": "Use N series",
+      "25_50_percent": "Mix N + target shade (equal parts)",
+      "50_100_percent": "Use NN series + N series (equal parts)",
+      "processing_time": "30-40 minutes for resistant gray"
+    },
+    "lift_guidelines": {
+      "1_level": "10 Volume (3%) developer",
+      "2_levels": "20 Volume (6%) developer",
+      "3_levels": "30 Volume (9%) developer",
+      "super_lift": "40 Volume (12%) developer + high lift shades"
+    },
+    "tonal_direction": {
+      "cool": ["A", "V", "P", "NA", "AX", "T"],
+      "warm": ["G", "C", "R", "B", "CG", "RR", "RRC", "RV"],
+      "neutral": ["N", "NN"],
+      "fashion": ["SPECIALTY", "KICKER"]
+    }
+  },
+  "metadata": {
+    "total_shades": 121,
+    "last_updated": "2026-05-02",
+    "data_sources": [
+      "SalonCentric",
+      "SleekShop",
+      "Optima Beauty Supply",
+      "BeastofallBeauty",
+      "Modern Beauty Supplies",
+      "Amanda's Hair Solutions",
+      "CanRad Professional"
+    ]
+  }
+}

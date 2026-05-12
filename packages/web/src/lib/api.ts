@@ -78,11 +78,37 @@ export const getAnalysisApi = async (id: string) => {
   return fetcher<AnalysisResult>(`/api/analyze/${id}`);
 };
 
+export interface FormulateRequest {
+  current_level: number;
+  current_tone: string;
+  target_level: number;
+  target_tone: string;
+  service_type: string;
+  gray_percentage: number;
+  preferred_brand?: string;
+  is_virgin: boolean;
+  hair_condition: string;
+  questionnaire: {
+    has_metallic_dye: boolean;
+    has_henna: boolean;
+    is_post_chemo: boolean;
+    recent_bleach: boolean;
+  };
+}
+
 /**
  * Formulation APIs
  */
 export const getFormulateApi = async (id: string) => {
   return fetcher<FormulationResult>(`/api/formulate/${id}`);
+};
+
+export const createFormulateApi = async (params: FormulateRequest) => {
+  return fetcher<FormulationResult>('/api/formulate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params)
+  });
 };
 
 /**
@@ -104,4 +130,33 @@ export const getColorsApi = async () => {
  */
 export const healthCheckApi = async () => {
   return fetcher<{ status: string; timestamp: string }>('/api/health');
+};
+
+export const registerApi = async (email: string, password: string) => {
+  return fetcher<{ token: string; user: any }>('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+};
+
+export const uploadPhotoApi = async (file: File) => {
+  const formData = new FormData();
+  formData.append('photo', file);
+  return fetcher<{ url: string }>('/api/upload', {
+    method: 'POST',
+    body: formData
+  });
+};
+
+export const analyzePhotoApi = async (photoUrl: string) => {
+  return fetcher<any>('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ photo_url: photoUrl })
+  });
+};
+
+export const getMe = async () => {
+  return fetcher<any>('/api/auth/me');
 };

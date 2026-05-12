@@ -1,13 +1,17 @@
 'use client'
 
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, FlaskConical, Camera, ImageIcon, MessageCircle, BookOpen,
-  Users, History, ClipboardList, Sparkles,
+  Users, History, ClipboardList,
+  Sparkles, CreditCard,
 } from 'lucide-react'
+import { LogoutButton } from '@/components/ui/logout-button'
+import { ColorGeniusLogo } from '@/components/icons/colorgenius-logo'
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/formulate', label: 'Formulate', icon: FlaskConical },
   { href: '/analyze', label: 'Analyze', icon: Camera },
   { href: '/gallery', label: 'Gallery', icon: ImageIcon },
@@ -19,6 +23,12 @@ const navItems = [
 ]
 
 export function Sidebar() {
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => setUser(d?.user)).catch(() => {})
+  }, [])
+
   return (
     <>
       {/* Desktop Sidebar */}
@@ -28,7 +38,7 @@ export function Sidebar() {
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, #14B8A6, #2DD4BF)', borderRadius: '10px' }}>
-              <Sparkles className="w-4 h-4" style={{ color: '#0A0A0F' }} />
+              <ColorGeniusLogo size={16} color="#0A0A0F" />
             </div>
             <span className="font-bold text-lg tracking-tight" style={{ color: '#F5F5F7' }}>ColorGenius</span>
           </Link>
@@ -49,13 +59,20 @@ export function Sidebar() {
         </nav>
 
         <div className="p-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="p-3" style={{ background: '#161620', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-[10px] uppercase tracking-wider font-semibold mb-1" style={{ color: '#71717A' }}>Pleij Salon</p>
+          <Link href="/subscription"
+            className="flex items-center gap-2 mb-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-[#161620] transition-colors"
+            style={{ color: '#A1A1AA' }}>
+            <CreditCard className="w-[18px] h-[18px]" />
+            Subscription
+          </Link>
+          <div className="p-3 mb-3" style={{ background: '#161620', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="text-[10px] uppercase tracking-wider font-semibold mb-1" style={{ color: '#71717A' }}>{user?.salonName || 'Guest'}</p>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full cg-pulse-glow" style={{ background: '#10B981' }} />
-              <span className="text-xs" style={{ color: '#A1A1AA' }}>Connected</span>
+              <div className="w-2 h-2 rounded-full cg-pulse-glow" style={{ background: user ? '#10B981' : '#EF4444' }} />
+              <span className="text-xs" style={{ color: '#A1A1AA' }}>{user ? 'Connected' : 'Signed Out'}</span>
             </div>
           </div>
+          <LogoutButton className="px-3 py-2 w-full justify-center rounded-lg hover:bg-[#161620]" />
         </div>
       </aside>
 
@@ -66,7 +83,7 @@ export function Sidebar() {
           <Link href="/" className="flex items-center gap-2">
             <div className="w-7 h-7 flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, #14B8A6, #2DD4BF)', borderRadius: '8px' }}>
-              <Sparkles className="w-3.5 h-3.5" style={{ color: '#0A0A0F' }} />
+              <ColorGeniusLogo size={14} color="#0A0A0F" />
             </div>
             <span className="font-bold text-sm" style={{ color: '#F5F5F7' }}>ColorGenius</span>
           </Link>

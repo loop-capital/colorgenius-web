@@ -12,6 +12,7 @@ import { historyRoutes } from './routes/history.js';
 import { clientsRoutes } from './routes/clients.js';
 import { appointmentsRoutes } from './routes/appointments.js';
 import { feedbackRoutes } from './routes/feedback.js';
+import { profitTrackingRoutes } from './routes/profit-tracking.js';
 import { checkEngineHealth } from './services/python-bridge.js';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -88,6 +89,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(clientsRoutes);
   await app.register(appointmentsRoutes);
   await app.register(feedbackRoutes);
+  await app.register(profitTrackingRoutes);
 
   // Global error handler
   app.setErrorHandler((error, request, reply) => {

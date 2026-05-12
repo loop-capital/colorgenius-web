@@ -69,3 +69,60 @@ Remaining: Analyze, Library, History, Questionnaire
 - Gateway restarts kill agents at ~13 minutes (under investigation)
 - 4 pages still need redesign
 - `sharp` module resolution error (pre-existing, not blocking)
+
+---
+
+## 2026-05-03 — Major Progress: Davines Integration + Vish Feature Foundations
+
+### Accomplishments:
+- ✅ **Davines Color Line Complete**: Added all 3 lines (View, A New Colour, Mask with Vibrachrom) to `/home/jason/.openclaw/workspaces/colorgenius/data/brands/davines/` with full formulation guidelines
+- ✅ **Vish Feature Foundations Laid**:
+  - **Bluetooth Scale Research**: Discovered Vish salons use Acaia Luna/Pearl scales (not proprietary hardware) → Recommended Acaia Pearl for ColorGenius (0.1g, open API, 30hr battery)
+  - **Inventory Tracking System**: Created complete Prisma schema (`/home/jason/.openclaw/workspaces/colorgenius/packages/api/prisma/schema.prisma`) with 7 tables for exact product usage tracking
+- 🔑 **Key Strategic Insight**: Vish uses rebranded Acaia scales → Ensuring Acaia compatibility = zero hardware switching cost for Vish clients
+
+### Decisions Made Today:
+1. **Hardware Strategy**: Target Acaia Luna/Pearl compatibility (what Vish salons actually own) rather than trying to work with proprietary Vish scale
+   - Enables seamless transition for current Vish clients (keep existing hardware)
+   - Leverages Acaia's open API for more flexibility than Vish's closed ecosystem
+   - Better value: one-time $220 Acaia vs Vish's $195 + $150/mo subscription
+
+2. **Development Approach**: 
+   - Start with Client Formula History System (builds directly on completed inventory work)
+   - Break all features into small, bounded tasks (15-30 minute chunks)
+   - Use explicit delegation via sessions_spawn with clear objectives
+   - Wait for completion signals between batches to prevent agent context overload
+
+3. **Memory Discipline**: 
+   - Update daily memory log immediately after work completion
+   - Curate key decisions to MEMORY.md periodically
+   - Prevent recurrence of context overload/lapse issues
+
+### Key Distributors (US Salon Supply)
+- **Monaco Blue** — Pleij Salon's exclusive distributor (PRIORITY for beta)
+  - No API — orders via email (customerservice@monacoblue.com)
+  - Auto-ordering = PDF PO generation → auto-email
+  - Jason reaching out to discuss partnership
+- **Coolbeauty** — major salon supply distributor
+- **Salon Centric** — L'Oréal-owned, major US distributor
+- **CosmoProf** — Sally Beauty Holdings-owned, major US distributor
+- Auto-ordering system must target these as suppliers
+
+### Competitive Intel:
+- **Vish is NOT Square-compatible** — Square integration is a ColorGenius differentiator
+- **The specific gap**: Vish offers auto-ordering for inventory replenishment, but this feature doesn't work with Square
+- **Our play**: Build auto-ordering that WORKS with Square's ecosystem — best of both worlds
+- Vish compatible with some other booking platforms (not yet specified)
+- Square = priority #1 for appointment book integration
+
+### Next Steps:
+- Begin Client Formula History System (database → API → UI)
+- Follow with Profit Tracking & Pricing Optimization  
+- Then Appointment Book Integration and Team Performance Metrics
+- Maintain small task sizes and strict delegation protocol throughout
+
+### Files Created Today:
+- `/home/jason/.openclaw/workspaces/colorgenius/data/brands/davines/shades.json` - Davines color data
+- `/home/jason/.openclaw/workspaces/colorgenius/data/brands/davines/index.js` - Davines module export
+- `/home/jason/.openclaw/workspaces/colorgenius/memory/2026-05-03.md` - Daily work log
+- `/home/jason/.openclaw/workspaces/colorgenius/packages/api/prisma/schema.prisma` - Inventory tracking system (subagent completed)

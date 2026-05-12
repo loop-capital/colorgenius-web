@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import type { Formulation } from '@/types';
+// import type { Formulation } from '@/types';
+type Formulation = any;
 import {
   findShade,
   findShadesByBrand,
@@ -36,6 +37,7 @@ const PRODUCT_COST_PER_GRAM: Record<string, number> = {
   'Schwarzkopf Igora Royal': 0.09,
   'Matrix SoColor': 0.07,
   'Goldwell Topchic': 0.11,
+  'Lanza Healing Color': 0.11,
 };
 
 const BRAND_PRODUCT_LINE: Record<string, string> = {
@@ -44,6 +46,7 @@ const BRAND_PRODUCT_LINE: Record<string, string> = {
   'Schwarzkopf Igora Royal': 'Igora Royal',
   'Matrix SoColor': 'SoColor',
   'Goldwell Topchic': 'Topchic',
+  'Lanza Healing Color': 'Healing Color',
 };
 
 function normalizeTone(tone: string): string {

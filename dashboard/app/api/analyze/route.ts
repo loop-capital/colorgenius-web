@@ -1,56 +1,166 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { analyzeImageBuffer, HairAnalysisResult } from '@/lib/photo-analysis-server';
+import { formulate, FormulationInput } from '@/lib/formulation';
+import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
+
+/**
+ * POST /api/analyze
+ * AI Hair Analysis & Formulation Endpoint
+ * 
+ * Accepts a hair state description and returns a complete color formulation
+ * (brand, shade, developer volume, ratio, timing) based on the input.
+ * 
+ * Request Body:
+ *   - currentLevel: number (1-10)
+ *   - currentTone: string (warm, cool, neutral, ash, golden, copper, red, violet, pearl, beige, mahogany, chocolate)
+ *   - targetLevel: number (1-10)
+ *   - targetTone: string (same options as currentTone)
+ *   - condition: object
+ *     - type: 'virgin' | 'previously_colored' | 'damaged' | 'highly_damaged'
+ *     - porosity: 'low' | 'normal' | 'high'
+ *     - grayPercent: number (0-100)
+ *     - highlights: boolean
+ *     - highlightedPercent: number (0-100)
+ *   - brandPreference?: string
+ *   - linePreference?: string
+ * 
+ * Response:
+ *   200: { success: true, data: {...}, meta: {...} }
+ *   400: { error: string }
+ *   500: { error: string }
+ */
 
 export async function POST(request: NextRequest) {
+  // Rate limiting: allow 5 requests per minute per client
+  const clientId = getClientIdentifier(request);
+  const rateLimitResult = rateLimit(clientId, 60000, 5); // 5 requests per minute
+  
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { 
+        error: 'Rate limit exceeded. Please try again later.',
+        rateLimit: {
+          limit: 5,
+          remaining: rateLimitResult.remaining,
+          resetTime: rateLimitResult.resetTime
+        }
+      },
+      { 
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': '5',
+          'X-RateLimit-Remaining': String(rateLimitResult.remaining),
+          'X-RateLimit-Reset': new Date(rateLimitResult.resetTime).toISOString()
+        }
+      }
+    );
+  }
+
   try {
-    const formData = await request.formData();
-    const file = formData.get('image') as File | null;
+    const body = await request.json();
 
-    if (!file) {
-      return NextResponse.json({ error: 'No image provided' }, { status: 400 });
+    // Validate required fields
+    if (!body.currentLevel || !body.targetLevel || !body.currentTone || !body.targetTone) {
+      return NextResponse.json(
+        { error: 'Missing required fields: currentLevel, currentTone, targetLevel, targetTone' },
+        { status: 400 }
+      );
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'Invalid file type. Please upload an image.' }, { status: 400 });
+    const currentLevel = Number(body.currentLevel);
+    const targetLevel = Number(body.targetLevel);
+
+    // Validate levels are in range 1-10
+    if (currentLevel < 1 || currentLevel > 10 || targetLevel < 1 || targetLevel > 10) {
+      return NextResponse.json(
+        { error: 'Hair level must be between 1 and 10' },
+        { status: 400 }
+      );
     }
 
-    // Max 10MB
-    if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json({ error: 'Image too large. Max 10MB.' }, { status: 400 });
+    // Build the formulation input
+    const input: FormulationInput = {
+      currentLevel,
+      currentTone: body.currentTone,
+      targetLevel,
+      targetTone: body.targetTone,
+      condition: {
+        type: body.condition?.type || 'previously_colored',
+        porosity: body.condition?.porosity || 'normal',
+        grayPercent: Number(body.condition?.grayPercent || 0),
+        highlights: Boolean(body.condition?.highlights || false),
+        highlightedPercent: Number(body.condition?.highlightedPercent || 0),
+      },
+      brandPreference: body.brandPreference,
+      linePreference: body.linePreference,
+    };
+
+    // Generate the formulation
+    const result = formulate(input);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Formulation failed',
+          warnings: result.warnings,
+        },
+        { status: 400 }
+      );
     }
 
-    // Convert File to buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Analyze using server-side sharp-based pipeline
-    const result: HairAnalysisResult = await analyzeImageBuffer(buffer);
-
-    // Return response matching the requested schema
+    // Build the AI analysis response with the dummy formula
     return NextResponse.json({
       success: true,
       data: {
-        currentLevel: result.currentLevel,
-        currentTone: result.currentTone,
-        condition: {
-          type: result.condition,
-          porosity: result.damageIndicators.porosityEstimate,
-          grayPercent: result.grayPercent,
+        // Hair state summary
+        hairState: {
+          currentLevel,
+          currentTone: body.currentTone,
+          targetLevel,
+          targetTone: body.targetTone,
+          condition: input.condition,
         },
-        confidence: result.confidence,
-        notes: result.recommendations.join(' | '),
+        // The formulation
+        formula: {
+          brand: result.brand,
+          line: result.line,
+          steps: result.steps.map((step, index) => ({
+            step: index + 1,
+            product: step.product.shadeName,
+            shadeCode: step.product.shadeCode,
+            grams: step.grams,
+            role: step.role,
+            notes: step.notes,
+          })),
+          developer: {
+            volume: result.developerVolume,
+            ml: result.developerMl,
+          },
+          mixingRatio: result.steps[0]?.product.mixingRatio || '1:1',
+          totalFormulaMl: result.totalMl,
+          processingTime: result.processingTime,
+          application: result.application,
+          coverage: result.coverage,
+        },
+        instructions: {
+          notes: result.notes,
+          warnings: result.warnings,
+          technique: result.application,
+        },
       },
       meta: {
-        fileName: file.name,
-        fileSize: file.size,
         analyzedAt: new Date().toISOString(),
-        fullResult: result,
+        version: '1.0.0-dummy',
+        confidence: 0.85,
       }
     });
+
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Analysis failed';
-    console.error('[Photo Analysis Error]', error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'AI analysis failed';
+    console.error('[AI Analysis Error]', error);
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    );
   }
 }

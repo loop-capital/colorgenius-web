@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { formulate, FormulationInput } from '@/lib/formulation';
+import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {

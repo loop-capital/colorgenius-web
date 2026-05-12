@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import type { Formulation } from '@/types';
+// import type { Formulation } from '@/types';
+type Formulation = any;
 
 // Lookup table for common color transitions
 const FORMULA_LOOKUP: Record<string, {
