@@ -141,7 +141,7 @@ export function BeforeAfterSlider({
             padding: '4px 10px',
           }}
         >
-          <p style={{ color: '#14B8A6', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+          <p style={{ color: '#9333EA', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
             {afterLabel}
           </p>
         </div>
@@ -211,7 +211,7 @@ export function BeforeAfterSlider({
           boxShadow: '0 0 20px rgba(20,184,166,0.2)',
         }}
       >
-        <ChevronLeft className="w-3 h-3" style={{ color: '#14B8A6' }} />
+        <ChevronLeft className="w-3 h-3" style={{ color: '#9333EA' }} />
         <ChevronRight className="w-3 h-3" style={{ color: '#F59E0B' }} />
       </motion.div>
     </div>

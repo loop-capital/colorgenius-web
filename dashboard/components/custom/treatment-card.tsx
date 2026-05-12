@@ -34,7 +34,7 @@ function MixRatioDiagram({ ratio }: { ratio: string }) {
     <div className="flex items-center gap-3">
       <div className="flex-1 h-2 rounded-full overflow-hidden bg-white/[0.06] flex">
         <motion.div
-          className="h-full bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF] rounded-l-full"
+          className="h-full bg-gradient-to-r from-[#9333EA] to-[#EC4899] rounded-l-full"
           initial={{ width: 0 }}
           animate={{ width: `${colorPct}%` }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -64,7 +64,7 @@ function ProcessingTimer({ time }: { time: string }) {
             cy="18"
             r="15.5"
             fill="none"
-            stroke="#14B8A6"
+            stroke="#9333EA"
             strokeWidth="2"
             strokeLinecap="round"
             strokeDasharray="97.4"
@@ -100,7 +100,7 @@ export function TreatmentCard({
   className,
 }: TreatmentCardProps) {
   // Determine gradient background based on first shade
-  const primaryShade = shades[0]?.hex || '#14B8A6'
+  const primaryShade = shades[0]?.hex || '#9333EA'
 
   return (
     <motion.div
@@ -118,7 +118,7 @@ export function TreatmentCard({
       />
 
       {/* Subtle border glow */}
-      <div className="absolute inset-0 rounded-2xl border border-white/[0.06] group-hover:border-[#14B8A6]/20 transition-colors duration-300" />
+      <div className="absolute inset-0 rounded-2xl border border-white/[0.06] group-hover:border-[#9333EA]/20 transition-colors duration-300" />
 
       <div className="relative p-5 space-y-4">
         {/* Header */}
@@ -129,7 +129,7 @@ export function TreatmentCard({
           transition={{ duration: 0.4 }}
         >
           <div className="min-w-0">
-            <h3 className="text-base font-bold text-[#F5F5F7] leading-tight tracking-tight group-hover:text-[#14B8A6] transition-colors">
+            <h3 className="text-base font-bold text-[#F5F5F7] leading-tight tracking-tight group-hover:text-[#9333EA] transition-colors">
               {name}
             </h3>
             <div className="flex items-center gap-2 mt-1">
@@ -190,7 +190,7 @@ export function TreatmentCard({
             <span className="text-[10px] font-medium uppercase tracking-[0.05em] text-[#71717A]">Developer</span>
             <div className="flex items-center gap-1.5">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M7 1L8.5 5.5L12 7L8.5 8.5L7 13L5.5 8.5L2 7L5.5 5.5L7 1Z" fill="#14B8A6" />
+                <path d="M7 1L8.5 5.5L12 7L8.5 8.5L7 13L5.5 8.5L2 7L5.5 5.5L7 1Z" fill="#9333EA" />
               </svg>
               <span className="text-sm font-semibold text-[#F5F5F7]">{developer}</span>
               <span className="text-[11px] text-[#A1A1AA]">{developerVolume}</span>
@@ -212,7 +212,7 @@ export function TreatmentCard({
           <ConfidenceBreakdown
             overall={confidence}
             scores={confidenceScores || [
-              { label: 'Warmth accuracy', value: Math.min(confidence + 3, 100), color: '#14B8A6' },
+              { label: 'Warmth accuracy', value: Math.min(confidence + 3, 100), color: '#9333EA' },
               { label: 'Coverage', value: Math.min(confidence - 2, 100), color: '#F59E0B' },
               { label: 'Damage risk', value: Math.min(confidence + 5, 100), color: '#A78BFA' },
               { label: 'Lift accuracy', value: Math.min(confidence - 1, 100), color: '#10B981' },

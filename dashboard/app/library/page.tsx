@@ -572,7 +572,7 @@ export default function LibraryPage() {
                       <div
                         className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold border"
                         style={{
-                          color: formula.confidence >= 90 ? '#14B8A6' : '#F59E0B',
+                          color: formula.confidence >= 90 ? '#9333EA' : '#F59E0B',
                           borderColor: formula.confidence >= 90 ? 'rgba(20,184,166,0.3)' : 'rgba(245,158,11,0.3)',
                           backgroundColor: formula.confidence >= 90 ? 'rgba(20,184,166,0.08)' : 'rgba(245,158,11,0.08)',
                         }}

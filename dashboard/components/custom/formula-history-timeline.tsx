@@ -61,8 +61,8 @@ function formatTimeAgo(dateStr: string): string {
 function ShadeSwatch({ shadeCode, shadeName }: { shadeCode: string; shadeName: string }) {
   return (
     <div className="flex items-center gap-2">
-      <div className="w-6 h-6 rounded-md border border-white/[0.08] bg-gradient-to-br from-[#14B8A6]/30 to-[#2DD4BF]/10 flex items-center justify-center">
-        <span className="text-[9px] font-mono font-semibold text-[#14B8A6]">
+      <div className="w-6 h-6 rounded-md border border-white/[0.08] bg-gradient-to-br from-[#9333EA]/30 to-[#EC4899]/10 flex items-center justify-center">
+        <span className="text-[9px] font-mono font-semibold text-[#9333EA]">
           {shadeCode.slice(0, 4)}
         </span>
       </div>
@@ -75,14 +75,14 @@ function TimelineNode({ index, isLast }: { index: number; isLast: boolean }) {
   return (
     <div className="flex flex-col items-center mr-4">
       <motion.div
-        className="w-3 h-3 rounded-full border-2 border-[#14B8A6] bg-[#0F0F1A] z-10"
+        className="w-3 h-3 rounded-full border-2 border-[#9333EA] bg-[#0F0F1A] z-10"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: index * 0.1 + 0.2, type: 'spring', stiffness: 300, damping: 20 }}
       />
       {!isLast && (
         <motion.div
-          className="w-px flex-1 bg-gradient-to-b from-[#14B8A6]/30 to-transparent min-h-[40px]"
+          className="w-px flex-1 bg-gradient-to-b from-[#9333EA]/30 to-transparent min-h-[40px]"
           initial={{ height: 0 }}
           animate={{ height: '100%' }}
           transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
@@ -123,7 +123,7 @@ function FormulaHistoryCard({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-[#14B8A6]"
+                className="text-[#9333EA]"
               >
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                 <line x1="16" y1="2" x2="16" y2="6" />
@@ -137,7 +137,7 @@ function FormulaHistoryCard({
 
           {/* Brand badge */}
           <div className="mb-3">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#14B8A6]/10 text-[10px] font-semibold uppercase tracking-[0.05em] text-[#14B8A6]">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#9333EA]/10 text-[10px] font-semibold uppercase tracking-[0.05em] text-[#9333EA]">
               {item.brand}
             </span>
           </div>
@@ -256,7 +256,7 @@ function LoadingSkeleton() {
                 <div className="h-4 w-24 bg-white/[0.06] rounded animate-pulse" />
                 <div className="h-3 w-12 bg-white/[0.06] rounded animate-pulse" />
               </div>
-              <div className="h-5 w-16 bg-[#14B8A6]/10 rounded-full animate-pulse" />
+              <div className="h-5 w-16 bg-[#9333EA]/10 rounded-full animate-pulse" />
               <div className="space-y-2">
                 <div className="h-4 w-32 bg-white/[0.06] rounded animate-pulse" />
                 <div className="h-4 w-28 bg-white/[0.06] rounded animate-pulse" />
@@ -277,7 +277,7 @@ function EmptyState() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="w-16 h-16 rounded-2xl bg-[#14B8A6]/10 flex items-center justify-center mb-4">
+      <div className="w-16 h-16 rounded-2xl bg-[#9333EA]/10 flex items-center justify-center mb-4">
         <svg
           width="28"
           height="28"
@@ -287,7 +287,7 @@ function EmptyState() {
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-[#14B8A6]"
+          className="text-[#9333EA]"
         >
           <path d="M12 19l7-7 3 3-7 7-3-3z" />
           <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
@@ -332,7 +332,7 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
       <p className="text-[11px] text-[#71717A] text-center max-w-[240px] mb-4">{message}</p>
       <button
         onClick={onRetry}
-        className="px-4 py-2 rounded-lg bg-[#14B8A6]/10 text-[11px] font-medium text-[#14B8A6] hover:bg-[#14B8A6]/20 transition-colors"
+        className="px-4 py-2 rounded-lg bg-[#9333EA]/10 text-[11px] font-medium text-[#9333EA] hover:bg-[#9333EA]/20 transition-colors"
       >
         Try again
       </button>

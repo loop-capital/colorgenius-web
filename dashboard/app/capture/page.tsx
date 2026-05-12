@@ -147,11 +147,11 @@ function CountdownOverlay({ count }: { count: number | null }) {
             className="w-24 h-24 rounded-full flex items-center justify-center"
             style={{
               background: 'rgba(20,184,166,0.25)',
-              border: '3px solid #14B8A6',
+              border: '3px solid #9333EA',
               boxShadow: '0 0 40px rgba(20,184,166,0.4)',
             }}
           >
-            <span className="text-5xl font-black" style={{ color: '#14B8A6' }}>
+            <span className="text-5xl font-black" style={{ color: '#9333EA' }}>
               {count || ''}
             </span>
           </div>
@@ -304,7 +304,7 @@ function CameraControls({
             onClick={onCapture}
             className="h-20 w-20 rounded-full flex items-center justify-center"
             style={{
-              background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
+              background: 'linear-gradient(135deg, #9333EA 0%, #0D9488 100%)',
               boxShadow: '0 0 0 4px rgba(20,184,166,0.25), 0 0 30px rgba(20,184,166,0.3)',
             }}
           >
@@ -365,10 +365,10 @@ function PhotoPreview({
         {isUploading && (
           <div className="absolute inset-x-0 bottom-0 p-4">
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs font-medium" style={{ color: '#14B8A6' }}>
+              <span className="text-xs font-medium" style={{ color: '#9333EA' }}>
                 ☁️ Uploading to cloud...
               </span>
-              <span className="text-xs font-medium" style={{ color: '#14B8A6' }}>
+              <span className="text-xs font-medium" style={{ color: '#9333EA' }}>
                 {photo.uploadProgress}%
               </span>
             </div>
@@ -377,7 +377,7 @@ function PhotoPreview({
                 className="h-full rounded-full transition-all duration-300"
                 style={{
                   width: `${photo.uploadProgress}%`,
-                  background: 'linear-gradient(90deg, #14B8A6, #0D9488)',
+                  background: 'linear-gradient(90deg, #9333EA, #0D9488)',
                 }}
               />
             </div>
@@ -418,7 +418,7 @@ function PhotoPreview({
           style={{
             background: 'rgba(20,184,166,0.2)',
             border: '1px solid rgba(20,184,166,0.4)',
-            color: '#14B8A6',
+            color: '#9333EA',
           }}
         >
           {section.charAt(0).toUpperCase() + section.slice(1)} — Captured ✓
@@ -440,7 +440,7 @@ function PhotoPreview({
           className="flex-1 h-12"
           onClick={onConfirm}
           style={{
-            background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
+            background: 'linear-gradient(135deg, #9333EA 0%, #0D9488 100%)',
             color: '#0A0A0A',
           }}
         >
@@ -491,7 +491,7 @@ function HairGuideOverlay({ section }: { section: HairSection }) {
           top: `${guide.rects[0].y - 5}%`,
           background: 'rgba(20,184,166,0.15)',
           border: '1px solid rgba(20,184,166,0.3)',
-          color: '#14B8A6',
+          color: '#9333EA',
         }}
       >
         {guide.label}
@@ -511,7 +511,7 @@ function ProgressDots({ current }: { current: 'roots' | 'midlengths' | 'ends' })
           className="h-1.5 rounded-full transition-all duration-300"
           style={{
             width: i === idx ? 24 : 8,
-            background: i <= idx ? '#14B8A6' : 'rgba(255,255,255,0.15)',
+            background: i <= idx ? '#9333EA' : 'rgba(255,255,255,0.15)',
           }}
         />
       ))}
@@ -543,9 +543,9 @@ function CompleteScreen({
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
           className="w-20 h-20 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(20,184,166,0.15)', border: '2px solid #14B8A6' }}
+          style={{ background: 'rgba(20,184,166,0.15)', border: '2px solid #9333EA' }}
         >
-          <Check className="h-10 w-10" style={{ color: '#14B8A6' }} />
+          <Check className="h-10 w-10" style={{ color: '#9333EA' }} />
         </motion.div>
 
         <div className="text-center space-y-2">
@@ -578,7 +578,7 @@ function CompleteScreen({
           className="w-full h-12"
           onClick={onDone}
           style={{
-            background: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 100%)',
+            background: 'linear-gradient(135deg, #9333EA 0%, #0D9488 100%)',
             color: '#0A0A0A',
           }}
         >
@@ -678,7 +678,7 @@ export default function CapturePage() {
               className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
               style={{ background: 'rgba(20,184,166,0.1)', border: '1px solid rgba(20,184,166,0.2)' }}
             >
-              <Camera className="h-7 w-7" style={{ color: '#14B8A6' }} />
+              <Camera className="h-7 w-7" style={{ color: '#9333EA' }} />
             </div>
             <h1 className="text-2xl font-bold" style={{ color: '#F5F5F7' }}>
               Hair Photo Capture
@@ -702,7 +702,7 @@ export default function CapturePage() {
               border: '1px solid rgba(255,255,255,0.06)',
             }}
           >
-            <Info className="h-4 w-4 mt-0.5 shrink-0" style={{ color: '#14B8A6' }} />
+            <Info className="h-4 w-4 mt-0.5 shrink-0" style={{ color: '#9333EA' }} />
             <p style={{ color: '#71717A' }}>
               For best results: use natural or daylight lighting, capture on a solid
               neutral background, and ensure hair is dry with no heavy styling products.

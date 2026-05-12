@@ -19,7 +19,7 @@ const mockFeed = [
     id: 1,
     author: 'Eiza at Pleij',
     avatar: 'EP',
-    avatarColor: '#14B8A6',
+    avatarColor: '#9333EA',
     time: '2h ago',
     content: 'Just did a summer balayage on level 6 natural — lifted to 8 with Wella Blondor and toned with 8/73 + 7/73. The key was pre-softening the ends first!',
     image: true,
@@ -95,7 +95,7 @@ export default function CommunityPage() {
               key={tab.id}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                 activeTab === tab.id
-                  ? 'bg-[#14B8A6]/15 text-[#14B8A6] border border-[#14B8A6]/20'
+                  ? 'bg-[#9333EA]/15 text-[#9333EA] border border-[#9333EA]/20'
                   : 'bg-white/[0.03] text-[#71717A] border border-white/[0.04] hover:bg-white/[0.06] hover:text-[#A1A1AA]'
               }`}
               onClick={() => setActiveTab(tab.id)}
@@ -157,7 +157,7 @@ export default function CommunityPage() {
                       <span className="text-[12px] font-medium">{post.saves + (savedPosts.has(post.id) ? 1 : 0)}</span>
                     </button>
 
-                    <button className="ml-auto text-[11px] text-[#14B8A6] hover:text-[#2DD4BF] font-medium flex items-center gap-1 transition-colors">
+                    <button className="ml-auto text-[11px] text-[#9333EA] hover:text-[#EC4899] font-medium flex items-center gap-1 transition-colors">
                       Reply <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>

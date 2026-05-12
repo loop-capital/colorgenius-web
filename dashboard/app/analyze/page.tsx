@@ -97,7 +97,7 @@ function SectionHeader({ icon, title, confidence }: { icon: React.ReactNode; tit
         <div
           className="px-2.5 py-1 rounded-full text-xs font-semibold border"
           style={{
-            color: confidence >= 90 ? '#14B8A6' : '#F59E0B',
+            color: confidence >= 90 ? '#9333EA' : '#F59E0B',
             borderColor: confidence >= 90 ? 'rgba(20,184,166,0.3)' : 'rgba(245,158,11,0.3)',
             backgroundColor: confidence >= 90 ? 'rgba(20,184,166,0.08)' : 'rgba(245,158,11,0.08)',
           }}
@@ -213,7 +213,7 @@ export default function AnalyzePage() {
 
   const getPorosityColor = (p: string) => {
     switch (p) {
-      case 'low': return '#14B8A6'
+      case 'low': return '#9333EA'
       case 'medium': return '#F59E0B'
       case 'high': return '#EF4444'
       default: return '#A1A1AA'
@@ -246,7 +246,7 @@ export default function AnalyzePage() {
           >
             <GlassCard className="h-fit p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Camera className="h-4 w-4 text-[#14B8A6]" />
+                <Camera className="h-4 w-4 text-[#9333EA]" />
                 <h3 className="text-sm font-semibold" style={{ color: 'var(--cg-text-primary)' }}>
                   Upload Client Photo
                 </h3>
@@ -263,14 +263,14 @@ export default function AnalyzePage() {
                   className={cn(
                     'border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200',
                     dragOver
-                      ? 'border-[#14B8A6] bg-[#14B8A6]/5'
+                      ? 'border-[#9333EA] bg-[#9333EA]/5'
                       : 'border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] hover:border-[rgba(255,255,255,0.15)]'
                   )}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
                   <div className="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'rgba(20,184,166,0.1)' }}>
-                    <Upload className="h-6 w-6 text-[#14B8A6]" />
+                    <Upload className="h-6 w-6 text-[#9333EA]" />
                   </div>
                   <h3 className="font-semibold text-sm mb-1" style={{ color: 'var(--cg-text-primary)' }}>
                     Drag &amp; drop or click to upload
@@ -380,7 +380,7 @@ export default function AnalyzePage() {
                 {/* Hair Characteristics */}
                 <GlassCard className="p-5">
                   <SectionHeader
-                    icon={<Sparkles className="h-4 w-4 text-[#14B8A6]" />}
+                    icon={<Sparkles className="h-4 w-4 text-[#9333EA]" />}
                     title="Hair Characteristics"
                     confidence={Math.round(analysisResult.confidence * 100)}
                   />
@@ -493,7 +493,7 @@ export default function AnalyzePage() {
                 {/* Color Spectrum Bar */}
                 <GlassCard className="p-5">
                   <SectionHeader
-                    icon={<Droplets className="h-4 w-4 text-[#14B8A6]" />}
+                    icon={<Droplets className="h-4 w-4 text-[#9333EA]" />}
                     title="Color Extraction"
                   />
                   <ColorSpectrumBar
@@ -553,7 +553,7 @@ export default function AnalyzePage() {
                 {/* Recommendations */}
                 <GlassCard className="p-5">
                   <SectionHeader
-                    icon={<Sparkles className="h-4 w-4 text-[#14B8A6]" />}
+                    icon={<Sparkles className="h-4 w-4 text-[#9333EA]" />}
                     title="Recommendations"
                   />
                   <ul className="space-y-2.5">
@@ -566,7 +566,7 @@ export default function AnalyzePage() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.08 }}
                       >
-                        <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-[#14B8A6]" />
+                        <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-[#9333EA]" />
                         <span>{rec}</span>
                       </motion.li>
                     ))}

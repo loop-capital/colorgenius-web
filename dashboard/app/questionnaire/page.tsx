@@ -68,9 +68,9 @@ function StepIndicator({ currentStep, totalSteps }: { currentStep: number; total
           <motion.div
             className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
               step === currentStep
-                ? 'bg-[#14B8A6] text-white'
+                ? 'bg-[#9333EA] text-white'
                 : step < currentStep
-                ? 'bg-[#14B8A6]/30 text-[#14B8A6]'
+                ? 'bg-[#9333EA]/30 text-[#9333EA]'
                 : 'bg-white/5 text-white/40 border border-white/10'
             }`}
             initial={{ scale: 0.8 }}
@@ -82,7 +82,7 @@ function StepIndicator({ currentStep, totalSteps }: { currentStep: number; total
           {step < totalSteps && (
             <motion.div
               className={`w-12 h-0.5 rounded-full transition-colors ${
-                step < currentStep ? 'bg-[#14B8A6]/50' : 'bg-white/10'
+                step < currentStep ? 'bg-[#9333EA]/50' : 'bg-white/10'
               }`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -180,7 +180,7 @@ export default function QuestionnairePage() {
                 placeholder="e.g., Jennifer Smith"
                 value={formData.clientName}
                 onChange={(e) => updateField('clientName', e.target.value)}
-                className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#14B8A6] focus:ring-[#14B8A6]"
+                className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#9333EA] focus:ring-[#9333EA]"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -191,7 +191,7 @@ export default function QuestionnairePage() {
                   placeholder="(555) 000-0000"
                   value={formData.phone}
                   onChange={(e) => updateField('phone', e.target.value)}
-                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#14B8A6] focus:ring-[#14B8A6]"
+                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#9333EA] focus:ring-[#9333EA]"
                 />
               </div>
               <div>
@@ -202,7 +202,7 @@ export default function QuestionnairePage() {
                   placeholder="client@email.com"
                   value={formData.email}
                   onChange={(e) => updateField('email', e.target.value)}
-                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#14B8A6] focus:ring-[#14B8A6]"
+                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#9333EA] focus:ring-[#9333EA]"
                 />
               </div>
             </div>
@@ -214,7 +214,7 @@ export default function QuestionnairePage() {
                 placeholder="Allergies, past treatments, stylist observations..."
                 value={formData.salonNotes}
                 onChange={(e) => updateField('salonNotes', e.target.value)}
-                className="mt-1.5 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#F5F5F7] placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14B8A6] focus-visible:ring-offset-2 ring-offset-[#0F0F0F]"
+                className="mt-1.5 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#F5F5F7] placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9333EA] focus-visible:ring-offset-2 ring-offset-[#0F0F0F]"
               />
             </div>
           </div>
@@ -228,9 +228,9 @@ export default function QuestionnairePage() {
                 <Label className="text-[#F5F5F7]">Current Level</Label>
                 <motion.span
                   key={formData.currentLevel}
-                  initial={{ scale: 1.3, color: '#14B8A6' }}
-                  animate={{ scale: 1, color: '#14B8A6' }}
-                  className="font-bold text-lg text-[#14B8A6]"
+                  initial={{ scale: 1.3, color: '#9333EA' }}
+                  animate={{ scale: 1, color: '#9333EA' }}
+                  className="font-bold text-lg text-[#9333EA]"
                 >
                   {formData.currentLevel}
                 </motion.span>
@@ -243,7 +243,7 @@ export default function QuestionnairePage() {
                 onChange={(e) => updateField('currentLevel', Number(e.target.value))}
                 className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10"
                 style={{
-                  background: `linear-gradient(to right, #14B8A6 0%, #14B8A6 ${(formData.currentLevel - 1) * 11.11}%, rgba(255,255,255,0.1) ${(formData.currentLevel - 1) * 11.11}%, rgba(255,255,255,0.1) 100%)`,
+                  background: `linear-gradient(to right, #9333EA 0%, #9333EA ${(formData.currentLevel - 1) * 11.11}%, rgba(255,255,255,0.1) ${(formData.currentLevel - 1) * 11.11}%, rgba(255,255,255,0.1) 100%)`,
                 }}
               />
               <div className="flex justify-between text-xs text-white/40 mt-2">
@@ -263,7 +263,7 @@ export default function QuestionnairePage() {
                 </SelectTrigger>
                 <SelectContent className="bg-[#0F0F0F] border-white/10">
                   {TONES.map((t) => (
-                    <SelectItem key={t.value} value={t.value} className="text-[#F5F5F7] focus:bg-[#14B8A6]/20 focus:text-[#F5F5F7]">
+                    <SelectItem key={t.value} value={t.value} className="text-[#F5F5F7] focus:bg-[#9333EA]/20 focus:text-[#F5F5F7]">
                       {t.label}
                     </SelectItem>
                   ))}
@@ -279,7 +279,7 @@ export default function QuestionnairePage() {
                     key={c.id}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
                       formData.hairCondition.includes(c.id)
-                        ? 'border-[#14B8A6]/50 bg-[#14B8A6]/10'
+                        ? 'border-[#9333EA]/50 bg-[#9333EA]/10'
                         : 'border-white/10 bg-white/5 hover:bg-white/[0.07]'
                     }`}
                     whileHover={{ scale: 1.02 }}
@@ -290,7 +290,7 @@ export default function QuestionnairePage() {
                       id={`cond-${c.id}`}
                       checked={formData.hairCondition.includes(c.id)}
                       onChange={() => toggleCondition(c.id)}
-                      className="h-4 w-4 rounded border-white/20 bg-white/5 text-[#14B8A6] accent-[#14B8A6] focus:ring-[#14B8A6] focus:ring-offset-[#0F0F0F]"
+                      className="h-4 w-4 rounded border-white/20 bg-white/5 text-[#9333EA] accent-[#9333EA] focus:ring-[#9333EA] focus:ring-offset-[#0F0F0F]"
                     />
                     <span className="text-sm text-[#F5F5F7]/80">{c.label}</span>
                   </motion.label>
@@ -308,9 +308,9 @@ export default function QuestionnairePage() {
                 <Label className="text-[#F5F5F7]">Target Level</Label>
                 <motion.span
                   key={formData.targetLevel}
-                  initial={{ scale: 1.3, color: '#14B8A6' }}
-                  animate={{ scale: 1, color: '#14B8A6' }}
-                  className="font-bold text-lg text-[#14B8A6]"
+                  initial={{ scale: 1.3, color: '#9333EA' }}
+                  animate={{ scale: 1, color: '#9333EA' }}
+                  className="font-bold text-lg text-[#9333EA]"
                 >
                   {formData.targetLevel}
                 </motion.span>
@@ -323,7 +323,7 @@ export default function QuestionnairePage() {
                 onChange={(e) => updateField('targetLevel', Number(e.target.value))}
                 className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10"
                 style={{
-                  background: `linear-gradient(to right, #14B8A6 0%, #14B8A6 ${(formData.targetLevel - 1) * 11.11}%, rgba(255,255,255,0.1) ${(formData.targetLevel - 1) * 11.11}%, rgba(255,255,255,0.1) 100%)`,
+                  background: `linear-gradient(to right, #9333EA 0%, #9333EA ${(formData.targetLevel - 1) * 11.11}%, rgba(255,255,255,0.1) ${(formData.targetLevel - 1) * 11.11}%, rgba(255,255,255,0.1) 100%)`,
                 }}
               />
               <div className="flex justify-between text-xs text-white/40 mt-2">
@@ -343,7 +343,7 @@ export default function QuestionnairePage() {
                 </SelectTrigger>
                 <SelectContent className="bg-[#0F0F0F] border-white/10">
                   {TONES.map((t) => (
-                    <SelectItem key={t.value} value={t.value} className="text-[#F5F5F7] focus:bg-[#14B8A6]/20 focus:text-[#F5F5F7]">
+                    <SelectItem key={t.value} value={t.value} className="text-[#F5F5F7] focus:bg-[#9333EA]/20 focus:text-[#F5F5F7]">
                       {t.label}
                     </SelectItem>
                   ))}
@@ -359,7 +359,7 @@ export default function QuestionnairePage() {
                   placeholder="e.g., Wella, Redken"
                   value={formData.brandPreference}
                   onChange={(e) => updateField('brandPreference', e.target.value)}
-                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#14B8A6] focus:ring-[#14B8A6]"
+                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#9333EA] focus:ring-[#9333EA]"
                 />
               </div>
               <div>
@@ -369,7 +369,7 @@ export default function QuestionnairePage() {
                   placeholder="e.g., Koleston Perfect"
                   value={formData.linePreference}
                   onChange={(e) => updateField('linePreference', e.target.value)}
-                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#14B8A6] focus:ring-[#14B8A6]"
+                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#9333EA] focus:ring-[#9333EA]"
                 />
               </div>
             </div>
@@ -382,7 +382,7 @@ export default function QuestionnairePage() {
                 placeholder="Any additional details, preferences, or concerns..."
                 value={formData.specialRequests}
                 onChange={(e) => updateField('specialRequests', e.target.value)}
-                className="mt-1.5 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#F5F5F7] placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14B8A6] focus-visible:ring-offset-2 ring-offset-[#0F0F0F]"
+                className="mt-1.5 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#F5F5F7] placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9333EA] focus-visible:ring-offset-2 ring-offset-[#0F0F0F]"
               />
             </div>
           </div>
@@ -436,7 +436,7 @@ export default function QuestionnairePage() {
                     {formData.hairCondition.map((c) => (
                       <span
                         key={c}
-                        className="px-2 py-1 rounded-full text-xs bg-[#14B8A6]/15 text-[#14B8A6] border border-[#14B8A6]/20"
+                        className="px-2 py-1 rounded-full text-xs bg-[#9333EA]/15 text-[#9333EA] border border-[#9333EA]/20"
                       >
                         {HAIR_CONDITIONS.find((h) => h.id === c)?.label}
                       </span>
@@ -497,7 +497,7 @@ export default function QuestionnairePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#14B8A6] to-[#0D9488] bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#9333EA] to-[#0D9488] bg-clip-text text-transparent">
             New Consultation
           </h1>
           <p className="text-white/50 mt-2">Walk through a professional color consultation with your client</p>
@@ -541,14 +541,14 @@ export default function QuestionnairePage() {
             <Button
               onClick={handleNext}
               disabled={!canProceed()}
-              className="bg-[#14B8A6] hover:bg-[#14B8A6]/90 text-white disabled:opacity-30"
+              className="bg-[#9333EA] hover:bg-[#9333EA]/90 text-white disabled:opacity-30"
             >
               Next →
             </Button>
           ) : (
             <Button
               onClick={handleSubmit}
-              className="bg-gradient-to-r from-[#14B8A6] to-[#0D9488] hover:opacity-90 text-white font-semibold"
+              className="bg-gradient-to-r from-[#9333EA] to-[#0D9488] hover:opacity-90 text-white font-semibold"
             >
               Create Formula →
             </Button>

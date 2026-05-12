@@ -45,19 +45,19 @@ export function FormulaCard({
     <Card
       onClick={onClick}
       className={cn(
-        'group bg-[#1A1A1A] border-[#2A2A2A] hover:border-[#14B8A6]/30 transition-all duration-300 cursor-pointer overflow-hidden',
+        'group bg-[#1A1A1A] border-[#2A2A2A] hover:border-[#9333EA]/30 transition-all duration-300 cursor-pointer overflow-hidden',
         className
       )}
     >
       <CardContent className="p-0">
         {/* Top accent bar */}
-        <div className="h-1 w-full bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF] opacity-60 group-hover:opacity-100 transition-opacity" />
+        <div className="h-1 w-full bg-gradient-to-r from-[#9333EA] to-[#EC4899] opacity-60 group-hover:opacity-100 transition-opacity" />
 
         <div className="p-5 space-y-4">
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="font-semibold text-[#F5F5F5] truncate group-hover:text-[#14B8A6] transition-colors">{name}</h3>
+              <h3 className="font-semibold text-[#F5F5F5] truncate group-hover:text-[#9333EA] transition-colors">{name}</h3>
               <p className="text-xs text-[#737373] mt-0.5">{brand} · {line}</p>
             </div>
             <div className={cn('shrink-0 px-2 py-1 rounded-full text-xs font-semibold border', confidenceColor)}>
@@ -85,7 +85,7 @@ export function FormulaCard({
           {/* Formula details grid */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
             <div className="flex items-center gap-2">
-              <Droplets className="w-3.5 h-3.5 text-[#14B8A6]" />
+              <Droplets className="w-3.5 h-3.5 text-[#9333EA]" />
               <span className="text-[#A3A3A3]">Dev:</span>
               <span className="text-[#F5F5F5] font-medium">{developer} {developerVolume}</span>
             </div>
@@ -95,7 +95,7 @@ export function FormulaCard({
               <span className="text-[#F5F5F5] font-medium">{mixRatio}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5 text-[#14B8A6]" />
+              <Clock className="w-3.5 h-3.5 text-[#9333EA]" />
               <span className="text-[#A3A3A3]">Time:</span>
               <span className="text-[#F5F5F5] font-medium">{processingTime}</span>
             </div>

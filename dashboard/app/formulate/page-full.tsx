@@ -40,7 +40,7 @@ const TONE_OPTIONS: { value: ToneFamily; label: string; color: string }[] = [
 ]
 
 const POROSITY_OPTIONS = [
-  { value: 'low', label: 'Low — Smooth, cuticle intact', color: '#14B8A6' },
+  { value: 'low', label: 'Low — Smooth, cuticle intact', color: '#9333EA' },
   { value: 'normal', label: 'Normal — Balanced', color: '#F59E0B' },
   { value: 'high', label: 'High — Porous, damaged', color: '#EF4444' },
 ]
@@ -68,12 +68,12 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                   className={cn(
                     'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300',
                     isActive && 'shadow-lg',
-                    isCompleted && 'border border-[#14B8A6]/40',
+                    isCompleted && 'border border-[#9333EA]/40',
                     !isActive && !isCompleted && 'border border-white/[0.08]'
                   )}
                   style={{
-                    backgroundColor: isActive ? '#14B8A6' : isCompleted ? 'rgba(20,184,166,0.15)' : 'rgba(255,255,255,0.03)',
-                    color: isActive ? '#0A0A0A' : isCompleted ? '#14B8A6' : 'var(--cg-text-tertiary)',
+                    backgroundColor: isActive ? '#9333EA' : isCompleted ? 'rgba(20,184,166,0.15)' : 'rgba(255,255,255,0.03)',
+                    color: isActive ? '#0A0A0A' : isCompleted ? '#9333EA' : 'var(--cg-text-tertiary)',
                     boxShadow: isActive ? '0 0 20px rgba(20,184,166,0.3)' : undefined,
                   }}
                   animate={isActive ? { scale: [1, 1.05, 1] } : {}}
@@ -264,7 +264,7 @@ function FormulatePageContent() {
           <StepTransition stepKey="step1" direction={direction}>
             <GlassCard className="p-6 md:p-8">
               <SectionHeader
-                icon={<Sparkles className="w-5 h-5 text-[#14B8A6]" />}
+                icon={<Sparkles className="w-5 h-5 text-[#9333EA]" />}
                 title="Current Hair Color"
               />
 
@@ -457,7 +457,7 @@ function FormulatePageContent() {
                       className={cn('px-2 py-1 rounded-full text-[10px] font-bold')}
                       style={{
                         backgroundColor: levelDiff > 0 ? 'rgba(245,158,11,0.1)' : levelDiff < 0 ? 'rgba(20,184,166,0.1)' : 'rgba(255,255,255,0.06)',
-                        color: levelDiff > 0 ? '#F59E0B' : levelDiff < 0 ? '#14B8A6' : 'var(--cg-text-tertiary)',
+                        color: levelDiff > 0 ? '#F59E0B' : levelDiff < 0 ? '#9333EA' : 'var(--cg-text-tertiary)',
                       }}
                     >
                       {levelDiff > 0 ? `+${levelDiff} levels` : levelDiff < 0 ? `${levelDiff} levels` : 'Same level'}
@@ -492,7 +492,7 @@ function FormulatePageContent() {
           <StepTransition stepKey="step3" direction={direction}>
             <GlassCard className="p-6 md:p-8">
               <SectionHeader
-                icon={<Droplets className="w-5 h-5 text-[#14B8A6]" />}
+                icon={<Droplets className="w-5 h-5 text-[#9333EA]" />}
                 title="Hair Condition & History"
               />
 
@@ -514,7 +514,7 @@ function FormulatePageContent() {
                         whileHover={{ y: -2 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <p className={cn('text-sm font-medium', formData.condition.type === opt.value ? 'text-[#14B8A6]' : 'text-[#F5F5F7]')}>
+                        <p className={cn('text-sm font-medium', formData.condition.type === opt.value ? 'text-[#9333EA]' : 'text-[#F5F5F7]')}>
                           {opt.label}
                         </p>
                         <p className="text-xs mt-1" style={{ color: 'var(--cg-text-tertiary)' }}>{opt.desc}</p>
@@ -578,7 +578,7 @@ function FormulatePageContent() {
                       id="highlights"
                       checked={formData.condition.highlights}
                       onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlights: e.target.checked } }))}
-                      className="w-4 h-4 rounded border-[rgba(255,255,255,0.12)] bg-[var(--cg-surface)] accent-[#14B8A6]"
+                      className="w-4 h-4 rounded border-[rgba(255,255,255,0.12)] bg-[var(--cg-surface)] accent-[#9333EA]"
                     />
                     <Label htmlFor="highlights" className="text-sm font-medium cursor-pointer" style={{ color: 'var(--cg-text-primary)' }}>
                       Highlights Present
@@ -700,7 +700,7 @@ function FormulatePageContent() {
                 <ConfidenceBreakdown
                   overall={result.success ? 92 : 70}
                   scores={[
-                    { label: 'Warmth accuracy', value: result.success ? 95 : 70, color: '#14B8A6' },
+                    { label: 'Warmth accuracy', value: result.success ? 95 : 70, color: '#9333EA' },
                     { label: 'Coverage', value: result.coverage === 'full' ? 94 : 80, color: '#F59E0B' },
                     { label: 'Damage risk', value: result.developerVolume <= 20 ? 97 : 85, color: '#A78BFA' },
                     { label: 'Lift accuracy', value: result.success ? 91 : 65, color: '#10B981' },

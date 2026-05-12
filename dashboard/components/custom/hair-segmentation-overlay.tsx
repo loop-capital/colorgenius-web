@@ -27,7 +27,7 @@ const HAIR_ZONES: ScanRegion[] = [
   {
     id: 'midlengths',
     label: 'Mid-lengths',
-    color: '#14B8A6',
+    color: '#9333EA',
     path: 'M35,120 L30,180 L226,180 L221,120 Z',
   },
   {
@@ -129,7 +129,7 @@ export function HairSegmentationOverlay({
               className="absolute left-0 right-0 h-[2px]"
               style={{
                 top: `${scanProgress * 100}%`,
-                background: 'linear-gradient(90deg, transparent, #14B8A6, #2DD4BF, #14B8A6, transparent)',
+                background: 'linear-gradient(90deg, transparent, #9333EA, #EC4899, #9333EA, transparent)',
                 boxShadow: '0 0 20px rgba(20,184,166,0.5), 0 0 60px rgba(20,184,166,0.2)',
               }}
             />
@@ -143,7 +143,7 @@ export function HairSegmentationOverlay({
             />
             {/* Progress text */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#14B8A6]">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#9333EA]">
                 Analyzing {Math.round(scanProgress * 100)}%
               </span>
             </div>
