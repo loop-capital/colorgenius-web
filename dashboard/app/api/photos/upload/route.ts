@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 /**
  * POST /api/photos/upload

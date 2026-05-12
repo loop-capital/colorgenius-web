@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Shade } from '@/types';
+type Shade = any;
 
 interface ShadeCardProps {
   shade: Shade;

@@ -140,3 +140,48 @@ export interface ShadeEntry {
   mixingRatio: string;
   baseProcessingMinutes: number;
 }
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
+export interface Formulation {
+  formulation_id: string;
+  created_at: string;
+  confidence_score: number;
+  validation: {
+    is_valid: boolean;
+    warnings: string[];
+  };
+  primary_formula: {
+    action_type: string;
+    brand: string;
+    product_line: string;
+    components: any[];
+    developer: { volume: number; amount_oz: number; amount_ml: number };
+    mixing_ratio: string;
+    total_volume_oz: number;
+    total_volume_ml: number;
+  };
+  processing_instructions: {
+    total_time_minutes: number;
+    application_sequence: any[];
+    heat_optional: boolean;
+    notes: string[];
+  };
+  cost_estimate: {
+    total_product_cost: number;
+    breakdown: any[];
+  };
+  pricing_suggestion: {
+    recommended_price: number;
+    price_range: [number, number];
+  };
+  recommendations: {
+    aftercare: string[];
+    maintenance_schedule: string;
+    next_appointment: string;
+  };
+}

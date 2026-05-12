@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClients, saveClient, getClient, deleteClient } from '@/lib/storage';
+import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

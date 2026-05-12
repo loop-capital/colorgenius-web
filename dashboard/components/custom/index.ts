@@ -6,3 +6,8 @@ export { ColorWheel3D, type ToneOption } from './color-wheel-3d'
 export { TreatmentCard, type TreatmentCardProps } from './treatment-card'
 export { StepTransition } from './step-transition'
 export { GlassCard, StatCard } from './glass-card'
+export {
+  FormulaHistoryTimeline,
+  type FormulaHistoryItem,
+  type FormulaHistoryTimelineProps,
+} from './formula-history-timeline'

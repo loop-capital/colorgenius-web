@@ -1,0 +1,180 @@
+{
+  "brand": "Davines",
+  "product_line": "Multiple Lines (View, A New Colour, Mask with Vibrachrom)",
+  "type": "permanent",
+  "feature_sets": {
+    "View": {
+      "name": "View",
+      "description": "Tone-on-tone color line with acidic pH for shine and fullness",
+      "key_characteristics": [
+        "Acidic pH for shine and fullness",
+        "Tone-on-tone coloring (adds tone without significant level change)",
+        "Can disguise up to 50% white hair",
+        "Mixing ratio: 1 part color + 1 part Activator 10 vol",
+        "Processing time: 5-20 minutes (visual control)"
+      ],
+      "level_range": "1-10",
+      "tone_system": {
+        ".1": "ash",
+        ".2": "green", 
+        ".3": "gold",
+        ".4": "copper",
+        ".5": "mahogany",
+        ".6": "red",
+        ".7": "mat/green",
+        ".8": "mocha/brown",
+        ".9": "soft ash blue"
+      }
+    },
+    "A New Colour": {
+      "name": "A New Colour",
+      "description": "Ammonia-free permanent color system for total gray coverage",
+      "key_characteristics": [
+        "Ammonia-free, odorless permanent color",
+        "Total gray coverage (up to 100%)",
+        "Up to 7 levels of lift",
+        "Long-lasting, shiny, healthy results",
+        "Mixing ratio: 1 part color + 1 part Activator (5, 10, 20, 30, or 40 vol)",
+        "Processing time: 30-40 minutes"
+      ],
+      "level_range": "1-10",
+      "tone_system": {
+        ".0": "natural",
+        ".1": "ash",
+        ".2": "iridescent",
+        ".3": "gold",
+        ".4": "copper",
+        ".5": "mahogany",
+        ".6": "red",
+        ".7": "mat",
+        ".8": "mocha",
+        ".9": "soft"
+      },
+      "activators": {
+        "5_vol": "Deposit only, no lift",
+        "10_vol": "Deposit with slight lift (1-2 levels)",
+        "20_vol": "Standard lift (2-3 levels)",
+        "30_vol": "High lift (3-4 levels)",
+        "40_vol": "Maximum lift (up to 7 levels)"
+      }
+    },
+    "Mask with Vibrachrom": {
+      "name": "Mask with Vibrachrom",
+      "description": "Permanent cream-based color with Vibrachrom™ technology for intense conditioning",
+      "key_characteristics": [
+        "Permanent cream-based color",
+        "Vibrachrom™ technology for intense conditioning",
+        "Even penetration into hair structure",
+        "Extraordinary shine and long-lasting color",
+        "Can be mixed with activators for lift",
+        "Processing time varies based on desired result"
+      ],
+      "level_range": "1-10",
+      "tone_system": {
+        ".0": "natural",
+        ".1": "ash",
+        ".2": "iridescent",
+        ".3": "gold",
+        ".4": "copper",
+        ".5": "mahogany",
+        ".6": "red",
+        ".7": "mat",
+        ".8": "mocha",
+        ".9": "soft"
+      }
+    }
+  },
+  "shades": {
+    "View": [
+      {"code": "10,0", "name": "Buttercream Blonde", "level": 10, "tone": "Natural", "description": "White-yellow, soft, pastel-friendly", "line": "View"},
+      {"code": "10,1", "name": "Pearl Blonde", "level": 10, "tone": "Ash", "description": "Cool blonde with ash tones", "line": "View"},
+      {"code": "10,2", "name": "Iris Blonde", "level": 10, "tone": "Green", "description": "Blonde with green undertones", "line": "View"},
+      {"code": "10,27", "name": "Metallic Mauve", "level": 10, "tone": "Green+Mat", "description": "Pastel metallic mauve", "line": "View"},
+      {"code": "9,0", "name": "Light Blonde", "level": 9, "tone": "Natural", "description": "Light blonde base", "line": "View"},
+      {"code": "9,1", "name": "Ash Blonde", "level": 9, "tone": "Ash", "description": "Cool light blonde", "line": "View"},
+      {"code": "9,3", "name": "Golden Blonde", "level": 9, "tone": "Gold", "description": "Warm golden blonde", "line": "View"},
+      {"code": "8,0", "name": "Dark Blonde", "level": 8, "tone": "Natural", "description": "Dark blonde base", "line": "View"},
+      {"code": "8,3", "name": "Honey Blonde", "level": 8, "tone": "Gold", "description": "Warm honey blonde", "line": "View"},
+      {"code": "7,0", "name": "Light Brown", "level": 7, "tone": "Natural", "description": "Light brown base", "line": "View"},
+      {"code": "7,4", "name": "Copper Brown", "level": 7, "tone": "Copper", "description": "Reddish copper brown", "line": "View"},
+      {"code": "6,0", "name": "Dark Brown", "level": 6, "tone": "Natural", "description": "Dark brown base", "line": "View"},
+      {"code": "6,6", "name": "Red Brown", "level": 6, "tone": "Red", "description": "Reddish brown", "line": "View"},
+      {"code": "5,0", "name": "Light Brown", "level": 5, "tone": "Natural", "description": "Light brown base", "line": "View"},
+      {"code": "4,0", "name": "Brown", "level": 4, "tone": "Natural", "description": "Medium brown base", "line": "View"},
+      {"code": "3,0", "name": "Dark Brown", "level": 3, "tone": "Natural", "description": "Dark brown base", "line": "View"},
+      {"code": "2,0", "name": "Darkest Brown", "level": 2, "tone": "Natural", "description": "Very dark brown", "line": "View"},
+      {"code": "1,0", "name": "Black", "level": 1, "tone": "Natural", "description": "Black", "line": "View"}
+    ],
+    "A New Colour": [
+      {"code": "10.0", "name": "Lightest Blonde", "level": 10, "tone": "Natural", "description": "Maximum lightness", "line": "A New Colour"},
+      {"code": "9.0", "name": "Light Blonde", "level": 9, "tone": "Natural", "description": "Light blonde", "line": "A New Colour"},
+      {"code": "8.0", "name": "Dark Blonde", "level": 8, "tone": "Natural", "description": "Dark blonde", "line": "A New Colour"},
+      {"code": "7.0", "name": "Light Brown", "level": 7, "tone": "Natural", "description": "Light brown", "line": "A New Colour"},
+      {"code": "6.0", "name": "Dark Brown", "level": 6, "tone": "Natural", "description": "Dark brown", "line": "A New Colour"},
+      {"code": "5.0", "name": "Brown", "level": 5, "tone": "Natural", "description": "Medium brown", "line": "A New Colour"},
+      {"code": "4.0", "name": "Dark Brown", "level": 4, "tone": "Natural", "description": "Dark brown", "line": "A New Colour"},
+      {"code": "3.0", "name": "Very Dark Brown", "level": 3, "tone": "Natural", "description": "Very dark brown", "line": "A New Colour"},
+      {"code": "2.0", "name": "Darkest Brown", "level": 2, "tone": "Natural", "description": "Nearly black", "line": "A New Colour"},
+      {"code": "1.0", "name": "Black", "level": 1, "tone": "Natural", "description": "Black", "line": "A New Colour"},
+      {"code": "6.3", "name": "Dark Golden Brown", "level": 6, "tone": "Gold", "description": "Golden brown", "line": "A New Colour"},
+      {"code": "5.4", "name": "Light Copper Brown", "level": 5, "tone": "Copper", "description": "Coppery brown", "line": "A New Colour"},
+      {"code": "4.5", "name": "Mahogany Brown", "level": 4, "tone": "Mahogany", "description": "Reddish brown", "line": "A New Colour"},
+      {"code": "3.6", "name": "Dark Red Brown", "level": 3, "tone": "Red", "description": "Reddish brown", "line": "A New Colour"},
+      {"code": "7.1", "name": "Light Ash Brown", "level": 7, "tone": "Ash", "description": "Cool light brown", "line": "A New Colour"},
+      {"code": "8.2", "name": "Iridescent Blonde", "level": 8, "tone": "Iridescent", "description": "Multi-dimensional blonde", "line": "A New Colour"},
+      {"code": "9.1", "name": "Light Ash Blonde", "level": 9, "tone": "Ash", "description": "Cool light blonde", "line": "A New Colour"},
+      {"code": "10.1", "name": "Lightest Ash Blonde", "level": 10, "tone": "Ash", "description": "Maximum cool blonde", "line": "A New Colour"},
+      {"code": "10.3", "name": "Lightest Golden Blonde", "level": 10, "tone": "Gold", "description": "Maximum warm blonde", "line": "A New Colour"}
+    ],
+    "Mask with Vibrachrom": [
+      {"code": "6.4", "name": "Intense Copper", "level": 6, "tone": "Copper", "description": "Vibrant copper red", "line": "Mask with Vibrachrom"},
+      {"code": "5.5", "name": "Mahogany", "level": 5, "tone": "Mahogany", "description": "Deep reddish brown", "line": "Mask with Vibrachrom"},
+      {"code": "4.6", "name": "Intebse Red", "level": 4, "tone": "Red", "description": "Vibrant red", "line": "Mask with Vibrachrom"},
+      {"code": "3.6", "name": "Dark Red", "level": 3, "tone": "Red", "description": "Deep red", "line": "Mask with Vibrachrom"},
+      {"code": "7.3", "name": "Golden Brown", "level": 7, "tone": "Gold", "description": "Warm golden brown", "line": "Mask with Vibrachrom"},
+      {"code": "6.3", "name": "Light Golden Brown", "level": 6, "tone": "Gold", "description": "Golden brown", "line": "Mask with Vibrachrom"},
+      {"code": "5.3", "name": "Light Brown", "level": 5, "tone": "Gold", "description": "Light brown with gold", "line": "Mask with Vibrachrom"},
+      {"code": "4.3", "name": "Light Brown", "level": 4, "tone": "Gold", "description": "Light brown base", "line": "Mask with Vibrachrom"},
+      {"code": "7.1", "name": "Ash Brown", "level": 7, "tone": "Ash", "description": "Cool brown", "line": "Mask with Vibrachrom"},
+      {"code": "6.1", "name": "Dark Ash Brown", "level": 6, "tone": "Ash", "description": "Cool dark brown", "line": "Mask with Vibrachrom"},
+      {"code": "5.1", "name": "Light Ash Brown", "level": 5, "tone": "Ash", "description": "Cool light brown", "line": "Mask with Vibrachrom"},
+      {"code": "4.1", "name": "Ash Brown", "level": 4, "tone": "Ash", "description": "Cool medium brown", "line": "Mask with Vibrachrom"},
+      {"code": "3.1", "name": "Dark Ash Brown", "level": 3, "tone": "Ash", "description": "Cool dark brown", "line": "Mask with Vibrachrom"},
+      {"code": "2.1", "name": "Very Dark Ash Brown", "level": 2, "tone": "Ash", "description": "Nearly black with ash", "line": "Mask with Vibrachrom"},
+      {"code": "10.0", "name": "Light Blonde", "level": 10, "tone": "Natural", "description": "Maximum lightness", "line": "Mask with Vibrachrom"},
+      {"code": "9.0", "name": "Light Blonde", "level": 9, "tone": "Natural", "description": "Light blonde", "line": "Mask with Vibrachrom"},
+      {"code": "8.0", "name": "Dark Blonde", "level": 8, "tone": "Natural", "description": "Dark blonde", "line": "Mask with Vibrachrom"},
+      {"code": "7.0", "name": "Light Brown", "level": 7, "tone": "Natural", "description": "Light brown", "line": "Mask with Vibrachrom"},
+      {"code": "6.0", "name": "Dark Brown", "level": 6, "tone": "Natural", "description": "Dark brown", "line": "Mask with Vibrachrom"}
+    ]
+  },
+  "formulation_guidelines": {
+    "mixing_ratios": {
+      "View": "1 part color + 1 part Activator 10 vol",
+      "A New Colour": "1 part color + 1 part Activator (5, 10, 20, 30, or 40 vol)",
+      "Mask with Vibrachrom": "1 part color + 1 part Activator (varies based on desired lift)"
+    },
+    "processing_times": {
+      "View": "5-20 minutes (visual control)",
+      "A New Colour": "30-40 minutes",
+      "Mask with Vibrachrom": "Varies based on desired result"
+    },
+    "gray_coverage": {
+      "View": "Up to 50% white hair",
+      "A New Colour": "Up to 100%",
+      "Mask with Vibrachrom": "Varies based on formulation"
+    },
+    "lift_capability": {
+      "View": "Tone-on-tone (minimal level change)",
+      "A New Colour": "Up to 7 levels of lift",
+      "Mask with Vibrachrom": "Can be mixed with activators for lift"
+    }
+  },
+  "metadata": {
+    "total_shades": 43,
+    "lines_count": 3,
+    "last_updated": "2026-05-02",
+    "data_source": "Davines US Professional Website: us.davines.com",
+    "notes": "Contains three distinct lines: View (tone-on-tone), A New Colour (ammonia-free permanent), and Mask with Vibrachrom (conditioning permanent). Each line has different characteristics and use cases."
+  }
+}

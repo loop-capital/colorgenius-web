@@ -1,7 +1,7 @@
 'use client';
 
 import { Clock, Droplets, Beaker, AlertCircle, CheckCircle2 } from 'lucide-react';
-import type { Formulation } from '@/types';
+type Formulation = any;
 import ColorSwatch from './ColorSwatch';
 
 interface FormulaCardProps {
@@ -41,7 +41,7 @@ export default function FormulaCard({ formulation, showClientInfo = false }: For
           <div className="flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5" />
             <div className="flex flex-wrap gap-1">
-              {validation.warnings.map((warning, i) => (
+              {validation.warnings.map((warning: string, i: number) => (
                 <span key={i} className="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded">
                   {warning}
                 </span>
@@ -58,7 +58,7 @@ export default function FormulaCard({ formulation, showClientInfo = false }: For
             Color Formula
           </h4>
           <div className="space-y-3">
-            {primary_formula.components.map((comp, i) => (
+            {primary_formula.components.map((comp: any, i: number) => (
               <div key={i} className="flex items-center gap-4 bg-cream-50 rounded-xl p-3">
                 <ColorSwatch
                   rgb={comp.shade.rgb}
@@ -132,7 +132,7 @@ export default function FormulaCard({ formulation, showClientInfo = false }: For
               </span>
             </div>
             <div className="space-y-2">
-              {processing_instructions.application_sequence.map((step, i) => (
+              {processing_instructions.application_sequence.map((step: any, i: number) => (
                 <div key={i} className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-6 h-6 bg-mahogany-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                     {i + 1}

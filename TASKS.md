@@ -54,6 +54,17 @@
 - [ ] Client detail page with formulation history
 - [ ] Tablet-first responsive pass (iPad primary)
 
+### Inventory & Auto-Ordering
+- [x] Inventory tracking schema (Products, UsageLogs, StockTransactions, PurchaseOrders)
+- [x] Client + ClientVisit models (hairProfile, service history)
+- [x] Profit tracking (ServicePricing, ProfitSnapshot)
+- [x] Auto-ordering system (Supplier, AutoOrderLog, reorderThreshold)
+- [x] Client History API endpoints (3 routes)
+- [x] Square API research (integration approach defined)
+- [ ] Auto-order email/PDF generation for Monaco Blue
+- [ ] Square OAuth2 integration
+- [ ] Appointment book integration
+
 ### Infrastructure
 - [x] Provision PostgreSQL (Supabase)
 - [x] Deploy frontend (Vercel)
