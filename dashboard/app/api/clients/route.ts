@@ -1,93 +1,109 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getClients, saveClient, getClient, deleteClient } from '@/lib/storage';
+import { prisma } from '@/lib/prisma';
 import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-  const search = searchParams.get('search');
-  
-  if (id) {
-    const client = getClient(id);
-    if (!client) return NextResponse.json({ error: 'Client not found' }, { status: 404 });
-    return NextResponse.json({ client, total: 1 });
+  // Rate limiting
+  const clientIdentifier = getClientIdentifier(request);
+  const rateLimitResult = rateLimit(clientIdentifier, 60000, 30);
+  if (!rateLimitResult.success) {
+    return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
   }
-  
-  let clients = getClients();
-  if (search) {
-    const q = search.toLowerCase();
-    clients = clients.filter(c =>
-      c.name.toLowerCase().includes(q) ||
-      (c.email && c.email.toLowerCase().includes(q)) ||
-      (c.phone && c.phone.includes(q))
-    );
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const search = searchParams.get('search');
+
+    if (id) {
+      const client = await prisma.client.findUnique({ where: { id } });
+      if (!client) return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+      return NextResponse.json({
+        client: {
+          id: client.id,
+          name: `${client.first_name} ${client.last_name}`,
+          email: client.email,
+          phone: client.phone,
+          notes: client.general_notes,
+          createdAt: client.created_at,
+          lastVisit: client.last_visit_at,
+          favoriteBrand: null,
+          conditions: [],
+        }
+      });
+    }
+
+    const where: any = {};
+    if (search) {
+      const q = search.toLowerCase();
+      where.OR = [
+        { first_name: { contains: q, mode: 'insensitive' } },
+        { last_name: { contains: q, mode: 'insensitive' } },
+        { email: { contains: q, mode: 'insensitive' } },
+        { phone: { contains: q } },
+      ];
+    }
+
+    const clients = await prisma.client.findMany({
+      where,
+      orderBy: { created_at: 'desc' },
+      take: 50,
+    });
+
+    const mapped = clients.map(c => ({
+      id: c.id,
+      name: `${c.first_name} ${c.last_name}`,
+      email: c.email,
+      phone: c.phone,
+      notes: c.general_notes,
+      createdAt: c.created_at,
+      lastVisit: c.last_visit_at,
+      favoriteBrand: null,
+      conditions: [],
+      visits: c.total_visits,
+    }));
+
+    return NextResponse.json({ clients: mapped, total: mapped.length });
+  } catch (error) {
+    console.error('GET /api/clients error:', error);
+    return NextResponse.json({ error: 'Failed to load clients' }, { status: 500 });
   }
-  return NextResponse.json({ clients, total: clients.length });
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     if (!body.name || body.name.trim() === '') {
       return NextResponse.json({ error: 'Client name is required' }, { status: 400 });
     }
 
-    const client = saveClient({
-      name: body.name.trim(),
-      email: body.email?.trim(),
-      phone: body.phone?.trim(),
-      notes: body.notes?.trim(),
-      favoriteBrand: body.favoriteBrand,
-      conditions: body.conditions || [],
+    const nameParts = body.name.trim().split(' ');
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const client = await prisma.client.create({
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+        email: body.email?.trim() || null,
+        phone: body.phone?.trim() || null,
+        general_notes: body.notes?.trim() || null,
+      },
     });
 
-    return NextResponse.json({ client, success: true }, { status: 201 });
+    return NextResponse.json({
+      client: {
+        id: client.id,
+        name: `${client.first_name} ${client.last_name}`,
+        email: client.email,
+        phone: client.phone,
+        notes: client.general_notes,
+        createdAt: client.created_at,
+      }
+    }, { status: 201 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to save client';
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
-}
-
-export async function PUT(request: NextRequest) {
-  try {
-    const body = await request.json();
-    
-    if (!body.id) {
-      return NextResponse.json({ error: 'Client ID is required' }, { status: 400 });
-    }
-
-    const existing = getClient(body.id);
-    if (!existing) {
-      return NextResponse.json({ error: 'Client not found' }, { status: 404 });
-    }
-
-    const updated = saveClient({
-      ...existing,
-      ...body,
-      id: body.id,
-    });
-
-    return NextResponse.json({ client: updated, success: true });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to update client';
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
-}
-
-export async function DELETE(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-    
-    if (!id) {
-      return NextResponse.json({ error: 'Client ID is required' }, { status: 400 });
-    }
-
-    deleteClient(id);
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to delete client';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('POST /api/clients error:', error);
+    return NextResponse.json({ error: 'Failed to create client' }, { status: 500 });
   }
 }

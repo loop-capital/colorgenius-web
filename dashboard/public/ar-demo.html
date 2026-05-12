@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ColorGenius AR Try-On Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg-deep: #0A0A0F;
+      --bg-primary: #0F0F1A;
+      --surface: #161620;
+      --surface-raised: #1E1E2D;
+      --teal: #14B8A6;
+      --teal-bright: #2DD4BF;
+      --gold: #F59E0B;
+      --text-primary: #F5F5F7;
+      --text-secondary: #A1A1AA;
+      --text-tertiary: #71717A;
+      --border: rgba(255,255,255,0.06);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #14B8A6, #2DD4BF);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo h1 { font-size: 14px; font-weight: 700; }
+    .logo p { font-size: 10px; color: var(--text-tertiary); }
+
+    .mode-toggle {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      padding: 3px;
+    }
+
+    .mode-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: var(--teal);
+      color: #0A0A0F;
+    }
+
+    /* Main layout */
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; }
+    }
+
+    /* Preview area */
+    .preview-container {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--bg-primary);
+      aspect-ratio: 4/3;
+    }
+
+    #video { display: none; }
+    #preview-canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    #mask-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: screen;
+      transition: opacity 0.3s;
+      transform: scaleX(-1);
+    }
+
+    #mask-canvas.visible { opacity: 0.6; }
+
+    /* Camera controls */
+    .camera-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: var(--bg-primary);
+    }
+
+    .camera-overlay.hidden { display: none; }
+
+    .camera-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      border: 2px dashed rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .camera-overlay p { font-size: 14px; color: var(--text-secondary); }
+
+    .start-btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      background: var(--teal);
+      color: #0A0A0F;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(20,184,166,0.3);
+      transition: all 0.2s;
+    }
+
+    .start-btn:hover { background: var(--teal-bright); transform: scale(1.02); }
+
+    .cam-controls {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .cam-controls.hidden { display: none; }
+
+    .cam-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .cam-btn:hover { background: rgba(0,0,0,0.7); }
+    .cam-btn.stop:hover { background: rgba(239,68,68,0.5); }
+
+    .shade-indicator {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    .shade-indicator.hidden { display: none; }
+
+    .shade-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .shade-indicator .code { font-size: 11px; font-weight: 600; }
+    .shade-indicator .name { font-size: 9px; color: rgba(255,255,255,0.5); }
+
+    /* Settings bar */
+    .settings-bar {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .setting-card {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+    }
+
+    .setting-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .setting-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .option-btn {
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.03);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      text-transform: capitalize;
+      transition: all 0.2s;
+    }
+
+    .option-btn.active-teal {
+      background: rgba(20,184,166,0.15);
+      color: var(--teal);
+      box-shadow: inset 0 0 0 1px rgba(20,184,166,0.3);
+    }
+
+    .option-btn.active-gold {
+      background: rgba(245,158,11,0.15);
+      color: var(--gold);
+      box-shadow: inset 0 0 0 1px rgba(245,158,11,0.3);
+    }
+
+    /* Intensity slider */
+    .intensity-row {
+      margin-top: 12px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+    }
+
+    .intensity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .intensity-value {
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--teal);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      appearance: none;
+      background: rgba(255,255,255,0.08);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--teal);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(20,184,166,0.3);
+    }
+
+    /* Shade picker sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .shade-info {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .shade-info.hidden { display: none; }
+
+    .shade-info-swatch {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+
+    .shade-info-text .name { font-size: 14px; font-weight: 700; }
+    .shade-info-text .detail { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+
+    .shade-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .shade-tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text-secondary);
+    }
+
+    .shade-picker-panel {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+    }
+
+    .shade-picker-panel h2 {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+    }
+
+    .shade-search {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text-primary);
+      font-size: 13px;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .shade-search:focus { border-color: rgba(20,184,166,0.4); }
+    .shade-search::placeholder { color: var(--text-tertiary); }
+
+    .tone-filters {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+
+    .tone-filters::-webkit-scrollbar { display: none; }
+
+    .tone-pill {
+      flex-shrink: 0;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.04);
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tone-pill .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .shade-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      max-height: 340px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.1) transparent;
+    }
+
+    .shade-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 4px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .shade-swatch:hover { background: rgba(255,255,255,0.05); transform: scale(1.05); }
+
+    .shade-swatch.selected {
+      background: rgba(255,255,255,0.08);
+      box-shadow: inset 0 0 0 1px rgba(20,184,166,0.6), 0 0 15px rgba(20,184,166,0.1);
+    }
+
+    .swatch-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+    }
+
+    .swatch-circle .shimmer {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), transparent 60%);
+    }
+
+    .swatch-code {
+      font-size: 9px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .shade-count {
+      margin-top: 8px;
+      font-size: 10px;
+      color: var(--text-tertiary);
+      text-align: right;
+    }
+
+    /* Tips */
+    .tips {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(20,184,166,0.04);
+      border: 1px solid rgba(20,184,166,0.08);
+    }
+
+    .tips h3 { font-size: 11px; font-weight: 600; color: var(--teal); margin-bottom: 8px; }
+    .tips li {
+      font-size: 11px;
+      color: var(--text-secondary);
+      list-style: none;
+      padding: 3px 0;
+      display: flex;
+      gap: 8px;
+    }
+    .tips li::before { content: '•'; color: var(--teal); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1C5.5 1 3 3.5 3 7C3 10.5 5 12.5 8 12.5C11 12.5 13 10.5 13 7C13 3.5 10.5 1 8 1Z" fill="rgba(0,0,0,0.3)"/>
+        <circle cx="8" cy="7" r="2.5" fill="rgba(0,0,0,0.5)"/>
+      </svg>
+    </div>
+    <div>
+      <h1>ColorGenius AR Try-On</h1>
+      <p>Virtual hair color preview — Demo for Tiche</p>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Left column -->
+  <div>
+    <div class="preview-container">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="preview-canvas"></canvas>
+      <canvas id="mask-canvas"></canvas>
+
+      <!-- Camera start overlay -->
+      <div class="camera-overlay" id="camera-overlay">
+        <div class="camera-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+        <p>Camera preview will appear here</p>
+        <button class="start-btn" onclick="startCamera()">Start Camera</button>
+      </div>
+
+      <!-- Camera controls -->
+      <div class="cam-controls hidden" id="cam-controls">
+        <button class="cam-btn" onclick="switchCamera()" title="Switch camera">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M23 4v6h-6M1 20v-6h6"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+        </button>
+        <button class="cam-btn stop" onclick="stopCamera()" title="Stop">
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+            <rect x="1" y="1" width="12" height="12" rx="2" fill="white"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Shade indicator -->
+      <div class="shade-indicator hidden" id="shade-indicator">
+        <div class="shade-dot" id="shade-dot"></div>
+        <div>
+          <div class="code" id="shade-code"></div>
+          <div class="name" id="shade-name"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="settings-bar">
+      <div class="setting-card">
+        <div class="setting-label">Blend Mode</div>
+        <div class="setting-options">
+          <button class="option-btn active-teal" data-blend="natural" onclick="setBlend(this, 'natural')">Natural</button>
+          <button class="option-btn" data-blend="vibrant" onclick="setBlend(this, 'vibrant')">Vibrant</button>
+          <button class="option-btn" data-blend="subtle" onclick="setBlend(this, 'subtle')">Subtle</button>
+          <button class="option-btn" data-blend="fashion" onclick="setBlend(this, 'fashion')">Fashion</button>
+        </div>
+      </div>
+      <div class="setting-card">
+        <div class="setting-label">Hair Region</div>
+        <div class="setting-options">
+          <button class="option-btn active-gold" data-seg="auto" onclick="setSeg(this, 'auto')">Auto</button>
+          <button class="option-btn" data-seg="full" onclick="setSeg(this, 'full')">Full</button>
+          <button class="option-btn" data-seg="roots" onclick="setSeg(this, 'roots')">Roots</button>
+          <button class="option-btn" data-seg="midlengths" onclick="setSeg(this, 'midlengths')">Mid</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="intensity-row">
+      <div class="intensity-header">
+        <span class="setting-label">Intensity</span>
+        <span class="intensity-value" id="intensity-val">70%</span>
+      </div>
+      <input type="range" min="0" max="100" value="70" id="intensity-slider" oninput="setIntensity(this.value)">
+    </div>
+  </div>
+
+  <!-- Right column — Shade picker -->
+  <div class="sidebar">
+    <div class="shade-info hidden" id="shade-info">
+      <div class="shade-info-swatch" id="info-swatch"></div>
+      <div class="shade-info-text">
+        <div class="name" id="info-name">Select a shade</div>
+        <div class="detail" id="info-detail"></div>
+        <div class="shade-tags">
+          <span class="shade-tag" id="info-level"></span>
+          <span class="shade-tag" id="info-tone"></span>
+          <span class="shade-tag" id="info-cat"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="shade-picker-panel">
+      <h2>Shade Library</h2>
+      <input type="text" class="shade-search" placeholder="Search shades..." oninput="filterShades(this.value)">
+      <div class="tone-filters" id="tone-filters"></div>
+      <div class="shade-grid" id="shade-grid"></div>
+      <div class="shade-count" id="shade-count"></div>
+    </div>
+
+    <div class="tips">
+      <h3>Tips for best results</h3>
+      <ul>
+        <li>Use good lighting — natural light works best</li>
+        <li>Face the camera directly for accurate detection</li>
+        <li>Pull hair away from face for cleaner segmentation</li>
+        <li>Try different blend modes for your desired look</li>
+        <li>Hover over mask overlay to see detected hair region</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== SHADE LIBRARY =====
+const SHADES = [
+  // Davines View — Natural
+  {id:'dv-v-n1',brand:'Davines',line:'View',code:'1N',name:'Black',level:1,tone:'neutral',rgb:[30,25,20],opacity:0.95,intensity:1.0,shimmer:false,cat:'permanent'},
+  {id:'dv-v-n2',brand:'Davines',line:'View',code:'2N',name:'Very Dark Brown',level:2,tone:'neutral',rgb:[55,40,30],opacity:0.92,intensity:0.95,shimmer:false,cat:'permanent'},
+  {id:'dv-v-n3',brand:'Davines',line:'View',code:'3N',name:'Dark Brown',level:3,tone:'neutral',rgb:[75,55,40],opacity:0.90,intensity:0.90,shimmer:false,cat:'permanent'},
+  {id:'dv-v-n4',brand:'Davines',line:'View',code:'4N',name:'Medium Brown',level:4,tone:'neutral',rgb:[100,70,50],opacity:0.88,intensity:0.85,shimmer:false,cat:'permanent'},
+  {id:'dv-v-n5',brand:'Davines',line:'View',code:'5N',name:'Light Brown',level:5,tone:'neutral',rgb:[130,95,65],opacity:0.85,intensity:0.80,shimmer:false,cat:'permanent'},
+  {id:'dv-v-n6',brand:'Davines',line:'View',code:'6N',name:'Dark Blonde',level:6,tone:'neutral',rgb:[160,120,80],opacity:0.82,intensity:0.75,shimmer:false,cat:'permanent'},
+  {id:'dv-v-n7',brand:'Davines',line:'View',code:'7N',name:'Medium Blonde',level:7,tone:'neutral',rgb:[185,150,105],opacity:0.78,intensity:0.70,shimmer:false,cat:'permanent'},
+  {id:'dv-v-n8',brand:'Davines',line:'View',code:'8N',name:'Light Blonde',level:8,tone:'neutral',rgb:[210,175,130],opacity:0.75,intensity:0.65,shimmer:false,cat:'permanent'},
+  {id:'dv-v-n9',brand:'Davines',line:'View',code:'9N',name:'Very Light Blonde',level:9,tone:'neutral',rgb:[225,200,165],opacity:0.70,intensity:0.60,shimmer:false,cat:'permanent'},
+  {id:'dv-v-n10',brand:'Davines',line:'View',code:'10N',name:'Lightest Blonde',level:10,tone:'neutral',rgb:[240,220,190],opacity:0.65,intensity:0.55,shimmer:false,cat:'permanent'},
+  // Ash
+  {id:'dv-v-a5',brand:'Davines',line:'View',code:'5A',name:'Light Ash Brown',level:5,tone:'ash',rgb:[115,100,85],opacity:0.85,intensity:0.75,shimmer:false,cat:'permanent'},
+  {id:'dv-v-a6',brand:'Davines',line:'View',code:'6A',name:'Dark Ash Blonde',level:6,tone:'ash',rgb:[140,125,105],opacity:0.82,intensity:0.70,shimmer:false,cat:'permanent'},
+  {id:'dv-v-a7',brand:'Davines',line:'View',code:'7A',name:'Medium Ash Blonde',level:7,tone:'ash',rgb:[165,150,130],opacity:0.78,intensity:0.65,shimmer:false,cat:'permanent'},
+  {id:'dv-v-a8',brand:'Davines',line:'View',code:'8A',name:'Light Ash Blonde',level:8,tone:'ash',rgb:[190,178,160],opacity:0.75,intensity:0.60,shimmer:false,cat:'permanent'},
+  // Golden
+  {id:'dv-v-g5',brand:'Davines',line:'View',code:'5G',name:'Light Golden Brown',level:5,tone:'golden',rgb:[145,105,55],opacity:0.85,intensity:0.85,shimmer:true,cat:'permanent'},
+  {id:'dv-v-g6',brand:'Davines',line:'View',code:'6G',name:'Dark Golden Blonde',level:6,tone:'golden',rgb:[170,130,65],opacity:0.82,intensity:0.80,shimmer:true,cat:'permanent'},
+  {id:'dv-v-g7',brand:'Davines',line:'View',code:'7G',name:'Medium Golden Blonde',level:7,tone:'golden',rgb:[195,155,80],opacity:0.78,intensity:0.75,shimmer:true,cat:'permanent'},
+  {id:'dv-v-g8',brand:'Davines',line:'View',code:'8G',name:'Light Golden Blonde',level:8,tone:'golden',rgb:[215,180,110],opacity:0.75,intensity:0.70,shimmer:true,cat:'permanent'},
+  // Copper
+  {id:'dv-v-c5',brand:'Davines',line:'View',code:'5C',name:'Light Copper Brown',level:5,tone:'copper',rgb:[150,90,45],opacity:0.88,intensity:0.90,shimmer:true,cat:'permanent'},
+  {id:'dv-v-c6',brand:'Davines',line:'View',code:'6C',name:'Dark Copper Blonde',level:6,tone:'copper',rgb:[175,110,55],opacity:0.85,intensity:0.85,shimmer:true,cat:'permanent'},
+  {id:'dv-v-c7',brand:'Davines',line:'View',code:'7C',name:'Medium Copper Blonde',level:7,tone:'copper',rgb:[195,130,70],opacity:0.82,intensity:0.80,shimmer:true,cat:'permanent'},
+  // Red
+  {id:'dv-v-r4',brand:'Davines',line:'View',code:'4R',name:'Medium Red Brown',level:4,tone:'red',rgb:[130,50,40],opacity:0.90,intensity:0.92,shimmer:false,cat:'permanent'},
+  {id:'dv-v-r5',brand:'Davines',line:'View',code:'5R',name:'Light Red Brown',level:5,tone:'red',rgb:[155,65,50],opacity:0.88,intensity:0.88,shimmer:false,cat:'permanent'},
+  {id:'dv-v-r6',brand:'Davines',line:'View',code:'6R',name:'Dark Red Blonde',level:6,tone:'red',rgb:[175,80,60],opacity:0.85,intensity:0.85,shimmer:false,cat:'permanent'},
+  // Violet
+  {id:'dv-v-v6',brand:'Davines',line:'View',code:'6V',name:'Dark Violet Blonde',level:6,tone:'violet',rgb:[135,100,135],opacity:0.82,intensity:0.70,shimmer:false,cat:'permanent'},
+  {id:'dv-v-v7',brand:'Davines',line:'View',code:'7V',name:'Medium Violet Blonde',level:7,tone:'violet',rgb:[160,125,160],opacity:0.78,intensity:0.65,shimmer:false,cat:'permanent'},
+  // Pearl
+  {id:'dv-v-p7',brand:'Davines',line:'View',code:'7P',name:'Pearl Blonde',level:7,tone:'pearl',rgb:[180,170,180],opacity:0.75,intensity:0.55,shimmer:true,cat:'permanent'},
+  {id:'dv-v-p8',brand:'Davines',line:'View',code:'8P',name:'Light Pearl Blonde',level:8,tone:'pearl',rgb:[200,192,200],opacity:0.72,intensity:0.50,shimmer:true,cat:'permanent'},
+  {id:'dv-v-p9',brand:'Davines',line:'View',code:'9P',name:'Very Light Pearl',level:9,tone:'pearl',rgb:[218,212,220],opacity:0.68,intensity:0.45,shimmer:true,cat:'permanent'},
+  // Beige
+  {id:'dv-v-d7',brand:'Davines',line:'View',code:'7D',name:'Beige Blonde',level:7,tone:'beige',rgb:[185,165,135],opacity:0.78,intensity:0.65,shimmer:false,cat:'permanent'},
+  {id:'dv-v-d8',brand:'Davines',line:'View',code:'8D',name:'Light Beige Blonde',level:8,tone:'beige',rgb:[205,188,158],opacity:0.75,intensity:0.60,shimmer:false,cat:'permanent'},
+  // Mahogany
+  {id:'dv-v-m4',brand:'Davines',line:'View',code:'4M',name:'Mahogany Brown',level:4,tone:'mahogany',rgb:[100,55,55],opacity:0.90,intensity:0.85,shimmer:false,cat:'permanent'},
+  {id:'dv-v-m5',brand:'Davines',line:'View',code:'5M',name:'Light Mahogany Brown',level:5,tone:'mahogany',rgb:[125,70,65],opacity:0.88,intensity:0.80,shimmer:false,cat:'permanent'},
+  // Chocolate
+  {id:'dv-v-ch4',brand:'Davines',line:'View',code:'4CH',name:'Chocolate Brown',level:4,tone:'chocolate',rgb:[90,55,40],opacity:0.90,intensity:0.88,shimmer:false,cat:'permanent'},
+  {id:'dv-v-ch5',brand:'Davines',line:'View',code:'5CH',name:'Light Chocolate Brown',level:5,tone:'chocolate',rgb:[115,75,55],opacity:0.88,intensity:0.82,shimmer:false,cat:'permanent'},
+  // Davines ANC
+  {id:'dv-anc-4n',brand:'Davines',line:'A New Colour',code:'4.0',name:'Natural Medium Brown',level:4,tone:'neutral',rgb:[95,68,48],opacity:0.90,intensity:0.88,shimmer:false,cat:'permanent'},
+  {id:'dv-anc-5n',brand:'Davines',line:'A New Colour',code:'5.0',name:'Natural Light Brown',level:5,tone:'neutral',rgb:[125,92,62],opacity:0.87,intensity:0.82,shimmer:false,cat:'permanent'},
+  {id:'dv-anc-6n',brand:'Davines',line:'A New Colour',code:'6.0',name:'Natural Dark Blonde',level:6,tone:'neutral',rgb:[155,118,78],opacity:0.84,intensity:0.78,shimmer:false,cat:'permanent'},
+  {id:'dv-anc-7n',brand:'Davines',line:'A New Colour',code:'7.0',name:'Natural Medium Blonde',level:7,tone:'neutral',rgb:[180,148,102],opacity:0.80,intensity:0.72,shimmer:false,cat:'permanent'},
+  {id:'dv-anc-7g',brand:'Davines',line:'A New Colour',code:'7.3',name:'Golden Blonde',level:7,tone:'golden',rgb:[190,152,78],opacity:0.80,intensity:0.80,shimmer:true,cat:'permanent'},
+  {id:'dv-anc-8n',brand:'Davines',line:'A New Colour',code:'8.0',name:'Natural Light Blonde',level:8,tone:'neutral',rgb:[205,172,125],opacity:0.76,intensity:0.68,shimmer:false,cat:'permanent'},
+  // Davines Mask Vibrachrom
+  {id:'dv-mv-pink',brand:'Davines',line:'Mask Vibrachrom',code:'PK',name:'Rose Quartz',level:8,tone:'pink',rgb:[220,150,165],opacity:0.70,intensity:0.65,shimmer:true,cat:'semi'},
+  {id:'dv-mv-coral',brand:'Davines',line:'Mask Vibrachrom',code:'CO',name:'Living Coral',level:7,tone:'copper',rgb:[230,130,100],opacity:0.75,intensity:0.70,shimmer:true,cat:'semi'},
+  {id:'dv-mv-violet',brand:'Davines',line:'Mask Vibrachrom',code:'VL',name:'Lavender Haze',level:9,tone:'violet',rgb:[185,165,210],opacity:0.65,intensity:0.60,shimmer:true,cat:'semi'},
+  // Universal
+  {id:'uni-plat',brand:'Universal',line:'Lightener',code:'PLT',name:'Platinum',level:10,tone:'platinum',rgb:[245,240,235],opacity:0.55,intensity:0.40,shimmer:true,cat:'lightener'},
+  {id:'uni-silver',brand:'Universal',line:'Fashion',code:'SV',name:'Silver',level:10,tone:'silver',rgb:[192,192,192],opacity:0.65,intensity:0.55,shimmer:true,cat:'semi'},
+  {id:'uni-rose',brand:'Universal',line:'Fashion',code:'RS',name:'Rose Gold',level:7,tone:'copper',rgb:[220,160,140],opacity:0.75,intensity:0.70,shimmer:true,cat:'semi'},
+  {id:'uni-blonde',brand:'Universal',line:'Fashion',code:'HB',name:'Honey Blonde',level:7,tone:'golden',rgb:[195,155,85],opacity:0.80,intensity:0.78,shimmer:true,cat:'permanent'},
+  {id:'uni-caramel',brand:'Universal',line:'Fashion',code:'CR',name:'Caramel',level:6,tone:'warm',rgb:[170,120,70],opacity:0.85,intensity:0.80,shimmer:false,cat:'permanent'},
+  {id:'uni-espresso',brand:'Universal',line:'Fashion',code:'ES',name:'Espresso',level:2,tone:'chocolate',rgb:[45,30,22],opacity:0.95,intensity:0.95,shimmer:false,cat:'permanent'},
+  {id:'uni-auburn',brand:'Universal',line:'Fashion',code:'AU',name:'Auburn',level:4,tone:'red',rgb:[135,55,35],opacity:0.90,intensity:0.90,shimmer:false,cat:'permanent'},
+  {id:'uni-burgundy',brand:'Universal',line:'Fashion',code:'BG',name:'Burgundy',level:3,tone:'red',rgb:[95,30,45],opacity:0.92,intensity:0.92,shimmer:false,cat:'semi'},
+  {id:'uni-ice',brand:'Universal',line:'Fashion',code:'IC',name:'Ice Blonde',level:10,tone:'cool',rgb:[230,225,220],opacity:0.55,intensity:0.40,shimmer:true,cat:'toner'},
+];
+
+// ===== STATE =====
+let selectedShade = null;
+let blendMode = 'natural';
+let segMode = 'auto';
+let intensity = 0.7;
+let cameraActive = false;
+let stream = null;
+let facingMode = 'user';
+let animFrame = 0;
+let lastMask = null;
+
+const TONE_COLORS = {
+  neutral:'#9C8B7A',ash:'#8A7D6E',golden:'#C4A35A',copper:'#B87333',red:'#A03030',
+  violet:'#7B68A6',pearl:'#B8B0C4',beige:'#C4B5A0',mahogany:'#6B3A3A',chocolate:'#4A2C2A',
+  warm:'#D4A574',cool:'#7D8B9A',pink:'#E8A0B0',silver:'#C0C0C0',platinum:'#E8E4DF'
+};
+
+let activeTone = 'all';
+let searchQuery = '';
+
+// ===== SHADE RENDERING =====
+function renderToneFilters() {
+  const tones = [...new Set(SHADES.map(s => s.tone))].sort();
+  const container = document.getElementById('tone-filters');
+  container.innerHTML = `<button class="tone-pill ${activeTone==='all'?'':''}" onclick="setTone('all')" style="${activeTone==='all'?'background:var(--teal);color:#0A0A0F':''}">All</button>`;
+  tones.forEach(tone => {
+    const color = TONE_COLORS[tone] || '#999';
+    const active = activeTone === tone;
+    container.innerHTML += `<button class="tone-pill" onclick="setTone('${tone}')" style="${active?`background:${color};color:#0A0A0F`:''}"><span class="dot" style="background:${color}"></span>${tone}</button>`;
+  });
+}
+
+function renderShadeGrid() {
+  const filtered = SHADES.filter(s => {
+    if (activeTone !== 'all' && s.tone !== activeTone) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q) || s.brand.toLowerCase().includes(q);
+    }
+    return true;
+  });
+
+  const grid = document.getElementById('shade-grid');
+  grid.innerHTML = '';
+  filtered.forEach(shade => {
+    const sel = selectedShade && selectedShade.id === shade.id;
+    const darker = `rgb(${Math.max(0,shade.rgb[0]-40)},${Math.max(0,shade.rgb[1]-40)},${Math.max(0,shade.rgb[2]-40)})`;
+    const swatch = document.createElement('button');
+    swatch.className = `shade-swatch ${sel?'selected':''}`;
+    swatch.onclick = () => selectShade(shade);
+    swatch.innerHTML = `
+      <div class="swatch-circle" style="background:radial-gradient(circle at 35% 35%,rgb(${shade.rgb.join(',')}),${darker})">
+        ${shade.shimmer?'<div class="shimmer"></div>':''}
+        ${sel?'<div style="position:absolute;inset:0;border-radius:50%;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke="#14B8A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>':''}
+      </div>
+      <span class="swatch-code">${shade.code}</span>
+    `;
+    grid.appendChild(swatch);
+  });
+
+  document.getElementById('shade-count').textContent = `${filtered.length} shade${filtered.length!==1?'s':''}`;
+}
+
+function setTone(tone) {
+  activeTone = tone;
+  renderToneFilters();
+  renderShadeGrid();
+}
+
+function filterShades(q) {
+  searchQuery = q;
+  renderShadeGrid();
+}
+
+function selectShade(shade) {
+  selectedShade = shade;
+  renderShadeGrid();
+
+  const info = document.getElementById('shade-info');
+  info.classList.remove('hidden');
+  const darker = `rgb(${Math.max(0,shade.rgb[0]-40)},${Math.max(0,shade.rgb[1]-40)},${Math.max(0,shade.rgb[2]-40)})`;
+  document.getElementById('info-swatch').style.background = `radial-gradient(circle at 35% 35%,rgb(${shade.rgb.join(',')}),${darker})`;
+  document.getElementById('info-name').textContent = shade.name;
+  document.getElementById('info-detail').textContent = `${shade.brand} · ${shade.line} · ${shade.code}`;
+  document.getElementById('info-level').textContent = `Level ${shade.level}`;
+  document.getElementById('info-tone').textContent = shade.tone;
+  document.getElementById('info-cat').textContent = shade.cat;
+
+  // Update shade indicator on camera view
+  const indicator = document.getElementById('shade-indicator');
+  indicator.classList.remove('hidden');
+  document.getElementById('shade-dot').style.background = `rgb(${shade.rgb.join(',')})`;
+  document.getElementById('shade-code').textContent = shade.code;
+  document.getElementById('shade-name').textContent = shade.name;
+}
+
+// ===== CAMERA =====
+async function startCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false
+    });
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    await video.play();
+    cameraActive = true;
+    document.getElementById('camera-overlay').classList.add('hidden');
+    document.getElementById('cam-controls').classList.remove('hidden');
+    processLoop();
+  } catch(e) {
+    alert('Camera access error: ' + e.message);
+  }
+}
+
+function stopCamera() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  cameraActive = false;
+  cancelAnimationFrame(animFrame);
+  document.getElementById('camera-overlay').classList.remove('hidden');
+  document.getElementById('cam-controls').classList.add('hidden');
+}
+
+function switchCamera() {
+  stopCamera();
+  facingMode = facingMode === 'user' ? 'environment' : 'user';
+  startCamera();
+}
+
+// ===== SEGMENTATION =====
+function isSkinTone(r, g, b) {
+  if (r > 95 && g > 40 && b > 20 && (r-g) > 15 && (r-b) > 15 && Math.max(r,g,b)-Math.min(r,g,b) > 15) return true;
+  return false;
+}
+
+function isHairColor(r, g, b) {
+  const lum = 0.299*r + 0.587*g + 0.114*b;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  const sat = max === 0 ? 0 : ((max-min)/max)*100;
+  if (lum < 120 && sat < 60) return true;
+  if (r > g && g > b && lum < 160) return true;
+  if (lum > 120 && lum < 220 && sat < 50) return true;
+  if (r > 120 && g < r*0.7 && b < g && sat > 30) return true;
+  if (lum > 150 && sat < 20) return true;
+  if (sat > 40 && lum > 60 && lum < 200) return true;
+  return false;
+}
+
+function segmentHair(imageData, mode) {
+  const { width, height, data } = imageData;
+  const mask = new Uint8Array(width * height);
+
+  for (let y = 0; y < height; y++) {
+    const yNorm = y / height;
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4;
+      const r = data[idx], g = data[idx+1], b = data[idx+2];
+
+      if (isSkinTone(r, g, b)) continue;
+      if (r < 25 && g < 25 && b < 25) continue;
+      if (r > 240 && g > 240 && b > 240) continue;
+
+      let posWeight = 0;
+      switch(mode) {
+        case 'roots': posWeight = yNorm < 0.25 ? 1.0 : yNorm < 0.4 ? 0.5 : 0.2; break;
+        case 'midlengths': posWeight = (yNorm > 0.25 && yNorm < 0.6) ? 1.0 : 0.3; break;
+        case 'ends': posWeight = yNorm > 0.55 ? 1.0 : yNorm > 0.4 ? 0.5 : 0.2; break;
+        case 'full': posWeight = yNorm < 0.8 ? 0.7 + 0.3*Math.sin(Math.PI*Math.max(0,yNorm-0.1)/0.4) : 0.1; break;
+        default:
+          posWeight = yNorm < 0.1 ? 0.3 : yNorm < 0.5 ? 0.7+0.3*Math.sin(Math.PI*(yNorm-0.1)/0.4) : yNorm < 0.8 ? 0.5*(1-(yNorm-0.5)/0.3) : 0.1;
+      }
+
+      const hairLike = isHairColor(r, g, b);
+      const score = hairLike ? (0.5 + 0.3*posWeight) : (0.1*posWeight);
+      mask[y * width + x] = Math.round(Math.max(0, Math.min(255, score * 255)));
+    }
+  }
+  return mask;
+}
+
+function smoothMask(mask, w, h) {
+  const result = new Uint8Array(mask.length);
+  for (let y = 1; y < h-1; y++) {
+    for (let x = 1; x < w-1; x++) {
+      let sum = 0;
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++)
+          sum += mask[(y+dy)*w+(x+dx)];
+      result[y*w+x] = Math.round(sum/9);
+    }
+  }
+  return result;
+}
+
+// ===== COLOR BLENDING =====
+function blendSoftLight(base, blend, opacity) {
+  const result = [0,0,0];
+  for (let i = 0; i < 3; i++) {
+    const b = base[i]/255, c = blend[i]/255;
+    let blended;
+    if (c < 0.5) blended = b - (1-2*c)*b*(1-b);
+    else { const d = b < 0.25 ? ((16*b-12)*b+4)*b : Math.sqrt(b); blended = b + (2*c-1)*(d-b); }
+    result[i] = Math.round(Math.max(0, Math.min(255, blended*255*opacity + base[i]*(1-opacity))));
+  }
+  return result;
+}
+
+function blendOverlay(base, blend, opacity) {
+  const result = [0,0,0];
+  for (let i = 0; i < 3; i++) {
+    const b = base[i]/255, c = blend[i]/255;
+    const blended = b < 0.5 ? 2*b*c : 1-2*(1-b)*(1-c);
+    result[i] = Math.round(Math.max(0, Math.min(255, blended*255*opacity + base[i]*(1-opacity))));
+  }
+  return result;
+}
+
+function applyColor(pixels, offset, shade, blendFn, intOverride) {
+  const int = intOverride != null ? intOverride : shade.intensity;
+  const base = [pixels[offset], pixels[offset+1], pixels[offset+2]];
+  const result = blendFn(base, shade.rgb, shade.opacity * int);
+  pixels[offset] = result[0];
+  pixels[offset+1] = result[1];
+  pixels[offset+2] = result[2];
+}
+
+// ===== RENDER LOOP =====
+function processLoop() {
+  if (!cameraActive) return;
+
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('preview-canvas');
+  const maskCanvas = document.getElementById('mask-canvas');
+
+  if (!video.videoWidth) { animFrame = requestAnimationFrame(processLoop); return; }
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(video, 0, 0);
+
+  if (selectedShade) {
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    // Segment every 5th frame
+    if (!lastMask || Math.random() < 0.2) {
+      lastMask = smoothMask(segmentHair(imageData, segMode), canvas.width, canvas.height);
+    }
+
+    const blendFn = blendMode === 'vibrant' || blendMode === 'fashion' ? blendOverlay : blendSoftLight;
+
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      const mi = i / 4;
+      const maskVal = lastMask[mi] / 255;
+      if (maskVal > 0.05) {
+        applyColor(imageData.data, i, selectedShade, blendFn, intensity * maskVal);
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    // Mask overlay
+    maskCanvas.width = canvas.width;
+    maskCanvas.height = canvas.height;
+    const mCtx = maskCanvas.getContext('2d');
+    const mImg = mCtx.createImageData(canvas.width, canvas.height);
+    for (let i = 0; i < lastMask.length; i++) {
+      mImg.data[i*4] = 20;
+      mImg.data[i*4+1] = 184;
+      mImg.data[i*4+2] = 166;
+      mImg.data[i*4+3] = lastMask[i] * 0.35;
+    }
+    mCtx.putImageData(mImg, 0, 0);
+  }
+
+  animFrame = requestAnimationFrame(processLoop);
+}
+
+// ===== UI CONTROLS =====
+function setBlend(btn, mode) {
+  blendMode = mode;
+  document.querySelectorAll('[data-blend]').forEach(b => b.classList.remove('active-teal'));
+  btn.classList.add('active-teal');
+}
+
+function setSeg(btn, mode) {
+  segMode = mode;
+  lastMask = null; // Force re-segmentation
+  document.querySelectorAll('[data-seg]').forEach(b => b.classList.remove('active-gold'));
+  btn.classList.add('active-gold');
+}
+
+function setIntensity(val) {
+  intensity = val / 100;
+  document.getElementById('intensity-val').textContent = val + '%';
+}
+
+// ===== INIT =====
+renderToneFilters();
+renderShadeGrid();
+</script>
+
+</body>
+</html>

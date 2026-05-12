@@ -1,0 +1,120 @@
+// ─── MARKETPLACE FORMULA MODELS (Prisma) ───────────────────────────
+// Add these models to the existing Prisma schema (dashboard/prisma/schema.prisma)
+// These complement the existing CommunityPost/MarketplaceTemplate models with
+// a direct formula marketplace for sharing individual formulas (not just templates)
+
+model MarketplaceFormula {
+  id String @id @default(uuid())
+
+  // Ownership
+  stylist_id String
+  stylist    Stylist @relation(fields: [stylist_id], references: [id], onDelete: Cascade)
+
+  salon_id String?
+  salon    Salon?  @relation(fields: [salon_id], references: [id], onDelete: SetNull)
+
+  // Shareable Formula ID
+  formula_id String @unique @default(dbgenerated("'CG-' || floor(random() * 90000 + 10000)::text"))
+
+  // Listing content
+  title       String  @db.VarChar(200)
+  description String? @db.VarChar(2000)
+
+  // Formula details
+  brand         String? @db.VarChar(100)
+  product_line  String? @db.VarChar(100)
+  developer_volume Int? @default(20)
+  mixing_ratio  String? @db.VarChar(20)
+  processing_time Int?  @default(30)
+  application_method String? @db.VarChar(100)
+
+  // Starting conditions
+  natural_level   Int?
+  previous_color  String? @db.VarChar(100)
+  grey_percentage Int?    @default(0)
+  porosity        String? @db.VarChar(20)
+  hair_condition  String? @db.VarChar(20)
+  hair_texture    String? @db.VarChar(20)
+  hair_density    String? @db.VarChar(20)
+
+  // Search / discovery
+  technique    String?   @db.VarChar(50)
+  hair_type    String?   @db.VarChar(20)
+  hair_length  String?   @db.VarChar(20)
+  result_level Int?
+  result_tone  String?   @db.VarChar(20)
+  tags         String[]
+  season       String?   @db.VarChar(20)
+
+  // Engagement (denormalized for performance)
+  views_count Int @default(0)
+  saves_count Int @default(0)
+  likes_count Int @default(0)
+
+  // Moderation
+  status           String  @default("pending_review") @db.VarChar(20)
+  rejection_reason String? @db.VarChar(500)
+
+  // Optional: created from existing formula
+  original_formula_id String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  // Relations
+  images  MarketplaceFormulaImage[]
+  shades  MarketplaceFormulaShade[]
+
+  @@index([stylist_id])
+  @@index([salon_id])
+  @@index([status])
+  @@index([technique])
+  @@index([hair_type])
+  @@index([hair_length])
+  @@index([result_level])
+  @@index([result_tone])
+  @@index([season])
+  @@index([brand])
+  @@index([created_at])
+  @@index([formula_id])
+  @@index([status, created_at])
+}
+
+model MarketplaceFormulaImage {
+  id String @id @default(uuid())
+
+  marketplace_formula_id String
+  marketplaceFormula     MarketplaceFormula @relation(fields: [marketplace_formula_id], references: [id], onDelete: Cascade)
+
+  url            String
+  thumbnail_url  String?
+  alt_text       String?  @db.VarChar(200)
+  image_type     String   @default("secondary") @db.VarChar(20) // hero | additional | before | after
+  sort_order     Int      @default(0)
+
+  created_at DateTime @default(now())
+
+  @@index([marketplace_formula_id])
+  @@index([image_type])
+}
+
+model MarketplaceFormulaShade {
+  id String @id @default(uuid())
+
+  marketplace_formula_id String
+  marketplaceFormula     MarketplaceFormula @relation(fields: [marketplace_formula_id], references: [id], onDelete: Cascade)
+
+  shade_id     String?
+  shade_code   String  @db.VarChar(20)
+  shade_name   String? @db.VarChar(100)
+  brand        String? @db.VarChar(100)
+  product_line String? @db.VarChar(100)
+  amount_g     Int?    @default(0)
+  amount_ml    Int?    @default(0)
+  sort_order   Int     @default(0)
+
+  created_at DateTime @default(now())
+
+  @@index([marketplace_formula_id])
+  @@index([shade_id])
+}
