@@ -36,6 +36,15 @@ interface Client {
   lastVisit?: string;
 }
 
+// Same hardcoded clients as /clients page
+const DEMO_CLIENTS: Client[] = [
+  { id: '1', name: 'Maria Garcia', email: 'maria.g@email.com', lastVisit: '2026-04-20' },
+  { id: '2', name: 'Jennifer Liu', email: 'jennifer.l@email.com', lastVisit: '2026-04-15' },
+  { id: '3', name: 'Sarah Thompson', email: 'sarah.t@email.com', lastVisit: '2026-04-10' },
+  { id: '4', name: 'Amanda Chen', email: 'amanda.c@email.com', lastVisit: '2026-04-08' },
+  { id: '5', name: 'Rachel Kim', email: 'rachel.k@email.com', lastVisit: '2026-04-05' },
+];
+
 interface FormulaStep {
   product: { shadeCode: string; shadeName: string; brand?: string; level?: number };
   grams: number;
@@ -67,11 +76,9 @@ function ServiceEntryContent() {
   const [shadeGrams, setShadeGrams] = useState(30);
   const [shadeRole, setShadeRole] = useState('Primary');
 
-  // Load clients
+  // Load clients (using same hardcoded data as /clients page)
   useEffect(() => {
-    fetch('/api/clients').then(r => r.ok ? r.json() : { clients: [] }).then(d => {
-      setClients(d.clients || []);
-    }).catch(() => {});
+    setClients(DEMO_CLIENTS);
   }, []);
 
   // Pre-select client from URL
