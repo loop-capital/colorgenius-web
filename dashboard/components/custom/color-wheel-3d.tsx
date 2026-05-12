@@ -100,8 +100,6 @@ export function ColorWheel3D({ tones, selected, onSelect, className }: ColorWhee
                 onHoverStart={() => setHovered(tone.value)}
                 onHoverEnd={() => setHovered(null)}
                 onClick={() => onSelect(tone.value)}
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.95 }}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.03 * positioned.indexOf(tone) }}

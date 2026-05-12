@@ -113,12 +113,18 @@ export default function FormulatePage() {
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
                 <button type="button" onClick={() => { const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.capture='environment'; i.onchange=(e:any) => { const f = e.target.files?.[0]; if(f) { const r = new FileReader(); r.onload = (ev) => setPhoto(ev.target?.result as string); r.readAsDataURL(f) }}; i.click() }}
-                  style={{ padding: 32, border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 16, background: 'rgba(147,51,234,0.05)', color: '#F5F5F7', cursor: 'pointer', fontSize: 16, textAlign: 'center' }}>
-                  <Camera style={{ width: 28, height: 28, color: '#9333EA', margin: '0 auto 8px', display: 'block' }} /> Take Photo
+                  style={{ padding: 32, border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 16, background: 'rgba(255,255,255,0.02)', color: '#F5F5F7', cursor: 'pointer', fontSize: 16, textAlign: 'center' }}>
+                  <Camera style={{ width: 28, height: 28, color: '#71717A', margin: '0 auto 8px', display: 'block' }} /> Take Photo
                 </button>
                 <button type="button" onClick={() => { const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.onchange=(e:any) => { const f = e.target.files?.[0]; if(f) { const r = new FileReader(); r.onload = (ev) => setPhoto(ev.target?.result as string); r.readAsDataURL(f) }}; i.click() }}
-                  style={{ padding: 32, border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 16, background: 'rgba(245,158,11,0.05)', color: '#F5F5F7', cursor: 'pointer', fontSize: 16, textAlign: 'center' }}>
-                  <Upload style={{ width: 28, height: 28, color: '#F59E0B', margin: '0 auto 8px', display: 'block' }} /> Upload Photo
+                  style={{ padding: 32, border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 16, background: 'rgba(255,255,255,0.02)', color: '#F5F5F7', cursor: 'pointer', fontSize: 16, textAlign: 'center' }}>
+                  <div style={{ width: 28, height: 28, margin: '0 auto 8px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                    <div style={{ width: 22, height: 18, border: '2px solid #71717A', borderRadius: 3, position: 'relative' }}>
+                      <div style={{ position: 'absolute', top: -4, left: '50%', transform: 'translateX(-50%)', width: 8, height: 4, background: '#71717A', borderRadius: '2px 2px 0 0' }} />
+                    </div>
+                    <span style={{ position: 'absolute', bottom: -2, right: 0, width: 14, height: 14, background: '#9333EA', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 12, fontWeight: 'bold', lineHeight: 1 }}>+</span>
+                  </div>
+                  Upload Photo
                 </button>
               </div>
             )}
@@ -141,9 +147,11 @@ export default function FormulatePage() {
             </div>
             <div style={{ marginBottom: 24 }}>
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Current Tone</Label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
-                <ColorWheel3D tones={TONES.map(t => ({ value: t.value as ToneFamily, label: t.label, color: t.color }))} selected={toneMap[fd.currentTone] || 'neutral'} onSelect={(val) => setFd(p => ({ ...p, currentTone: revToneMap[val] || 'N' }))} />
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'row', gap: 32, alignItems: 'flex-start' }}>
+                <div style={{ cursor: 'pointer' }}>
+                  <ColorWheel3D tones={TONES.map(t => ({ value: t.value as ToneFamily, label: t.label, color: t.color }))} selected={toneMap[fd.currentTone] || 'neutral'} onSelect={(val) => { const code = revToneMap[val] || 'N'; setFd(p => ({ ...p, currentTone: code })) }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {TONES.map(t => <ColorCircle key={t.value} color={t.color} label={t.label} isActive={fd.currentTone === t.value} onClick={() => setFd(p => ({ ...p, currentTone: t.value }))} />)}
                 </div>
               </div>

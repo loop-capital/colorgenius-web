@@ -66,9 +66,11 @@ export function VoiceAssistant({ clientId, context, position = 'bottom-right' }:
 
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [speechSupported, setSpeechSupported] = useState(false)
 
-  const speechSupported = typeof window !== 'undefined' &&
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
+  useEffect(() => {
+    setSpeechSupported('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
+  }, [])
 
   // ── Check if assistant is enabled ──
   useEffect(() => {

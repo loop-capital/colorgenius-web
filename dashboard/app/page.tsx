@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Camera, Sparkles, CheckCircle, Shield, ClipboardList, Palette, BarChart3, Package, DollarSign, Scale, History, ArrowRight } from 'lucide-react'
 
 export default function LandingPage() {
   const [showLogin, setShowLogin] = useState(false)
@@ -15,203 +16,199 @@ export default function LandingPage() {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
+      const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) })
       const data = await res.json()
-      if (res.ok && data.success) {
-        window.location.href = '/dashboard'
-      } else {
-        setError(data.error || 'Login failed')
-      }
-    } catch (err: any) {
-      setError('Network error: ' + err.message)
-    }
+      if (res.ok && data.success) window.location.href = '/dashboard'
+      else setError(data.error || 'Login failed')
+    } catch (err: any) { setError('Network error: ' + err.message) }
     setLoading(false)
   }
 
+  const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 999, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 16, display: 'inline-flex', alignItems: 'center', gap: 8 }
+
   return (
-    <main className="min-h-screen bg-[#0A0A1A] text-white overflow-x-hidden">
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0A0A1A]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#9333EA] to-[#EC4899] flex items-center justify-center">
-              <span className="text-white font-black text-sm">CG</span>
-            </div>
-            <span className="text-white font-bold text-lg tracking-tight">ColorGenius</span>
+    <main style={{ minHeight: '100vh', background: '#0A0A1A', color: '#F5F5F7', overflow: 'hidden' }}>
+      {/* Navbar */}
+      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(10,10,26,0.8)', backdropFilter: 'blur(20px)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #9333EA, #EC4899)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ color: 'white', fontWeight: 900, fontSize: 13 }}>CG</span></div>
+            <span style={{ color: 'white', fontWeight: 700, fontSize: 18 }}>ColorGenius</span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm text-white/60">
-            <a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a>
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
-            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hide-mobile">
+            <a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>How it Works</a>
+            <a href="#features" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>Features</a>
+            <a href="#tools" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>Color Tools</a>
+            <a href="#pricing" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>Pricing</a>
           </div>
-          <button onClick={() => setShowLogin(true)}
-            className="bg-gradient-to-r from-[#9333EA] to-[#EC4899] text-white text-sm font-semibold px-5 py-2 rounded-full hover:opacity-90 transition-opacity">
-            Sign In
-          </button>
+          <button onClick={() => setShowLogin(true)} style={{ ...btnPrimary, padding: '8px 20px', fontSize: 14 }}>Sign In</button>
         </div>
       </nav>
 
+      {/* Login Modal */}
       {showLogin && (
-        <motion.div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setShowLogin(false)}>
-          <motion.div className="bg-[#161620] border border-white/10 rounded-2xl p-8 w-full max-w-md"
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-xl font-bold text-white mb-6">Welcome back</h2>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#9333EA]" placeholder="you@salon.com" />
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#9333EA]" placeholder="Password" />
-              {error && <p className="text-red-400 text-sm">{error}</p>}
-              <button type="submit" disabled={loading}
-                className="w-full bg-gradient-to-r from-[#9333EA] to-[#EC4899] text-white font-bold py-3 rounded-xl hover:opacity-90 disabled:opacity-50">
-                {loading ? 'Signing in...' : 'Sign In'}
-              </button>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: 16 }} onClick={() => setShowLogin(false)}>
+          <div style={{ background: '#161620', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 400 }} onClick={e => e.stopPropagation()}>
+            <h2 style={{ fontSize: 20, marginBottom: 24 }}>Welcome back</h2>
+            <form onSubmit={handleLogin}>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@salon.com" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '12px 16px', color: 'white', fontSize: 14, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="Password" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '12px 16px', color: 'white', fontSize: 14, marginBottom: 16, outline: 'none', boxSizing: 'border-box' }} />
+              {error && <p style={{ color: '#EF4444', fontSize: 14, marginBottom: 12 }}>{error}</p>}
+              <button type="submit" disabled={loading} style={{ ...btnPrimary, width: '100%', justifyContent: 'center', padding: '14px 24px' }}>{loading ? 'Signing in...' : 'Sign In'}</button>
             </form>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
 
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-16 overflow-hidden">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[#9333EA]/20 blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[#EC4899]/15 blur-[100px] pointer-events-none" />
-        <motion.div className="relative z-10 text-center max-w-4xl mx-auto">
-          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
-            className="text-5xl md:text-7xl font-black text-white leading-[1.05] tracking-tight mb-6">
-            Stop Guessing.<br />
-            <span className="bg-gradient-to-r from-[#9333EA] to-[#EC4899] bg-clip-text text-transparent">Start Formulating.</span>
-          </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-4 leading-relaxed">
+      {/* Hero */}
+      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 24px 0' }}>
+        <div style={{ position: 'absolute', top: '25%', left: '50%', transform: 'translateX(-50%)', width: 600, height: 600, borderRadius: '50%', background: 'rgba(147,51,234,0.15)', filter: 'blur(120px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: '35%', left: '50%', transform: 'translateX(-50%)', width: 400, height: 400, borderRadius: '50%', background: 'rgba(236,72,153,0.1)', filter: 'blur(100px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: 800 }}>
+          <h1 style={{ fontSize: 'clamp(36px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: 24 }}>
+            Stop Guessing.<br /><span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Start Formulating.</span>
+          </h1>
+          <p style={{ fontSize: 'clamp(16px, 2vw, 20px)', color: 'rgba(255,255,255,0.5)', maxWidth: 600, margin: '0 auto 20px', lineHeight: 1.6 }}>
             AI-powered hair color formulation that analyzes your client's hair and delivers a precise formula — shades, developer, ratios, and processing time — in seconds.
-          </motion.p>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-            className="inline-flex items-center gap-2 border border-[#9333EA]/30 bg-[#9333EA]/10 text-[#9333EA] text-xs font-semibold px-4 py-1.5 rounded-full mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+          </p>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(147,51,234,0.3)', background: 'rgba(147,51,234,0.1)', color: '#A855F7', fontSize: 13, fontWeight: 600, padding: '6px 16px', borderRadius: 999, marginBottom: 32 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80' }} />
             1,000+ professional shades · 10 color lines · 90%+ formulation accuracy
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button onClick={() => setShowLogin(true)}
-              className="w-full sm:w-auto bg-gradient-to-r from-[#9333EA] to-[#EC4899] text-white font-bold text-base px-8 py-4 rounded-full hover:opacity-90 shadow-lg shadow-[#9333EA]/25">
-              Join the Beta
-            </button>
-            <a href="#how-it-works"
-              className="w-full sm:w-auto border border-white/20 text-white/80 font-semibold text-base px-8 py-4 rounded-full hover:bg-white/5 text-center">
-              See How It Works
-            </a>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      <section id="how-it-works" className="py-32 px-6">
-        <div className="max-w-6xl mx-auto text-center mb-20">
-          <p className="text-[#9333EA] font-semibold text-sm uppercase tracking-widest mb-4">Simple by Design</p>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-5">Three steps. Zero guesswork.</h2>
-          <p className="text-white/50 text-lg max-w-xl mx-auto">From photo to formula in under 30 seconds.</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {[
-            { n: "01", t: "Capture Your Client's Hair", d: "Take a photo. Our AI reads level, tone, condition — and flags safety concerns." },
-            { n: "02", t: "Choose the Target Shade", d: "Pick from your brand's catalog. ColorGenius calculates the exact formulation." },
-            { n: "03", t: "Get Your Formula", d: "Complete formula card with mixing ratios, developer, and processing time." },
-          ].map((s, i) => (
-            <div key={s.n} className="border border-white/10 bg-white/5 rounded-2xl p-8 hover:border-[#9333EA]/40 transition-colors">
-              <span className="text-6xl font-black text-white/5 select-none block mb-4">{s.n}</span>
-              <h3 className="text-xl font-bold text-white mb-3">{s.t}</h3>
-              <p className="text-white/50 leading-relaxed">{s.d}</p>
-            </div>
-          ))}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
+            <button onClick={() => setShowLogin(true)} style={{ ...btnPrimary, padding: '16px 32px', boxShadow: '0 0 40px rgba(147,51,234,0.2)' }}>Join the Beta <ArrowRight size={18} /></button>
+            <a href="#how-it-works" style={{ ...btnPrimary, background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', textDecoration: 'none' }}>See How It Works</a>
+          </div>
         </div>
       </section>
 
-      <section id="features" className="py-32 px-6 border-t border-white/5">
-        <div className="max-w-6xl mx-auto text-center mb-16">
-          <p className="text-[#9333EA] font-semibold text-sm uppercase tracking-widest mb-4">Built for Pros</p>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-5">Everything you need at the bowl</h2>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
-          {[
-            { t: "AI Photo Analysis", d: "Detects level, tone, porosity, condition. Flags metallic dye, henna, previous treatments.", i: "🧠" },
-            { t: "Precision Formulation", d: "Exact shade mix, developer volume, processing time based on 10+ variables.", i: "🎯" },
-            { t: "Result Scoring", d: "Before/after comparison scoring color accuracy, condition, and evenness.", i: "📊" },
-            { t: "Client History", d: "Every formula, photo, and result saved. Complete color history one tap away.", i: "🔒" },
-            { t: "Smart Questionnaire", d: "Treatment history, allergies, texture. AI uses every answer to refine results.", i: "📋" },
-            { t: "Multi-Line Support", d: "Redken, Wella, Schwarzkopf, Davines, L'Oréal. Each brand's ratios and systems.", i: "🏪" },
-          ].map((f) => (
-            <div key={f.t} className="border border-white/10 bg-white/5 rounded-2xl p-6 hover:border-[#9333EA]/30 transition-colors">
-              <span className="text-2xl mb-4 block">{f.i}</span>
-              <h3 className="text-base font-bold text-white mb-2">{f.t}</h3>
-              <p className="text-sm text-white/50 leading-relaxed">{f.d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section id="pricing" className="py-32 px-6 border-t border-white/5">
-        <div className="max-w-5xl mx-auto text-center mb-16">
-          <p className="text-[#9333EA] font-semibold text-sm uppercase tracking-widest mb-4">Free During Beta</p>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-5">$0 through August 2026</h2>
-        </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-5xl mx-auto">
-          {[
-            { n: "Professional", p: "$29/mo", f: ["Unlimited formulations", "8+ color lines", "AI learning"] },
-            { n: "Pro+", p: "$49/mo", f: ["All brands", "Advanced AI", "Priority support"] },
-            { n: "Salon", p: "$149/mo", f: ["5 seats", "Team analytics", "Client management"], h: true },
-            { n: "Salon+", p: "$299/mo", f: ["15 seats", "Inventory integration", "Custom reporting"] },
-          ].map((t) => (
-            <div key={t.n} className={`relative rounded-2xl p-6 border ${t.h ? 'border-[#9333EA]/50 bg-[#9333EA]/10' : 'border-white/10 bg-white/5'}`}>
-              {t.h && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#9333EA] to-[#EC4899] text-white text-[10px] font-bold px-3 py-1 rounded-full">Popular</div>}
-              <h3 className="text-base font-bold text-white">{t.n}</h3>
-              <p className="text-3xl font-black text-white mt-3">{t.p}</p>
-              <ul className="space-y-2 mt-4">
-                {t.f.map(f => <li key={f} className="text-xs text-white/60"><span className="text-[#9333EA]">✓</span> {f}</li>)}
-              </ul>
-              <p className="text-[10px] text-white/30 mt-4">After beta · Beta testers get permanent discount</p>
-            </div>
-          ))}
+      {/* How It Works */}
+      <section id="how-it-works" style={{ padding: '128px 24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 80 }}>
+            <p style={{ color: '#9333EA', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 16 }}>Simple by Design</p>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Three steps. Zero guesswork.</h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, maxWidth: 500, margin: '0 auto' }}>From photo to formula in under 30 seconds.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+            {[
+              { icon: <Camera size={28} />, title: 'Capture Your Client\'s Hair', desc: 'Take a photo or upload one. Our AI reads level, tone, and condition — and flags safety concerns like metallic dye or henna.', step: '01' },
+              { icon: <Palette size={28} />, title: 'Choose the Target Shade', desc: 'Pick the shade from your preferred brand\'s catalog. ColorGenius cross-references starting level, underlying pigment, and desired outcome.', step: '02' },
+              { icon: <CheckCircle size={28} />, title: 'Get Your Formula — and Score the Result', desc: 'Receive a complete formula card with mixing ratios, developer volume, and processing time. After the service, our AI scores the result.', step: '03' },
+            ].map((s, i) => (
+              <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 32 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                  <div style={{ width: 56, height: 56, borderRadius: 12, background: 'linear-gradient(135deg, rgba(147,51,234,0.15), rgba(236,72,153,0.15))', border: '1px solid rgba(147,51,234,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9333EA' }}>{s.icon}</div>
+                  <span style={{ fontSize: 48, fontWeight: 900, color: 'rgba(255,255,255,0.03)' }}>{s.step}</span>
+                </div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>{s.title}</h3>
+                <p style={{ color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section id="faq" className="py-32 px-6 border-t border-white/5">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="text-[#9333EA] font-semibold text-sm uppercase tracking-widest mb-4">Common Questions</p>
-          <h2 className="text-4xl md:text-5xl font-black text-white">FAQ</h2>
-        </div>
-        <div className="space-y-4 max-w-3xl mx-auto">
-          {[
-            { q: "Which color lines do you support?", a: "Redken, Wella, Schwarzkopf, Davines, and L'Oréal Professionnel at launch, with more added based on demand." },
-            { q: "Does it replace my color training?", a: "No. ColorGenius handles the calculation so you can focus on the art. Think of it as a calculator for colorists." },
-            { q: "Is client data secure?", a: "Yes. All photos and client data are encrypted and never shared." },
-            { q: "How much does beta cost?", a: "Completely free. Beta testers get a lifetime discount on future paid plans." },
-          ].map((f) => (
-            <div key={f.q} className="border border-white/10 bg-white/5 rounded-2xl p-6">
-              <h3 className="text-sm font-bold text-white mb-2">{f.q}</h3>
-              <p className="text-sm text-white/50">{f.a}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-32 px-6 border-t border-white/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">Your next great formulation starts here.</h2>
-          <p className="text-white/50 text-lg mb-10">Join 50 founding stylists. Free during beta. No credit card required.</p>
-          <button onClick={() => setShowLogin(true)}
-            className="bg-gradient-to-r from-[#9333EA] to-[#EC4899] text-white font-bold text-base px-10 py-4 rounded-full hover:opacity-90 shadow-lg shadow-[#9333EA]/25">
-            Join the Beta
-          </button>
+      {/* Color Management Tools */}
+      <section id="tools" style={{ padding: '128px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 80 }}>
+            <p style={{ color: '#9333EA', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 16 }}>Color Management Suite</p>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Everything you need at the bowl</h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, maxWidth: 600, margin: '0 auto' }}>Formulation is just the start. ColorGenius is a complete color management platform for professional salons.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+            {[
+              { icon: <History size={22} />, title: 'Formula History & Timeline', desc: 'Every formula saved to client profile. Track what worked, revisit past colors, and rebook with one tap. Complete service timeline per client.' },
+              { icon: <DollarSign size={22} />, title: 'Cost Calculator & Pricing', desc: 'Real-time cost per service based on product usage. Set pricing rules, track margins, and ensure every service is profitable.' },
+              { icon: <Scale size={22} />, title: 'Bluetooth Scale Integration', desc: 'Acaia precision scales (0.1g accuracy) for exact gram measurements. Auto-capture weight at the bowl for accurate cost tracking.' },
+              { icon: <Package size={22} />, title: 'Inventory Management', desc: 'Track color stock levels, set reorder alerts, and auto-deduct usage per service. Never run out of a shade mid-appointment.' },
+              { icon: <BarChart3 size={22} />, title: 'Salon Analytics', desc: 'Color service revenue, most popular shades, product usage trends, and stylist performance — all in one dashboard.' },
+              { icon: <Shield size={22} />, title: 'Client Safety Flags', desc: 'Automatic alerts for metallic dye, henna, previous chemical treatments, and allergies. Safety checks before every formulation.' },
+            ].map((f, i) => (
+              <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 24, display: 'flex', gap: 16 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(147,51,234,0.08)', border: '1px solid rgba(147,51,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9333EA', flexShrink: 0 }}>{f.icon}</div>
+                <div>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{f.title}</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, lineHeight: 1.5 }}>{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <footer className="border-t border-white/5 py-10 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <span className="text-white/40 text-sm">ColorGenius · AI Hair Color Formulation for Professionals</span>
-          <p className="text-white/25 text-xs">© 2026 ColorGenius Inc.</p>
+      {/* AI Features */}
+      <section id="features" style={{ padding: '128px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 80 }}>
+            <p style={{ color: '#9333EA', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 16 }}>AI-Powered</p>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>The science behind the color</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+            {[
+              { icon: <Sparkles size={22} />, title: 'AI Photo Analysis', desc: 'See what the eye sometimes misses. Our AI detects hair level, tone, porosity, and condition from a single photo. Flags safety concerns before they become problems.' },
+              { icon: <Palette size={22} />, title: 'Precision Formulation', desc: 'The right formula, every time. Calculates exact shade mix, developer volume, and processing time based on 10+ variables — including your client\'s unique hair history.' },
+              { icon: <BarChart3 size={22} />, title: 'Result Scoring & Learning', desc: 'Every formulation makes the next one better. Our AI compares before and after photos, scoring color accuracy, condition, and evenness.' },
+              { icon: <ClipboardList size={22} />, title: 'Smart Questionnaire', desc: 'Covers treatment history, allergies, texture, and desired outcomes. The AI uses every answer to refine its recommendation and flag potential reactions.' },
+            ].map((f, i) => (
+              <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 24, display: 'flex', gap: 16 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg, rgba(147,51,234,0.12), rgba(236,72,153,0.12))', border: '1px solid rgba(147,51,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EC4899', flexShrink: 0 }}>{f.icon}</div>
+                <div>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{f.title}</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, lineHeight: 1.5 }}>{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" style={{ padding: '128px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <p style={{ color: '#9333EA', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 16 }}>Free During Beta</p>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>$0 through August 2026</h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18 }}>We're building this with stylists, for stylists. Beta is free because your feedback makes the product better.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+            {[
+              { name: 'Professional', price: '$29', period: '/mo', desc: 'Individual stylists', features: ['Unlimited formulations', '8+ color lines', 'AI learning system', 'Client history'], highlight: false },
+              { name: 'Pro+', price: '$49', period: '/mo', desc: 'Power users', features: ['All brands', 'Advanced AI', 'Priority support', 'Scale integration'], highlight: false },
+              { name: 'Salon', price: '$149', period: '/mo', desc: 'Teams of 5', features: ['5 seats', 'Team analytics', 'Inventory tracking', 'Client management'], highlight: true },
+              { name: 'Salon+', price: '$299', period: '/mo', desc: 'Larger teams', features: ['15 seats', 'Full inventory', 'Custom reporting', 'API access'], highlight: false },
+            ].map((t, i) => (
+              <div key={i} style={{ position: 'relative', border: t.highlight ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.08)', background: t.highlight ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 24 }}>
+                {t.highlight && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', fontSize: 10, fontWeight: 700, padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase' }}>Popular</div>}
+                <h3 style={{ fontSize: 15, fontWeight: 700 }}>{t.name}</h3>
+                <p style={{ fontSize: 32, fontWeight: 900, marginTop: 12 }}>{t.price}<span style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)' }}>{t.period}</span></p>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>{t.desc}</p>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {t.features.map((f, j) => <li key={j} style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 6 }}><span style={{ color: '#9333EA', marginRight: 6 }}>✓</span>{f}</li>)}
+                </ul>
+                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', marginTop: 12 }}>After beta · Beta testers get permanent discount</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ padding: '128px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ width: 64, height: 64, borderRadius: 16, background: 'linear-gradient(135deg, #9333EA, #EC4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}><span style={{ color: 'white', fontWeight: 900, fontSize: 20 }}>CG</span></div>
+          <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Your next great formulation starts here.</h2>
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, marginBottom: 40 }}>Join 50 founding stylists shaping the future of professional hair color. Free during beta. No credit card required.</p>
+          <button onClick={() => setShowLogin(true)} style={{ ...btnPrimary, padding: '16px 40px', boxShadow: '0 0 40px rgba(147,51,234,0.2)' }}>Join the Beta <ArrowRight size={18} /></button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '40px 24px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>ColorGenius · AI Hair Color Formulation for Professionals</span>
+          <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>© 2026 ColorGenius Inc.</p>
         </div>
       </footer>
     </main>
