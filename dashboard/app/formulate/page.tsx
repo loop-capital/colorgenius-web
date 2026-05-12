@@ -9,6 +9,7 @@ import { HairSwatch } from '@/components/ui/hair-swatch'
 import { ColorCircle } from '@/components/ui/color-circle'
 import { ConfidenceBadge } from '@/components/ui/confidence-badge'
 import { GlassCard, StepTransition, ColorWheel3D, TreatmentCard, ConfidenceBreakdown } from '@/components/custom'
+import { ScaleWidget } from '@/components/scale-widget'
 import { HAIR_LEVELS } from '@/lib/products'
 import type { ToneFamily } from '@/lib/products'
 import {
@@ -707,6 +708,14 @@ function FormulatePageContent() {
                   ]}
                 />
               </GlassCard>
+
+              {/* Scale Integration */}
+              <ScaleWidget
+                onWeightCapture={(grams) => {
+                  // Could auto-fill the grams in formula steps
+                  console.log('Captured weight:', grams)
+                }}
+              />
 
               {/* Action buttons */}
               <div className="flex gap-3 pt-2">
