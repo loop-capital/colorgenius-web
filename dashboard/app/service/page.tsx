@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { CostCalculator } from '@/components/custom/cost-calculator';
 import { deductFormulaFromInventory } from '@/components/custom/inventory-dashboard';
+import { ScaleWidget } from '@/components/scale-widget';
 
 const STEPS = [
   { id: 0, title: 'Client', icon: User },
@@ -320,6 +321,13 @@ function ServiceEntryContent() {
                 <span className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>ml</span>
               </div>
 
+              {/* Scale for weighing */}
+              <ScaleWidget
+                onWeightCapture={(grams) => {
+                  setShadeGrams(Math.round(grams));
+                }}
+              />
+
               {/* Continue */}
               <button onClick={() => setStep(3)} disabled={formulaSteps.length === 0}
                 className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-30"
@@ -354,6 +362,9 @@ function ServiceEntryContent() {
 
               {/* Cost */}
               <CostCalculator steps={formulaSteps} developerMl={developerMl} brand={brand} />
+
+              {/* Scale — compact for review */}
+              <ScaleWidget compact onWeightCapture={(grams) => {}} />
 
               {/* Rating & Notes */}
               <div className="rounded-2xl p-4 space-y-3" style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}>

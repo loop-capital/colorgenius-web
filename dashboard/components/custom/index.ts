@@ -11,3 +11,6 @@ export {
   type FormulaHistoryItem,
   type FormulaHistoryTimelineProps,
 } from './formula-history-timeline'
+export { InventoryDashboard, getInventory, saveInventory, deductFromInventory, deductFormulaFromInventory } from './inventory-dashboard'
+export { AddInventoryItem } from './add-inventory-item'
+export { CostCalculator } from './cost-calculator'
