@@ -136,7 +136,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-2 border border-[#9333EA]/30 bg-[#9333EA]/10 text-[#9333EA] text-xs font-semibold px-4 py-1.5 rounded-full mb-8"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            50 founding beta stylists · 5 major color lines · 90%+ formulation accuracy
+            1,000+ professional shades · 10 color lines · 90%+ formulation accuracy
           </motion.div>
 
           <motion.div
