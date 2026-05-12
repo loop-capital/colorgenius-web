@@ -412,16 +412,21 @@ function FormulatePageContent() {
                         setFormData(p => ({ ...p, currentTone: revMap[val as ToneFamily] || 'N' }))
                       }}
                     />
-                    {/* Fallback tone circles */}
+                    {/* Tone circles — all 12 */}
                     <div className="flex flex-wrap gap-3">
                       {[
                         { value: 'N', label: 'Natural', color: '#9C8B7A' },
                         { value: 'A', label: 'Ash', color: '#8A7D6E' },
                         { value: 'G', label: 'Gold', color: '#C4A35A' },
+                        { value: 'K', label: 'Copper', color: '#B87333' },
                         { value: 'R', label: 'Red', color: '#A03030' },
                         { value: 'V', label: 'Violet', color: '#7B68A6' },
-                        { value: 'K', label: 'Copper', color: '#B87333' },
+                        { value: 'P', label: 'Pearl', color: '#B8B0C4' },
                         { value: 'B', label: 'Beige', color: '#C4B5A0' },
+                        { value: 'M', label: 'Mahogany', color: '#6B3A3A' },
+                        { value: 'Ch', label: 'Chocolate', color: '#4A2C2A' },
+                        { value: 'W', label: 'Warm', color: '#D4A574' },
+                        { value: 'C', label: 'Cool', color: '#7D8B9A' },
                       ].map((tone) => (
                         <ColorCircle
                           key={tone.value}
@@ -504,6 +509,11 @@ function FormulatePageContent() {
                   <input type="range" min={0} max={100} value={formData.condition.grayPercent}
                     onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, grayPercent: Number(e.target.value) } }))}
                     className="w-full" />
+                  <div className="flex justify-between text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>
+                    <span>No gray</span>
+                    <span>Partial</span>
+                    <span>Full coverage needed</span>
+                  </div>
                 </div>
 
                 {/* Highlights */}
