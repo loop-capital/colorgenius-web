@@ -19,6 +19,9 @@ import {
   Edit3,
   ExternalLink,
   ImageIcon,
+  Zap,
+  TrendingUp,
+  DollarSign,
 } from 'lucide-react'
 
 interface Client {
@@ -160,6 +163,13 @@ export default function ClientDetailPage() {
             onClick={() => router.push(`/formulate?clientId=${clientId}`)}
           >
             <FlaskConical className="mr-2 h-4 w-4" /> Quick Formulate
+          </Button>
+          <Button
+            
+            onClick={() => router.push(`/service?clientId=${clientId}`)}
+            className="!bg-gradient-to-r from-purple-600 to-pink-600 !text-white"
+          >
+            <Zap className="mr-2 h-4 w-4" /> New Service
           </Button>
         </div>
       </div>
@@ -383,6 +393,64 @@ export default function ClientDetailPage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Formula Insights — Vish Analytics */}
+          {formulas.length > 0 && (
+            <Card className="card-glass mt-4">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-[var(--cg-accent)]" />
+                  Formula Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="rounded-xl p-3" style={{ background: 'rgba(147, 51, 234, 0.08)' }}>
+                    <p className="text-[10px] uppercase tracking-wider font-medium text-white/50">Avg Cost/Service</p>
+                    <p className="text-lg font-mono font-bold text-[var(--cg-accent)]">
+                      ${(formulas.reduce((s, f) => {
+                        const steps = f.formulation.steps || [];
+                        const cost = steps.reduce((c, step) => c + ((step.grams || 0) * 0.40), 0);
+                        return s + cost;
+                      }, 0) / formulas.length).toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="rounded-xl p-3" style={{ background: 'rgba(236, 72, 153, 0.08)' }}>
+                    <p className="text-[10px] uppercase tracking-wider font-medium text-white/50">Most Used Brand</p>
+                    <p className="text-lg font-bold text-[var(--cg-accent2)]">
+                      {(() => {
+                        const brands = formulas.map(f => f.formulation.brand).filter(Boolean);
+                        const counts = brands.reduce((acc, b) => { acc[b] = (acc[b] || 0) + 1; return acc; }, {} as Record<string, number>);
+                        return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+                      })()}
+                    </p>
+                  </div>
+                  <div className="rounded-xl p-3" style={{ background: 'rgba(16, 185, 129, 0.08)' }}>
+                    <p className="text-[10px] uppercase tracking-wider font-medium text-white/50">Total Services</p>
+                    <p className="text-lg font-bold text-[#10B981]">{formulas.length}</p>
+                  </div>
+                  <div className="rounded-xl p-3" style={{ background: 'rgba(245, 158, 11, 0.08)' }}>
+                    <p className="text-[10px] uppercase tracking-wider font-medium text-white/50">Preferred Service</p>
+                    <p className="text-sm font-bold text-[#F59E0B]">
+                      {(() => {
+                        const apps = formulas.map(f => f.formulation.application).filter(Boolean);
+                        const counts = apps.reduce((acc, a) => { acc[a] = (acc[a] || 0) + 1; return acc; }, {} as Record<string, number>);
+                        const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+                        return top.replace(/_/g, ' ');
+                      })()}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center gap-2 p-2 rounded-lg" style={{ background: 'rgba(147, 51, 234, 0.06)' }}>
+                  <DollarSign className="w-3.5 h-3.5 text-[var(--cg-accent)] flex-shrink-0" />
+                  <p className="text-[10px]" style={{ color: 'var(--cg-text-secondary)' }}>
+                    Estimated lifetime value: <span className="font-mono font-bold text-white">${(formulas.length * 35).toFixed(0)}</span>
+                    <span className="text-white/30 ml-2">(avg $35/service × {formulas.length} visits)</span>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
