@@ -72,7 +72,7 @@ export function CostCalculator({
   return (
     <Card
       className={cn(
-        'bg-[#1A1A1A] border-[#2A2A2A] hover:border-[#14B8A6]/30 transition-all duration-300',
+        'bg-[#1A1A1A] border-[#2A2A2A] hover:border-[#9333EA]/30 transition-all duration-300',
         className
       )}
     >
@@ -82,7 +82,7 @@ export function CostCalculator({
             Cost Calculator
           </h2>
           <div className="flex items-center gap-2 text-sm">
-            <Calculator className="w-4 h-4 text-[#14B8A6]" />
+            <Calculator className="w-4 h-4 text-[#9333EA]" />
             <span className="text-[#A3A3A3]">Estimate costs & pricing</span>
           </div>
         </div>
@@ -176,11 +176,11 @@ export function CostCalculator({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-[#A3A3A3]">Calculated Service Price:</span>
-                    <span className="text-[#14B8A6] font-bold text-lg">${servicePrice.toFixed(2)}</span>
+                    <span className="text-[#9333EA] font-bold text-lg">${servicePrice.toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-[#A3A3A3]">Margin:</span>
-                    <span className={margin >= 0 ? 'text-[#14B8A6] font-bold' : 'text-red-400 font-bold'}>
+                    <span className={margin >= 0 ? 'text-[#9333EA] font-bold' : 'text-red-400 font-bold'}>
                       ${margin.toFixed(2)} ({marginPercentage.toFixed(1)}%)
                     </span>
                   </div>
@@ -207,19 +207,19 @@ export function CostCalculator({
             </div>
             <div>
               <p className="text-[#A3A3A3]">Service Price:</p>
-              <p className={servicePrice > 0 ? 'text-[#14B8A6] font-bold' : 'text-[#A3A3A3]'}>
+              <p className={servicePrice > 0 ? 'text-[#9333EA] font-bold' : 'text-[#A3A3A3]'}>
                 ${servicePrice.toFixed(2)}
               </p>
             </div>
             <div>
               <p className="text-[#A3A3A3]">Margin:</p>
-              <p className={margin >= 0 ? 'text-[#14B8A6] font-bold' : 'text-red-400 font-bold'}>
+              <p className={margin >= 0 ? 'text-[#9333EA] font-bold' : 'text-red-400 font-bold'}>
                 ${margin.toFixed(2)} ({marginPercentage.toFixed(1)}%)
               </p>
             </div>
             <div>
               <p className="text-[#A3A3A3]">ROI:</p>
-              <p className={margin >= 0 ? 'text-[#14B8A6] font-bold' : 'text-red-400 font-bold'}>
+              <p className={margin >= 0 ? 'text-[#9333EA] font-bold' : 'text-red-400 font-bold'}>
                 {marginPercentage.toFixed(0)}%
               </p>
             </div>

@@ -42,8 +42,8 @@ export function HairSwatch({
           sizeMap[size],
           'border-2 transition-all duration-200 shadow-sm',
           isActive
-            ? 'border-[#14B8A6] shadow-[0_0_0_3px_rgba(20,184,166,0.2)] scale-105'
-            : 'border-white/[0.08] hover:border-[#14B8A6]/40 hover:scale-105'
+            ? 'border-[#9333EA] shadow-[0_0_0_3px_rgba(20,184,166,0.2)] scale-105'
+            : 'border-white/[0.08] hover:border-[#9333EA]/40 hover:scale-105'
         )}
         style={{ backgroundColor: color }}
       >
@@ -67,7 +67,7 @@ export function HairSwatch({
             <span
               className={cn(
                 'text-xs font-medium block',
-                isActive ? 'text-[#14B8A6]' : 'text-[#A3A3A3] group-hover:text-[#F5F5F5]'
+                isActive ? 'text-[#9333EA]' : 'text-[#A3A3A3] group-hover:text-[#F5F5F5]'
               )}
             >
               {label}

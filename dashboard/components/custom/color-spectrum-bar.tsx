@@ -114,7 +114,7 @@ export function ColorSpectrumBar({ dominant, secondary, className }: ColorSpectr
           </div>
           <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[#14B8A6] to-[#2DD4BF]"
+              className="h-full rounded-full bg-gradient-to-r from-[#9333EA] to-[#EC4899]"
               initial={{ width: 0 }}
               animate={{ width: `${dominant.saturation}%` }}
               transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}

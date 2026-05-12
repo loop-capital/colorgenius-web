@@ -61,7 +61,7 @@ export default function GalleryPage() {
               key={tab.id}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all shrink-0 ${
                 activeTab === tab.id
-                  ? 'bg-[#14B8A6]/15 text-[#14B8A6] border border-[#14B8A6]/20'
+                  ? 'bg-[#9333EA]/15 text-[#9333EA] border border-[#9333EA]/20'
                   : 'bg-white/[0.03] text-[#71717A] border border-white/[0.04] hover:bg-white/[0.06] hover:text-[#A1A1AA]'
               }`}
               onClick={() => setActiveTab(tab.id)}
@@ -83,7 +83,7 @@ export default function GalleryPage() {
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-[#14B8A6]/15 flex items-center justify-center text-[#14B8A6] text-xs font-bold">
+                      <div className="w-8 h-8 rounded-lg bg-[#9333EA]/15 flex items-center justify-center text-[#9333EA] text-xs font-bold">
                         {post.stylist.name.charAt(0)}
                       </div>
                       <div>
@@ -103,7 +103,7 @@ export default function GalleryPage() {
                     <button className="flex items-center gap-1.5 text-[11px] text-[#71717A] hover:text-[#F59E0B] transition-colors">
                       <Bookmark className="w-3.5 h-3.5" />{post.saves}
                     </button>
-                    <button className="ml-auto text-[11px] text-[#14B8A6] hover:text-[#2DD4BF] font-medium flex items-center gap-1 transition-colors">
+                    <button className="ml-auto text-[11px] text-[#9333EA] hover:text-[#EC4899] font-medium flex items-center gap-1 transition-colors">
                       View <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>

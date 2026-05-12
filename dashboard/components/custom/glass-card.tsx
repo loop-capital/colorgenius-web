@@ -31,7 +31,7 @@ interface StatCardProps {
   accent?: string
 }
 
-export function StatCard({ label, value, change, icon, accent = '#14B8A6' }: StatCardProps) {
+export function StatCard({ label, value, change, icon, accent = '#9333EA' }: StatCardProps) {
   return (
     <GlassCard className="p-4">
       <div className="flex items-start justify-between mb-3">

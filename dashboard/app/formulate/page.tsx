@@ -19,9 +19,10 @@ import {
 import { cn } from '@/lib/utils'
 
 const STEPS = [
-  { id: 1, title: 'Hair Assessment', description: 'Current color, tone & condition' },
+  { id: 1, title: 'Hair Assessment', description: 'Current color level & tone' },
   { id: 2, title: 'Target Look', description: 'Desired color result' },
-  { id: 3, title: 'Results', description: 'Your custom formula' },
+  { id: 3, title: 'Condition', description: 'Hair health & history' },
+  { id: 4, title: 'Results', description: 'Your custom formula' },
 ]
 
 const TONE_OPTIONS: { value: ToneFamily; label: string; color: string }[] = [
@@ -40,7 +41,7 @@ const TONE_OPTIONS: { value: ToneFamily; label: string; color: string }[] = [
 ]
 
 const POROSITY_OPTIONS = [
-  { value: 'low', label: 'Low — Smooth, cuticle intact', color: '#14B8A6' },
+  { value: 'low', label: 'Low — Smooth, cuticle intact', color: '#9333EA' },
   { value: 'normal', label: 'Normal — Balanced', color: '#F59E0B' },
   { value: 'high', label: 'High — Porous, damaged', color: '#EF4444' },
 ]
@@ -68,13 +69,13 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                   className={cn(
                     'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300',
                     isActive && 'shadow-lg',
-                    isCompleted && 'border border-[#14B8A6]/40',
+                    isCompleted && 'border border-[#9333EA]/40',
                     !isActive && !isCompleted && 'border border-white/[0.08]'
                   )}
                   style={{
-                    backgroundColor: isActive ? '#14B8A6' : isCompleted ? 'rgba(20,184,166,0.15)' : 'rgba(255,255,255,0.03)',
-                    color: isActive ? '#0A0A0A' : isCompleted ? '#14B8A6' : 'var(--cg-text-tertiary)',
-                    boxShadow: isActive ? '0 0 20px rgba(20,184,166,0.3)' : undefined,
+                    backgroundColor: isActive ? '#9333EA' : isCompleted ? 'rgba(147,51,234,0.15)' : 'rgba(255,255,255,0.03)',
+                    color: isActive ? '#0A0A0A' : isCompleted ? '#9333EA' : 'var(--cg-text-tertiary)',
+                    boxShadow: isActive ? '0 0 20px rgba(147,51,234,0.3)' : undefined,
                   }}
                   animate={isActive ? { scale: [1, 1.05, 1] } : {}}
                   transition={{ duration: 0.5 }}
@@ -92,7 +93,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
                 <motion.div
                   className={cn('h-[2px] flex-1 mx-3 rounded-full')}
                   style={{
-                    backgroundColor: isCompleted ? 'rgba(20,184,166,0.4)' : 'rgba(255,255,255,0.06)',
+                    backgroundColor: isCompleted ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
                   }}
                   initial={false}
                   animate={isCompleted ? { scaleX: 1 } : { scaleX: 1 }}
@@ -214,7 +215,7 @@ function FormulatePageContent() {
       const data = await response.json()
       setResult(data.data)
       setDirection('forward')
-      setStep(3)
+      setStep(4)
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Formulation failed')
     } finally {
@@ -266,7 +267,7 @@ function FormulatePageContent() {
           <StepTransition stepKey="step1" direction={direction}>
             <GlassCard className="p-6 md:p-8">
               <SectionHeader
-                icon={<Sparkles className="w-5 h-5 text-[#14B8A6]" />}
+                icon={<Sparkles className="w-5 h-5 text-[#9333EA]" />}
                 title="Current Hair Color"
               />
 
@@ -351,115 +352,6 @@ function FormulatePageContent() {
                     </p>
                   </div>
                 </motion.div>
-
-                {/* Hair Type */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Hair Type</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {CONDITION_OPTIONS.map(opt => (
-                      <motion.button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, type: opt.value } }))}
-                        className={cn('p-4 rounded-xl border text-left transition-all duration-200')}
-                        style={{
-                          backgroundColor: formData.condition.type === opt.value ? 'rgba(20,184,166,0.05)' : 'var(--cg-surface)',
-                          borderColor: formData.condition.type === opt.value ? 'rgba(20,184,166,0.3)' : 'rgba(255,255,255,0.06)',
-                        }}
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <p className={cn('text-sm font-medium', formData.condition.type === opt.value ? 'text-[#14B8A6]' : 'text-[#F5F5F7]')}>
-                          {opt.label}
-                        </p>
-                        <p className="text-xs mt-1" style={{ color: 'var(--cg-text-tertiary)' }}>{opt.desc}</p>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Porosity */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Porosity</Label>
-                  <div className="flex gap-3">
-                    {POROSITY_OPTIONS.map(opt => (
-                      <motion.button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, porosity: opt.value } }))}
-                        className={cn('flex-1 p-4 rounded-xl border text-center transition-all duration-200')}
-                        style={{
-                          backgroundColor: formData.condition.porosity === opt.value ? 'rgba(20,184,166,0.05)' : 'var(--cg-surface)',
-                          borderColor: formData.condition.porosity === opt.value ? 'rgba(20,184,166,0.3)' : 'rgba(255,255,255,0.06)',
-                        }}
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <div className="w-4 h-4 rounded-full mx-auto mb-2" style={{ backgroundColor: opt.color }} />
-                        <p className={cn('text-sm font-medium', formData.condition.porosity === opt.value ? 'text-[#F5F5F7]' : 'text-[#A1A1AA]')}>
-                          {opt.label.split('—')[0]}
-                        </p>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Gray Coverage */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Gray Coverage</Label>
-                    <span className="text-sm font-bold" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.grayPercent}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={formData.condition.grayPercent}
-                    onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, grayPercent: Number(e.target.value) } }))}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>
-                    <span>No gray</span>
-                    <span>Partial</span>
-                    <span>Full coverage needed</span>
-                  </div>
-                </div>
-
-                {/* Highlights */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      id="highlights"
-                      checked={formData.condition.highlights}
-                      onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlights: e.target.checked } }))}
-                      className="w-4 h-4 rounded border-[rgba(255,255,255,0.12)] bg-[var(--cg-surface)] accent-[#14B8A6]"
-                    />
-                    <Label htmlFor="highlights" className="text-sm font-medium cursor-pointer" style={{ color: 'var(--cg-text-primary)' }}>
-                      Highlights Present
-                    </Label>
-                  </div>
-                  {formData.condition.highlights && (
-                    <motion.div
-                      className="pl-7 space-y-2"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs" style={{ color: 'var(--cg-text-secondary)' }}>Highlighted Area</Label>
-                        <span className="text-xs font-bold" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.highlightedPercent}%</span>
-                      </div>
-                      <input
-                        type="range"
-                        min={0}
-                        max={100}
-                        value={formData.condition.highlightedPercent}
-                        onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlightedPercent: Number(e.target.value) } }))}
-                        className="w-full"
-                      />
-                    </motion.div>
-                  )}
-                </div>
 
                 <div className="flex justify-end">
                   <ActionButton onClick={() => goToStep(2)}>
@@ -567,8 +459,8 @@ function FormulatePageContent() {
                     <div
                       className={cn('px-2 py-1 rounded-full text-[10px] font-bold')}
                       style={{
-                        backgroundColor: levelDiff > 0 ? 'rgba(245,158,11,0.1)' : levelDiff < 0 ? 'rgba(20,184,166,0.1)' : 'rgba(255,255,255,0.06)',
-                        color: levelDiff > 0 ? '#F59E0B' : levelDiff < 0 ? '#14B8A6' : 'var(--cg-text-tertiary)',
+                        backgroundColor: levelDiff > 0 ? 'rgba(245,158,11,0.1)' : levelDiff < 0 ? 'rgba(147,51,234,0.1)' : 'rgba(255,255,255,0.06)',
+                        color: levelDiff > 0 ? '#F59E0B' : levelDiff < 0 ? '#9333EA' : 'var(--cg-text-tertiary)',
                       }}
                     >
                       {levelDiff > 0 ? `+${levelDiff} levels` : levelDiff < 0 ? `${levelDiff} levels` : 'Same level'}
@@ -578,7 +470,7 @@ function FormulatePageContent() {
                   <div className="text-center">
                     <div
                       className="w-12 h-12 rounded-lg border-2 mx-auto mb-1"
-                      style={{ backgroundColor: HAIR_LEVELS[formData.targetLevel]?.hex, borderColor: 'rgba(20,184,166,0.4)' }}
+                      style={{ backgroundColor: HAIR_LEVELS[formData.targetLevel]?.hex, borderColor: 'rgba(147,51,234,0.4)' }}
                     />
                     <p className="text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>To</p>
                     <p className="text-xs font-medium" style={{ color: 'var(--cg-teal)' }}>Level {formData.targetLevel}</p>
@@ -590,7 +482,7 @@ function FormulatePageContent() {
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back
                   </ActionButton>
                   <ActionButton onClick={() => goToStep(3)}>
-                    Next: Generate Formula <ChevronRight className="w-4 h-4 ml-1" />
+                    Next: Condition <ChevronRight className="w-4 h-4 ml-1" />
                   </ActionButton>
                 </div>
               </div>
@@ -598,17 +490,126 @@ function FormulatePageContent() {
           </StepTransition>
         )}
 
-        {/* Step 3: Formula & Results */}
+        {/* Step 3: Condition */}
         {step === 3 && (
           <StepTransition stepKey="step3" direction={direction}>
             <GlassCard className="p-6 md:p-8">
               <SectionHeader
-                icon={<FlaskConical className="w-5 h-5 text-[#14B8A6]" />}
-                title="Review & Generate Formula"
+                icon={<Droplets className="w-5 h-5 text-[#9333EA]" />}
+                title="Hair Condition"
               />
 
-              <div className="space-y-6">
-                {/* Summary preview */}
+              <div className="space-y-8">
+                {/* Hair Type */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Hair Type</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {CONDITION_OPTIONS.map(opt => (
+                      <motion.button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, type: opt.value } }))}
+                        className={cn('p-4 rounded-xl border text-left transition-all duration-200')}
+                        style={{
+                          backgroundColor: formData.condition.type === opt.value ? 'rgba(147,51,234,0.08)' : 'var(--cg-surface)',
+                          borderColor: formData.condition.type === opt.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                        }}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <p className={cn('text-sm font-medium', formData.condition.type === opt.value ? 'text-[#9333EA]' : 'text-[#F5F5F7]')}>
+                          {opt.label}
+                        </p>
+                        <p className="text-xs mt-1" style={{ color: 'var(--cg-text-tertiary)' }}>{opt.desc}</p>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Porosity */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Porosity</Label>
+                  <div className="flex gap-3">
+                    {POROSITY_OPTIONS.map(opt => (
+                      <motion.button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, porosity: opt.value } }))}
+                        className={cn('flex-1 p-4 rounded-xl border text-center transition-all duration-200')}
+                        style={{
+                          backgroundColor: formData.condition.porosity === opt.value ? 'rgba(147,51,234,0.08)' : 'var(--cg-surface)',
+                          borderColor: formData.condition.porosity === opt.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                        }}
+                        whileHover={{ y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <div className="w-4 h-4 rounded-full mx-auto mb-2" style={{ backgroundColor: opt.color }} />
+                        <p className={cn('text-sm font-medium', formData.condition.porosity === opt.value ? 'text-[#F5F5F7]' : 'text-[#A1A1AA]')}>
+                          {opt.label.split('—')[0]}
+                        </p>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Gray Coverage */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Gray Coverage</Label>
+                    <span className="text-sm font-bold" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.grayPercent}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={formData.condition.grayPercent}
+                    onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, grayPercent: Number(e.target.value) } }))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>
+                    <span>No gray</span>
+                    <span>Partial</span>
+                    <span>Full coverage needed</span>
+                  </div>
+                </div>
+
+                {/* Highlights */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="highlights"
+                      checked={formData.condition.highlights}
+                      onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlights: e.target.checked } }))}
+                      className="w-4 h-4 rounded border-[rgba(255,255,255,0.12)] bg-[var(--cg-surface)] accent-[#9333EA]"
+                    />
+                    <Label htmlFor="highlights" className="text-sm font-medium cursor-pointer" style={{ color: 'var(--cg-text-primary)' }}>
+                      Highlights Present
+                    </Label>
+                  </div>
+                  {formData.condition.highlights && (
+                    <motion.div
+                      className="pl-7 space-y-2"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs" style={{ color: 'var(--cg-text-secondary)' }}>Highlighted Area</Label>
+                        <span className="text-xs font-bold" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.highlightedPercent}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={formData.condition.highlightedPercent}
+                        onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlightedPercent: Number(e.target.value) } }))}
+                        className="w-full"
+                      />
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* Summary before generating */}
                 <motion.div
                   className="p-4 rounded-xl"
                   style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}
@@ -659,8 +660,8 @@ function FormulatePageContent() {
           </StepTransition>
         )}
 
-        {/* Step 3: Results */}
-        {step === 3 && result && (
+        {/* Step 4: Results */}
+        {step === 4 && result && (
           <StepTransition stepKey="step4" direction={direction}>
             <div className="space-y-4">
               {/* Warnings if any */}
@@ -702,7 +703,7 @@ function FormulatePageContent() {
                 <ConfidenceBreakdown
                   overall={result.success ? 92 : 70}
                   scores={[
-                    { label: 'Warmth accuracy', value: result.success ? 95 : 70, color: '#14B8A6' },
+                    { label: 'Warmth accuracy', value: result.success ? 95 : 70, color: '#9333EA' },
                     { label: 'Coverage', value: result.coverage === 'full' ? 94 : 80, color: '#F59E0B' },
                     { label: 'Damage risk', value: result.developerVolume <= 20 ? 97 : 85, color: '#A78BFA' },
                     { label: 'Lift accuracy', value: result.success ? 91 : 65, color: '#10B981' },

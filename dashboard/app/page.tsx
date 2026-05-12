@@ -11,10 +11,10 @@ import {
 } from 'lucide-react'
 
 const stats = [
-  { label: 'Active Clients', value: '24', change: '+3', icon: <Users className="w-5 h-5" />, accent: '#14B8A6' },
+  { label: 'Active Clients', value: '24', change: '+3', icon: <Users className="w-5 h-5" />, accent: '#9333EA' },
   { label: 'Formulations Today', value: '8', change: '+2', icon: <FlaskConical className="w-5 h-5" />, accent: '#F59E0B' },
   { label: 'Avg. Confidence', value: '92%', change: '+1.5%', icon: <TrendingUp className="w-5 h-5" />, accent: '#10B981' },
-  { label: 'Avg. Processing', value: '32m', change: '-3m', icon: <Clock className="w-5 h-5" />, accent: '#14B8A6' },
+  { label: 'Avg. Processing', value: '32m', change: '-3m', icon: <Clock className="w-5 h-5" />, accent: '#9333EA' },
 ]
 
 const recentFormulations = [
@@ -39,7 +39,7 @@ const recentFormulations = [
 ]
 
 const quickActions = [
-  { title: 'New Formula', desc: 'Create a custom formulation', icon: FlaskConical, href: '/formulate', gradient: 'linear-gradient(135deg, #14B8A6 0%, #0D9488 50%, #115E59 100%)' },
+  { title: 'New Formula', desc: 'Create a custom formulation', icon: FlaskConical, href: '/formulate', gradient: 'linear-gradient(135deg, #9333EA 0%, #0D9488 50%, #115E59 100%)' },
   { title: 'Photo Analysis', desc: 'Analyze hair color from photo', icon: Camera, href: '/analyze', gradient: 'linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #92400E 100%)' },
   { title: 'Client Intake', desc: 'Guided consultation wizard', icon: Sparkles, href: '/questionnaire', gradient: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 50%, #4C1D95 100%)' },
 ]
@@ -47,8 +47,8 @@ const quickActions = [
 const systemStatus = [
   { label: 'AI Model', status: 'Online', icon: <Zap className="w-3.5 h-3.5" />, color: '#10B981' },
   { label: 'Photo Analysis', status: 'Ready', icon: <Camera className="w-3.5 h-3.5" />, color: '#10B981' },
-  { label: 'Product DB', status: 'Synced', icon: <Database className="w-3.5 h-3.5" />, color: '#14B8A6' },
-  { label: 'Brand Library', status: '9 brands', icon: <Shield className="w-3.5 h-3.5" />, color: '#14B8A6' },
+  { label: 'Product DB', status: 'Synced', icon: <Database className="w-3.5 h-3.5" />, color: '#9333EA' },
+  { label: 'Brand Library', status: '9 brands', icon: <Shield className="w-3.5 h-3.5" />, color: '#9333EA' },
 ]
 
 export default function DashboardPage() {
@@ -73,7 +73,7 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="mb-8">
           <h2 className="text-sm font-semibold text-[#F5F5F7] mb-3 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#14B8A6]" /> Quick Actions
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9333EA]" /> Quick Actions
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {quickActions.map((action, i) => (
@@ -107,7 +107,7 @@ export default function DashboardPage() {
             <h2 className="text-sm font-semibold text-[#F5F5F7] flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" /> Recent Formulations
             </h2>
-            <Link href="/history" className="text-[11px] text-[#14B8A6] hover:text-[#2DD4BF] flex items-center gap-1 transition-colors">
+            <Link href="/history" className="text-[11px] text-[#9333EA] hover:text-[#EC4899] flex items-center gap-1 transition-colors">
               View all <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
@@ -128,7 +128,7 @@ export default function DashboardPage() {
               <h3 className="text-sm font-semibold text-[#F5F5F7] mb-4">Today&apos;s Activity</h3>
               <div className="space-y-2">
                 {[
-                  { text: 'Color analysis for Jennifer', time: '2h ago', color: '#14B8A6' },
+                  { text: 'Color analysis for Jennifer', time: '2h ago', color: '#9333EA' },
                   { text: 'New formula saved for Maria', time: '4h ago', color: '#F59E0B' },
                   { text: 'Client consultation — Sarah', time: '6h ago', color: '#8B5CF6' },
                   { text: 'Root touch-up formula used', time: '8h ago', color: '#F59E0B' },
