@@ -21,10 +21,9 @@ import { cn } from '@/lib/utils'
 
 const STEPS = [
   { id: 1, title: 'Photo', description: 'Capture or upload hair photo' },
-  { id: 2, title: 'Hair Assessment', description: 'Current color level & tone' },
+  { id: 2, title: 'Hair Assessment', description: 'Current color, tone & condition' },
   { id: 3, title: 'Target Look', description: 'Desired color result' },
-  { id: 4, title: 'Condition', description: 'Hair health & history' },
-  { id: 5, title: 'Results', description: 'Your custom formula' },
+  { id: 4, title: 'Results', description: 'Your custom formula' },
 ]
 
 const TONE_OPTIONS: { value: ToneFamily; label: string; color: string }[] = [
@@ -219,7 +218,7 @@ function FormulatePageContent() {
       const data = await response.json()
       setResult(data.data)
       setDirection('forward')
-      setStep(5)
+      setStep(4)
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Formulation failed')
     } finally {
@@ -244,7 +243,7 @@ function FormulatePageContent() {
               Create <span className="gradient-text-teal">Formulation</span>
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--cg-text-secondary)' }}>
-              Build a professional color formula in 5 steps
+              Build a professional color formula in 4 steps
             </p>
           </div>
           <ActionButton
@@ -458,6 +457,65 @@ function FormulatePageContent() {
                   </div>
                 </motion.div>
 
+                {/* Hair Type */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Hair Type</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {CONDITION_OPTIONS.map(opt => (
+                      <motion.button key={opt.value} type="button"
+                        onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, type: opt.value } }))}
+                        className={cn('p-4 rounded-xl border text-left transition-all duration-200')}
+                        style={{
+                          backgroundColor: formData.condition.type === opt.value ? 'rgba(147,51,234,0.08)' : 'var(--cg-surface)',
+                          borderColor: formData.condition.type === opt.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                        }} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                        <p className={cn('text-sm font-medium', formData.condition.type === opt.value ? 'text-[#9333EA]' : 'text-[#F5F5F7]')}>{opt.label}</p>
+                        <p className="text-xs mt-1" style={{ color: 'var(--cg-text-tertiary)' }}>{opt.desc}</p>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Porosity */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Porosity</Label>
+                  <div className="flex gap-3">
+                    {POROSITY_OPTIONS.map(opt => (
+                      <motion.button key={opt.value} type="button"
+                        onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, porosity: opt.value } }))}
+                        className={cn('flex-1 p-4 rounded-xl border text-center transition-all duration-200')}
+                        style={{
+                          backgroundColor: formData.condition.porosity === opt.value ? 'rgba(147,51,234,0.08)' : 'var(--cg-surface)',
+                          borderColor: formData.condition.porosity === opt.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                        }} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                        <div className="w-4 h-4 rounded-full mx-auto mb-2" style={{ backgroundColor: opt.color }} />
+                        <p className={cn('text-sm font-medium', formData.condition.porosity === opt.value ? 'text-[#F5F5F7]' : 'text-[#A1A1AA]')}>{opt.label.split('—')[0]}</p>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Gray Coverage */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Gray Coverage</Label>
+                    <span className="text-sm font-bold" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.grayPercent}%</span>
+                  </div>
+                  <input type="range" min={0} max={100} value={formData.condition.grayPercent}
+                    onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, grayPercent: Number(e.target.value) } }))}
+                    className="w-full" />
+                </div>
+
+                {/* Highlights */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <input type="checkbox" id="highlights" checked={formData.condition.highlights}
+                      onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlights: e.target.checked } }))}
+                      className="w-4 h-4 rounded border-[rgba(255,255,255,0.12)] bg-[var(--cg-surface)] accent-[#9333EA]" />
+                    <Label htmlFor="highlights" className="text-sm font-medium cursor-pointer" style={{ color: 'var(--cg-text-primary)' }}>Highlights Present</Label>
+                  </div>
+                </div>
+
                 <div className="flex justify-end">
                   <ActionButton onClick={() => goToStep(3)}>
                     Next: Target Look <ChevronRight className="w-4 h-4 ml-1" />
@@ -586,178 +644,8 @@ function FormulatePageContent() {
                   <ActionButton variant="outline" onClick={() => goToStep(2)}>
                     <ChevronLeft className="w-4 h-4 mr-1" /> Back
                   </ActionButton>
-                  <ActionButton onClick={() => goToStep(4)}>
-                    Next: Condition <ChevronRight className="w-4 h-4 ml-1" />
-                  </ActionButton>
-                </div>
-              </div>
-            </GlassCard>
-          </StepTransition>
-        )}
-
-        {/* Step 4: Condition */}
-        {step === 4 && (
-          <StepTransition stepKey="step4" direction={direction}>
-            <GlassCard className="p-6 md:p-8">
-              <SectionHeader
-                icon={<Droplets className="w-5 h-5 text-[#9333EA]" />}
-                title="Hair Condition"
-              />
-
-              <div className="space-y-8">
-                {/* Hair Type */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Hair Type</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {CONDITION_OPTIONS.map(opt => (
-                      <motion.button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, type: opt.value } }))}
-                        className={cn('p-4 rounded-xl border text-left transition-all duration-200')}
-                        style={{
-                          backgroundColor: formData.condition.type === opt.value ? 'rgba(147,51,234,0.08)' : 'var(--cg-surface)',
-                          borderColor: formData.condition.type === opt.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
-                        }}
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <p className={cn('text-sm font-medium', formData.condition.type === opt.value ? 'text-[#9333EA]' : 'text-[#F5F5F7]')}>
-                          {opt.label}
-                        </p>
-                        <p className="text-xs mt-1" style={{ color: 'var(--cg-text-tertiary)' }}>{opt.desc}</p>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Porosity */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Porosity</Label>
-                  <div className="flex gap-3">
-                    {POROSITY_OPTIONS.map(opt => (
-                      <motion.button
-                        key={opt.value}
-                        type="button"
-                        onClick={() => setFormData(p => ({ ...p, condition: { ...p.condition, porosity: opt.value } }))}
-                        className={cn('flex-1 p-4 rounded-xl border text-center transition-all duration-200')}
-                        style={{
-                          backgroundColor: formData.condition.porosity === opt.value ? 'rgba(147,51,234,0.08)' : 'var(--cg-surface)',
-                          borderColor: formData.condition.porosity === opt.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
-                        }}
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <div className="w-4 h-4 rounded-full mx-auto mb-2" style={{ backgroundColor: opt.color }} />
-                        <p className={cn('text-sm font-medium', formData.condition.porosity === opt.value ? 'text-[#F5F5F7]' : 'text-[#A1A1AA]')}>
-                          {opt.label.split('—')[0]}
-                        </p>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Gray Coverage */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>Gray Coverage</Label>
-                    <span className="text-sm font-bold" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.grayPercent}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={formData.condition.grayPercent}
-                    onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, grayPercent: Number(e.target.value) } }))}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-[10px]" style={{ color: 'var(--cg-text-tertiary)' }}>
-                    <span>No gray</span>
-                    <span>Partial</span>
-                    <span>Full coverage needed</span>
-                  </div>
-                </div>
-
-                {/* Highlights */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      id="highlights"
-                      checked={formData.condition.highlights}
-                      onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlights: e.target.checked } }))}
-                      className="w-4 h-4 rounded border-[rgba(255,255,255,0.12)] bg-[var(--cg-surface)] accent-[#9333EA]"
-                    />
-                    <Label htmlFor="highlights" className="text-sm font-medium cursor-pointer" style={{ color: 'var(--cg-text-primary)' }}>
-                      Highlights Present
-                    </Label>
-                  </div>
-                  {formData.condition.highlights && (
-                    <motion.div
-                      className="pl-7 space-y-2"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs" style={{ color: 'var(--cg-text-secondary)' }}>Highlighted Area</Label>
-                        <span className="text-xs font-bold" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.highlightedPercent}%</span>
-                      </div>
-                      <input
-                        type="range"
-                        min={0}
-                        max={100}
-                        value={formData.condition.highlightedPercent}
-                        onChange={(e) => setFormData(p => ({ ...p, condition: { ...p.condition, highlightedPercent: Number(e.target.value) } }))}
-                        className="w-full"
-                      />
-                    </motion.div>
-                  )}
-                </div>
-
-                {/* Summary before generating */}
-                <motion.div
-                  className="p-4 rounded-xl"
-                  style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <p className="text-[10px] uppercase tracking-wider font-semibold mb-2" style={{ color: 'var(--cg-text-tertiary)' }}>
-                    Consultation Summary
-                  </p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                    <div>
-                      <span className="block text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Current</span>
-                      <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>Level {formData.currentLevel} {formData.currentTone}</span>
-                    </div>
-                    <div>
-                      <span className="block text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Target</span>
-                      <span className="font-medium" style={{ color: 'var(--cg-teal)' }}>Level {formData.targetLevel} {formData.targetTone}</span>
-                    </div>
-                    <div>
-                      <span className="block text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Condition</span>
-                      <span className="font-medium capitalize" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.type.replace('_', ' ')}</span>
-                    </div>
-                    <div>
-                      <span className="block text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Gray</span>
-                      <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>{formData.condition.grayPercent}%</span>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <div className="flex justify-between">
-                  <ActionButton variant="outline" onClick={() => goToStep(3)}>
-                    <ChevronLeft className="w-4 h-4 mr-1" /> Back
-                  </ActionButton>
                   <ActionButton onClick={handleSubmit} disabled={isFormulating}>
-                    {isFormulating ? (
-                      <>
-                        <Sparkles className="w-4 h-4 mr-2 animate-spin" /> Generating...
-                      </>
-                    ) : (
-                      <>
-                        Generate Formula <FlaskConical className="w-4 h-4 ml-2" />
-                      </>
-                    )}
+                    {isFormulating ? (<><Sparkles className="w-4 h-4 mr-2 animate-spin" /> Generating...</>) : (<><span>Generate Formula</span> <FlaskConical className="w-4 h-4 ml-2" /></>)}
                   </ActionButton>
                 </div>
               </div>
@@ -765,9 +653,9 @@ function FormulatePageContent() {
           </StepTransition>
         )}
 
-        {/* Step 5: Results */}
-        {step === 5 && result && (
-          <StepTransition stepKey="step5" direction={direction}>
+        {/* Step 4: Results */}
+        {step === 4 && result && (
+          <StepTransition stepKey="step4" direction={direction}>
             <div className="space-y-4">
               {/* Warnings if any */}
               {result.warnings && result.warnings.length > 0 && (
