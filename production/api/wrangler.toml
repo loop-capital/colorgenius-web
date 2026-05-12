@@ -1,0 +1,11 @@
+name = "colorgenius-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+SUPABASE_URL = "https://beuiayrnzbgvvqfgsenc.supabase.co"
+SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJldWlheXJuemJndnZxZmdzZW5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4NTExOTAsImV4cCI6MjA5MzQyNzE5MH0.qzW29jlsPmd4SCZ_b_GIAXNeyzHu3n3wovY2ihE91SU"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "colorgenius-cache"

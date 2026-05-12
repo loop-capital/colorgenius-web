@@ -1,0 +1,379 @@
+{
+  "brand": "Schwarzkopf Professional",
+  "product_line": "IGORA ROYAL",
+  "source": "Schwarzkopf IGORA ROYAL Paper Chart (official)",
+  "verification_status": "verified",
+  "verified_date": "2026-05-11",
+  "distributor": "Henkel Corporation",
+  "website": "www.schwarzkopf-professionalUSA.com",
+  "numbering_system": {
+    "description": "Up to 3 numbers: depth before dash, primary tone after dash, optional secondary tone",
+    "depth_before_dash": {
+      "1": "Black",
+      "2": "Darkest Brown (reserved)",
+      "3": "Dark Brown",
+      "4": "Medium Brown",
+      "5": "Light Brown",
+      "6": "Dark Blonde",
+      "7": "Medium Blonde",
+      "8": "Light Blonde",
+      "9": "Extra Light Blonde",
+      "10": "Ultra Blonde",
+      "12": "Special Blonde (High Lift)"
+    },
+    "tone_after_dash": {
+      "0": "Natural",
+      "00": "Natural Extra (intensified natural)",
+      "1": "Cendré (Blue-Ash)",
+      "2": "Ash (Green-Ash)",
+      "3": "Matte (Green-Gold)",
+      "4": "Beige (Beige-Violet)",
+      "5": "Gold",
+      "6": "Chocolate",
+      "7": "Copper",
+      "8": "Red",
+      "9": "Violet"
+    }
+  },
+  "gray_coverage": {
+    "rule": "All IGORA ROYAL shades provide up to 50% or 100% white hair coverage",
+    "absolutes": "100% coverage on more than 50% white hair without mixing with natural tone",
+    "standard_shades_up_to_70_percent": "When used on more than 50% white hair, add 1 part Natural (-0) or Beige (-4) in 2:1 ratio",
+    "example": "40g 6-65 + 20g 6-4 + 60g IGORA ROYAL Oil Developer",
+    "thick_resistant_hair": "Mix 1:1 for thick and resistant hair",
+    "100_percent_cover_shades": ["-0", "-1", "-4", "-63"],
+    "coverage_notes": {
+      "standard": "Up to 50% or 100% coverage depending on shade",
+      "absolutes": "100% on more than 50% white hair, no natural needed",
+      "natural_extra": "Double pigmented for maximum coverage"
+    }
+  },
+  "developers": {
+    "igora_royal_oil_developer": {
+      "volumes": [3, 6, 9, 12],
+      "strengths": {
+        "3": "3% (10 Vol.)",
+        "6": "6% (20 Vol.)",
+        "9": "9% (30 Vol.)",
+        "12": "12% (40 Vol.)"
+      }
+    },
+    "usage": {
+      "3_vol": {
+        "use": "Coloring darker, 100% white coverage, deposit on pre-lightened, pastel shades, tone-on-tone",
+        "lift": "Deposit only"
+      },
+      "6_vol": {
+        "use": "Tone-on-tone, white hair coverage, lifting 1-2 levels, Absolutes on >90% white hair",
+        "lift": "0-2 levels"
+      },
+      "9_vol": {
+        "use": "Lifting 2-3 levels, -00 series, Absolutes white coverage, Ultra Blonde up to 3 levels, Special Blonde up to 3-4 levels, Fashion Lights",
+        "lift": "2-4 levels"
+      },
+      "12_vol": {
+        "use": "Ultra Blonde 3-4 levels, Special Blonde 4-5 levels (base 6+)",
+        "lift": "3-5 levels"
+      }
+    }
+  },
+  "lines": [
+    {
+      "name": "IGORA ROYAL Permanent Color",
+      "type": "permanent",
+      "description": "Professional permanent color cream with up to 100% white hair coverage",
+      "mixing_ratio": "1:1 (color : IGORA ROYAL Oil Developer)",
+      "developer_volumes": [3, 6, 9, 12],
+      "processing_time": "30-45 minutes",
+      "shades": [
+        {"code": "1-0", "level": 1, "tone": "0", "name": "Black Natural", "family": "natural"},
+        {"code": "1-1", "level": 1, "tone": "1", "name": "Cendré Black", "family": "cendré"},
+        {"code": "1-66", "level": 1, "tone": "66", "name": "Black Intensive Chocolate", "family": "chocolate"},
+
+        {"code": "3-0", "level": 3, "tone": "0", "name": "Dark Brown Natural", "family": "natural"},
+        {"code": "3-3", "level": 3, "tone": "3", "name": "Dark Brown Matte", "family": "matte"},
+        {"code": "3-65", "level": 3, "tone": "65", "name": "Dark Brown Chocolate-Gold", "family": "chocolate"},
+        {"code": "3-68", "level": 3, "tone": "68", "name": "Dark Brown Chocolate-Red", "family": "chocolate"},
+
+        {"code": "4-0", "level": 4, "tone": "0", "name": "Medium Brown Natural", "family": "natural"},
+        {"code": "4-00", "level": 4, "tone": "00", "name": "Medium Brown Natural Extra", "family": "natural"},
+        {"code": "4-13", "level": 4, "tone": "13", "name": "Medium Brown Cendré-Matte", "family": "cendré"},
+        {"code": "4-4", "level": 4, "tone": "4", "name": "Medium Brown Beige", "family": "beige"},
+        {"code": "4-46", "level": 4, "tone": "46", "name": "Medium Brown Beige-Chocolate", "family": "beige"},
+        {"code": "4-48", "level": 4, "tone": "48", "name": "Medium Brown Beige-Red", "family": "beige"},
+        {"code": "4-6", "level": 4, "tone": "6", "name": "Medium Brown Chocolate", "family": "chocolate"},
+        {"code": "4-63", "level": 4, "tone": "63", "name": "Medium Brown Chocolate-Matte", "family": "chocolate"},
+        {"code": "4-65", "level": 4, "tone": "65", "name": "Medium Brown Chocolate-Gold", "family": "chocolate"},
+        {"code": "4-68", "level": 4, "tone": "68", "name": "Medium Brown Chocolate-Red", "family": "chocolate"},
+        {"code": "4-88", "level": 4, "tone": "88", "name": "Medium Brown Intensive Red", "family": "red"},
+        {"code": "4-99", "level": 4, "tone": "99", "name": "Medium Brown Intensive Violet", "family": "violet"},
+
+        {"code": "5-0", "level": 5, "tone": "0", "name": "Light Brown Natural", "family": "natural"},
+        {"code": "5-00", "level": 5, "tone": "00", "name": "Light Brown Natural Extra", "family": "natural"},
+        {"code": "5-1", "level": 5, "tone": "1", "name": "Light Brown Cendré", "family": "cendré"},
+        {"code": "5-4", "level": 5, "tone": "4", "name": "Light Brown Beige", "family": "beige"},
+        {"code": "5-5", "level": 5, "tone": "5", "name": "Light Brown Gold", "family": "gold"},
+        {"code": "5-50", "level": 5, "tone": "50", "name": "Light Brown Gold Booster", "family": "gold"},
+        {"code": "5-57", "level": 5, "tone": "57", "name": "Light Brown Gold-Copper", "family": "gold"},
+        {"code": "5-6", "level": 5, "tone": "6", "name": "Light Brown Chocolate", "family": "chocolate"},
+        {"code": "5-60", "level": 5, "tone": "60", "name": "Light Brown Chocolate Booster", "family": "chocolate"},
+        {"code": "5-63", "level": 5, "tone": "63", "name": "Light Brown Chocolate-Matte", "family": "chocolate"},
+        {"code": "5-65", "level": 5, "tone": "65", "name": "Light Brown Chocolate-Gold", "family": "chocolate"},
+        {"code": "5-68", "level": 5, "tone": "68", "name": "Light Brown Chocolate-Red", "family": "chocolate"},
+        {"code": "5-80", "level": 5, "tone": "80", "name": "Light Brown Red Booster", "family": "red"},
+        {"code": "5-88", "level": 5, "tone": "88", "name": "Light Brown Intensive Red", "family": "red"},
+        {"code": "5-99", "level": 5, "tone": "99", "name": "Light Brown Intensive Violet", "family": "violet"},
+
+        {"code": "6-0", "level": 6, "tone": "0", "name": "Dark Blonde Natural", "family": "natural"},
+        {"code": "6-00", "level": 6, "tone": "00", "name": "Dark Blonde Natural Extra", "family": "natural"},
+        {"code": "6-1", "level": 6, "tone": "1", "name": "Dark Blonde Cendré", "family": "cendré"},
+        {"code": "6-12", "level": 6, "tone": "12", "name": "Dark Blonde Cendré-Ash", "family": "cendré"},
+        {"code": "6-16", "level": 6, "tone": "16", "name": "Dark Blonde Cendré-Chocolate", "family": "cendré"},
+        {"code": "6-4", "level": 6, "tone": "4", "name": "Dark Blonde Beige", "family": "beige"},
+        {"code": "6-46", "level": 6, "tone": "46", "name": "Dark Blonde Beige-Chocolate", "family": "beige"},
+        {"code": "6-460", "level": 6, "tone": "460", "name": "Dark Blonde Beige-Chocolate Booster", "family": "beige"},
+        {"code": "6-5", "level": 6, "tone": "5", "name": "Dark Blonde Gold", "family": "gold"},
+        {"code": "6-50", "level": 6, "tone": "50", "name": "Dark Blonde Gold Booster", "family": "gold"},
+        {"code": "6-6", "level": 6, "tone": "6", "name": "Dark Blonde Chocolate", "family": "chocolate"},
+        {"code": "6-60", "level": 6, "tone": "60", "name": "Dark Blonde Chocolate Booster", "family": "chocolate"},
+        {"code": "6-63", "level": 6, "tone": "63", "name": "Dark Blonde Chocolate-Matte", "family": "chocolate"},
+        {"code": "6-65", "level": 6, "tone": "65", "name": "Dark Blonde Chocolate-Gold", "family": "chocolate"},
+        {"code": "6-68", "level": 6, "tone": "68", "name": "Dark Blonde Chocolate-Red", "family": "chocolate"},
+        {"code": "6-70", "level": 6, "tone": "70", "name": "Dark Blonde Copper Booster", "family": "copper"},
+        {"code": "6-77", "level": 6, "tone": "77", "name": "Dark Blonde Intensive Copper", "family": "copper"},
+        {"code": "6-80", "level": 6, "tone": "80", "name": "Dark Blonde Red Booster", "family": "red"},
+        {"code": "6-88", "level": 6, "tone": "88", "name": "Dark Blonde Intensive Red", "family": "red"},
+        {"code": "6-99", "level": 6, "tone": "99", "name": "Dark Blonde Intensive Violet", "family": "violet"},
+
+        {"code": "7-0", "level": 7, "tone": "0", "name": "Medium Blonde Natural", "family": "natural"},
+        {"code": "7-00", "level": 7, "tone": "00", "name": "Medium Blonde Natural Extra", "family": "natural"},
+        {"code": "7-1", "level": 7, "tone": "1", "name": "Medium Blonde Cendré", "family": "cendré"},
+        {"code": "7-10", "level": 7, "tone": "10", "name": "Medium Blonde Cendré Booster", "family": "cendré"},
+        {"code": "7-21", "level": 7, "tone": "21", "name": "Medium Blonde Ash-Cendré", "family": "ash"},
+        {"code": "7-24", "level": 7, "tone": "24", "name": "Medium Blonde Ash-Beige", "family": "ash"},
+        {"code": "7-4", "level": 7, "tone": "4", "name": "Medium Blonde Beige", "family": "beige"},
+        {"code": "7-42", "level": 7, "tone": "42", "name": "Medium Blonde Beige-Ash", "family": "beige"},
+        {"code": "7-450", "level": 7, "tone": "450", "name": "Medium Blonde Beige-Gold Booster", "family": "beige"},
+        {"code": "7-460", "level": 7, "tone": "460", "name": "Medium Blonde Beige-Chocolate Booster", "family": "beige"},
+        {"code": "7-470", "level": 7, "tone": "470", "name": "Medium Blonde Beige-Copper Booster", "family": "beige"},
+        {"code": "7-50", "level": 7, "tone": "50", "name": "Medium Blonde Gold Booster", "family": "gold"},
+        {"code": "7-55", "level": 7, "tone": "55", "name": "Medium Blonde Intensive Gold", "family": "gold"},
+        {"code": "7-560", "level": 7, "tone": "560", "name": "Medium Blonde Gold-Chocolate Booster", "family": "gold"},
+        {"code": "7-57", "level": 7, "tone": "57", "name": "Medium Blonde Gold-Copper", "family": "gold"},
+        {"code": "7-60", "level": 7, "tone": "60", "name": "Medium Blonde Chocolate Booster", "family": "chocolate"},
+        {"code": "7-65", "level": 7, "tone": "65", "name": "Medium Blonde Chocolate-Gold", "family": "chocolate"},
+        {"code": "7-70", "level": 7, "tone": "70", "name": "Medium Blonde Copper Booster", "family": "copper"},
+        {"code": "7-710", "level": 7, "tone": "710", "name": "Medium Blonde Copper-Cendré Booster", "family": "copper"},
+        {"code": "7-77", "level": 7, "tone": "77", "name": "Medium Blonde Intensive Copper", "family": "copper"},
+
+        {"code": "8-0", "level": 8, "tone": "0", "name": "Light Blonde Natural", "family": "natural"},
+        {"code": "8-00", "level": 8, "tone": "00", "name": "Light Blonde Natural Extra", "family": "natural"},
+        {"code": "8-01", "level": 8, "tone": "01", "name": "Light Blonde Natural-Cendré", "family": "natural"},
+        {"code": "8-1", "level": 8, "tone": "1", "name": "Light Blonde Cendré", "family": "cendré"},
+        {"code": "8-11", "level": 8, "tone": "11", "name": "Light Blonde Intensive Cendré", "family": "cendré"},
+        {"code": "8-140", "level": 8, "tone": "140", "name": "Light Blonde Cendré-Beige Booster", "family": "cendré"},
+        {"code": "8-4", "level": 8, "tone": "4", "name": "Light Blonde Beige", "family": "beige"},
+        {"code": "8-46", "level": 8, "tone": "46", "name": "Light Blonde Beige-Chocolate", "family": "beige"},
+        {"code": "8-50", "level": 8, "tone": "50", "name": "Light Blonde Gold Booster", "family": "gold"},
+        {"code": "8-55", "level": 8, "tone": "55", "name": "Light Blonde Intensive Gold", "family": "gold"},
+        {"code": "8-60", "level": 8, "tone": "60", "name": "Light Blonde Chocolate Booster", "family": "chocolate"},
+        {"code": "8-65", "level": 8, "tone": "65", "name": "Light Blonde Chocolate-Gold", "family": "chocolate"},
+
+        {"code": "9-0", "level": 9, "tone": "0", "name": "Extra Light Blonde Natural", "family": "natural"},
+        {"code": "9-00", "level": 9, "tone": "00", "name": "Extra Light Blonde Natural Extra", "family": "natural"},
+        {"code": "9-1", "level": 9, "tone": "1", "name": "Extra Light Blonde Cendré", "family": "cendré"},
+        {"code": "9-4", "level": 9, "tone": "4", "name": "Extra Light Blonde Beige", "family": "beige"},
+        {"code": "9-40", "level": 9, "tone": "40", "name": "Extra Light Blonde Beige Booster", "family": "beige"},
+        {"code": "9-42", "level": 9, "tone": "42", "name": "Extra Light Blonde Beige-Ash", "family": "beige"},
+        {"code": "9-46", "level": 9, "tone": "46", "name": "Extra Light Blonde Beige-Chocolate", "family": "beige"},
+        {"code": "9-470", "level": 9, "tone": "470", "name": "Extra Light Blonde Beige-Copper Booster", "family": "beige"},
+        {"code": "9-49", "level": 9, "tone": "49", "name": "Extra Light Blonde Beige-Violet", "family": "beige"},
+        {"code": "9-5", "level": 9, "tone": "5", "name": "Extra Light Blonde Gold", "family": "gold"},
+        {"code": "9-50", "level": 9, "tone": "50", "name": "Extra Light Blonde Gold Booster", "family": "gold"},
+        {"code": "9-55", "level": 9, "tone": "55", "name": "Extra Light Blonde Intensive Gold", "family": "gold"},
+        {"code": "9-560", "level": 9, "tone": "560", "name": "Extra Light Blonde Gold-Chocolate Booster", "family": "gold"},
+        {"code": "9-60", "level": 9, "tone": "60", "name": "Extra Light Blonde Chocolate Booster", "family": "chocolate"},
+        {"code": "9-65", "level": 9, "tone": "65", "name": "Extra Light Blonde Chocolate-Gold", "family": "chocolate"},
+        {"code": "9-7", "level": 9, "tone": "7", "name": "Extra Light Blonde Copper", "family": "copper"},
+        {"code": "9-89", "level": 9, "tone": "89", "name": "Extra Light Blonde Red-Violet", "family": "red"},
+        {"code": "9-98", "level": 9, "tone": "98", "name": "Extra Light Blonde Violet-Red", "family": "violet"}
+      ]
+    },
+    {
+      "name": "IGORA ROYAL Absolutes",
+      "type": "permanent",
+      "description": "Intensified color series providing 100% white hair coverage on more than 50% white hair without mixing with natural tones",
+      "mixing_ratio": "1:1",
+      "developer_volumes": [9, 12],
+      "recommended_developer": "9% (30 Vol.) standard; 6% (20 Vol.) on >90% white hair",
+      "processing_time": "30-45 minutes",
+      "shades": [
+        {"code": "4-19", "level": 4, "tone": "19", "name": "Medium Brown Absolutes Cendré-Violet", "family": "cendré"},
+        {"code": "5-19", "level": 5, "tone": "19", "name": "Light Brown Absolutes Cendré-Violet", "family": "cendré"},
+        {"code": "5-99", "level": 5, "tone": "99", "name": "Light Brown Absolutes Intensive Violet", "family": "violet"},
+        {"code": "6-19", "level": 6, "tone": "19", "name": "Dark Blonde Absolutes Cendré-Violet", "family": "cendré"},
+        {"code": "7-19", "level": 7, "tone": "19", "name": "Medium Blonde Absolutes Cendré-Violet", "family": "cendré"},
+        {"code": "9-98", "level": 9, "tone": "98", "name": "Extra Light Blonde Absolutes Violet-Red", "family": "violet"}
+      ]
+    },
+    {
+      "name": "IGORA ROYAL Ultra Blonde (10- Series)",
+      "type": "permanent",
+      "description": "Ultra blonde lifting shades for up to 3-4 levels of lift",
+      "mixing_ratio": "1:1",
+      "developer_volumes": [9, 12],
+      "processing_time": "30-45 minutes",
+      "lift_capability": {
+        "9_vol": "Up to 3 levels",
+        "12_vol": "3-4 levels"
+      },
+      "shades": [
+        {"code": "10-0", "level": 10, "tone": "0", "name": "Ultra Blonde Natural", "family": "high-lift"},
+        {"code": "10-1", "level": 10, "tone": "1", "name": "Ultra Blonde Cendré", "family": "high-lift-cendré"},
+        {"code": "10-4", "level": 10, "tone": "4", "name": "Ultra Blonde Beige", "family": "high-lift-beige"},
+        {"code": "10-14", "level": 10, "tone": "14", "name": "Ultra Blonde Cendré-Beige", "family": "high-lift-cendré"},
+        {"code": "10-21", "level": 10, "tone": "21", "name": "Ultra Blonde Ash-Cendré", "family": "high-lift-ash"}
+      ]
+    },
+    {
+      "name": "IGORA ROYAL Special Blonde (12- Series)",
+      "type": "permanent",
+      "description": "Maximum lifting blonde shades for up to 4-5 levels of lift on natural base 6 and lighter",
+      "mixing_ratio": "1:2 (color : developer)",
+      "developer_volumes": [9, 12],
+      "processing_time": "30-45 minutes",
+      "lift_capability": {
+        "9_vol": "Up to 4 levels",
+        "12_vol": "Up to 5 levels (base 6+)"
+      },
+      "shades": [
+        {"code": "12-0", "level": 12, "tone": "0", "name": "Special Blonde Natural", "family": "high-lift"},
+        {"code": "12-1", "level": 12, "tone": "1", "name": "Special Blonde Cendré", "family": "high-lift-cendré"},
+        {"code": "12-2", "level": 12, "tone": "2", "name": "Special Blonde Ash", "family": "high-lift-ash"},
+        {"code": "12-4", "level": 12, "tone": "4", "name": "Special Blonde Beige", "family": "high-lift-beige"},
+        {"code": "12-11", "level": 12, "tone": "11", "name": "Special Blonde Intensive Cendré", "family": "high-lift-cendré"},
+        {"code": "12-19", "level": 12, "tone": "19", "name": "Special Blonde Cendré-Violet", "family": "high-lift-cendré"}
+      ]
+    },
+    {
+      "name": "IGORA ROYAL Highlifts (9.5- Series)",
+      "type": "permanent",
+      "description": "Highlift shades for pastel and cool blonde results on levels 7 and higher",
+      "mixing_ratio": "1:1",
+      "developer_volumes": [9, 12],
+      "processing_time": "30-45 minutes",
+      "shades": [
+        {"code": "9.5-1", "level": 9.5, "tone": "1", "name": "Highlift Cendré", "family": "highlift"},
+        {"code": "9.5-4", "level": 9.5, "tone": "4", "name": "Highlift Beige", "family": "highlift-beige"},
+        {"code": "9.5-22", "level": 9.5, "tone": "22", "name": "Highlift Intensive Ash", "family": "highlift-ash"},
+        {"code": "9.5-49", "level": 9.5, "tone": "49", "name": "Highlift Beige-Violet", "family": "highlift-beige"}
+      ]
+    },
+    {
+      "name": "IGORA ROYAL Silver Whites & Specials",
+      "type": "permanent",
+      "description": "Special shades for grey blending, pastel effects, and neutralizing",
+      "mixing_ratio": "1:1",
+      "developer_volumes": [3, 6, 9],
+      "processing_time": "30-45 minutes",
+      "shades": [
+        {"code": "3-68", "level": 3, "tone": "68", "name": "Dark Brown Chocolate-Red", "family": "chocolate"},
+        {"code": "6-60", "level": 6, "tone": "60", "name": "Dark Blonde Chocolate Booster", "family": "chocolate"},
+        {"code": "0-11", "level": 10, "tone": "11", "name": "Silver White Cendré", "family": "silver"},
+        {"code": "0-22", "level": 10, "tone": "22", "name": "Silver White Ash", "family": "silver"},
+        {"code": "0-33", "level": 10, "tone": "33", "name": "Silver White Matte", "family": "silver"},
+        {"code": "0-55", "level": 10, "tone": "55", "name": "Silver White Gold", "family": "silver"},
+        {"code": "0-77", "level": 10, "tone": "77", "name": "Silver White Copper", "family": "silver"},
+        {"code": "0-88", "level": 10, "tone": "88", "name": "Silver White Red", "family": "silver"},
+        {"code": "0-89", "level": 10, "tone": "89", "name": "Silver White Red-Violet", "family": "silver"},
+        {"code": "0-99", "level": 10, "tone": "99", "name": "Silver White Violet", "family": "silver"},
+        {"code": "0-00", "level": 10, "tone": "00", "name": "Silver White Natural Extra", "family": "silver"},
+        {"code": "9.5-22", "level": 9.5, "tone": "22", "name": "Slate Grey", "family": "grey"},
+        {"code": "9.5-1", "level": 9.5, "tone": "1", "name": "Grey Lilac", "family": "grey"},
+        {"code": "9.5-4", "level": 9.5, "tone": "4", "name": "Dove Grey", "family": "grey"}
+      ]
+    },
+    {
+      "name": "IGORA ROYAL Fashion Lights",
+      "type": "permanent",
+      "description": "Fashion-forward shades for creative color effects and highlights",
+      "mixing_ratio": "1:1",
+      "developer_volumes": [9],
+      "processing_time": "30-45 minutes",
+      "shades": [
+        {"code": "L-00", "level": 10, "tone": "00", "name": "Fashion Light Natural", "family": "fashion"},
+        {"code": "L-44", "level": 10, "tone": "44", "name": "Fashion Light Beige", "family": "fashion"},
+        {"code": "L-77", "level": 10, "tone": "77", "name": "Fashion Light Copper", "family": "fashion"},
+        {"code": "L-88", "level": 10, "tone": "88", "name": "Fashion Light Red", "family": "fashion"},
+        {"code": "L-89", "level": 10, "tone": "89", "name": "Fashion Light Red-Violet", "family": "fashion"}
+      ]
+    },
+    {
+      "name": "IGORA COLOR10",
+      "type": "permanent",
+      "description": "10-minute express permanent color for fast results",
+      "mixing_ratio": "1:1",
+      "developer_volumes": [3, 6, 9],
+      "processing_time": "As little as 10 minutes",
+      "shades": "Uses core IGORA ROYAL shade codes. Denoted by highlighted marker on chart."
+    },
+    {
+      "name": "IGORA VIBRANCE",
+      "type": "demi-permanent",
+      "description": "Demi-permanent color for tone, refresh, and gloss. Denoted by underlined codes on chart.",
+      "mixing_ratio": "1:1",
+      "developer_volumes": [3, 6],
+      "processing_time": "Up to 20 minutes",
+      "recommended_developer": "3% (10 Vol.)",
+      "shades": "Uses core IGORA ROYAL shade codes. Denoted by underlined marker on chart."
+    }
+  ],
+  "lighteners": [
+    {
+      "name": "IGORA VARIO BLOND Plus",
+      "form": "powder",
+      "type": "lightener",
+      "mixing_ratio": "1:2",
+      "processing_time": "Up to 60 minutes",
+      "developer_volumes": [3, 6, 9, 12],
+      "application": "Blonding, highlighting"
+    },
+    {
+      "name": "IGORA VARIO BLOND Extra",
+      "form": "powder",
+      "type": "lightener",
+      "mixing_ratio": "1:2",
+      "processing_time": "Up to 60 minutes",
+      "developer_volumes": [3, 6, 9, 12],
+      "application": "Maximum lift blonding"
+    }
+  ],
+  "pastel_system": {
+    "name": "IGORA ROYAL Pastelfier",
+    "description": "Pastel mixing cream to create soft pastel tones",
+    "shades": [
+      {"code": "E-1", "name": "Pastelfier Cool", "family": "pastel"},
+      {"code": "Pastelfier", "name": "Pastelfier Clear", "family": "pastel"}
+    ]
+  },
+  "specialty_shades": {
+    "boosters_neutralizers": [
+      {"code": "6-460", "level": 6, "name": "Beige-Chocolate Booster", "family": "booster"},
+      {"code": "7-450", "level": 7, "name": "Beige-Gold Booster", "family": "booster"},
+      {"code": "7-460", "level": 7, "name": "Beige-Chocolate Booster", "family": "booster"},
+      {"code": "7-470", "level": 7, "name": "Beige-Copper Booster", "family": "booster"},
+      {"code": "7-560", "level": 7, "name": "Gold-Chocolate Booster", "family": "booster"},
+      {"code": "7-710", "level": 7, "name": "Copper-Cendré Booster", "family": "booster"},
+      {"code": "8-140", "level": 8, "name": "Cendré-Beige Booster", "family": "booster"},
+      {"code": "9-40", "level": 9, "name": "Beige Booster", "family": "booster"},
+      {"code": "9-140", "level": 9, "name": "Cendré-Beige Booster", "family": "booster"},
+      {"code": "9-470", "level": 9, "name": "Beige-Copper Booster", "family": "booster"},
+      {"code": "9-560", "level": 9, "name": "Gold-Chocolate Booster", "family": "booster"},
+      {"code": "7-140", "level": 7, "name": "Cendré-Beige Booster", "family": "booster"},
+      {"code": "5-80", "level": 5, "name": "Red Booster", "family": "booster"},
+      {"code": "6-80", "level": 6, "name": "Red Booster", "family": "booster"},
+      {"code": "4-63", "level": 4, "name": "Chocolate-Matte", "family": "special"},
+      {"code": "9-98", "level": 9, "name": "Violet-Red", "family": "special"}
+    ]
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "brand": "Aveda",
+  "product_line": "Full Spectrum™ Hair Color System",
+  "type": "permanent",
+  "features": [
+    "99% naturally derived",
+    "Green Chemistry formulation",
+    "Protective Plant Complex (PPF)",
+    "Ammonia-free (alkalizing agent)",
+    "Certified organic essential oils"
+  ],
+  "mix_ratio": "1:1",
+  "processing_time": "35 minutes",
+  "gray_processing_time": "40-45 minutes",
+  "developers": [
+    {"volume": 5, "percentage": "1.5%", "use": "Toning and deposit, gray blending"},
+    {"volume": 10, "percentage": "3%", "use": "Deposit with slight lift (0-1 levels), gray coverage"},
+    {"volume": 20, "percentage": "6%", "use": "Standard lift (1-2 levels), optimal gray coverage"},
+    {"volume": 30, "percentage": "9%", "use": "Maximum lift (2-3 levels), resistant hair"},
+    {"volume": 40, "percentage": "12%", "use": "Super lift (3+ levels), resistant/virgin hair"}
+  ],
+  "series": [
+    {
+      "code": "N",
+      "name": "Natural",
+      "description": "Pure neutral tones for natural-looking results and maximum gray coverage",
+      "gray_coverage": "0-100%",
+      "shades": [
+        {"code": "1N", "name": "Natural Black", "level": 1, "tone": "Natural", "description": "Deepest natural black with no reflect", "line": "Full Spectrum™"},
+        {"code": "2N", "name": "Natural Darkest Brown", "level": 2, "tone": "Natural", "description": "Darkest natural brown with no reflect", "line": "Full Spectrum™"},
+        {"code": "3N", "name": "Natural Dark Brown", "level": 3, "tone": "Natural", "description": "Dark natural brown with no reflect", "line": "Full Spectrum™"},
+        {"code": "4N", "name": "Natural Medium Brown", "level": 4, "tone": "Natural", "description": "Medium natural brown with no reflect", "line": "Full Spectrum™"},
+        {"code": "5N", "name": "Natural Light Brown", "level": 5, "tone": "Natural", "description": "Light natural brown with no reflect", "line": "Full Spectrum™"},
+        {"code": "6N", "name": "Natural Dark Blonde", "level": 6, "tone": "Natural", "description": "Dark natural blonde with no reflect", "line": "Full Spectrum™"},
+        {"code": "7N", "name": "Natural Medium Blonde", "level": 7, "tone": "Natural", "description": "Medium natural blonde with no reflect", "line": "Full Spectrum™"},
+        {"code": "8N", "name": "Natural Light Blonde", "level": 8, "tone": "Natural", "description": "Light natural blonde with no reflect", "line": "Full Spectrum™"},
+        {"code": "9N", "name": "Natural Very Light Blonde", "level": 9, "tone": "Natural", "description": "Very light natural blonde with no reflect", "line": "Full Spectrum™"},
+        {"code": "10N", "name": "Natural Lightest Blonde", "level": 10, "tone": "Natural", "description": "Lightest natural blonde with no reflect", "line": "Full Spectrum™"}
+      ]
+    },
+    {
+      "code": "NN",
+      "name": "Double Natural",
+      "description": "Extra neutral coverage for resistant gray hair (50%+ gray); adds depth and opacity",
+      "gray_coverage": "50-100%",
+      "mixing": "Use NN shade alone for maximum coverage, or mix with N shade for softer result",
+      "shades": [
+        {"code": "2NN", "name": "Double Natural Darkest Brown", "level": 2, "tone": "Natural", "description": "Extra coverage darkest brown", "line": "Full Spectrum™"},
+        {"code": "3NN", "name": "Double Natural Dark Brown", "level": 3, "tone": "Natural", "description": "Extra coverage dark brown", "line": "Full Spectrum™"},
+        {"code": "4NN", "name": "Double Natural Medium Brown", "level": 4, "tone": "Natural", "description": "Extra coverage medium brown", "line": "Full Spectrum™"},
+        {"code": "5NN", "name": "Double Natural Light Brown", "level": 5, "tone": "Natural", "description": "Extra coverage light brown", "line": "Full Spectrum™"},
+        {"code": "6NN", "name": "Double Natural Dark Blonde", "level": 6, "tone": "Natural", "description": "Extra coverage dark blonde", "line": "Full Spectrum™"},
+        {"code": "7NN", "name": "Double Natural Medium Blonde", "level": 7, "tone": "Natural", "description": "Extra coverage medium blonde", "line": "Full Spectrum™"},
+        {"code": "8NN", "name": "Double Natural Light Blonde", "level": 8, "tone": "Natural", "description": "Extra coverage light blonde", "line": "Full Spectrum™"}
+      ]
+    },
+    {
+      "code": "A",
+      "name": "Ash",
+      "description": "Cool ash tones to neutralize warmth and create sophisticated cool results",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4A", "name": "Ash Brown", "level": 4, "tone": "Ash", "description": "Rich dark ash brown", "line": "Full Spectrum™"},
+        {"code": "5A", "name": "Light Ash Brown", "level": 5, "tone": "Ash", "description": "Light ash brown", "line": "Full Spectrum™"},
+        {"code": "6A", "name": "Dark Ash Blonde", "level": 6, "tone": "Ash", "description": "Dark ash blonde", "line": "Full Spectrum™"},
+        {"code": "7A", "name": "Medium Ash Blonde", "level": 7, "tone": "Ash", "description": "Medium ash blonde", "line": "Full Spectrum™"},
+        {"code": "8A", "name": "Light Ash Blonde", "level": 8, "tone": "Ash", "description": "Light ash blonde", "line": "Full Spectrum™"},
+        {"code": "9A", "name": "Very Light Ash Blonde", "level": 9, "tone": "Ash", "description": "Very light ash blonde", "line": "Full Spectrum™"},
+        {"code": "10A", "name": "Lightest Ash Blonde", "level": 10, "tone": "Ash", "description": "Lightest ash blonde", "line": "Full Spectrum™"}
+      ]
+    },
+    {
+      "code": "V",
+      "name": "Violet",
+      "description": "Cool violet tones to neutralize unwanted yellow and add sophisticated cool reflect",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "3V", "name": "Dark Violet Brown", "level": 3, "tone": "Violet", "description": "Deep violet brown-black", "line": "Full Spectrum™"},
+        {"code": "4V", "name": "Medium Violet Brown", "level": 4, "tone": "Violet", "description": "Medium violet brown", "line": "Full Spectrum™"},
+        {"code": "5V", "name": "Light Violet Brown", "level": 5, "tone": "Violet", "description": "Light violet brown", "line": "Full Spectrum™"},
+        {"code": "6V", "name": "Dark Violet Blonde", "level": 6, "tone": "Violet", "description": "Dark violet blonde", "line": "Full Spectrum™"},
+        {"code": "7V", "name": "Medium Violet Blonde", "level": 7, "tone": "Violet", "description": "Medium violet blonde", "line": "Full Spectrum™"},
+        {"code": "8V", "name": "Light Violet Blonde", "level": 8, "tone": "Violet", "description": "Light violet blonde", "line": "Full Spectrum™"}
+      ]
+    },
+    {
+      "code": "B",
+      "name": "Beige",
+      "description": "Warm neutral beige tones — soft, sophisticated warmth with a natural finish",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "5B", "name": "Light Beige Brown", "level": 5, "tone": "Beige", "description": "Light beige brown", "line": "Full Spectrum™"},
+        {"code": "6B", "name": "Dark Beige Blonde", "level": 6, "tone": "Beige", "description": "Dark beige blonde", "line": "Full Spectrum™"},
+        {"code": "7B", "name": "Medium Beige Blonde", "level": 7, "tone": "Beige", "description": "Medium beige blonde", "line": "Full Spectrum™"},
+        {"code": "8B", "name": "Light Beige Blonde", "level": 8, "tone": "Beige", "description": "Light beige blonde", "line": "Full Spectrum™"},
+        {"code": "9B", "name": "Very Light Beige Blonde", "level": 9, "tone": "Beige", "description": "Very light beige blonde", "line": "Full Spectrum™"},
+        {"code": "10B", "name": "Lightest Beige Blonde", "level": 10, "tone": "Beige", "description": "Lightest beige blonde", "line": "Full Spectrum™"}
+      ]
+    },
+    {
+      "code": "C",
+      "name": "Copper",
+      "description": "Warm copper tones for vibrant richness and fiery red-orange reflect",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4C", "name": "Dark Copper Brown", "level": 4, "tone": "Copper", "description": "Rich dark copper brown", "line": "Full Spectrum™"},
+        {"code": "5C", "name": "Light Copper Brown", "level": 5, "tone": "Copper", "description": "Light copper brown", "line": "Full Spectrum™"},
+        {"code": "6C", "name": "Dark Copper Blonde", "level": 6, "tone": "Copper", "description": "Dark copper blonde", "line": "Full Spectrum™"},
+        {"code": "7C", "name": "Medium Copper Blonde", "level": 7, "tone": "Copper", "description": "Medium copper blonde", "line": "Full Spectrum™"},
+        {"code": "8C", "name": "Light Copper Blonde", "level": 8, "tone": "Copper", "description": "Light copper blonde", "line": "Full Spectrum™"}
+      ]
+    },
+    {
+      "code": "R",
+      "name": "Red",
+      "description": "Rich warm red tones for vibrant, bold color results",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "4R", "name": "Dark Red Brown", "level": 4, "tone": "Red", "description": "Rich dark red brown", "line": "Full Spectrum™"},
+        {"code": "5R", "name": "Light Red Brown", "level": 5, "tone": "Red", "description": "Light red brown", "line": "Full Spectrum™"},
+        {"code": "6R", "name": "Dark Red Blonde", "level": 6, "tone": "Red", "description": "Dark red blonde", "line": "Full Spectrum™"},
+        {"code": "7R", "name": "Medium Red Blonde", "level": 7, "tone": "Red", "description": "Medium red blonde", "line": "Full Spectrum™"}
+      ]
+    },
+    {
+      "code": "G",
+      "name": "Gold",
+      "description": "Warm golden tones for sun-kissed, honey-like results",
+      "gray_coverage": "0-50%",
+      "shades": [
+        {"code": "5G", "name": "Light Golden Brown", "level": 5, "tone": "Gold", "description": "Light golden brown", "line": "Full Spectrum™"},
+        {"code": "6G", "name": "Dark Golden Blonde", "level": 6, "tone": "Gold", "description": "Dark golden blonde", "line": "Full Spectrum™"},
+        {"code": "7G", "name": "Medium Golden Blonde", "level": 7, "tone": "Gold", "description": "Medium golden blonde", "line": "Full Spectrum™"},
+        {"code": "8G", "name": "Light Golden Blonde", "level": 8, "tone": "Gold", "description": "Light golden blonde", "line": "Full Spectrum™"},
+        {"code": "9G", "name": "Very Light Golden Blonde", "level": 9, "tone": "Gold", "description": "Very light golden blonde", "line": "Full Spectrum™"},
+        {"code": "10G", "name": "Lightest Golden Blonde", "level": 10, "tone": "Gold", "description": "Lightest golden blonde", "line": "Full Spectrum™"}
+      ]
+    },
+    {
+      "code": "H",
+      "name": "High Lift (HLA)",
+      "description": "High-lift ash series for maximum lift on natural/resistant dark hair",
+      "gray_coverage": "0%",
+      "usage": "For natural or tinted level 6 or darker. Use with 30 or 40 vol developer only.",
+      "shades": [
+        {"code": "HLA", "name": "High Lift Ash", "level": 10, "tone": "Ash", "description": "Maximum lift ash blonde", "line": "Full Spectrum™"}
+      ]
+    },
+    {
+      "code": "P",
+      "name": "Pastel Additives",
+      "description": "Fashion color additives for mixing into Full Spectrum™ shades to create custom pastel results",
+      "gray_coverage": "N/A",
+      "usage": "Mix with chosen Full Spectrum™ shade to create pastel tones. Do not use alone.",
+      "shades": [
+        {"code": "VIOLET", "name": "Violet", "level": null, "tone": "Violet", "description": "Cool violet pastel additive", "line": "Full Spectrum™"},
+        {"code": "BLUE", "name": "Blue", "level": null, "tone": "Cool", "description": "Cool blue pastel additive", "line": "Full Spectrum™"},
+        {"code": "PINK", "name": "Pink", "level": null, "tone": "Red", "description": "Warm pink pastel additive", "line": "Full Spectrum™"}
+      ]
+    }
+  ],
+  "formulation_guidelines": {
+    "mixing_ratios": {
+      "Full Spectrum™": "1 part color + 1 part Full Spectrum™ Developer"
+    },
+    "processing_times": {
+      "Full Spectrum™": "35 minutes (up to 40-45 minutes for resistant gray)"
+    },
+    "gray_coverage": {
+      "0_25_percent": "Use N series",
+      "25_50_percent": "Mix N + target shade (equal parts) or use NN shade",
+      "50_100_percent": "Use NN shade alone or mix NN + N shade (equal parts)"
+    },
+    "lift_guidelines": {
+      "tone_on_tone": "5 or 10 vol (1.5-3%)",
+      "1_level": "10 or 20 vol (3-6%)",
+      "2_levels": "20 or 30 vol (6-9%)",
+      "3_levels": "30 or 40 vol (9-12%)"
+    },
+    "tonal_direction": {
+      "cool": ["A", "V", "HLA"],
+      "warm": ["C", "R", "G"],
+      "neutral": ["N", "NN", "B"],
+      "specialty": ["HLA", "P"]
+    }
+  },
+  "metadata": {
+    "total_shades": 72,
+    "lines_count": 1,
+    "last_updated": "2026-05-04",
+    "data_source": "Aveda Professional Hair Color — Full Spectrum™ Technical Guide",
+    "notes": "Aveda Full Spectrum™ is a single-line permanent color system with extensive shade variety (N, NN, A, V, B, C, R, G, HLA series). All shades use the same 1:1 mixing ratio with Full Spectrum™ developer. 99% naturally derived. Formulation follows the same structure as L'ANZA Healing Color for consistency within ColorGenius."
+  }
+}

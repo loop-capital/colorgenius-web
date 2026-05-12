@@ -36,15 +36,6 @@ interface Client {
   lastVisit?: string;
 }
 
-// Same hardcoded clients as /clients page
-const DEMO_CLIENTS: Client[] = [
-  { id: '1', name: 'Maria Garcia', email: 'maria.g@email.com', lastVisit: '2026-04-20' },
-  { id: '2', name: 'Jennifer Liu', email: 'jennifer.l@email.com', lastVisit: '2026-04-15' },
-  { id: '3', name: 'Sarah Thompson', email: 'sarah.t@email.com', lastVisit: '2026-04-10' },
-  { id: '4', name: 'Amanda Chen', email: 'amanda.c@email.com', lastVisit: '2026-04-08' },
-  { id: '5', name: 'Rachel Kim', email: 'rachel.k@email.com', lastVisit: '2026-04-05' },
-];
-
 interface FormulaStep {
   product: { shadeCode: string; shadeName: string; brand?: string; level?: number };
   grams: number;
@@ -69,6 +60,7 @@ function ServiceEntryContent() {
   const [rating, setRating] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [loadingFormula, setLoadingFormula] = useState(false);
 
   // Shade input for formula step
   const [shadeCode, setShadeCode] = useState('');
@@ -76,9 +68,11 @@ function ServiceEntryContent() {
   const [shadeGrams, setShadeGrams] = useState(30);
   const [shadeRole, setShadeRole] = useState('Primary');
 
-  // Load clients (using same hardcoded data as /clients page)
+  // Load clients from API
   useEffect(() => {
-    setClients(DEMO_CLIENTS);
+    fetch('/api/clients').then(r => r.ok ? r.json() : { clients: [] }).then(d => {
+      setClients(d.clients || []);
+    }).catch(() => {});
   }, []);
 
   // Pre-select client from URL
@@ -88,6 +82,35 @@ function ServiceEntryContent() {
       if (found) setSelectedClient(found);
     }
   }, [preselectedClientId, clients]);
+
+  // Load formula from URL
+  useEffect(() => {
+    if (!preselectedFormulaId) return;
+    setLoadingFormula(true);
+    fetch(`/api/v1/formulas/${preselectedFormulaId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(formula => {
+        if (formula) {
+          setBrand(formula.brand || 'Wella');
+          setDeveloperMl(formula.developerVolume || 60);
+          if (formula.shadeCode) {
+            setFormulaSteps([{
+              product: { 
+                shadeCode: formula.shadeCode, 
+                shadeName: formula.shadeName || formula.shadeCode,
+                brand: formula.brand 
+              },
+              grams: 30,
+              role: 'Primary',
+            }]);
+          }
+          if (formula.processingTime) setServiceTime(formula.processingTime);
+          if (formula.notes) setNotes(formula.notes);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingFormula(false));
+  }, [preselectedFormulaId]);
 
   const filteredClients = clients.filter(c =>
     !clientSearch || c.name.toLowerCase().includes(clientSearch.toLowerCase())
@@ -155,6 +178,21 @@ function ServiceEntryContent() {
             <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Quick service entry — {STEPS[step].title}</p>
           </div>
         </div>
+
+        {/* Loading indicator */}
+        {loadingFormula && (
+          <div className="mb-4 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-sm text-blue-400 flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+            Loading formula...
+          </div>
+        )}
+        {/* Formula loaded badge */}
+        {preselectedFormulaId && !loadingFormula && (
+          <div className="mb-4 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-sm text-green-400 flex items-center gap-2">
+            <Check className="w-4 h-4" />
+            Formula loaded from library
+          </div>
+        )}
 
         {/* Step Indicator */}
         <div className="flex items-center gap-2 mb-8">

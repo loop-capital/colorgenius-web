@@ -176,6 +176,7 @@ function FormulatePageContent() {
   })
   const [isFormulating, setIsFormulating] = useState(false)
   const [result, setResult] = useState<any>(null)
+  const [savedFormulaId, setSavedFormulaId] = useState<string | null>(null)
 
   const searchParams = useSearchParams()
   useEffect(() => {
@@ -718,20 +719,63 @@ function FormulatePageContent() {
               />
 
               {/* Action buttons */}
-              <div className="flex gap-3 pt-2">
-                <ActionButton
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    setResult(null)
-                    goToStep(1)
-                  }}
-                >
-                  <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> New Formula
-                </ActionButton>
-                <ActionButton className="flex-1" onClick={() => {}}>
-                  <Save className="w-3.5 h-3.5 mr-1.5" /> Save to Library
-                </ActionButton>
+              <div className="flex flex-col gap-3 pt-2">
+                <div className="flex gap-3">
+                  <ActionButton
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      setResult(null)
+                      goToStep(1)
+                    }}
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> New Formula
+                  </ActionButton>
+                  <ActionButton 
+                    className="flex-1" 
+                    onClick={async () => {
+                      if (!result) return
+                      try {
+                        const response = await fetch('/api/v1/formulas', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            clientId: 'temp-client-id',
+                            stylistId: 'temp-stylist-id',
+                            salonId: 'temp-salon-id',
+                            brand: result.brand,
+                            shadeCode: result.steps?.[0]?.product?.shadeCode || '',
+                            shadeName: result.steps?.[0]?.product?.shadeName || '',
+                            developerVolume: result.developerVolume || 20,
+                            mixingRatio: result.steps?.[0]?.product?.mixingRatio || '1:1',
+                            processingTime: result.processingTime || 35,
+                            applicationTechnique: result.application || 'all over',
+                            notes: result.notes?.join('. ') || '',
+                          }),
+                        })
+                        if (!response.ok) throw new Error('Failed to save formula')
+                        const savedFormula = await response.json()
+                        setSavedFormulaId(savedFormula.id)
+                        alert('Formula saved!')
+                      } catch (error) {
+                        alert(error instanceof Error ? error.message : 'Save failed')
+                      }
+                    }}
+                  >
+                    <Save className="w-3.5 h-3.5 mr-1.5" /> Save to Library
+                  </ActionButton>
+                </div>
+                {savedFormulaId && (
+                  <ActionButton
+                    className="w-full"
+                    style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)' }}
+                    onClick={() => {
+                      window.location.href = `/service?formulaId=${savedFormulaId}`
+                    }}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 mr-1.5" /> Use in Service
+                  </ActionButton>
+                )}
               </div>
             </div>
           </StepTransition>

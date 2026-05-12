@@ -1,0 +1,12 @@
+{
+  "name": "colorgenius-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev dist",
+    "deploy": "wrangler pages deploy dist --project-name=colorgenius"
+  },
+  "devDependencies": {
+    "wrangler": "^3.22.0"
+  }
+}
