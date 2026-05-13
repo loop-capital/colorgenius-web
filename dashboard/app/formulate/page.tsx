@@ -104,13 +104,14 @@ export default function FormulatePage() {
         {step === 1 && (
           <div style={card}>
             <h2 style={{ fontSize: 18, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}><Camera style={{ color: '#9333EA' }} /> Capture Hair Photo</h2>
-            <p style={{ color: '#A1A1AA', fontSize: 14, marginBottom: 16 }}>Take a clear photo of the client's current hair. Wet or dry both work.</p>
+            <p style={{ color: '#A1A1AA', fontSize: 14, marginBottom: 16 }}>Take a clear photo of the client's current hair. Ensure hair is dry for accurate color analysis.</p>
             {photo ? (
               <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', marginBottom: 16 }}>
                 <img src={photo} alt="Hair" style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }} />
                 <button type="button" onClick={() => setPhoto(null)} style={{ position: 'absolute', top: 12, right: 12, width: 32, height: 32, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
               </div>
             ) : (
+              <>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
                 <button type="button" onClick={() => { const i = document.createElement('input'); i.type='file'; i.accept='image/*'; i.capture='environment'; i.onchange=(e:any) => { const f = e.target.files?.[0]; if(f) { const r = new FileReader(); r.onload = (ev) => setPhoto(ev.target?.result as string); r.readAsDataURL(f) }}; i.click() }}
                   style={{ padding: 32, border: '2px dashed rgba(255,255,255,0.1)', borderRadius: 16, background: 'rgba(255,255,255,0.02)', color: '#F5F5F7', cursor: 'pointer', fontSize: 16, textAlign: 'center' }}>
@@ -127,10 +128,12 @@ export default function FormulatePage() {
                   Upload Photo
                 </button>
               </div>
+              <div style={{ padding: '12px 16px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, background: 'rgba(255,255,255,0.03)' }}><p style={{ fontSize: 13, color: '#A1A1AA', textAlign: 'center', margin: 0 }}>For best results, photograph the back of the head in natural light. Show 2–3 inches of root area for accurate level detection.</p></div>
+              </>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p style={{ fontSize: 12, color: '#71717A' }}>{photo ? 'Photo captured ✓' : 'Photo is optional — skip to continue'}</p>
-              <button type="button" onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Skip to Assessment'} <ChevronRight size={16} /></button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24 }}>
+              <p style={{ fontSize: 12, color: '#71717A' }}>{photo ? 'Photo captured ✓' : 'Photo recommended for best results'}</p>
+              <button type="button" onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Next: Assessment'} <ChevronRight size={16} /></button>
             </div>
           </div>
         )}
@@ -151,8 +154,13 @@ export default function FormulatePage() {
                 <div style={{ cursor: 'pointer' }}>
                   <ColorWheel3D tones={TONES.map(t => ({ value: t.value as ToneFamily, label: t.label, color: t.color }))} selected={toneMap[fd.currentTone] || 'neutral'} onSelect={(val) => { const code = revToneMap[val] || 'N'; setFd(p => ({ ...p, currentTone: code })) }} />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {TONES.map(t => <ColorCircle key={t.value} color={t.color} label={t.label} isActive={fd.currentTone === t.value} onClick={() => setFd(p => ({ ...p, currentTone: t.value }))} />)}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 48 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
+                    {TONES.slice(0, 6).map(t => <ColorCircle key={t.value} color={t.color} label={t.label} isActive={fd.currentTone === t.value} onClick={() => setFd(p => ({ ...p, currentTone: t.value }))} />)}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
+                    {TONES.slice(6, 12).map(t => <ColorCircle key={t.value} color={t.color} label={t.label} isActive={fd.currentTone === t.value} onClick={() => setFd(p => ({ ...p, currentTone: t.value }))} />)}
+                  </div>
                 </div>
               </div>
             </div>

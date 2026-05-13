@@ -74,7 +74,7 @@ export function HairSwatch({
             </span>
           )}
           {level !== undefined && (
-            <span className="text-[10px] text-[#737373] block">Level {level}</span>
+            <span className="text-[11px] text-[#737373] block">Level {level}</span>
           )}
         </div>
       )}
