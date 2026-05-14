@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TreatmentCard } from '@/components/custom'
 import { GlassCard } from '@/components/custom'
 import { ColorWheel3D } from '@/components/custom'
+import { HairSwatch } from '@/components/ui/hair-swatch'
 import {
   Search, Save, Edit3, Trash2, X, FlaskConical, Filter,
   Grid3X3, LayoutList, ChevronRight,
@@ -255,30 +256,21 @@ const MOCK_FORMULAS: Formula[] = [
   },
 ]
 
-const BRANDS = Array.from(new Set(MOCK_FORMULAS.map((f) => f.brand)))
 
-const LINES_BY_BRAND: Record<string, string[]> = MOCK_FORMULAS.reduce(
-  (acc, f) => {
-    if (!acc[f.brand]) acc[f.brand] = []
-    if (!acc[f.brand].includes(f.line)) acc[f.brand].push(f.line)
-    return acc
-  },
-  {} as Record<string, string[]>
-)
 
 const TONE_OPTIONS = [
-  { value: 'neutral', label: 'Natural', color: '#9C8B7A' },
-  { value: 'ash', label: 'Ash', color: '#8A7D6E' },
-  { value: 'golden', label: 'Golden', color: '#C4A35A' },
-  { value: 'copper', label: 'Copper', color: '#B87333' },
-  { value: 'red', label: 'Red', color: '#A03030' },
-  { value: 'violet', label: 'Violet', color: '#7B68A6' },
-  { value: 'pearl', label: 'Pearl', color: '#B8B0C4' },
-  { value: 'beige', label: 'Beige', color: '#C4B5A0' },
-  { value: 'silver', label: 'Silver', color: '#C0C0C0' },
-  { value: 'chrome', label: 'Chrome', color: '#A8A8A8' },
-  { value: 'orange', label: 'Orange Kicker', color: '#FF8C00' },
-  { value: 'yellow', label: 'Yellow Kicker', color: '#FFD700' },
+  { value: 'N', label: 'Natural', color: '#9C8B7A' },
+  { value: 'A', label: 'Ash', color: '#8A7D6E' },
+  { value: 'G', label: 'Gold', color: '#C4A35A' },
+  { value: 'K', label: 'Copper', color: '#B87333' },
+  { value: 'R', label: 'Red', color: '#A03030' },
+  { value: 'V', label: 'Violet', color: '#7B68A6' },
+  { value: 'P', label: 'Pearl', color: '#B8B0C4' },
+  { value: 'B', label: 'Beige', color: '#C4B5A0' },
+  { value: 'M', label: 'Mahogany', color: '#6B3A3A' },
+  { value: 'Ch', label: 'Chocolate', color: '#4A2C2A' },
+  { value: 'W', label: 'Warm', color: '#D4A574' },
+  { value: 'C', label: 'Cool', color: '#7D8B9A' },
 ]
 
 type ViewMode = 'grid' | 'table'
@@ -290,9 +282,68 @@ export default function LibraryPage() {
   const [filterTone, setFilterTone] = useState('')
   const [selectedFormula, setSelectedFormula] = useState<Formula | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [formulas, setFormulas] = useState<Formula[]>(MOCK_FORMULAS)
+  const [loading, setLoading] = useState(false)
+
+  // Fetch formulas from API
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        setLoading(true)
+        const res = await fetch('/api/v1/formulas/list?limit=100')
+        if (!res.ok) {
+          console.warn('Library API returned', res.status, '- using fallback data')
+          // Keep default mock data, don't set empty
+          return
+        }
+        const data = await res.json()
+        if (!cancelled && data.items?.length > 0) {
+            const mapped = data.items.map((f: any) => ({
+              id: f.id,
+              name: f.name || 'Untitled Formula',
+              clientName: f.clientName || 'Unknown',
+              brand: f.brand || 'Unknown',
+              line: f.productLine || '',
+              createdAt: f.createdAt || new Date().toISOString(),
+              tags: f.tags || [],
+              developer: f.developerVolume ? f.developerVolume + 'Vol' : '20Vol',
+              developerVolume: f.developerVolume ? f.developerVolume + 'ml' : '60ml',
+              totalVolume: f.totalVolume || '60ml',
+              processingTime: f.processingTime ? f.processingTime + ' min' : '30 min',
+              application: f.application || 'Full Head',
+              coverage: f.coverage || 'Roots',
+              notes: f.notes || '',
+              shades: (f.components || []).filter((c: any) => c.componentType === 'color').map((c: any) => ({
+                code: c.shadeCode || '?',
+                name: c.shadeName || c.shadeCode || 'Unknown',
+                hex: '#9333EA',
+              })),
+              confidence: f.confidence || 85,
+            }))
+            setFormulas(mapped)
+          }
+      } catch (e) {
+        console.error('Failed to fetch formulas:', e)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  const BRANDS = useMemo(() => Array.from(new Set(formulas.map((f) => f.brand))), [formulas])
+  const LINES_BY_BRAND = useMemo(() => formulas.reduce(
+    (acc, f) => {
+      if (!acc[f.brand]) acc[f.brand] = []
+      if (!acc[f.brand].includes(f.line)) acc[f.brand].push(f.line)
+      return acc
+    },
+    {}
+  ), [formulas])
 
   const filteredFormulas = useMemo(() => {
-    let result = [...MOCK_FORMULAS]
+    let result = [...formulas]
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase()
       result = result.filter(
@@ -303,18 +354,19 @@ export default function LibraryPage() {
           f.notes.toLowerCase().includes(q)
       )
     }
-    if (filterBrand) result = result.filter((f) => f.brand === filterBrand)
-    if (filterLine) result = result.filter((f) => f.line === filterLine)
+    if (filterBrand && filterBrand !== 'all') result = result.filter((f) => f.brand === filterBrand)
+    if (filterLine && filterLine !== 'all') result = result.filter((f) => f.line === filterLine)
     if (filterTone) {
+      const toneLabel = TONE_OPTIONS.find(t => t.value === filterTone)?.label?.toLowerCase() || filterTone.toLowerCase()
       result = result.filter((f) =>
-        f.tags.some((t) => t.toLowerCase().includes(filterTone.toLowerCase())) ||
-        f.name.toLowerCase().includes(filterTone.toLowerCase())
+        f.tags.some((t) => t.toLowerCase().includes(toneLabel)) ||
+        f.name.toLowerCase().includes(toneLabel)
       )
     }
     return result
   }, [searchTerm, filterBrand, filterLine, filterTone])
 
-  const linesForBrand = filterBrand ? LINES_BY_BRAND[filterBrand] || [] : []
+  const linesForBrand = (filterBrand && filterBrand !== 'all') ? LINES_BY_BRAND[filterBrand] || [] : []
 
   return (
     <div className="min-h-screen p-4 md:p-8" style={{ background: 'var(--cg-bg-deep)' }}>
@@ -404,7 +456,7 @@ export default function LibraryPage() {
                 <SelectValue placeholder="All brands" />
               </SelectTrigger>
               <SelectContent style={{ background: 'var(--cg-surface)', borderColor: 'rgba(255,255,255,0.08)' }}>
-                <SelectItem value="">All brands</SelectItem>
+                <SelectItem value="all" className="text-[#F5F5F7]">All brands</SelectItem>
                 {BRANDS.map((brand) => (
                   <SelectItem key={brand} value={brand} className="text-[#F5F5F7]">{brand}</SelectItem>
                 ))}
@@ -423,7 +475,7 @@ export default function LibraryPage() {
                 <SelectValue placeholder="All lines" />
               </SelectTrigger>
               <SelectContent style={{ background: 'var(--cg-surface)', borderColor: 'rgba(255,255,255,0.08)' }}>
-                <SelectItem value="">All lines</SelectItem>
+                <SelectItem value="all" className="text-[#F5F5F7]">All lines</SelectItem>
                 {linesForBrand.map((line) => (
                   <SelectItem key={line} value={line} className="text-[#F5F5F7]">{line}</SelectItem>
                 ))}
@@ -448,26 +500,31 @@ export default function LibraryPage() {
               selected={filterTone as any}
               onSelect={(val) => setFilterTone(filterTone === val ? '' : val)}
             />
-            <div className="flex flex-wrap gap-2">
-              {TONE_OPTIONS.map((tone) => (
-                <motion.button
-                  key={tone.value}
-                  onClick={() => setFilterTone(filterTone === tone.value ? '' : tone.value)}
-                  className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200'
-                  )}
-                  style={{
-                    backgroundColor: filterTone === tone.value ? `${tone.color}15` : 'rgba(255,255,255,0.03)',
-                    borderColor: filterTone === tone.value ? `${tone.color}40` : 'rgba(255,255,255,0.06)',
-                    color: filterTone === tone.value ? tone.color : 'var(--cg-text-secondary)',
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: tone.color }} />
-                  {tone.label}
-                </motion.button>
-              ))}
+            <div className="flex flex-col gap-2 pt-4">
+              <div className="grid grid-cols-6 gap-2">
+                {TONE_OPTIONS.slice(0, 6).map((tone) => (
+                  <HairSwatch
+                    key={tone.value}
+                    color={tone.color}
+                    label={tone.label}
+                    isActive={filterTone === tone.value}
+                    onClick={() => setFilterTone(filterTone === tone.value ? '' : tone.value)}
+                    size="sm"
+                  />
+                ))}
+              </div>
+              <div className="grid grid-cols-6 gap-2">
+                {TONE_OPTIONS.slice(6, 12).map((tone) => (
+                  <HairSwatch
+                    key={tone.value}
+                    color={tone.color}
+                    label={tone.label}
+                    isActive={filterTone === tone.value}
+                    onClick={() => setFilterTone(filterTone === tone.value ? '' : tone.value)}
+                    size="sm"
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </motion.div>
@@ -475,7 +532,7 @@ export default function LibraryPage() {
         {/* Results count */}
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
-            Showing <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>{filteredFormulas.length}</span> of {MOCK_FORMULAS.length} formulas
+            Showing <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>{filteredFormulas.length}</span> of {formulas.length} formulas
           </p>
         </div>
 

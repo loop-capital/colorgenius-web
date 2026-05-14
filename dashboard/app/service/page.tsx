@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -43,9 +44,11 @@ interface FormulaStep {
 }
 
 function ServiceEntryContent() {
+  const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedClientId = searchParams.get('clientId');
+  const preselectedFormulaId = searchParams.get('formulaId');
 
   const [step, setStep] = useState(0);
   const [clients, setClients] = useState<Client[]>([]);
@@ -157,7 +160,7 @@ function ServiceEntryContent() {
       setSaved(true);
       setTimeout(() => router.push('/clients/' + selectedClient.id), 1500);
     } catch (e: any) {
-      alert(e?.message || 'Save failed');
+      toast({ title: 'Save failed', description: e?.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -172,10 +175,10 @@ function ServiceEntryContent() {
             <ArrowLeft className="w-5 h-5" style={{ color: 'var(--cg-text-secondary)' }} />
           </button>
           <div>
-            <h1 className="text-xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
               New <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Color Service</span>
             </h1>
-            <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>Quick service entry — {STEPS[step].title}</p>
+            <p className="text-sm" style={{ color: 'var(--cg-text-tertiary)' }}>Quick service entry — {STEPS[step].title}</p>
           </div>
         </div>
 

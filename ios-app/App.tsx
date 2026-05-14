@@ -46,11 +46,20 @@ export default function App() {
   const [tareWeight, setTareWeight] = useState(0);
   const [isTared, setIsTared] = useState(false);
   const [formulaComponents, setFormulaComponents] = useState<Array<{name: string; targetGrams: number; actualGrams: number}>>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [bluetoothAvailable, setBluetoothAvailable] = useState(true);
   const bleManagerRef = useRef<BleManager | null>(null);
 
   useEffect(() => {
-    const manager = new BleManager();
-    bleManagerRef.current = manager;
+    let manager: BleManager;
+    try {
+      manager = new BleManager();
+      bleManagerRef.current = manager;
+    } catch (e) {
+      console.warn('BLE not available:', e);
+      setBluetoothAvailable(false);
+      return;
+    }
 
     // Monitor Bluetooth state
     const subscription = manager.onStateChange((state) => {
@@ -117,10 +126,17 @@ export default function App() {
           }
           
           if (characteristic?.value) {
-            const decoded = Buffer.from(characteristic.value, 'base64');
-            const flags = decoded[0];
+            // Decode base64 without Node.js Buffer (React Native safe)
+            const binaryString = atob(characteristic.value);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            const flags = bytes[0];
             const isKg = (flags & 0x01) === 0;
-            const weight = decoded.readFloatLE(1);
+            // Read float LE from bytes 1-4
+            const view = new DataView(bytes.buffer);
+            const weight = view.getFloat32(1, true); // true = little-endian
             
             const reading: ScaleReading = {
               weight: isKg ? weight * 1000 : weight, // Convert to grams

@@ -16,6 +16,8 @@
     "@radix-ui/react-toast": "^1.2.15",
     "@sentry/nextjs": "^10.50.0",
     "@tanstack/react-table": "^8.21.3",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "colorthief": "^3.3.1",
