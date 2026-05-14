@@ -23,6 +23,8 @@
       "infoPlist": {
         "NSBluetoothAlwaysUsageDescription": "ColorGenius needs Bluetooth to connect to your scale for precise color mixing.",
         "NSBluetoothPeripheralUsageDescription": "ColorGenius needs Bluetooth to connect to your scale for precise color mixing.",
+        "NSCameraUsageDescription": "ColorGenius uses your camera to photograph client hair for color assessment.",
+        "NSPhotoLibraryUsageDescription": "ColorGenius accesses your photo library to select hair reference photos.",
         "UIBackgroundModes": ["bluetooth-central"]
       }
     },
