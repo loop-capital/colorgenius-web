@@ -125,6 +125,10 @@ export default function LandingPage() {
               { icon: <Package size={22} />, title: 'Inventory Management', desc: 'Track color stock levels, set reorder alerts, and auto-deduct usage per service. Never run out of a shade mid-appointment.' },
               { icon: <BarChart3 size={22} />, title: 'Salon Analytics', desc: 'Color service revenue, most popular shades, product usage trends, and stylist performance — all in one dashboard.' },
               { icon: <Shield size={22} />, title: 'Client Safety Flags', desc: 'Automatic alerts for metallic dye, henna, previous chemical treatments, and allergies. Safety checks before every formulation.' },
+              { icon: <Package size={22} />, title: 'Formula Marketplace', desc: 'Browse and purchase verified formulas from top stylists. Every formula includes before/after photos, client hair type, and step-by-step instructions. Buy once, use forever.' },
+              { icon: <DollarSign size={22} />, title: 'Sell Your Formulas', desc: 'Monetize your expertise. Upload your signature formulas with photos and instructions. Set your price and earn every time another stylist purchases your creation.' },
+              { icon: <ClipboardList size={22} />, title: 'Community Feed', desc: 'Share your best work, get feedback from fellow stylists, and discover trending techniques. Build a following and establish yourself as a color authority.' },
+              { icon: <Palette size={22} />, title: 'Color Management System', desc: 'Centralized color catalog across all brands. Create custom shade palettes, organize by client preference, and streamline your color selection workflow.' },
             ].map((f, i) => (
               <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 24, display: 'flex', gap: 16 }}>
                 <div style={{ width: 44, height: 44, borderRadius: 10, background: 'rgba(147,51,234,0.08)', border: '1px solid rgba(147,51,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9333EA', flexShrink: 0 }}>{f.icon}</div>
@@ -164,20 +168,47 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Community & Marketplace */}
+      <section id="community" style={{ padding: '128px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 80 }}>
+            <p style={{ color: '#9333EA', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 16 }}>Community</p>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Share, discover, and sell formulas</h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, maxWidth: 600, margin: '0 auto' }}>Connect with stylists worldwide. Buy proven formulas, sell your signature mixes, and build your brand.</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
+            {[
+              { icon: <Package size={22} />, title: 'Formula Marketplace', desc: 'Browse and purchase verified formulas from top stylists. Every formula includes before/after photos, client hair type, and step-by-step instructions. Buy once, use forever.' },
+              { icon: <DollarSign size={22} />, title: 'Sell Your Formulas', desc: 'Monetize your expertise. Upload your signature formulas with photos and instructions. Set your price and earn every time another stylist purchases your creation.' },
+              { icon: <ClipboardList size={22} />, title: 'Community Feed', desc: 'Share your best work, get feedback from fellow stylists, and discover trending techniques. Build a following and establish yourself as a color authority.' },
+              { icon: <Shield size={22} />, title: 'Verified Reviews', desc: 'Every purchased formula can be reviewed by the buyer. Build trust with verified ratings and detailed feedback on formula accuracy and results.' },
+            ].map((f, i) => (
+              <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 24, display: 'flex', gap: 16 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg, rgba(147,51,234,0.12), rgba(236,72,153,0.12))', border: '1px solid rgba(147,51,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EC4899', flexShrink: 0 }}>{f.icon}</div>
+                <div>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{f.title}</h3>
+                  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, lineHeight: 1.5 }}>{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" style={{ padding: '128px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ color: '#9333EA', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 16 }}>Free During Beta</p>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>$0 through August 2026</h2>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18 }}>We're building this with stylists, for stylists. Beta is free because your feedback makes the product better.</p>
+            <p style={{ color: '#9333EA', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 16 }}>Simple Pricing</p>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Choose Your Plan</h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18 }}>Professional color management that pays for itself. Start free, upgrade when you're ready.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
             {[
               { name: 'Professional', price: '$29', period: '/mo', desc: 'Individual stylists', features: ['Unlimited formulations', '8+ color lines', 'AI learning system', 'Client history'], highlight: false },
-              { name: 'Pro+', price: '$49', period: '/mo', desc: 'Power users', features: ['All brands', 'Advanced AI', 'Priority support', 'Scale integration'], highlight: false },
+              { name: 'Pro+', price: '$49', period: '/mo', desc: 'Power users', features: ['All brands', 'Color Management System', 'Advanced AI', 'Priority support', 'Scale integration'], highlight: false },
               { name: 'Salon', price: '$149', period: '/mo', desc: 'Teams of 5', features: ['5 seats', 'Team analytics', 'Inventory tracking', 'Client management'], highlight: true },
-              { name: 'Salon+', price: '$299', period: '/mo', desc: 'Larger teams', features: ['15 seats', 'Full inventory', 'Custom reporting', 'API access'], highlight: false },
+              { name: 'Salon+', price: '$289', period: '/mo', desc: 'Larger teams', features: ['10 seats', 'Full inventory', 'Custom reporting', 'API access'], highlight: false },
             ].map((t, i) => (
               <div key={i} style={{ position: 'relative', border: t.highlight ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.08)', background: t.highlight ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 24 }}>
                 {t.highlight && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', fontSize: 10, fontWeight: 700, padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase' }}>Popular</div>}
