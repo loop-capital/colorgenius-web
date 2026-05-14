@@ -13,9 +13,27 @@
 **/build/
 .vercel/
 
+# Ignore large project directories
+Davines Color Lnes/
+Vish/
+references/
+packages/
+docs/
+workers/
+data/
+memory/
+graphify-out/
+research/
+prisma/
+shared/
+color-lines/
+
 # Ignore large files
 *.log
 colorgenius-logo-reference.jpg
+login-result.png
+login-result.html
+tsconfig.tsbuildinfo
 
 # Ignore backup files
 *.backup-*
