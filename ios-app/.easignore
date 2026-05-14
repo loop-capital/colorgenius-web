@@ -1,5 +1,16 @@
+# dependencies
 node_modules/
+
+# git
 .git/
+
+# build artifacts
+.next/
+.vercel/
+dist/
 web-reference-dist/
+
+# large reference files
 *.md
 colorgenius-logo-reference.jpg
+*.log
