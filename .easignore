@@ -1,33 +1,23 @@
-# Dependencies
+# Ignore everything by default
+*
+
+# Only include the ios-app directory
+!ios-app/
+!ios-app/**
+
+# But still ignore node_modules within ios-app
+ios-app/node_modules/
+ios-app/.expo/
+ios-app/dist/
+ios-app/build/
+
+# Ignore other large directories at root
 node_modules/
-**/node_modules/
-
-# Git
 .git/
-
-# Build artifacts
+.archive/
 .next/
-.vercel/
 dist/
 build/
-web-reference-dist/
-
-# Archive
-.archive/
-
-# Large reference files
-*.md
-colorgenius-logo-reference.jpg
-*.log
-
-# Backup files
-*.backup-*
-
-# Test files
-__tests__/
-*.test.*
-*.spec.*
-
-# Development files
-.env*
-.env.local
+packages/*/node_modules/
+dashboard/node_modules/
+landing-page/node_modules/
