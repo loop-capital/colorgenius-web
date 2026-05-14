@@ -2,7 +2,7 @@
   "expo": {
     "name": "ColorGenius",
     "slug": "colorgenius",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -21,7 +21,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.colorgenius.app",
-      "buildNumber": "1.0.1",
+      "buildNumber": "1.0.2",
       "iosDeploymentTarget": "13.0",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
