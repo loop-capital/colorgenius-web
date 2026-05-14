@@ -24,6 +24,7 @@
       "buildNumber": "1.0.1",
       "iosDeploymentTarget": "13.0",
       "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
         "NSBluetoothAlwaysUsageDescription": "ColorGenius needs Bluetooth to connect to your scale for precise color mixing.",
         "NSBluetoothPeripheralUsageDescription": "ColorGenius needs Bluetooth to connect to your scale for precise color mixing.",
         "NSCameraUsageDescription": "ColorGenius uses your camera to photograph client hair for color assessment.",
