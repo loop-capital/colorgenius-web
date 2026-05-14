@@ -164,8 +164,7 @@ export default function PhotoGallery({ formulaId, stylistId }: PhotoGalleryProps
               >
                 {/* Before/After Comparison */}
                 <div className="relative h-64 overflow-hidden">
-                  <div className="absolute inset-0 flex"
-003e
+                  <div className="absolute inset-0 flex">
                     <div className="w-1/2 relative">
                       <img
                         src={photo.beforeUrl || '/placeholder-before.jpg'}
