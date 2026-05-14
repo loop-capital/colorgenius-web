@@ -1,16 +1,29 @@
-# dependencies
-node_modules/
+# Dependencies
+**/node_modules/
 
-# git
+# Git
 .git/
+.gitignore
 
-# build artifacts
+# Build artifacts
 .next/
 .vercel/
 dist/
 web-reference-dist/
 
-# large reference files
+# Large reference files
 *.md
 colorgenius-logo-reference.jpg
 *.log
+
+# Backup files
+*.backup-*
+
+# Test files
+__tests__/
+*.test.*
+*.spec.*
+
+# Development files
+.env*
+.env.local
