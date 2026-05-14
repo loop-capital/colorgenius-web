@@ -1,13 +1,17 @@
 # Ignore everything
 *
 
-# Only include ios-app
+# Re-include ios-app directory
 !ios-app/
-!ios-app/**/
 
-# But exclude node_modules even in ios-app
+# Re-include all files in ios-app
+!ios-app/**/*
+
+# But exclude node_modules in ios-app
 ios-app/node_modules/
-ios-app/.expo/
+
+# Exclude build artifacts
 ios-app/dist/
 ios-app/build/
+ios-app/.expo/
 ios-app/*.backup-*
