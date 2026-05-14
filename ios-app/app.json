@@ -14,7 +14,10 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.colorgenius.app",
@@ -25,7 +28,9 @@
         "NSBluetoothPeripheralUsageDescription": "ColorGenius needs Bluetooth to connect to your scale for precise color mixing.",
         "NSCameraUsageDescription": "ColorGenius uses your camera to photograph client hair for color assessment.",
         "NSPhotoLibraryUsageDescription": "ColorGenius accesses your photo library to select hair reference photos.",
-        "UIBackgroundModes": ["bluetooth-central"]
+        "UIBackgroundModes": [
+          "bluetooth-central"
+        ]
       }
     },
     "android": {
@@ -40,7 +45,10 @@
         "BLUETOOTH_ADMIN",
         "BLUETOOTH_SCAN",
         "BLUETOOTH_CONNECT",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_CONNECT"
       ]
     },
     "plugins": [
@@ -53,8 +61,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id-here"
+        "projectId": "b079806d-5b5b-4c83-ab89-63ea74de66da"
       }
-    }
+    },
+    "owner": "jasonopland"
   }
 }
