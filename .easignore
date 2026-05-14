@@ -1,17 +1,57 @@
-# Ignore everything
-*
+# Dependencies
+**/node_modules/
 
-# Re-include ios-app directory
-!ios-app/
+# Git
+.git/
 
-# Re-include all files in ios-app
-!ios-app/**/*
+# Archive
+.archive/
 
-# But exclude node_modules in ios-app
-ios-app/node_modules/
+# Build artifacts
+**/.next/
+**/dist/
+**/build/
+.vercel/
 
-# Exclude build artifacts
-ios-app/dist/
-ios-app/build/
-ios-app/.expo/
-ios-app/*.backup-*
+# Large directories
+Davines Color Lnes/
+Vish/
+references/
+packages/
+docs/
+workers/
+data/
+memory/
+graphify-out/
+research/
+prisma/
+shared/
+color-lines/
+components/
+blog/
+temp/
+second-brain/
+hooks/
+lib/
+infrastructure/
+production/
+
+# Large files
+*.log
+colorgenius-logo-reference.jpg
+login-result.png
+login-result.html
+*.backup-*
+*.md
+
+# Test files
+__tests__/
+*.test.*
+*.spec.*
+
+# Development files
+.env*
+.env.local
+
+# Expo cache
+.expo/
