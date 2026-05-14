@@ -51,3 +51,5 @@ coverage/
 # Misc
 *.bak
 *.tmp
+# Archive directory
+.archive/
