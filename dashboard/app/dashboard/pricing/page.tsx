@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DollarSign, Plus, Edit3, Trash2, X, Check, AlertCircle, TrendingUp, Save, Copy,
@@ -48,6 +49,7 @@ const emptyForm: RuleFormData = {
 };
 
 export default function PricingRulesPage() {
+  const { toast } = useToast();
   const [rules, setRules] = useState<PricingRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -129,7 +131,7 @@ export default function PricingRulesPage() {
       setEditingId(null);
       fetchRules();
     } catch (e: any) {
-      alert(e?.message || 'Save failed');
+      toast({ title: 'Save failed', description: e?.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -142,7 +144,7 @@ export default function PricingRulesPage() {
       if (!res.ok) throw new Error('Delete failed');
       fetchRules();
     } catch (e: any) {
-      alert(e?.message || 'Delete failed');
+      toast({ title: 'Delete failed', description: e?.message, variant: 'destructive' });
     }
   };
 
@@ -152,7 +154,7 @@ export default function PricingRulesPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
+            <h1 className="text-3xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
               Pricing <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Rules</span>
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--cg-text-secondary)' }}>

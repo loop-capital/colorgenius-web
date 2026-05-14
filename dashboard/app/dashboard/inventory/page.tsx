@@ -14,7 +14,7 @@ export default function InventoryPage() {
     <div className="min-h-screen p-4 md:p-8" style={{ background: 'var(--cg-bg-deep)' }}>
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
             Inventory <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">Management</span>
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--cg-text-secondary)' }}>

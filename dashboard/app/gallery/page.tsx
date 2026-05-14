@@ -2,117 +2,96 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { GlassCard } from '@/components/custom/glass-card'
-import { TreatmentCard } from '@/components/custom/treatment-card'
-import {
-  TrendingUp, Flame, Heart, Bookmark,
-  Palette, ChevronRight, Sparkles, Filter,
-} from 'lucide-react'
-
-const tabs = [
-  { id: 'trending', label: 'Trending', icon: TrendingUp },
-  { id: 'seasonal', label: 'Seasonal', icon: Palette },
-  { id: 'latest', label: 'Latest', icon: Flame },
-]
-
-const mockPosts = [
-  {
-    name: 'Summer Balayage', brand: 'Wella', line: 'Koleston Perfect',
-    shades: [{ code: '7/73', name: 'Golden Blonde', hex: '#C08C5A' }, { code: '8/73', name: 'Light Golden', hex: '#D4AA7D' }],
-    developer: 'Welloxon Perfect', developerVolume: '30Vol', mixRatio: '1:1', processingTime: '35',
-    application: 'Balayage', confidence: 94,
-    likes: 234, saves: 67,
-    stylist: { name: 'Eiza', salon: 'Pleij' },
-  },
-  {
-    name: 'Root Touch-Up', brand: 'Schwarzkopf', line: 'Igora Royal',
-    shades: [{ code: '5-0', name: 'Light Brown Natural', hex: '#7D5038' }],
-    developer: 'Igora Royal Oil', developerVolume: '10Vol', mixRatio: '1:1', processingTime: '30',
-    application: 'Roots', confidence: 91,
-    likes: 156, saves: 34,
-    stylist: { name: 'Maria', salon: 'Salon X' },
-  },
-  {
-    name: 'Ash Blonde Correction', brand: 'Goldwell', line: 'DualSenses',
-    shades: [{ code: '8A', name: 'Light Blonde Ash', hex: '#C4B0A0' }],
-    developer: 'Topchic Developer', developerVolume: '20Vol', mixRatio: '1:1', processingTime: '45',
-    application: 'Zone', confidence: 88,
-    likes: 189, saves: 52,
-    stylist: { name: 'Jen', salon: 'Studio Y' },
-  },
-]
+import { GalleryFeed } from '@/components/custom/gallery-feed'
+import { PhotoDetail, type PhotoDetailProps } from '@/components/custom/photo-detail'
+import { AnimatePresence } from 'framer-motion'
 
 export default function GalleryPage() {
-  const [activeTab, setActiveTab] = useState('trending')
+  const [detailPhoto, setDetailPhoto] = useState<{
+    id: string
+    beforeUrl: string | null
+    afterUrl: string | null
+    caption: string
+    tags: string[]
+    likes: number
+    comments: number
+    isLiked: boolean
+    isSaved: boolean
+    createdAt: string
+    stylistName: string
+    salonName: string
+    avatarUrl?: string
+    confidence?: number
+    formulaId?: string
+    stylistId?: string
+  } | null>(null)
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F]" style={{ backgroundImage: 'linear-gradient(135deg, #0A0A0F 0%, #1A1033 50%, #0F1A2E 100%)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--cg-bg-deep)' }}>
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         <motion.div className="mb-8" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="text-[11px] text-[#71717A] uppercase tracking-[0.1em] font-semibold mb-2">Discover</p>
-          <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F7]">Color Gallery</h1>
-          <p className="text-sm text-[#A1A1AA] mt-1">Inspiring transformations from professional colorists worldwide</p>
-        </motion.div>
-
-        {/* Tabs */}
-        <div className="flex items-center gap-2 mb-6 overflow-x-auto">
-          {tabs.map((tab) => (
-            <motion.button
-              key={tab.id}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all shrink-0 ${
-                activeTab === tab.id
-                  ? 'bg-[#9333EA]/15 text-[#9333EA] border border-[#9333EA]/20'
-                  : 'bg-white/[0.03] text-[#71717A] border border-white/[0.04] hover:bg-white/[0.06] hover:text-[#A1A1AA]'
-              }`}
-              onClick={() => setActiveTab(tab.id)}
-              whileTap={{ scale: 0.97 }}
+          <p className="text-[11px] uppercase tracking-[0.1em] font-semibold mb-2" style={{ color: 'var(--cg-text-tertiary)' }}>
+            Discover
+          </p>
+          <h1 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
+            Color{' '}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{ backgroundImage: 'linear-gradient(135deg, #9333EA, #EC4899)' }}
             >
-              <tab.icon className="w-4 h-4" />{tab.label}
-            </motion.button>
-          ))}
-          <motion.button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white/[0.03] text-[#71717A] border border-white/[0.04] hover:bg-white/[0.06] shrink-0" whileTap={{ scale: 0.97 }}>
-            <Filter className="w-4 h-4" /> Filter
-          </motion.button>
-        </div>
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {mockPosts.map((post, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-              <GlassCard className="overflow-hidden">
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg bg-[#9333EA]/15 flex items-center justify-center text-[#9333EA] text-xs font-bold">
-                        {post.stylist.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="text-[13px] text-[#F5F5F7] font-medium">{post.stylist.name}</p>
-                        <p className="text-[11px] text-[#71717A]">{post.stylist.salon}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 text-[11px] text-[#71717A]">
-                      <Sparkles className="w-3 h-3 text-[#F59E0B]" />{post.confidence}%
-                    </div>
-                  </div>
-                  <TreatmentCard {...post} className='w-full' />
-                  <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/[0.04]">
-                    <button className="flex items-center gap-1.5 text-[11px] text-[#71717A] hover:text-[#EF4444] transition-colors">
-                      <Heart className="w-3.5 h-3.5" />{post.likes}
-                    </button>
-                    <button className="flex items-center gap-1.5 text-[11px] text-[#71717A] hover:text-[#F59E0B] transition-colors">
-                      <Bookmark className="w-3.5 h-3.5" />{post.saves}
-                    </button>
-                    <button className="ml-auto text-[11px] text-[#9333EA] hover:text-[#EC4899] font-medium flex items-center gap-1 transition-colors">
-                      View <ChevronRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
+              Gallery
+            </span>
+          </h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--cg-text-secondary)' }}>
+            Inspiring transformations from professional colorists worldwide
+          </p>
+        </motion.div>
       </div>
+
+      <GalleryFeed
+        onPhotoClick={(photo) =>
+          setDetailPhoto({
+            id: photo.id,
+            beforeUrl: photo.beforeImage || null,
+            afterUrl: photo.afterImage || null,
+            caption: '',
+            tags: photo.tags,
+            likes: 0,
+            comments: photo.commentCount,
+            isLiked: false,
+            isSaved: false,
+            createdAt: photo.createdAt,
+            stylistName: photo.stylistName,
+            salonName: '',
+            formulaId: photo.formulaId,
+            stylistId: undefined,
+          })
+        }
+      />
+
+      <AnimatePresence>
+        {detailPhoto && (
+          <PhotoDetail
+            photoId={detailPhoto.id}
+            beforeUrl={detailPhoto.beforeUrl}
+            afterUrl={detailPhoto.afterUrl}
+            caption={detailPhoto.caption}
+            tags={detailPhoto.tags}
+            likes={detailPhoto.likes}
+            comments={detailPhoto.comments}
+            isLiked={detailPhoto.isLiked}
+            isSaved={detailPhoto.isSaved}
+            createdAt={detailPhoto.createdAt}
+            stylistName={detailPhoto.stylistName}
+            salonName={detailPhoto.salonName}
+            avatarUrl={detailPhoto.avatarUrl}
+            confidence={detailPhoto.confidence}
+            formulaId={detailPhoto.formulaId}
+            stylistId={detailPhoto.stylistId}
+            onClose={() => setDetailPhoto(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

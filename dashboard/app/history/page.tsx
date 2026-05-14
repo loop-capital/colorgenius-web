@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/use-toast'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { GlassCard } from '@/components/custom'
@@ -10,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Filter, Search, Trash2, Edit3, Save, Loader2, Clock, Image, Palette } from 'lucide-react'
 
 export default function HistoryPage() {
+  const router = useRouter()
+  const { toast } = useToast()
   const [history, setHistory] = useState<Array<any>>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -17,13 +21,21 @@ export default function HistoryPage() {
   const [dateFrom, setDateFrom] = useState<string | null>(null)
   const [dateTo, setDateTo] = useState<string | null>(null)
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [multiSelectMode, setMultiSelectMode] = useState(false)
 
   useEffect(() => {
-    fetchHistory()
+    const timer = setTimeout(() => fetchHistory(false), 300)
+    return () => clearTimeout(timer)
   }, [searchTerm, filterType, dateFrom, dateTo])
 
-  const fetchHistory = async () => {
-    setLoading(true)
+  // Initial load with loading state
+  useEffect(() => {
+    fetchHistory(true)
+  }, [])
+
+  const fetchHistory = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     try {
       // Build query parameters
       const params = new URLSearchParams()
@@ -41,7 +53,7 @@ export default function HistoryPage() {
       const data = await response.json()
       setHistory(data.history || [])
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to load history')
+      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to load history', variant: 'destructive' })
     } finally {
       setLoading(false)
     }
@@ -57,11 +69,11 @@ export default function HistoryPage() {
     try {
       // In a real implementation, this would call a delete API endpoint
       // For now, we'll simulate it
-      alert('History entry has been removed successfully')
+      toast({ title: 'Deleted', description: 'History entry removed' })
       
       fetchHistory()
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to delete history entry')
+      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to delete', variant: 'destructive' })
     }
   }
 
@@ -79,12 +91,23 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Analysis History</h1>
+        <h1 className="text-3xl font-bold">Analysis <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">History</span></h1>
         <div className="flex items-center gap-3">
           <Button 
             onClick={() => {
+              setMultiSelectMode(!multiSelectMode)
+              if (multiSelectMode) setSelectedIds(new Set())
+            }}
+            variant="outline"
+            size="sm"
+            className={multiSelectMode ? 'border-[#9333EA] text-[#9333EA]' : ''}
+          >
+            {multiSelectMode ? 'Cancel' : 'Select'}
+          </Button>
+          <Button 
+            onClick={() => {
               // Export functionality
-              alert('Export history')
+              toast({ title: 'Export', description: 'Exporting history...' })
             }}
             variant="outline"
             size="sm"
@@ -95,7 +118,7 @@ export default function HistoryPage() {
           <Button 
             onClick={() => {
               // New analysis
-              alert('Navigate to new analysis')
+              router.push('/formulate')
             }}
             variant="outline"
             size="sm"
@@ -170,6 +193,7 @@ export default function HistoryPage() {
             <table className="w-full text-sm text-muted-foreground">
               <thead className="bg-muted/50">
                 <tr>
+                  {multiSelectMode && <th className="w-10 px-2 py-3"><input type="checkbox" checked={selectedIds.size === history.length && history.length > 0} onChange={(e) => { if (e.target.checked) { setSelectedIds(new Set(history.map((h: any) => h.id))) } else { setSelectedIds(new Set()) } }} className="accent-[#9333EA]" /></th>}
                   <th className="text-left px-4 py-3">Date</th>
                   <th className="text-left px-4 py-3">Client</th>
                   <th className="text-left px-4 py-3">Type</th>
@@ -182,6 +206,7 @@ export default function HistoryPage() {
                   const date = new Date(entry.createdAt || entry.timestamp || Date.now())
                   return (
                     <tr key={entry.id} className="hover:bg-muted/50">
+                      {multiSelectMode && <td className="w-10 px-2 py-3"><input type="checkbox" checked={selectedIds.has(entry.id)} onChange={() => { const next = new Set(selectedIds); if (next.has(entry.id)) next.delete(entry.id); else next.add(entry.id); setSelectedIds(next); }} className="accent-[#9333EA]" /></td>}
                       <td className="px-4 py-3">
                         <Clock className="mr-2 h-4 w-4" /> 
                         {date.toLocaleDateString()} {date.toLocaleTimeString()}
@@ -232,7 +257,7 @@ export default function HistoryPage() {
                           size="icon"
                           onClick={() => {
                             // Edit functionality
-                            alert('Edit history entry')
+                            router.push(`/formulate?formulaId=${entry.id}`)
                           }}
                           title="Edit entry"
                         >
@@ -334,7 +359,7 @@ export default function HistoryPage() {
               <Button 
                 onClick={() => {
                   // Create formulation from this analysis
-                  alert('Create formulation from this analysis')
+                  router.push('/formulate')
                 }}
                 variant="default"
               >

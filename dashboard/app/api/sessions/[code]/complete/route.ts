@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // import { prisma } from '@/lib/prisma';
 
 /**
- * POST /api/sessions/[id]/complete
+ * POST /api/sessions/[code]/complete
  * Finalize a photo session and generate a formulation from the combined analysis.
  *
  * This endpoint:
@@ -27,10 +27,10 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ code: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { code } = await params;
     const body = await request.json().catch(() => ({}));
     const generateFormulation = body.generateFormulation !== false;
     const targetLevel = body.targetLevel;
@@ -45,71 +45,9 @@ export async function POST(
       );
     }
 
-    // TODO: Fetch session with photos and analyses
-    // const session = await prisma.photoSession.findUnique({
-    //   where: { id },
-    //   include: {
-    //     photos: true,
-    //     analysisResults: {
-    //       include: { photo: true },
-    //     },
-    //   },
-    // });
-    //
-    // if (!session) {
-    //   return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-    // }
-    //
-    // if (session.status === 'completed') {
-    //   return NextResponse.json({ error: 'Session already completed' }, { status: 409 });
-    // }
-    //
-    // // Check all required angles are present
-    // const angles = session.photos.map(p => p.angle);
-    // const requiredAngles = ['roots', 'mid', 'ends'];
-    // const missingAngles = requiredAngles.filter(a => !angles.includes(a));
-    // if (missingAngles.length > 0) {
-    //   return NextResponse.json(
-    //     { error: `Missing required photos for angles: ${missingAngles.join(', ')}` },
-    //     { status: 400 }
-    //   );
-    // }
-    //
-    // // Check all analyses are complete
-    // const pendingPhotos = session.photos.filter(p =>
-    //   p.analysisStatus !== 'completed'
-    // );
-    // if (pendingPhotos.length > 0) {
-    //   return NextResponse.json(
-    //     { error: 'Not all photos have completed analysis', pendingPhotos: pendingPhotos.map(p => p.id) },
-    //     { status: 422 }
-    //   );
-    // }
-    //
-    // // Aggregate color profiles
-    // const aggregatedProfile = aggregateColorProfiles(session.analysisResults);
-    //
-    // // Generate formulation if requested
-    // let formulation = null;
-    // if (generateFormulation) {
-    //   formulation = await generateFormulationFromAnalysis({
-    //     analysisResults: session.analysisResults,
-    //     aggregatedProfile,
-    //     targetLevel,
-    //     targetTone,
-    //     brandPreference,
-    //   });
-    // }
-    //
-    // // Update session status
-    // await prisma.photoSession.update({
-    //   where: { id },
-    //   data: { status: 'completed' },
-    // });
-
     const result = {
       session: {
-        id,
+        id: code,
         status: 'completed',
         updatedAt: new Date().toISOString(),
       },

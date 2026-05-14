@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         client: {
           id: client.id,
+          salonId: client.salon_id,
           name: `${client.first_name} ${client.last_name}`,
           email: client.email,
           phone: client.phone,
@@ -52,6 +53,7 @@ export async function GET(request: NextRequest) {
 
     const mapped = clients.map(c => ({
       id: c.id,
+      salonId: c.salon_id,
       name: `${c.first_name} ${c.last_name}`,
       email: c.email,
       phone: c.phone,

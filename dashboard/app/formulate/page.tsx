@@ -1,14 +1,19 @@
 'use client'
 
-import { useState } from 'react'
-import { HAIR_LEVELS } from '@/lib/products'
+import { useState, useEffect } from 'react'
+import { useToast } from '@/components/ui/use-toast'
+import { HAIR_LEVELS, BRANDS, LINES_BY_BRAND } from '@/lib/products'
 import { HairSwatch } from '@/components/ui/hair-swatch'
 import { ColorCircle } from '@/components/ui/color-circle'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { ColorWheel3D } from '@/components/custom'
 import { ScaleWidget } from '@/components/scale-widget'
-import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle } from 'lucide-react'
+import { EditFormula, type FormulaIngredient } from '@/components/edit-formula'
+import { ScaleBowl, type BowlIngredient } from '@/components/scale-bowl'
+import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle, Smartphone, User, Search, UserPlus } from 'lucide-react'
+import { ProductSearch, type SelectedProduct } from '@/components/product-search'
+import { StockCheck } from '@/components/stock-check'
 import type { ToneFamily } from '@/lib/products'
 
 const STEPS = [
@@ -25,11 +30,20 @@ const POROSITY = [
   { value: 'high', label: 'High', color: '#EF4444' },
 ]
 
+const HAIR_TYPES = [
+  { value: 'fine', label: 'Fine/Thin', desc: 'Delicate, low density' },
+  { value: 'normal', label: 'Normal', desc: 'Medium texture & density' },
+  { value: 'thick', label: 'Thick/Coarse', desc: 'Strong, high density' },
+  { value: 'curly', label: 'Curly', desc: 'Coiled or wavy texture' },
+]
+
 const CONDITION_TYPES = [
   { value: 'virgin', label: 'Virgin Hair', desc: 'Never chemically treated' },
-  { value: 'previously_colored', label: 'Previously Colored', desc: 'Has existing color' },
   { value: 'bleached', label: 'Bleached/Lightened', desc: 'Lifted from natural' },
-  { value: 'damaged', label: 'Damaged', desc: 'Over-processed or dry' },
+  { value: 'gray_coverage', label: 'Gray Coverage Needed', desc: 'Requires gray blending or coverage' },
+  { value: 'previously_colored', label: 'Previously Colored', desc: 'Has existing color deposit' },
+  { value: 'damaged', label: 'Damaged', desc: 'Over-processed or compromised' },
+  { value: 'dry_brittle', label: 'Dry/Brittle', desc: 'Lacks moisture, prone to breakage' },
 ]
 
 const TONES = [
@@ -41,7 +55,8 @@ const TONES = [
   { value: 'W', label: 'Warm', color: '#D4A574' }, { value: 'C', label: 'Cool', color: '#7D8B9A' },
 ]
 
-const BRANDS = ['Davines', 'Wella', 'Schwarzkopf', 'Redken', 'Matrix', 'Joico', 'Paul Mitchell', 'Pulp Riot', 'Goldwell']
+// Brands & lines now fetched from API (salon inventory)
+
 
 const toneMap: Record<string, ToneFamily> = { N: 'neutral', A: 'ash', G: 'golden', R: 'red', V: 'violet', K: 'copper', B: 'beige', P: 'pearl', M: 'mahogany', Ch: 'chocolate', W: 'warm', C: 'cool' }
 const revToneMap: Record<string, string> = { neutral: 'N', ash: 'A', golden: 'G', red: 'R', violet: 'V', copper: 'K', beige: 'B', pearl: 'P', mahogany: 'M', chocolate: 'Ch', warm: 'W', cool: 'C' }
@@ -51,15 +66,138 @@ const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, 
 const btnOutline = { padding: '12px 24px', border: '1px solid rgba(255,255,255,0.12)', color: '#A1A1AA', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 
 export default function FormulatePage() {
+  const { toast } = useToast()
   const [step, setStep] = useState(1)
   const [photo, setPhoto] = useState<string | null>(null)
   const [fd, setFd] = useState({
     currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N',
+    hairType: 'normal',
     condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 },
-    brandPreference: '',
+    brandPreference: '', linePreference: '',
   })
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
+  const [formulaView, setFormulaView] = useState<'edit' | 'bowl'>('edit')
+  const [formulaIngredients, setFormulaIngredients] = useState<FormulaIngredient[]>([])
+  const [formulaDeveloper, setFormulaDeveloper] = useState({ name: '20 Vol Cream', volume: 20 })
+  const [formulaRatio, setFormulaRatio] = useState('1:1.5')
+  const [brands] = useState<string[]>(BRANDS)
+  const [shades, setShades] = useState<Array<{shadeCode: string; shadeName: string; quantity: number; line?: string | null}>>([])
+  const [showProductSearch, setShowProductSearch] = useState(false)
+  const [sessionCode, setSessionCode] = useState<string | null>(null)
+  const [salonId, setSalonId] = useState<string>('')
+  const [clientId, setClientId] = useState<string | null>(null)
+  const [clientName, setClientName] = useState('')
+  const [clientPhone, setClientPhone] = useState('')
+  const [clientSearch, setClientSearch] = useState('')
+  const [clientResults, setClientResults] = useState<Array<{id: string; name: string; phone?: string}>>([])
+  const [showClientSearch, setShowClientSearch] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  // Fetch salon context and shades on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const authRes = await fetch('/api/auth/me')
+        const authData = await authRes.json()
+        setSalonId(authData?.user?.id || 'default')
+      } catch (e) { /* non-critical */ }
+    })()
+  }, [])
+
+  // Auto-select line when brand changes
+  useEffect(() => {
+    if (!fd.brandPreference) { setFd(p => ({ ...p, linePreference: '' })); return }
+    const lines = LINES_BY_BRAND[fd.brandPreference] || []
+    if (lines.length === 1) {
+      setFd(p => ({ ...p, linePreference: lines[0] }))
+    } else {
+      setFd(p => ({ ...p, linePreference: '' }))
+    }
+  }, [fd.brandPreference])
+
+  // Search clients
+  useEffect(() => {
+    if (!clientSearch || clientSearch.length < 2) { setClientResults([]); return }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/clients?search=${encodeURIComponent(clientSearch)}`)
+        const data = await res.json()
+        setClientResults(data.clients || [])
+      } catch (e) { console.error('Client search failed:', e) }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [clientSearch])
+
+  const selectClient = (c: { id: string; name: string; phone?: string }) => {
+    setClientId(c.id)
+    setClientName(c.name)
+    setClientPhone(c.phone || '')
+    setShowClientSearch(false)
+    setClientSearch('')
+    setClientResults([])
+  }
+
+  const handleSaveFormula = async () => {
+    if (saving) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/formulations/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          clientName: clientName || undefined,
+          clientPhone: clientPhone || undefined,
+          salonId,
+          stylistId: salonId,
+          formData: fd,
+          result,
+          ingredients: formulaIngredients,
+          developer: formulaDeveloper,
+          ratio: formulaRatio,
+          photoUrl: photo,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setSaved(true)
+        if (data.clientId && !clientId) setClientId(data.clientId)
+        toast({ title: 'Saved', description: clientName ? `Formula saved for ${clientName}` : 'Formula saved to library' })
+      } else {
+        toast({ title: 'Error', description: data.error || 'Failed to save', variant: 'destructive' })
+      }
+    } catch (e: any) {
+      toast({ title: 'Error', description: e.message, variant: 'destructive' })
+    }
+    setSaving(false)
+  }
+
+  // Generate session code for phone upload
+  const generateSessionCode = async () => {
+    try {
+      const res = await fetch('/api/sessions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ salonId: 'default' }) })
+      const data = await res.json()
+      if (data.code) setSessionCode(data.code)
+    } catch (e) { console.error('Failed to generate session code:', e) }
+  }
+
+  // Handle product selection from ProductSearch
+  const handleProductSelect = (product: SelectedProduct) => {
+    const newIngredient: FormulaIngredient = {
+      id: `ing-${Date.now()}`,
+      name: product.shadeName,
+      brand: product.brand,
+      shadeCode: product.shadeCode,
+      series: product.line,
+      targetGrams: product.targetGrams,
+      color: product.color,
+      order: formulaIngredients.length,
+    }
+    setFormulaIngredients(prev => [...prev, newIngredient])
+    setShowProductSearch(false)
+  }
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -68,8 +206,26 @@ export default function FormulatePage() {
       if (!res.ok) throw new Error('Formulation failed')
       const data = await res.json()
       setResult(data.data)
+      // Convert API result to EditFormula ingredients
+      const ingredients: FormulaIngredient[] = (data.data?.steps || [])
+        .filter((s: any) => s.role === 'primary' || s.role === 'secondary')
+        .map((s: any, idx: number) => ({
+          id: `ing-${idx}`,
+          name: s.product?.shadeName || 'Unknown',
+          brand: data.data?.brand || 'Unknown',
+          shadeCode: s.product?.shadeCode || '?',
+          series: data.data?.line || '',
+          targetGrams: s.grams || 20,
+          color: HAIR_LEVELS[s.product?.level]?.hex || '#7D5038',
+          order: idx,
+        }))
+      setFormulaIngredients(ingredients)
+      if (data.data?.developerVolume) {
+        setFormulaDeveloper({ name: `${data.data.developerVolume} Vol`, volume: data.data.developerVolume })
+      }
+      setFormulaView('edit')
       setStep(5)
-    } catch (e: any) { alert(e.message) }
+    } catch (e: any) { toast({ title: 'Error', description: e.message, variant: 'destructive' }) }
     setLoading(false)
   }
 
@@ -80,10 +236,83 @@ export default function FormulatePage() {
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontSize: 24, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
+            <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
             <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 5 steps</p>
           </div>
-          <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
+          <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
+        </div>
+
+        {/* Client Picker */}
+        <div style={{ ...card, marginBottom: 16, padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: clientId ? 'rgba(147,51,234,0.15)' : 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <User size={16} style={{ color: clientId ? '#9333EA' : '#71717A' }} />
+            </div>
+            <div>
+              {clientId || clientName ? (
+                <>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: '#F5F5F7', margin: 0 }}>{clientName || 'Client Selected'}</p>
+                  {clientPhone && <p style={{ fontSize: 12, color: '#71717A', margin: 0 }}>{clientPhone}</p>}
+                </>
+              ) : (
+                <p style={{ fontSize: 14, color: '#71717A', margin: 0 }}>No client linked — walk-in consultation</p>
+              )}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, position: 'relative' }}>
+            {clientId ? (
+              <button type="button" onClick={() => { setClientId(null); setClientName(''); setClientPhone('') }} style={{ ...btnOutline, padding: '6px 12px', fontSize: 12 }}><X size={12} /> Clear</button>
+            ) : (
+              <>
+                <button type="button" onClick={() => setShowClientSearch(!showClientSearch)} style={{ ...btnOutline, padding: '6px 12px', fontSize: 12 }}><Search size={12} /> Search</button>
+                <button type="button" onClick={() => { setShowClientSearch(false); setClientName('Walk-in Client'); setClientPhone('') }} style={{ ...btnPrimary, padding: '6px 12px', fontSize: 12 }}><UserPlus size={12} /> Walk-in</button>
+              </>
+            )}
+            {showClientSearch && !clientId && (
+              <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 8, width: 320, background: 'rgba(30,30,45,0.98)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: 16, zIndex: 50 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <Search size={14} style={{ color: '#71717A' }} />
+                  <input
+                    type="text"
+                    placeholder="Search by name or phone..."
+                    value={clientSearch}
+                    onChange={e => setClientSearch(e.target.value)}
+                    autoFocus
+                    style={{ flex: 1, background: 'transparent', border: 'none', color: '#F5F5F7', fontSize: 14, outline: 'none' }}
+                  />
+                  <button type="button" onClick={() => setShowClientSearch(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}><X size={14} style={{ color: '#71717A' }} /></button>
+                </div>
+                {/* New client inline */}
+                {clientSearch.length >= 2 && (
+                  <div style={{ marginBottom: 12 }}>
+                    <input
+                      type="text"
+                      placeholder="Phone number (optional)"
+                      value={clientPhone}
+                      onChange={e => setClientPhone(e.target.value)}
+                      style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '8px 12px', color: '#F5F5F7', fontSize: 13, marginBottom: 8, outline: 'none' }}
+                    />
+                    <button type="button" onClick={() => { setClientName(clientSearch); setShowClientSearch(false); setClientSearch('') }} style={{ width: '100%', padding: '8px 12px', background: 'rgba(147,51,234,0.1)', border: '1px solid rgba(147,51,234,0.3)', borderRadius: 8, color: '#9333EA', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                      <UserPlus size={12} style={{ display: 'inline', marginRight: 6 }} />
+                      Create new client: {clientSearch}
+                    </button>
+                  </div>
+                )}
+                {/* Search results */}
+                <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                  {clientResults.map(c => (
+                    <button type="button" key={c.id} onClick={() => selectClient(c)} style={{ width: '100%', textAlign: 'left', padding: '10px 12px', background: 'transparent', border: 'none', color: '#F5F5F7', cursor: 'pointer', borderRadius: 8, display: 'block' }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(147,51,234,0.1)'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
+                      <p style={{ fontSize: 14, fontWeight: 500, margin: 0 }}>{c.name}</p>
+                      {c.phone && <p style={{ fontSize: 12, color: '#71717A', margin: 0 }}>{c.phone}</p>}
+                    </button>
+                  ))}
+                  {clientSearch.length >= 2 && clientResults.length === 0 && (
+                    <p style={{ padding: 12, fontSize: 13, color: '#71717A', textAlign: 'center' }}>No clients found</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Step indicators */}
@@ -132,8 +361,25 @@ export default function FormulatePage() {
               </>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24 }}>
+              {/* Session code for phone-to-iPad upload */}
+              {!photo && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Smartphone size={14} style={{ color: '#71717A' }} />
+                  {sessionCode ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 12, color: '#71717A' }}>Phone upload code:</span>
+                      <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 4, color: '#9333EA', fontFamily: 'monospace' }}>{sessionCode}</span>
+                      <span style={{ fontSize: 11, color: '#71717A' }}>→ colorgenius.co/c</span>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={generateSessionCode} style={{ fontSize: 12, color: '#9333EA', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
+                      Get phone upload code
+                    </button>
+                  )}
+                </div>
+              )}
               <p style={{ fontSize: 12, color: '#71717A' }}>{photo ? 'Photo captured ✓' : 'Photo recommended for best results'}</p>
-              <button type="button" onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Next: Assessment'} <ChevronRight size={16} /></button>
+              <button type="button" onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Next: Hair Assessment'} <ChevronRight size={16} /></button>
             </div>
           </div>
         )}
@@ -148,11 +394,25 @@ export default function FormulatePage() {
                 {Object.entries(HAIR_LEVELS).map(([l, i]) => <HairSwatch key={l} color={i.hex} label={i.name} level={Number(l)} isActive={fd.currentLevel === Number(l)} onClick={() => setFd(p => ({ ...p, currentLevel: Number(l) }))} />)}
               </div>
             </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Hair Type</Label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                {HAIR_TYPES.map(o => (
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, hairType: o.value }))}
+                    style={{ padding: 14, borderRadius: 12, border: fd.hairType === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.hairType === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.hairType === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'center' }}>
+                    <p style={{ fontSize: 13, fontWeight: 600 }}>{o.label}</p>
+                    <p style={{ fontSize: 11, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div style={{ marginBottom: 24 }}>
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Current Tone</Label>
               <div style={{ display: 'flex', flexDirection: 'row', gap: 32, alignItems: 'flex-start' }}>
                 <div style={{ cursor: 'pointer' }}>
-                  <ColorWheel3D tones={TONES.map(t => ({ value: t.value as ToneFamily, label: t.label, color: t.color }))} selected={toneMap[fd.currentTone] || 'neutral'} onSelect={(val) => { const code = revToneMap[val] || 'N'; setFd(p => ({ ...p, currentTone: code })) }} />
+                  <ColorWheel3D tones={TONES.map(t => ({ value: t.value, label: t.label, color: t.color }))} selected={fd.currentTone || 'N'} onSelect={(val) => { setFd(p => ({ ...p, currentTone: val })) }} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 48 }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
@@ -183,17 +443,32 @@ export default function FormulatePage() {
             </div>
             <div style={{ marginBottom: 24 }}>
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Target Tone</Label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {TONES.slice(0, 7).map(t => <ColorCircle key={t.value} color={t.color} label={t.label} isActive={fd.targetTone === t.value} onClick={() => setFd(p => ({ ...p, targetTone: t.value }))} />)}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
+                  {TONES.slice(0, 6).map(t => <ColorCircle key={t.value} color={t.color} label={t.label} isActive={fd.targetTone === t.value} onClick={() => setFd(p => ({ ...p, targetTone: t.value }))} />)}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
+                  {TONES.slice(6, 12).map(t => <ColorCircle key={t.value} color={t.color} label={t.label} isActive={fd.targetTone === t.value} onClick={() => setFd(p => ({ ...p, targetTone: t.value }))} />)}
+                </div>
               </div>
             </div>
-            <div style={{ marginBottom: 24 }}>
-              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Brand Preference (Optional)</Label>
-              <Select value={fd.brandPreference} onValueChange={v => setFd(p => ({ ...p, brandPreference: v }))}>
-                <SelectTrigger style={{ background: 'rgba(30,30,45,0.6)', borderColor: 'rgba(255,255,255,0.08)', color: '#F5F5F7', width: '100%' }}><SelectValue placeholder="Select a brand or leave empty" /></SelectTrigger>
-                <SelectContent style={{ background: 'rgba(30,30,45,0.9)' }}>{BRANDS.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
-              </Select>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
+              <div>
+                <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Brand</Label>
+                <Select value={fd.brandPreference} onValueChange={v => setFd(p => ({ ...p, brandPreference: v, linePreference: '' }))}>
+                  <SelectTrigger style={{ background: 'rgba(30,30,45,0.6)', borderColor: 'rgba(255,255,255,0.08)', color: '#F5F5F7', width: '100%' }}><SelectValue placeholder="Select brand" /></SelectTrigger>
+                  <SelectContent style={{ background: 'rgba(30,30,45,0.9)' }}>{brands.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Line</Label>
+                <Select value={fd.linePreference} onValueChange={v => setFd(p => ({ ...p, linePreference: v }))} disabled={!fd.brandPreference}>
+                  <SelectTrigger style={{ background: 'rgba(30,30,45,0.6)', borderColor: 'rgba(255,255,255,0.08)', color: '#F5F5F7', width: '100%' }}><SelectValue placeholder={fd.brandPreference ? "Select line" : "Select brand first"} /></SelectTrigger>
+                  <SelectContent style={{ background: 'rgba(30,30,45,0.9)' }}>{(LINES_BY_BRAND[fd.brandPreference] || []).map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
             </div>
+            <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Level Change</Label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, borderRadius: 12, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', marginBottom: 24 }}>
               <div style={{ width: 48, height: 48, borderRadius: 8, background: HAIR_LEVELS[fd.currentLevel]?.hex, border: '2px solid rgba(255,255,255,0.08)' }} />
               <div style={{ fontSize: 12, color: '#71717A' }}>Level {fd.currentLevel} → Level {fd.targetLevel} ({lvlDiff > 0 ? '+' : ''}{lvlDiff})</div>
@@ -210,16 +485,16 @@ export default function FormulatePage() {
         {step === 4 && (
           <div style={card}>
             <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Droplets style={{ color: '#9333EA' }} /> Hair Condition</h2>
-            <p style={{ color: '#A1A1AA', fontSize: 13, marginBottom: 24 }}>Pre-filled from consultation or prior service. Review and update as needed.</p>
+            <p style={{ color: '#A1A1AA', fontSize: 13, marginBottom: 24 }}>Assess the hair's condition and history. These details directly affect the formula.</p>
 
             <div style={{ marginBottom: 24 }}>
-              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Hair Type</Label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Hair Condition</Label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                 {CONDITION_TYPES.map(o => (
                   <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, type: o.value } }))}
-                    style={{ padding: 16, borderRadius: 12, border: fd.condition.type === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.condition.type === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.condition.type === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'left' }}>
-                    <p style={{ fontSize: 14, fontWeight: 600 }}>{o.label}</p>
-                    <p style={{ fontSize: 12, color: '#71717A', marginTop: 4 }}>{o.desc}</p>
+                    style={{ padding: 14, borderRadius: 12, border: fd.condition.type === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.condition.type === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.condition.type === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'left' }}>
+                    <p style={{ fontSize: 13, fontWeight: 600 }}>{o.label}</p>
+                    <p style={{ fontSize: 11, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
                   </button>
                 ))}
               </div>
@@ -232,7 +507,7 @@ export default function FormulatePage() {
                   <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, porosity: o.value } }))}
                     style={{ flex: 1, padding: 16, borderRadius: 12, border: fd.condition.porosity === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.condition.porosity === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', cursor: 'pointer', textAlign: 'center' }}>
                     <div style={{ width: 16, height: 16, borderRadius: '50%', background: o.color, margin: '0 auto 8px' }} />
-                    <p style={{ fontSize: 14, color: fd.condition.porosity === o.value ? '#F5F5F7' : '#A1A1AA' }}>{o.label}</p>
+                    <p style={{ fontSize: 12, color: fd.condition.porosity === o.value ? '#F5F5F7' : '#A1A1AA' }}>{o.label}</p>
                   </button>
                 ))}
               </div>
@@ -244,7 +519,7 @@ export default function FormulatePage() {
                 <span style={{ color: '#F5F5F7', fontWeight: 'bold' }}>{fd.condition.grayPercent}%</span>
               </div>
               <input type="range" min={0} max={100} value={fd.condition.grayPercent} onChange={e => setFd(p => ({ ...p, condition: { ...p.condition, grayPercent: Number(e.target.value) } }))} style={{ width: '100%' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#71717A', marginTop: 4 }}><span>No gray</span><span>Partial</span><span>Full coverage needed</span></div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: "#71717A", marginTop: 4 }}><span>No gray</span><span>Partial</span><span>Full coverage needed</span></div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24 }}>
@@ -254,12 +529,13 @@ export default function FormulatePage() {
 
             {/* Consultation Summary */}
             <div style={{ background: 'rgba(22,22,32,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, marginBottom: 24 }}>
-              <p style={{ fontSize: 10, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 8 }}>Consultation Summary</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, fontSize: 13 }}>
-                <div><span style={{ display: 'block', fontSize: 11, color: '#71717A' }}>Current</span><span>Level {fd.currentLevel} {fd.currentTone}</span></div>
-                <div><span style={{ display: 'block', fontSize: 11, color: '#71717A' }}>Target</span><span style={{ color: '#9333EA' }}>Level {fd.targetLevel} {fd.targetTone}</span></div>
-                <div><span style={{ display: 'block', fontSize: 11, color: '#71717A' }}>Condition</span><span style={{ textTransform: 'capitalize' }}>{fd.condition.type.replace('_', ' ')}</span></div>
-                <div><span style={{ display: 'block', fontSize: 11, color: '#71717A' }}>Gray</span><span>{fd.condition.grayPercent}%</span></div>
+              <p style={{ fontSize: 11, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 8 }}>Consultation Summary</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, fontSize: 13 }}>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Current</span><span>Level {fd.currentLevel} {fd.currentTone}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Target</span><span style={{ color: '#9333EA' }}>Level {fd.targetLevel} {fd.targetTone}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Type</span><span style={{ textTransform: 'capitalize' }}>{HAIR_TYPES.find(h => h.value === fd.hairType)?.label || fd.hairType}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Condition</span><span style={{ textTransform: 'capitalize' }}>{CONDITION_TYPES.find(c => c.value === fd.condition.type)?.label || fd.condition.type.replace('_', ' ')}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Gray</span><span>{fd.condition.grayPercent}%</span></div>
               </div>
             </div>
 
@@ -275,25 +551,65 @@ export default function FormulatePage() {
         {/* STEP 5: Results */}
         {step === 5 && result && (
           <div style={{ ...card, padding: 32 }}>
-            <h2 style={{ fontSize: 18, marginBottom: 16 }}>✅ Your Formula</h2>
-            {result.warnings?.map((w: string, i: number) => <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#FBBF24', marginBottom: 8 }}><AlertTriangle size={16} /><span>{w}</span></div>)}
-            <div style={{ background: 'rgba(22,22,32,0.8)', borderRadius: 12, padding: 24, marginBottom: 16 }}>
-              <p style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 8 }}>{result.brand} {result.line}</p>
-              {result.steps?.filter((s: any) => s.role === 'primary' || s.role === 'secondary').map((s: any, i: number) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <div style={{ width: 16, height: 16, borderRadius: '50%', background: HAIR_LEVELS[s.product?.level]?.hex || '#7D5038', border: '1px solid rgba(255,255,255,0.2)' }} />
-                  <span>{s.product?.shadeCode} — {s.product?.shadeName}</span>
-                </div>
-              ))}
-              <p style={{ color: '#A1A1AA', marginTop: 8 }}>Developer: {result.developerVolume}Vol · Processing: {result.processingTime}min</p>
-              {result.notes?.map((n: string, i: number) => <p key={i} style={{ color: '#A1A1AA', fontSize: 13, marginTop: 4 }}>• {n}</p>)}
+            {/* Header with Edit/Mix toggle */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h2 style={{ fontSize: 18, margin: 0 }}>✅ Your Formula</h2>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button type="button" onClick={() => setFormulaView('edit')} style={{ padding: '6px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: formulaView === 'edit' ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: formulaView === 'edit' ? 'rgba(147,51,234,0.1)' : 'transparent', color: formulaView === 'edit' ? '#9333EA' : '#71717A', cursor: 'pointer' }}>Edit</button>
+                <button type="button" onClick={() => setFormulaView('bowl')} style={{ padding: '6px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: formulaView === 'bowl' ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: formulaView === 'bowl' ? 'rgba(147,51,234,0.1)' : 'transparent', color: formulaView === 'bowl' ? '#9333EA' : '#71717A', cursor: 'pointer' }}>Mix</button>
+              </div>
             </div>
-            <ScaleWidget onWeightCapture={(g) => console.log('Weight:', g)} />
+            {result.warnings?.map((w: string, i: number) => <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#FBBF24', marginBottom: 8 }}><AlertTriangle size={16} /><span>{w}</span></div>)}
+
+            {/* Stock Check */}
+            <div style={{ marginBottom: 16, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
+              <StockCheck
+                steps={result.steps || []}
+                salonId={salonId}
+                onAcceptAlternative={(originalCode, altCode) => {
+                  // Replace the shade code in the ingredients
+                  setFormulaIngredients(prev => prev.map(ing =>
+                    ing.shadeCode === originalCode ? { ...ing, shadeCode: altCode, name: altCode } : ing
+                  ))
+                  toast({ title: 'Alternative applied', description: `Swapped ${originalCode} → ${altCode}` })
+                }}
+              />
+            </div>
+
+            {formulaView === 'edit' ? (
+              <EditFormula
+                ingredients={formulaIngredients}
+                developer={formulaDeveloper}
+                mixingRatio={formulaRatio}
+                onIngredientsChange={setFormulaIngredients}
+                onDeveloperChange={setFormulaDeveloper}
+                onRatioChange={setFormulaRatio}
+                onAddProduct={() => setShowProductSearch(true)}
+                onSave={handleSaveFormula}
+                onStartWeighing={() => setFormulaView('bowl')}
+              />
+            ) : (
+              <ScaleBowl
+                ingredients={formulaIngredients.map((i, idx) => ({ ...i, order: idx })) as BowlIngredient[]}
+                onComplete={(weights) => console.log('Final weights:', weights)}
+              />
+            )}
+
             <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-              <button type="button" onClick={() => { setResult(null); setStep(1) }} style={{ ...btnOutline, flex: 1, justifyContent: 'center' }}><RotateCcw size={14} /> New Formula</button>
-              <button type="button" onClick={() => alert('Saved!')} style={{ ...btnPrimary, flex: 1, justifyContent: 'center' }}><Save size={14} /> Save to Library</button>
+              <button type="button" onClick={() => { setResult(null); setFormulaIngredients([]); setFormulaView('edit'); setSaved(false); setClientId(null); setClientName(''); setClientPhone(''); setStep(1) }} style={{ ...btnOutline, flex: 1, justifyContent: 'center' }}><RotateCcw size={14} /> New Formula</button>
+              <button type="button" onClick={handleSaveFormula} disabled={saving || saved} style={{ ...btnPrimary, flex: 1, justifyContent: 'center', opacity: saved ? 0.6 : 1 }}><Save size={14} /> {saving ? 'Saving...' : saved ? 'Saved ✓' : 'Save to Library'}</button>
             </div>
           </div>
+        )}
+
+        {/* ProductSearch Modal */}
+        {showProductSearch && (
+          <ProductSearch
+            salonId={salonId}
+            onSelect={handleProductSelect}
+            onClose={() => setShowProductSearch(false)}
+            excludeIds={formulaIngredients.map(i => i.shadeCode)}
+          />
         )}
       </div>
     </div>

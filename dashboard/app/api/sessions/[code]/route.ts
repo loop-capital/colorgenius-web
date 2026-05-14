@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 // import { prisma } from '@/lib/prisma';
 
 /**
- * GET /api/sessions/[id]
- * Retrieve a single photo session with its photos and analysis results.
+ * GET /api/sessions/[code]
+ * Retrieve a single photo session (by code or id) with its photos and analysis results.
  *
  * Response:
  *   200: { success: true, data: PhotoSession }
@@ -12,34 +12,22 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ code: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { code } = await params;
 
-    // TODO: Replace with actual Prisma call
-    // const session = await prisma.photoSession.findUnique({
-    //   where: { id },
-    //   include: {
-    //     photos: {
-    //       orderBy: { createdAt: 'asc' },
-    //     },
-    //     analysisResults: {
-    //       include: { photo: true },
-    //     },
-    //   },
+    // TODO: Replace with actual Prisma call — try code first, then id
+    // const sessionCode = await prisma.session_codes.findFirst({
+    //   where: { code, used: false, expiresAt: { gt: new Date() } },
     // });
-    //
-    // if (!session) {
-    //   return NextResponse.json(
-    //     { error: 'Session not found' },
-    //     { status: 404 }
-    //   );
-    // }
+    // const session = sessionCode
+    //   ? await prisma.formulation_sessions.findUnique({ where: { id: sessionCode.formulationSessionId! } })
+    //   : await prisma.formulation_sessions.findUnique({ where: { id: code } });
 
     // Stub response — aligned with dashboard/types/camera.ts
     const session = {
-      id,
+      id: code,
       clientId: null,
       stylistId: null,
       hairType: '4c',
