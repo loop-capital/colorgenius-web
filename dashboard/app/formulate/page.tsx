@@ -14,6 +14,8 @@ import { ScaleBowl, type BowlIngredient } from '@/components/scale-bowl'
 import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle, Smartphone, User, Search, UserPlus } from 'lucide-react'
 import { ProductSearch, type SelectedProduct } from '@/components/product-search'
 import { StockCheck } from '@/components/stock-check'
+import CorrectiveColorPanel, { CorrectiveBadge } from '@/lib/corrective-color/CorrectiveColorPanel'
+import { diagnose, type CorrectiveIssue, type HairState } from '@/lib/corrective-color/engine'
 import type { ToneFamily } from '@/lib/products'
 
 const STEPS = [
@@ -41,6 +43,7 @@ const CONDITION_TYPES = [
   { value: 'virgin', label: 'Virgin Hair', desc: 'Never chemically treated' },
   { value: 'bleached', label: 'Bleached/Lightened', desc: 'Lifted from natural' },
   { value: 'gray_coverage', label: 'Gray Coverage Needed', desc: 'Requires gray blending or coverage' },
+  { value: 'oily_scalp', label: 'Oily Scalp', desc: 'Excess sebum production on scalp' },
   { value: 'previously_colored', label: 'Previously Colored', desc: 'Has existing color deposit' },
   { value: 'damaged', label: 'Damaged', desc: 'Over-processed or compromised' },
   { value: 'dry_brittle', label: 'Dry/Brittle', desc: 'Lacks moisture, prone to breakage' },
@@ -407,6 +410,23 @@ export default function FormulatePage() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {Object.entries(HAIR_LEVELS).map(([l, i]) => <HairSwatch key={l} color={i.hex} label={i.name} level={Number(l)} isActive={fd.currentLevel === Number(l)} onClick={() => setFd(p => ({ ...p, currentLevel: Number(l) }))} />)}
               </div>
+
+              {/* Corrective color warning preview */}
+              {<CorrectiveColorPanel
+                hairState={{
+                  currentLevel: fd.currentLevel,
+                  currentTone: fd.currentTone,
+                  targetLevel: fd.targetLevel,
+                  targetTone: fd.targetTone,
+                  porosity: fd.condition.porosity as 'low' | 'normal' | 'high',
+                  condition: fd.condition.type,
+                  banding: fd.condition.highlights && fd.condition.highlightedPercent > 30,
+                  hotRoots: fd.currentLevel < fd.targetLevel && fd.condition.type === 'previously_colored',
+                  previousLightener: fd.condition.type === 'bleached',
+                  multipleColors: fd.condition.type === 'previously_colored',
+                }}
+                compact
+              />}
             </div>
 
             <div style={{ marginBottom: 24 }}>
@@ -619,6 +639,30 @@ export default function FormulatePage() {
               <button type="button" onClick={() => { setResult(null); setFormulaIngredients([]); setFormulaView('edit'); setSaved(false); setClientId(null); setClientName(''); setClientPhone(''); setStep(1) }} style={{ ...btnOutline, flex: 1, justifyContent: 'center' }}><RotateCcw size={14} /> New Formula</button>
               <button type="button" onClick={handleSaveFormula} disabled={saving || saved} style={{ ...btnPrimary, flex: 1, justifyContent: 'center', opacity: saved ? 0.6 : 1 }}><Save size={14} /> {saving ? 'Saving...' : saved ? 'Saved ✓' : 'Save to Library'}</button>
             </div>
+
+            {/* Corrective Color Assistant */}
+            {result && (
+              <CorrectiveColorPanel
+                hairState={{
+                  currentLevel: fd.currentLevel,
+                  currentTone: fd.currentTone,
+                  targetLevel: fd.targetLevel,
+                  targetTone: fd.targetTone,
+                  porosity: fd.condition.porosity as 'low' | 'normal' | 'high',
+                  condition: fd.condition.type,
+                  banding: fd.condition.highlights && fd.condition.highlightedPercent > 30,
+                  hotRoots: fd.currentLevel < fd.targetLevel && fd.condition.type === 'previously_colored',
+                  previousLightener: fd.condition.type === 'bleached',
+                  multipleColors: fd.condition.type === 'previously_colored',
+                }}
+                onApplyFix={(fix) => {
+                  toast({
+                    title: `Applied: ${fix.name}`,
+                    description: fix.neutralizationStrategy.slice(0, 80) + '...',
+                  })
+                }}
+              />
+            )}
           </div>
         )}
 

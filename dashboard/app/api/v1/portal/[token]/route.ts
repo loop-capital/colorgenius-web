@@ -42,7 +42,7 @@ export async function GET(
           orderBy: { visit_date: 'desc' },
           take: 20,
           include: {
-            formulations: {
+            formulas: {
               select: {
                 id: true,
                 created_at: true,
@@ -54,7 +54,7 @@ export async function GET(
           },
         },
         // Get formula photos
-        formula_photos: {
+        formulaPhotos: {
           orderBy: { created_at: 'desc' },
           take: 20,
           select: {
@@ -100,7 +100,7 @@ export async function GET(
     }).catch(() => {}) // non-critical
 
     // Check if portal requires phone verification
-    const isPrivate = client.stylists?.portal_privacy === 'private'
+    const isPrivate = client.stylist?.portal_privacy === 'private'
 
     // Build response
     const portalData = {
@@ -112,15 +112,15 @@ export async function GET(
         nextAppointment: client.next_appointment_at,
         memberSince: client.created_at,
       },
-      stylist: client.stylists ? {
-        name: client.stylists.display_name || `${client.stylists.first_name} ${client.stylists.last_name}`,
-        handle: client.stylists.instagram_handle,
-        avatar: client.stylists.avatar_url,
+      stylist: client.stylist ? {
+        name: client.stylist.display_name || `${client.stylist.first_name} ${client.stylist.last_name}`,
+        handle: client.stylist.instagram_handle,
+        avatar: client.stylist.avatar_url,
       } : null,
       hairProfile: client.hair_profile,
       conditions: client.conditions,
       privacy: isPrivate ? 'private' : 'public',
-      photos: client.formula_photos.map((p) => ({
+      photos: client.formulaPhotos.map((p) => ({
         id: p.id,
         beforeUrl: p.before_url,
         afterUrl: p.after_url,
@@ -143,7 +143,7 @@ export async function GET(
         date: v.visit_date,
         serviceType: v.service_type,
         notes: v.notes,
-        formulations: v.formulations.map((f) => ({
+        formulas: v.formulas.map((f: any) => ({
           id: f.id,
           date: f.created_at,
           confidence: f.confidence,

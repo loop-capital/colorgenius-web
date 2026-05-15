@@ -5,7 +5,7 @@ import { formulaUpdateSchema } from "@/lib/vish/schemas";
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const formula = await prisma.formulation.findUnique({ where: { id } });
+    const formula = await prisma.formulas.findUnique({ where: { id } });
     if (!formula) {
       return NextResponse.json({ error: "Formula not found" }, { status: 404 });
     }
@@ -24,7 +24,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid input", issues: parsed.error.issues }, { status: 400 });
     }
-    const formula = await prisma.formulation.update({ where: { id }, data: parsed.data });
+    const formula = await prisma.formulas.update({ where: { id }, data: parsed.data });
     return NextResponse.json(formula, { status: 200 });
   } catch (e: any) {
     if (e?.code === "P2025") {
@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    await prisma.formulation.delete({ where: { id } });
+    await prisma.formulas.delete({ where: { id } });
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (e: any) {
     if (e?.code === "P2025") {

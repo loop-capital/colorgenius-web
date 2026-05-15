@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     // Upsert device (update lastSeen if exists)
     const device = await prisma.salon_devices.upsert({
       where: {
-        uniq_salon_device: {
+        salonId_deviceFingerprint: {
           salonId,
           deviceFingerprint: fingerprint,
         },

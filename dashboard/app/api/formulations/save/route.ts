@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      const client = await prisma.client.create({
+      const client = await prisma.clients.create({
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     // Also save to the simpler `formulas` table for the library view
     if (ingredients && ingredients.length > 0) {
       for (const ing of ingredients) {
-        await prisma.formula.create({
+        await prisma.formulas.create({
           data: {
             stylist_id: stylistId || salonId || null,
             client_id: resolvedClientId,
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     // Update client visit count
     if (resolvedClientId) {
-      await prisma.client.update({
+      await prisma.clients.update({
         where: { id: resolvedClientId },
         data: {
           last_visit_at: new Date(),
