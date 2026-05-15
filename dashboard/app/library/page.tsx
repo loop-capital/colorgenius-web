@@ -505,7 +505,7 @@ export default function LibraryPage() {
         >
           <div>
             <h1 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
-              Formula <span className="gradient-text-gold">Library</span>
+              Formula <span className="gradient-text-teal">Library</span>
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--cg-text-secondary)' }}>
               Browse, search, and manage your color formulas

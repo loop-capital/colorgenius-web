@@ -259,7 +259,7 @@ export default function CertificationPage() {
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F7] flex items-center gap-3">
                 <span className="text-3xl">✦</span>
-                ColorGenius <span className="gradient-text-gold">Certified</span>
+                ColorGenius <span className="gradient-text-teal">Certified</span>
               </h1>
               <p className="text-sm text-[#A1A1AA] mt-2 max-w-lg">
                 Earn the CGC badge — a recognized credential that shows clients and peers you've mastered AI-assisted color formulation.
