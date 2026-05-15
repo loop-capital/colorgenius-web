@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
 
     if (id) {
-      const client = await prisma.client.findUnique({ where: { id } });
+      const client = await prisma.clients.findUnique({ where: { id } });
       if (!client) return NextResponse.json({ error: 'Client not found' }, { status: 404 });
       return NextResponse.json({
         client: {
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    const clients = await prisma.client.findMany({
+    const clients = await prisma.clients.findMany({
       where,
       orderBy: { created_at: 'desc' },
       take: 50,
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(' ') || '';
 
-    const client = await prisma.client.create({
+    const client = await prisma.clients.create({
       data: {
         first_name: firstName,
         last_name: lastName,

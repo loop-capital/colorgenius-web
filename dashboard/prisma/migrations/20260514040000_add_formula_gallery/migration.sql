@@ -5,9 +5,9 @@
 -- ─── formula_photos ──────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS formula_photos (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  formula_id    UUID NOT NULL REFERENCES formulas(id) ON DELETE CASCADE,
-  stylist_id    UUID NOT NULL REFERENCES stylists(id) ON DELETE NO ACTION,
-  client_id     UUID REFERENCES clients(id) ON DELETE NO ACTION,
+  formula_id    UUID NOT NULL REFERENCES "Formula"(id) ON DELETE CASCADE,
+  stylist_id    UUID NOT NULL REFERENCES "Stylist"(id) ON DELETE NO ACTION,
+  client_id     UUID REFERENCES "Client"(id) ON DELETE NO ACTION,
   before_url    TEXT,
   after_url     TEXT NOT NULL,
   caption       VARCHAR(500),
@@ -80,7 +80,7 @@ CREATE INDEX idx_photo_comments_author ON formula_photo_comments(author_id);
 -- ─── formula_comments ───────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS formula_comments (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  formula_id  UUID NOT NULL REFERENCES formulas(id) ON DELETE CASCADE,
+  formula_id  UUID NOT NULL REFERENCES "Formula"(id) ON DELETE CASCADE,
   author_id   UUID NOT NULL,
   author_type VARCHAR(20) NOT NULL DEFAULT 'stylist', -- 'stylist' | 'client' | 'ai'
   content     VARCHAR(2000) NOT NULL,
@@ -100,7 +100,7 @@ CREATE INDEX idx_formula_comments_parent ON formula_comments(parent_id);
 -- ─── formula_ratings ─────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS formula_ratings (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  formula_id    UUID NOT NULL REFERENCES formulas(id) ON DELETE CASCADE,
+  formula_id    UUID NOT NULL REFERENCES "Formula"(id) ON DELETE CASCADE,
   rater_id      UUID NOT NULL,
   execution     INT, -- 1-5: how well was it executed
   effectiveness INT,  -- 1-5: how well did the formula work

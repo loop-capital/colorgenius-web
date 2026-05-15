@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
     if (brand) where.brand = brand;
 
     const [items, total] = await Promise.all([
-      prisma.formulation.findMany({ where, skip, take: limit, orderBy: { createdAt: "desc" } }),
-      prisma.formulation.count({ where }),
+      prisma.formulas.findMany({ where, skip, take: limit, orderBy: { created_at: "desc" } }),
+      prisma.formulas.count({ where }),
     ]);
 
     return NextResponse.json({ items, total, page, limit, pages: Math.ceil(total / limit) }, { status: 200 });

@@ -36,9 +36,11 @@ export async function GET(req: NextRequest) {
     })
 
     // Count active days (distinct days with activity — login or formulation)
-    const daysSinceCreation = Math.floor(
-      (Date.now() - new Date(stylist.created_at).getTime()) / (1000 * 60 * 60 * 24)
-    )
+    const daysSinceCreation = stylist.created_at
+      ? Math.floor(
+          (Date.now() - new Date(stylist.created_at).getTime()) / (1000 * 60 * 60 * 24)
+        )
+      : 0
 
     // Check assessment status (stored in badges if passed)
     const assessmentPassed = stylist.badges.includes('assessment-passed') || stylist.badges.includes('colorgenius-certified')
