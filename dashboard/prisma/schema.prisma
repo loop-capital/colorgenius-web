@@ -94,6 +94,11 @@ model clients {
   formula_notes       String?
   marketing_consent   Boolean?                 @default(false)
   consent_updated_at  DateTime?                @db.Timestamp(6)
+  // Client portal
+  portal_token        String?                  @unique @db.VarChar(32) // persistent magic link token
+  portal_enabled      Boolean?                 @default(true) // stylist can disable
+  portal_last_viewed  DateTime?                @db.Timestamp(6)
+  portal_view_count   Int?                     @default(0)
   created_at          DateTime?                @default(now()) @db.Timestamp(6)
   updated_at          DateTime?                @default(now()) @db.Timestamp(6)
   search_vector       Unsupported("tsvector")?
@@ -595,6 +600,23 @@ model stylists {
   subscription_expires_at DateTime?          @db.Timestamp(6)
   is_active               Boolean?           @default(true)
   is_verified             Boolean?           @default(false)
+  // Social handles
+  instagram_handle        String?            @db.VarChar(100)
+  tiktok_handle           String?            @db.VarChar(100)
+  website_url             String?            @db.VarChar(500)
+  bio                     String?            @db.VarChar(500)
+  avatar_url              String?            @db.VarChar(500)
+  // Creator tier for marketplace
+  creator_tier            String?            @default("community") @db.VarChar(20)
+  follower_count          Int?               @default(0)
+  formula_sales_count     Int?               @default(0)
+  // Badges & platform links
+  badges                  String[]           @default([]) // 'byondu-educator', 'founding-pro', 'colorgenius-certified', 'verified-colorist'
+  byondu_profile_url      String?            @db.VarChar(500) // link to ByondEdu educator profile
+  // Client portal settings
+  portal_enabled          Boolean?           @default(true) // master toggle for client portal
+  portal_privacy          String?            @default("private") @db.VarChar(20) // 'public' | 'private'
+  portal_show_products    Boolean?           @default(false) // affiliate product recommendations
   created_at              DateTime?          @default(now()) @db.Timestamp(6)
   updated_at              DateTime?          @default(now()) @db.Timestamp(6)
   api_keys                api_keys[]
@@ -605,6 +627,9 @@ model stylists {
   photo_analyses          photo_analyses[]
   stylist_feedback        stylist_feedback[]
   formula_photos          formula_photos[]
+  community_posts         community_posts[]
+  post_likes              post_likes[]
+  post_comments           post_comments[]
   salons                  salons?            @relation(fields: [salon_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([email], map: "idx_stylists_email")
@@ -917,4 +942,99 @@ model formula_ratings {
   @@unique([formula_id, rater_id], map: "uniq_formula_rating")
   @@index([formula_id], map: "idx_formula_ratings_formula")
   @@index([formula_id, overall(sort: Desc)], map: "idx_formula_ratings_formula_overall")
+}
+
+// Trend search tracking — powers the dynamic trend chips on the Library page
+model trend_searches {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  query       String   @db.VarChar(200)  // the search term or trend name
+  category    String   @db.VarChar(20)   // 'trend' | 'finish' | 'free-text'
+  user_id     String?  @db.Uuid          // who searched (nullable for anon)
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+
+  @@index([query], map: "idx_trend_searches_query")
+  @@index([created_at(sort: Desc)], map: "idx_trend_searches_date")
+  @@index([category], map: "idx_trend_searches_category")
+}
+
+// Community Posts — Instagram-style posts with photos, formulas, likes, comments
+model community_posts {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  stylist_id      String    @db.Uuid
+  type            String    @db.VarChar(20)  // 'transformation' | 'tip' | 'question' | 'inspiration' | 'milestone'
+  content         String    @db.Text
+  formula_id      String?   @db.Uuid  // optional linked formula
+  formula_label   String?   @db.VarChar(500) // e.g. "Wella 7/73 + 8/73, 30vol 1:1.5"
+  tags            String[]  // hashtags
+  like_count      Int       @default(0)
+  comment_count   Int       @default(0)
+  view_count      Int       @default(0)
+  score           Decimal?  @default(0) @db.Decimal(10, 2) // ranking score (likes * recency)
+  is_featured     Boolean?  @default(false)
+  is_approved     Boolean?  @default(true)
+  created_at      DateTime  @default(now()) @db.Timestamp(6)
+  updated_at      DateTime  @default(now()) @db.Timestamp(6)
+
+  stylist         stylists  @relation(fields: [stylist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  photos          community_post_photos[]
+  likes           post_likes[]
+  comments        post_comments[]
+
+  @@index([stylist_id], map: "idx_community_posts_stylist")
+  @@index([type], map: "idx_community_posts_type")
+  @@index([score(sort: Desc)], map: "idx_community_posts_score")
+  @@index([created_at(sort: Desc)], map: "idx_community_posts_recent")
+  @@index([is_featured], map: "idx_community_posts_featured")
+  @@index([tags], map: "idx_community_posts_tags")
+}
+
+// Post Photos — multi-photo support (up to 10 per post)
+model community_post_photos {
+  id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  post_id   String          @db.Uuid
+  url       String          @db.Text
+  label     String?         @db.VarChar(20) // 'before' | 'after' | 'process' | 'detail' | 'result'
+  order     Int             @default(0)
+  created_at DateTime       @default(now()) @db.Timestamp(6)
+
+  post      community_posts @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([post_id], map: "idx_post_photos_post")
+}
+
+// Post Likes — heart-style likes (one per user per post)
+model post_likes {
+  id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  post_id   String          @db.Uuid
+  user_id   String          @db.Uuid
+  created_at DateTime       @default(now()) @db.Timestamp(6)
+
+  post      community_posts @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user      stylists        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([post_id, user_id], map: "uniq_post_like")
+  @@index([post_id], map: "idx_post_likes_post")
+  @@index([user_id], map: "idx_post_likes_user")
+}
+
+// Post Comments — threaded comments on community posts
+model post_comments {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  post_id     String          @db.Uuid
+  author_id   String          @db.Uuid
+  content     String          @db.VarChar(2000)
+  is_approved Boolean?        @default(true) // verified pros auto-approve, new accounts queue
+  is_flagged  Boolean?        @default(false)
+  parent_id   String?         @db.Uuid // for threaded replies
+  created_at  DateTime        @default(now()) @db.Timestamp(6)
+  updated_at  DateTime        @default(now()) @db.Timestamp(6)
+
+  post        community_posts @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  author      stylists        @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([post_id], map: "idx_post_comments_post")
+  @@index([post_id, created_at(sort: Desc)], map: "idx_post_comments_post_date")
+  @@index([author_id], map: "idx_post_comments_author")
+  @@index([parent_id], map: "idx_post_comments_parent")
+  @@index([is_approved], map: "idx_post_comments_pending")
 }

@@ -62,6 +62,20 @@ const toneMap: Record<string, ToneFamily> = { N: 'neutral', A: 'ash', G: 'golden
 const revToneMap: Record<string, string> = { neutral: 'N', ash: 'A', golden: 'G', red: 'R', violet: 'V', copper: 'K', beige: 'B', pearl: 'P', mahogany: 'M', chocolate: 'Ch', warm: 'W', cool: 'C' }
 
 const card = { background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: '24px 32px' }
+
+// Blend level base color with tone color (toneWeight 0-1, higher = more tone influence)
+function blendColor(levelHex: string, toneHex: string, toneWeight = 0.35): string {
+  const parse = (h: string) => {
+    const v = parseInt(h.replace('#', ''), 16)
+    return [(v >> 16) & 255, (v >> 8) & 255, v & 255]
+  }
+  const [lr, lg, lb] = parse(levelHex)
+  const [tr, tg, tb] = parse(toneHex)
+  const r = Math.round(lr + (tr - lr) * toneWeight)
+  const g = Math.round(lg + (tg - lg) * toneWeight)
+  const b = Math.round(lb + (tb - lb) * toneWeight)
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
+}
 const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 const btnOutline = { padding: '12px 24px', border: '1px solid rgba(255,255,255,0.12)', color: '#A1A1AA', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 
@@ -470,9 +484,15 @@ export default function FormulatePage() {
             </div>
             <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Level Change</Label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, borderRadius: 12, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', marginBottom: 24 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 8, background: HAIR_LEVELS[fd.currentLevel]?.hex, border: '2px solid rgba(255,255,255,0.08)' }} />
-              <div style={{ fontSize: 12, color: '#71717A' }}>Level {fd.currentLevel} → Level {fd.targetLevel} ({lvlDiff > 0 ? '+' : ''}{lvlDiff})</div>
-              <div style={{ width: 48, height: 48, borderRadius: 8, background: HAIR_LEVELS[fd.targetLevel]?.hex, border: '2px solid rgba(147,51,234,0.4)' }} />
+              <div>
+                <div style={{ width: 48, height: 48, borderRadius: 8, background: blendColor(HAIR_LEVELS[fd.currentLevel]?.hex, TONES.find(t => t.value === fd.currentTone)?.color || '#9C8B7A'), border: '2px solid rgba(255,255,255,0.08)' }} />
+                <p style={{ fontSize: 10, color: '#71717A', marginTop: 4, textAlign: 'center' }}>{TONES.find(t => t.value === fd.currentTone)?.label}</p>
+              </div>
+              <div style={{ fontSize: 12, color: '#71717A', textAlign: 'center' }}>Level {fd.currentLevel} → Level {fd.targetLevel} ({lvlDiff > 0 ? '+' : ''}{lvlDiff})</div>
+              <div>
+                <div style={{ width: 48, height: 48, borderRadius: 8, background: blendColor(HAIR_LEVELS[fd.targetLevel]?.hex, TONES.find(t => t.value === fd.targetTone)?.color || '#9C8B7A'), border: '2px solid rgba(147,51,234,0.4)' }} />
+                <p style={{ fontSize: 10, color: '#9333EA', marginTop: 4, textAlign: 'center' }}>{TONES.find(t => t.value === fd.targetTone)?.label}</p>
+              </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <button type="button" onClick={() => setStep(2)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
@@ -531,8 +551,8 @@ export default function FormulatePage() {
             <div style={{ background: 'rgba(22,22,32,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, marginBottom: 24 }}>
               <p style={{ fontSize: 11, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 8 }}>Consultation Summary</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, fontSize: 13 }}>
-                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Current</span><span>Level {fd.currentLevel} {fd.currentTone}</span></div>
-                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Target</span><span style={{ color: '#9333EA' }}>Level {fd.targetLevel} {fd.targetTone}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Current</span><span>Level {fd.currentLevel} {TONES.find(t => t.value === fd.currentTone)?.label || fd.currentTone}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Target</span><span style={{ color: '#9333EA' }}>Level {fd.targetLevel} {TONES.find(t => t.value === fd.targetTone)?.label || fd.targetTone}</span></div>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Type</span><span style={{ textTransform: 'capitalize' }}>{HAIR_TYPES.find(h => h.value === fd.hairType)?.label || fd.hairType}</span></div>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Condition</span><span style={{ textTransform: 'capitalize' }}>{CONDITION_TYPES.find(c => c.value === fd.condition.type)?.label || fd.condition.type.replace('_', ' ')}</span></div>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Gray</span><span>{fd.condition.grayPercent}%</span></div>
