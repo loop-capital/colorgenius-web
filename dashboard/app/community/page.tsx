@@ -1,10 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import CommunityFeed from '@/components/gallery/CommunityFeed'
+import NotificationBell from '@/components/gallery/NotificationBell'
 
 export default function CommunityPage() {
+  const [userId, setUserId] = useState<string | undefined>()
+
+  useEffect(() => {
+    fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => setUserId(d?.user?.id)).catch(() => {})
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#0A0A0F]" style={{ backgroundImage: 'linear-gradient(135deg, #0A0A0F 0%, #1A1033 50%, #0F1A2E 100%)' }}>
       <div className="p-4 md:p-8 max-w-4xl mx-auto pb-28">
@@ -16,6 +23,7 @@ export default function CommunityPage() {
               <h1 className="text-2xl md:text-3xl font-bold text-[#F5F5F7]">Community</h1>
               <p className="text-sm text-[#A1A1AA] mt-1">Share formulas, ask questions, learn from pros worldwide</p>
             </div>
+            <NotificationBell userId={userId} />
           </div>
         </motion.div>
 
