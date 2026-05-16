@@ -1,0 +1,179 @@
+{
+  "brand": "kenra",
+  "line": "simply-blonde",
+  "displayName": "Simply Blonde",
+  "description": "Blonding system with lighteners, toners, and ultra lifts",
+  "type": "lightener",
+  "subType": "blonding-system",
+  "heat": false,
+  "products": [
+    {
+      "name": "Beyond Bond Lightener",
+      "category": "lightener",
+      "lift": "Up to 9 levels",
+      "mixRatio": "1:2 or 1:3",
+      "developers": [10, 20, 30],
+      "developerUnit": "vol",
+      "processingTimeMax": 45,
+      "processingTimeUnit": "min"
+    },
+    {
+      "name": "Blue Powder Lightener",
+      "category": "lightener",
+      "lift": "Up to 8 levels",
+      "mixRatio": "1:2 or 1:3",
+      "developers": [10, 20, 30],
+      "developerUnit": "vol",
+      "processingTimeMax": 40,
+      "processingTimeUnit": "min"
+    },
+    {
+      "name": "Clay Lightener",
+      "category": "lightener",
+      "lift": "Up to 8 levels",
+      "description": "For open air techniques",
+      "mixRatio": "1:2 or 1:3",
+      "developers": [10, 20, 30],
+      "developerUnit": "vol",
+      "processingTimeMax": 40,
+      "processingTimeUnit": "min"
+    },
+    {
+      "name": "Base Breakers — Cool",
+      "category": "base-breaker",
+      "lift": "Up to 1 level",
+      "description": "Cool shade, up to 1 level lift in 5 min or less",
+      "mixRatio": "1:1",
+      "developers": [20],
+      "developerUnit": "vol",
+      "processingTimeMax": 5,
+      "processingTimeUnit": "min",
+      "processingTimeNote": "5 min or less"
+    },
+    {
+      "name": "Base Breakers — Extra Cool",
+      "category": "base-breaker",
+      "lift": "Up to 1 level",
+      "description": "Extra Cool shade, up to 1 level lift in 5 min or less",
+      "mixRatio": "1:1",
+      "developers": [20],
+      "developerUnit": "vol",
+      "processingTimeMax": 5,
+      "processingTimeUnit": "min",
+      "processingTimeNote": "5 min or less"
+    },
+    {
+      "name": "Ultra Lifts",
+      "category": "ultra-lift",
+      "lift": "Up to 4 levels",
+      "description": "With max neutralization",
+      "mixRatio": "1:2",
+      "developers": [30, 40],
+      "developerUnit": "vol",
+      "processingTimeMax": 20,
+      "processingTimeUnit": "min"
+    }
+  ],
+  "toners": [
+    {
+      "code": "12AU",
+      "name": "12AU Ultra Ash",
+      "level": 12,
+      "toneCode": "AU",
+      "toneFamily": "ash",
+      "category": "ultra-lift",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    },
+    {
+      "code": "12CU",
+      "name": "12CU Ultra Copper",
+      "level": 12,
+      "toneCode": "CU",
+      "toneFamily": "copper",
+      "category": "ultra-lift",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    },
+    {
+      "code": "12VU",
+      "name": "12VU Ultra Violet",
+      "level": 12,
+      "toneCode": "VU",
+      "toneFamily": "violet",
+      "category": "ultra-lift",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    },
+    {
+      "code": "9NA",
+      "name": "9NA Natural Ash",
+      "level": 9,
+      "toneCode": "NA",
+      "toneFamily": "natural-ash",
+      "category": "toner",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    },
+    {
+      "code": "9A",
+      "name": "9A Ash",
+      "level": 9,
+      "toneCode": "A",
+      "toneFamily": "ash",
+      "category": "toner",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    },
+    {
+      "code": "9V",
+      "name": "9V Violet",
+      "level": 9,
+      "toneCode": "V",
+      "toneFamily": "violet",
+      "category": "toner",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    },
+    {
+      "code": "9PV",
+      "name": "9PV Pearl Violet",
+      "level": 9,
+      "toneCode": "PV",
+      "toneFamily": "pearl-violet",
+      "category": "toner",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    },
+    {
+      "code": "10A",
+      "name": "10A Ash",
+      "level": 10,
+      "toneCode": "A",
+      "toneFamily": "ash",
+      "category": "toner",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    },
+    {
+      "code": "10V",
+      "name": "10V Violet",
+      "level": 10,
+      "toneCode": "V",
+      "toneFamily": "violet",
+      "category": "toner",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    },
+    {
+      "code": "10PV",
+      "name": "10PV Pearl Violet",
+      "level": 10,
+      "toneCode": "PV",
+      "toneFamily": "pearl-violet",
+      "category": "toner",
+      "line": "simply-blonde",
+      "brand": "kenra"
+    }
+  ]
+}
