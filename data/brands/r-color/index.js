@@ -1,0 +1,18 @@
+module.exports = {
+  brand: 'R+COLOR',
+  slug: 'r-color',
+  lines: ['Omnipresent Permanent', 'HyperMatic 10-Min Demi', 'Stellar Demi Liquid', 'Star Sign Demi Crème', 'Super Palette', 'Half Truth Semi-Permanent'],
+  lighteners: ['Chairlift', 'Snowfall', 'Lunar Dust', 'Electronica'],
+  developers: ['Momentum Liqui-Crème', 'Momentum Liquid 5vol'],
+  permanent: require('./omnipresent-shades.json'),
+  permanentSpecs: require('./omnipresent-specs.json'),
+  hypermatic: require('./hypermatic-shades.json'),
+  hypermaticSpecs: require('./hypermatic-specs.json'),
+  stellar: require('./stellar-shades.json'),
+  stellarSpecs: require('./stellar-specs.json'),
+  starsign: require('./starsign-shades.json'),
+  starsignSpecs: require('./starsign-specs.json'),
+  additives: require('./super-palette-shades.json'),
+  semiPermanent: require('./half-truth-shades.json'),
+  lightenerSystem: require('./lighteners.json'),
+};

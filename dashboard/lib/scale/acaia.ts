@@ -102,11 +102,22 @@ export interface ScaleDevice {
 
 export type ScaleEventType = 'weight' | 'connection' | 'error' | 'battery';
 
+export type ScaleErrorStep =
+  | 'bluetoothCheck'
+  | 'requestDevice'
+  | 'gattCheck'
+  | 'gattConnect'
+  | 'getService'
+  | 'getCharacteristic'
+  | 'startNotifications'
+  | 'weightRequest';
+
 export interface ScaleEvent {
   type: ScaleEventType;
   weight?: ScaleWeight;
   connected?: boolean;
   error?: string;
+  step?: ScaleErrorStep;
   battery?: number;   // 0-100
 }
 
@@ -265,10 +276,16 @@ export class AcaiaScale {
   }
 
   async connect(): Promise<ScaleDevice> {
+    // Step 1: Check Web Bluetooth support
     if (!navigator.bluetooth) {
-      throw new Error('Web Bluetooth is not supported in this browser. Use Chrome or Edge.');
+      const msg = 'Web Bluetooth not supported. Use Chrome or Edge on HTTPS.';
+      console.error('[AcaiaScale] connect() failed:', msg);
+      this.emit({ type: 'error', error: msg, step: 'bluetoothCheck' });
+      throw new Error(msg);
     }
+    console.log('[AcaiaScale] Web Bluetooth API available, requesting device...');
 
+    // Step 2: Request device from browser picker
     try {
       this.device = await navigator.bluetooth.requestDevice({
         filters: [
@@ -281,15 +298,36 @@ export class AcaiaScale {
         ],
         optionalServices: [SCALE_SERVICE_UUID],
       });
+      console.log(`[AcaiaScale] Device selected: ${this.deviceName} (model: ${this.model})`);
+    } catch (err: any) {
+      const msg = err?.message === 'User cancelled the requestDevice() chooser.'
+        ? 'No scale found / user cancelled device picker'
+        : `No scale found / user cancelled device picker: ${err?.message || err}`;
+      console.error('[AcaiaScale] requestDevice() failed:', msg);
+      this.emit({ type: 'error', error: msg, step: 'requestDevice' });
+      throw new Error(msg);
+    }
 
+    // Step 3: Check GATT server is available
+    if (!this.device?.gatt) {
+      const msg = `Scale selected (${this.deviceName}) but GATT server not available`;
+      console.error('[AcaiaScale] GATT check failed:', msg);
+      this.emit({ type: 'error', error: msg, step: 'gattCheck' });
+      throw new Error(msg);
+    }
+    console.log('[AcaiaScale] GATT server available, connecting...');
+
+    try {
       this.device.addEventListener('gattserverdisconnected', () => this.handleDisconnect());
-
       await this.connectGatt();
-
+      console.log(`[AcaiaScale] Fully connected to ${this.deviceName}`);
       return this.info;
     } catch (err: any) {
       const msg = err?.message || String(err);
-      this.emit({ type: 'error', error: msg });
+      console.error('[AcaiaScale] connect() failed:', msg);
+      // The step should already be set by connectGatt's granular catches
+      // but emit a fallback if it wasn't
+      this.emit({ type: 'error', error: msg, step: 'gattConnect' });
       throw err;
     }
   }
@@ -297,22 +335,74 @@ export class AcaiaScale {
   private async connectGatt(): Promise<void> {
     if (!this.device?.gatt) throw new Error('No GATT server');
 
-    this.server = await this.device.gatt.connect();
-    const service = await this.server.getPrimaryService(SCALE_SERVICE_UUID);
-    this.characteristic = await service.getCharacteristic(SCALE_CHARACTERISTIC_UUID);
+    // Step 4: Connect to GATT server
+    try {
+      console.log('[AcaiaScale] Connecting to GATT server...');
+      this.server = await this.device.gatt.connect();
+      console.log('[AcaiaScale] GATT connected successfully');
+    } catch (err: any) {
+      const msg = `Failed to connect to scale GATT server: ${err?.message || err}`;
+      console.error('[AcaiaScale] gatt.connect() failed:', err);
+      this.emit({ type: 'error', error: msg, step: 'gattConnect' });
+      throw new Error(msg);
+    }
 
-    await this.characteristic.startNotifications();
+    // Step 5: Get primary service
+    let service: BluetoothRemoteGATTService;
+    try {
+      console.log(`[AcaiaScale] Getting primary service ${SCALE_SERVICE_UUID}...`);
+      service = await this.server.getPrimaryService(SCALE_SERVICE_UUID);
+      console.log('[AcaiaScale] Scale service found');
+    } catch (err: any) {
+      const msg = `Scale service not found (UUID: ${SCALE_SERVICE_UUID}): ${err?.message || err}`;
+      console.error('[AcaiaScale] getPrimaryService() failed:', err);
+      this.emit({ type: 'error', error: msg, step: 'getService' });
+      throw new Error(msg);
+    }
+
+    // Step 6: Get characteristic
+    try {
+      console.log(`[AcaiaScale] Getting characteristic ${SCALE_CHARACTERISTIC_UUID}...`);
+      this.characteristic = await service.getCharacteristic(SCALE_CHARACTERISTIC_UUID);
+      console.log('[AcaiaScale] Scale characteristic found');
+    } catch (err: any) {
+      const msg = `Scale characteristic not found (UUID: ${SCALE_CHARACTERISTIC_UUID}): ${err?.message || err}`;
+      console.error('[AcaiaScale] getCharacteristic() failed:', err);
+      this.emit({ type: 'error', error: msg, step: 'getCharacteristic' });
+      throw new Error(msg);
+    }
+
+    // Step 7: Start notifications
+    try {
+      console.log('[AcaiaScale] Starting BLE notifications...');
+      await this.characteristic.startNotifications();
+      console.log('[AcaiaScale] Notifications started');
+    } catch (err: any) {
+      const msg = `Failed to start scale notifications: ${err?.message || err}`;
+      console.error('[AcaiaScale] startNotifications() failed:', err);
+      this.emit({ type: 'error', error: msg, step: 'startNotifications' });
+      throw new Error(msg);
+    }
     this.characteristic.addEventListener('characteristicvaluechanged', (e: Event) => this.handleNotification(e));
 
-    // Send identification request
+    // Send identification request (non-fatal)
     try {
       await this.characteristic.writeValue(buildIdentRequest());
     } catch {}
 
-    // Start weight notifications
-    await this.characteristic.writeValue(buildWeightRequest());
+    // Step 8: Start weight notifications
+    try {
+      console.log('[AcaiaScale] Sending weight request...');
+      await this.characteristic.writeValue(buildWeightRequest());
+      console.log('[AcaiaScale] Weight request sent');
+    } catch (err: any) {
+      const msg = `Failed to start weight notifications: ${err?.message || err}`;
+      console.error('[AcaiaScale] writeValue(buildWeightRequest()) failed:', err);
+      this.emit({ type: 'error', error: msg, step: 'weightRequest' });
+      throw new Error(msg);
+    }
 
-    // Request battery
+    // Request battery (non-fatal)
     try {
       await this.characteristic.writeValue(buildBatteryRequest());
     } catch {}
@@ -320,6 +410,7 @@ export class AcaiaScale {
     this._connected = true;
     this._reconnectAttempts = 0;
     this.emit({ type: 'connection', connected: true });
+    console.log(`[AcaiaScale] Connection complete: ${this.deviceName} (${this.model})`);
   }
 
   private async handleDisconnect(): Promise<void> {

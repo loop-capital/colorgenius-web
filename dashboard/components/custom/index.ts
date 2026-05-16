@@ -9,8 +9,26 @@ export { GlassCard, StatCard } from './glass-card'
 export {
   FormulaHistoryTimeline,
   type FormulaHistoryItem,
-  type FormulaHistoryTimelineProps,
 } from './formula-history-timeline'
 export { InventoryDashboard, getInventory, saveInventory, deductFromInventory, deductFormulaFromInventory } from './inventory-dashboard'
 export { AddInventoryItem } from './add-inventory-item'
 export { CostCalculator } from './cost-calculator'
+export { FormulaRating } from './formula-rating'
+export { FormulaComments } from './formula-comments'
+export { GalleryFeed } from './gallery-feed'
+export {
+  FormulaGallery,
+  type GalleryPhoto,
+  type FormulaGalleryProps,
+} from './formula-gallery'
+export {
+  PhotoUpload,
+  type UploadedPhoto,
+  type PhotoUploadProps,
+} from './photo-upload'
+export {
+  PhotoDetail,
+  type Comment,
+  type PhotoDetailProps,
+  type PhotoDetail as PhotoDetailType,
+} from './photo-detail'

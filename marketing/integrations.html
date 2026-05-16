@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integrations — COLORgenius</title>
+  <meta name="description" content="Connect COLORgenius with Square and Vagaro POS systems. Auto-log color services, sync inventory, and manage client data seamlessly.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">COLOR<span>genius</span></a>
+
+      <div class="nav-links">
+        <a href="index.html#features">Features</a>
+        <a href="formula-conversion.html">Formula Conversion</a>
+        <a href="client-management.html">Clients</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="index.html#pricing">Pricing</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="signup.html" class="btn btn-primary btn-sm nav-cta">Get Started</a>
+        <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-mobile-menu" id="mobileMenu">
+      <a href="index.html#features">Features</a>
+      <a href="formula-conversion.html">Formula Conversion</a>
+      <a href="client-management.html">Clients</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <h1 class="page-title">Integrations</h1>
+      <p class="page-subtitle">Connect COLORgenius with the tools you already use. Sync data, automate workflows, and keep everything in one place.</p>
+    </div>
+  </header>
+
+  <!-- Integration Cards -->
+  <section class="product-section">
+    <div class="container">
+      <div class="grid-2" style="max-width:900px;margin:0 auto;">
+        <!-- Square -->
+        <div class="integration-card reveal">
+          <div class="integration-logo">Sq</div>
+          <div class="integration-status">Available Now</div>
+          <h3>Square</h3>
+          <p style="margin:1rem 0;">Connect your Square POS to automatically log color services, track inventory usage, and sync client data between platforms.</p>
+
+          <div style="text-align:left;margin-top:1.5rem;">
+            <div style="font-size:0.875rem;font-weight:600;color:var(--color-text);margin-bottom:0.75rem;">What syncs:</div>
+            <ul style="list-style:none;font-size:0.9375rem;color:var(--color-text-light);">
+              <li style="padding:0.375rem 0;display:flex;align-items:center;gap:0.5rem;"><span style="color:var(--color-primary);">✓</span> Service transactions</li>
+              <li style="padding:0.375rem 0;display:flex;align-items:center;gap:0.5rem;"><span style="color:var(--color-primary);">✓</span> Client profiles</li>
+              <li style="padding:0.375rem 0;display:flex;align-items:center;gap:0.5rem;"><span style="color:var(--color-primary);">✓</span> Inventory deductions</li>
+              <li style="padding:0.375rem 0;display:flex;align-items:center;gap:0.5rem;"><span style="color:var(--color-primary);">✓</span> Appointment data</li>
+            </ul>
+          </div>
+
+          <a href="signup.html" class="btn btn-primary btn-block" style="margin-top:1.5rem;">Connect Square</a>
+        </div>
+
+        <!-- Vagaro -->
+        <div class="integration-card reveal reveal-delay-1">
+          <div class="integration-logo">Va</div>
+          <div class="integration-status">Available Now</div>
+          <h3>Vagaro</h3>
+          <p style="margin:1rem 0;">Sync your Vagaro appointment calendar and client database. Color formulas automatically attach to appointments for seamless workflow.</p>
+
+          <div style="text-align:left;margin-top:1.5rem;">
+            <div style="font-size:0.875rem;font-weight:600;color:var(--color-text);margin-bottom:0.75rem;">What syncs:</div>
+            <ul style="list-style:none;font-size:0.9375rem;color:var(--color-text-light);">
+              <li style="padding:0.375rem 0;display:flex;align-items:center;gap:0.5rem;"><span style="color:var(--color-primary);">✓</span> Appointment calendar</li>
+              <li style="padding:0.375rem 0;display:flex;align-items:center;gap:0.5rem;"><span style="color:var(--color-primary);">✓</span> Client profiles & history</li>
+              <li style="padding:0.375rem 0;display:flex;align-items:center;gap:0.5rem;"><span style="color:var(--color-primary);">✓</span> Service details</li>
+              <li style="padding:0.375rem 0;display:flex;align-items:center;gap:0.5rem;"><span style="color:var(--color-primary);">✓</span> Staff scheduling</li>
+            </ul>
+          </div>
+
+          <a href="signup.html" class="btn btn-primary btn-block" style="margin-top:1.5rem;">Connect Vagaro</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="text-center reveal">
+        <h2>How It Works</h2>
+        <p class="mt-4" style="max-width:600px;margin:1rem auto 0;">Three simple steps to connect your salon's entire workflow.</p>
+      </div>
+
+      <div class="grid-3" style="margin-top:3rem;">
+        <div class="reveal reveal-delay-1">
+          <div style="text-align:center;">
+            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),var(--color-accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;font-weight:800;margin:0 auto 1rem;">1</div>
+            <h3 style="font-size:1.25rem;margin-bottom:0.5rem;">Connect</h3>
+            <p>One-click OAuth connection to your Square or Vagaro account. No technical setup required.</p>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+          <div style="text-align:center;">
+            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),var(--color-accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;font-weight:800;margin:0 auto 1rem;">2</div>
+            <h3 style="font-size:1.25rem;margin-bottom:0.5rem;">Sync</h3>
+            <p>Your data flows both ways. Clients, appointments, services, and inventory stay in sync automatically.</p>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-3">
+          <div style="text-align:center;">
+            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),var(--color-accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;font-weight:800;margin:0 auto 1rem;">3</div>
+            <h3 style="font-size:1.25rem;margin-bottom:0.5rem;">Automate</h3>
+            <p>Color formulas auto-attach to appointments. Inventory deducts on service completion. Zero manual work.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coming Soon -->
+  <section class="section">
+    <div class="container">
+      <div class="text-center reveal">
+        <h2>Coming Soon</h2>
+        <p class="mt-4" style="max-width:600px;margin:1rem auto 0;">More integrations are on the way. Have a request? Let us know.</p>
+      </div>
+
+      <div class="grid-4" style="margin-top:3rem;">
+        <div class="reveal reveal-delay-1">
+          <div style="background:var(--color-bg-alt);border-radius:var(--radius-md);padding:1.5rem;text-align:center;border:1px solid var(--color-border);opacity:0.6;">
+            <div style="font-size:1.125rem;font-weight:700;color:var(--color-text);">Mindbody</div>
+            <div style="font-size:0.8125rem;color:var(--color-text-muted);margin-top:0.25rem;">Coming Q3 2026</div>
+          </div>
+        </div>
+        <div class="reveal reveal-delay-2">
+          <div style="background:var(--color-bg-alt);border-radius:var(--radius-md);padding:1.5rem;text-align:center;border:1px solid var(--color-border);opacity:0.6;">
+            <div style="font-size:1.125rem;font-weight:700;color:var(--color-text);">Fresha</div>
+            <div style="font-size:0.8125rem;color:var(--color-text-muted);margin-top:0.25rem;">Coming Q3 2026</div>
+          </div>
+        </div>
+        <div class="reveal reveal-delay-3">
+          <div style="background:var(--color-bg-alt);border-radius:var(--radius-md);padding:1.5rem;text-align:center;border:1px solid var(--color-border);opacity:0.6;">
+            <div style="font-size:1.125rem;font-weight:700;color:var(--color-text);">Booksy</div>
+            <div style="font-size:0.8125rem;color:var(--color-text-muted);margin-top:0.25rem;">Coming Q4 2026</div>
+          </div>
+        </div>
+        <div class="reveal reveal-delay-1">
+          <div style="background:var(--color-bg-alt);border-radius:var(--radius-md);padding:1.5rem;text-align:center;border:1px solid var(--color-border);opacity:0.6;">
+            <div style="font-size:1.125rem;font-weight:700;color:var(--color-text);">Clover</div>
+            <div style="font-size:0.8125rem;color:var(--color-text-muted);margin-top:0.25rem;">Coming Q4 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="reveal">
+        <h2 class="cta-title">Connect Your Salon Today</h2>
+        <p class="cta-subtitle">Start syncing your POS with COLORgenius in under 2 minutes.</p>
+        <div class="flex justify-center">
+          <a href="signup.html" class="btn btn-primary btn-lg">Start Free Trial</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">COLOR<span>genius</span></a>
+          <p class="footer-desc">AI-powered color formula management for professional stylists and salons.</p>
+        </div>
+        <div>
+          <h4 class="footer-title">Product</h4>
+          <ul class="footer-links">
+            <li><a href="formula-conversion.html">Formula Conversion</a></li>
+            <li><a href="client-management.html">Client Management</a></li>
+            <li><a href="integrations.html">Integrations</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Company</h4>
+          <ul class="footer-links">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 COLORgenius. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

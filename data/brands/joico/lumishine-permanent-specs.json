@@ -1,0 +1,108 @@
+{
+  "brand": "Joico",
+  "productLine": "LumiShine Repair+ Permanent Crème Color",
+  "source": "Joico LumiShine Repair+ Permanent Crème Color technical data sheet",
+  "verification_status": "pending_review",
+  "verified_date": null,
+  "distributor": "Joico / Shiseido Americas",
+  "website": "www.joico.com",
+  "numbering_system": {
+    "description": "Joico LumiShine uses level number followed by tone letter code(s). NN = Double Natural, N = Natural, NA = Natural Ash, AA = Double Ash, NWB = Natural Warm Beige, NW = Natural Warm, NG = Natural Gold, NNG = Double Natural Gold, NNA = Double Natural Ash.",
+    "level_range": "1-10",
+    "tone_codes": {
+      "NN": "Double Natural (extra coverage)",
+      "NNA": "Double Natural Ash",
+      "NNG": "Double Natural Gold",
+      "N": "Natural",
+      "NA": "Natural Ash",
+      "AA": "Double Ash",
+      "NWB": "Natural Warm Beige",
+      "NW": "Natural Warm",
+      "NG": "Natural Gold",
+      "INCG": "Copper Gold Intensifier",
+      "INRR": "Red Red Intensifier"
+    },
+    "high_lift_xl": "XL shades available in level 11-12 range for maximum lift",
+    "intensifiers": "INCG and INRR can be added to any formula for custom tonal direction"
+  },
+  "lines": [
+    {
+      "name": "LumiShine Repair+ Permanent Crème Color",
+      "type": "permanent",
+      "mixRatio": "1:1 (color : LumiShine Developer)",
+      "developerVolumes": [10, 20, 30, 40],
+      "processingTime": "35 minutes standard; 45 minutes for grey coverage and High Lift XL",
+      "description": "Low ammonia permanent crème color with ArgiPlex technology, Quadramine Complex, and Gentle Fresh Fragrance. 100% grey coverage.",
+      "youthLock_note": "YouthLock shares the exact same shade codes as Permanent Crème Color"
+    }
+  ],
+  "developers": {
+    "lumishine_developer": {
+      "volumes": [10, 20, 30, 40],
+      "strengths": {
+        "10": "10 Volume (3%)",
+        "20": "20 Volume (6%)",
+        "30": "30 Volume (9%)",
+        "40": "40 Volume (12%)"
+      }
+    },
+    "usage": {
+      "10_vol": {
+        "use": "Deposit only, tone-on-tone, grey coverage, darker coloring",
+        "lift": "Deposit only, no lift"
+      },
+      "20_vol": {
+        "use": "1-2 levels of lift, grey coverage, standard permanent color service",
+        "lift": "1-2 levels"
+      },
+      "30_vol": {
+        "use": "2-3 levels of lift, resistant hair",
+        "lift": "2-3 levels"
+      },
+      "40_vol": {
+        "use": "3-4 levels of lift, High Lift XL shades only",
+        "lift": "3-4 levels"
+      }
+    }
+  },
+  "gray_coverage": {
+    "rule": "100% grey coverage on all LumiShine Permanent shades",
+    "nn_series": "Double Neutral (NN) shades provide extra coverage for resistant grey hair",
+    "resistant_hair": "Use 30 volume developer for resistant grey hair; 40 volume for High Lift XL",
+    "processing_time": "35 minutes standard; extend to 45 minutes for maximum grey coverage"
+  },
+  "formulation_guidelines": {
+    "lift_guidelines": {
+      "10_vol": "Deposit only, no lift",
+      "20_vol": "1-2 levels of lift",
+      "30_vol": "2-3 levels of lift",
+      "40_vol": "3-4 levels of lift (High Lift XL only)"
+    },
+    "grey_coverage": {
+      "standard": "100% on all shades with appropriate developer",
+      "resistant": "Use NN series or increase developer volume to 30",
+      "processing": "35 min standard; extend to 45 min for resistant grey"
+    },
+    "mixing_ratios": {
+      "standard": "1:1 (color : LumiShine Developer)",
+      "thick_hair": "1:1 (standard)",
+      "high_lift": "1:1 (standard)"
+    },
+    "processing_times": {
+      "standard": "35 minutes at room temperature",
+      "grey_coverage": "35 minutes; extend to 45 minutes for resistant grey",
+      "high_lift": "45 minutes"
+    },
+    "tonal_direction": {
+      "cooling": ["NA", "AA", "NNA"],
+      "warming": ["NW", "NG", "NNG", "NWB"],
+      "neutral": ["N", "NN"],
+      "intensifiers": ["INCG", "INRR"]
+    },
+    "intensifier_usage": {
+      "INCG": "Add up to 1/4 tube to formula for copper-gold enhancement",
+      "INRR": "Add up to 1/4 tube to formula for red enhancement",
+      "mixing": "Mix with chosen LumiShine shade and developer as normal"
+    }
+  }
+}

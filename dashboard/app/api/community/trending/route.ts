@@ -6,29 +6,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { communityPosts } from '@/lib/api/mock-data';
 import { CommunityPost, ApiResponse } from '@/lib/api/types';
-
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
-}
+import { getCurrentUser } from '@/lib/api/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
-      return NextResponse.json<ApiResponse>({
-        success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
-      }, { status: 401 });
-    }
+    const user = await getCurrentUser(request);
 
     const posts = [...communityPosts]
+      .filter(p => p.is_public)
       .sort((a, b) => b.score - a.score)
       .slice(0, 20);
+
+    // Attach user vote state if logged in
+    if (user) {
+      const { votes } = await import('@/lib/api/mock-data');
+      posts.forEach(p => {
+        p.user_liked = votes.some(v => v.post_id === p.id && v.user_id === user.id && v.action === 'like');
+        p.user_saved = votes.some(v => v.post_id === p.id && v.user_id === user.id && v.action === 'save');
+      });
+    }
 
     return NextResponse.json<ApiResponse<CommunityPost[]>>({
       success: true,

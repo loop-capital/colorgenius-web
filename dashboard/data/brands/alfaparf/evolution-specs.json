@@ -1,0 +1,171 @@
+{
+  "_meta": {
+    "brand": "Alfaparf Milano",
+    "line": "Evolution of the Color",
+    "type": "permanent",
+    "lastUpdated": "2026-05-15"
+  },
+  "brand": "alfaparf",
+  "line": "evolution",
+  "displayName": "Alfaparf Milano Evolution of the Color",
+  "type": "permanent",
+  "category": "permanent",
+  "mixingRatio": "1:1.5",
+  "defaultDeveloperVolume": 20,
+  "availableDeveloperVolumes": [10, 20, 30, 40],
+  "processingTimeMinutes": {
+    "default": 35,
+    "greyCoverage": 40,
+    "lightening": 40,
+    "platinum": 55,
+    "harmonizer": 20
+  },
+  "greyCoverage": {
+    "supported": true,
+    "maxGreyPercentage": 100,
+    "recommended": {
+      "developerVolume": 20,
+      "processingTime": 40,
+      "mixWithNatural": true
+    }
+  },
+  "lightening": {
+    "maxLevels": 3,
+    "developerVolumes": {
+      "1level": 20,
+      "2levels": 30,
+      "3levels": 40
+    },
+    "platinum": {
+      "maxLevels": 5,
+      "developerVolume": 40,
+      "processingTime": 50,
+      "requiresReinforcer": true,
+      "maxNaturalBase": 5,
+      "mixingRatio": "1:2"
+    }
+  },
+  "numberingSystem": {
+    "description": "Alfaparf Evolution decimal notation: level.tone(s). First number = level (1-10, plus 11 for Platinum). Numbers after separator = tone(s).",
+    "levelRange": [1, 11],
+    "toneCodes": {
+      "0": "natural / cool modifier",
+      "1": "ash (blue base)",
+      "2": "irisé (violet base)",
+      "3": "gold (yellow base)",
+      "4": "copper (orange base)",
+      "5": "mahogany (red-violet base)",
+      "6": "red (red base)",
+      "7": "matte (green base)"
+    },
+    "rules": [
+      "Single tone number = 100% that tone (e.g., 7.3 = Gold)",
+      "Two different numbers = primary tone + secondary tone (e.g., 7.32 = Gold-Violet)",
+      "Two identical numbers = Intense tone (e.g., 6.66I = Intense Red)",
+      "0 in front of secondary tone = less intense (e.g., 7.01 = Cool Natural)"
+    ]
+  },
+  "coverageSeries": {
+    "coolNaturals": {
+      "description": "Mix equal parts with cool fashion shades for grey coverage",
+      "shades": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+      "category": "cool-natural"
+    },
+    "intenseNaturals": {
+      "description": "Mix 40% NI + 60% fashion shade for intense coverage",
+      "shades": ["4NI", "5NI", "6NI", "7NI", "8NI", "9NI"],
+      "category": "intense-natural"
+    },
+    "warmNaturals": {
+      "description": "Mix equal parts with warm fashion shades",
+      "shades": ["4NB", "5NB", "6NB", "7NB", "8NB", "9NB", "10NB"],
+      "category": "warm-natural"
+    },
+    "coverReds": {
+      "description": "Mix equal parts with Copper/Bronze/Reds/Pure Reds",
+      "shades": ["5.6", "6.6", "7.6"],
+      "category": "cover-red"
+    }
+  },
+  "developerVolumeSelection": {
+    "level1": {
+      "sameLevel": 10,
+      "1levelDarker": "10/20",
+      "2levelsDarker": 20,
+      "3levelsDarker": 30,
+      "4levelsDarker": 40,
+      "5levelsDarker": "bleach"
+    },
+    "level2": {
+      "sameLevel": 10,
+      "1levelDarker": "10/20",
+      "2levelsDarker": 20,
+      "3levelsDarker": 30,
+      "4levelsDarker": 40,
+      "5levelsDarker": "bleach"
+    },
+    "level3": {
+      "sameLevel": 10,
+      "1levelDarker": 10,
+      "2levelsDarker": "10/20",
+      "3levelsDarker": 20,
+      "4levelsDarker": 30,
+      "5levelsDarker": 40,
+      "6levelsDarker": "bleach"
+    },
+    "level4": {
+      "sameLevel": 10,
+      "1levelDarker": 10,
+      "2levelsDarker": 10,
+      "3levelsDarker": "10/20",
+      "4levelsDarker": 20,
+      "5levelsDarker": 30,
+      "6levelsDarker": 40,
+      "7levelsDarker": "bleach"
+    },
+    "level5plus": {
+      "note": "Repigmentation required for darker targets",
+      "sameLevel": "repigmentation + 10",
+      "1levelDarker": "repigmentation + 10",
+      "2levelsDarker": "repigmentation + 10",
+      "3levelsDarker": "repigmentation + 10/20",
+      "4levelsDarker": "repigmentation + 20",
+      "5levelsDarker": "repigmentation + 30",
+      "6levelsDarker": "repigmentation + 40"
+    }
+  },
+  "specialInstructions": {
+    "platinum": {
+      "mixingRatio": "1:2",
+      "developerVolume": 40,
+      "processingTime": "50-55 min",
+      "maxLift": "5 levels",
+      "requires": "0SP Super High Lifting Reinforcer",
+      "maxNaturalBase": 5
+    },
+    "harmonizer": {
+      "description": "Post-bleach toners",
+      "mixingRatio": "1:2",
+      "developerOptions": {
+        "toneOnly": 5,
+        "toneAndGentleLift": "10-20"
+      }
+    }
+  },
+  "features": [
+    "Vegan formula",
+    "No PPD",
+    "Hyaluronic acid enriched",
+    "Color Guard Technology",
+    "100% grey coverage",
+    "Up to 3 levels of lightening",
+    "Up to 5 levels with Platinum series"
+  ],
+  "lines": [
+    {
+      "name": "Evolution of the Color",
+      "type": "permanent",
+      "description": "Long-lasting permanent cosmetic color"
+    }
+  ]
+}

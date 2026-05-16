@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding — COLORgenius</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/onboarding.css">
+</head>
+<body class="onboarding-page">
+  <div class="onboarding-container">
+    <!-- Progress -->
+    <div class="onboarding-progress">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="step-dots" id="stepDots">
+        <span class="dot active" data-step="1"></span>
+        <span class="dot" data-step="2"></span>
+        <span class="dot" data-step="3"></span>
+        <span class="dot" data-step="4"></span>
+        <span class="dot" data-step="5"></span>
+        <span class="dot" data-step="6"></span>
+      </div>
+      <p class="step-label" id="stepLabel">Step 1 of 6</p>
+    </div>
+
+    <!-- Step 1: Welcome -->
+    <div class="step" data-step="1">
+      <div class="step-content">
+        <div class="illustration welcome-illustration">
+          <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="welcomeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#5B2D8C"/>
+                <stop offset="100%" stop-color="#0D9488"/>
+              </linearGradient>
+            </defs>
+            <rect x="40" y="20" width="120" height="120" rx="16" fill="url(#welcomeGrad)" opacity="0.08"/>
+            <path d="M90 60c0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10-10 10-10-4.5-10-10z" fill="#5B2D8C"/>
+            <path d="M65 100c0-13.8 11.2-25 25-25s25 11.2 25 25" stroke="#5B2D8C" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <circle cx="160" cy="45" r="12" fill="#0D9488" opacity="0.15"/>
+            <circle cx="45" cy="115" r="8" fill="#5B2D8C" opacity="0.1"/>
+          </svg>
+        </div>
+        <h1>Welcome to COLORgenius</h1>
+        <p class="lead">Let's get your salon set up in about 5 minutes.</p>
+        <p>You'll connect your POS, choose your color lines, import clients, and create your first formula.</p>
+        <div class="onboarding-actions">
+          <button class="btn btn-primary btn-lg" onclick="nextStep()">Get Started →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Connect POS -->
+    <div class="step hidden" data-step="2">
+      <div class="step-content">
+        <div class="illustration">
+          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="10" width="70" height="50" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2"/>
+            <text x="55" y="38" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter" font-weight="600">Square</text>
+            <rect x="110" y="10" width="70" height="50" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2"/>
+            <text x="145" y="38" text-anchor="middle" font-size="10" fill="#64748b" font-family="Inter" font-weight="600">Vagaro</text>
+            <path d="M55 60v20h90v-20" stroke="#5B2D8C" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/>
+            <rect x="85" y="80" width="30" height="24" rx="4" fill="#5B2D8C"/>
+            <text x="100" y="96" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter">CG</text>
+          </svg>
+        </div>
+        <h2>Connect Your POS</h2>
+        <p class="lead">Sync your clients, inventory, and appointments automatically.</p>
+
+        <div class="pos-options">
+          <button class="pos-card" id="posSquare" onclick="selectPOS('square')">
+            <div class="pos-logo square-logo">Square</div>
+            <span>Connect Square</span>
+            <div class="checkmark"></div>
+          </button>
+          <button class="pos-card" id="posVagaro" onclick="selectPOS('vagaro')">
+            <div class="pos-logo vagaro-logo">Vagaro</div>
+            <span>Connect Vagaro</span>
+            <div class="checkmark"></div>
+          </button>
+          <button class="pos-card" id="posSkip" onclick="selectPOS('skip')">
+            <div class="pos-logo skip-logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg></div>
+            <span>Skip for now</span>
+            <div class="checkmark"></div>
+          </button>
+        </div>
+
+        <div class="onboarding-actions">
+          <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" id="btnPosContinue" onclick="nextStep()" disabled>Continue →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Select Color Lines -->
+    <div class="step hidden" data-step="3">
+      <div class="step-content">
+        <div class="illustration">
+          <svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="10" width="36" height="36" rx="8" fill="#5B2D8C" opacity="0.15"/>
+            <rect x="64" y="10" width="36" height="36" rx="8" fill="#0D9488" opacity="0.15"/>
+            <rect x="108" y="10" width="36" height="36" rx="8" fill="#dc2626" opacity="0.15"/>
+            <rect x="152" y="10" width="36" height="36" rx="8" fill="#2563eb" opacity="0.15"/>
+            <rect x="42" y="54" width="36" height="36" rx="8" fill="#d97706" opacity="0.15"/>
+            <rect x="86" y="54" width="36" height="36" rx="8" fill="#7c3aed" opacity="0.15"/>
+            <rect x="130" y="54" width="36" height="36" rx="8" fill="#0891b2" opacity="0.15"/>
+          </svg>
+        </div>
+        <h2>Select Your Color Lines</h2>
+        <p class="lead">Choose the brands your salon uses. You can always add more later.</p>
+
+        <div class="brand-grid" id="brandGrid">
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="schwarzkopf" hidden>
+            <span class="brand-name">Schwarzkopf</span>
+            <span class="brand-badge">Professional</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="wella" hidden>
+            <span class="brand-name">Wella</span>
+            <span class="brand-badge">Professional</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="redken" hidden>
+            <span class="brand-name">Redken</span>
+            <span class="brand-badge">Professional</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="loreal" hidden>
+            <span class="brand-name">L'Oréal Professionnel</span>
+            <span class="brand-badge">Professional</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="matrix" hidden>
+            <span class="brand-name">Matrix</span>
+            <span class="brand-badge">Professional</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="goldwell" hidden>
+            <span class="brand-name">Goldwell</span>
+            <span class="brand-badge">Professional</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="chi" hidden>
+            <span class="brand-name">CHI</span>
+            <span class="brand-badge">Professional</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="joico" hidden>
+            <span class="brand-name">Joico</span>
+            <span class="brand-badge">Professional</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="kenra" hidden>
+            <span class="brand-name">Kenra</span>
+            <span class="brand-badge">Professional</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="pulp-riot" hidden>
+            <span class="brand-name">Pulp Riot</span>
+            <span class="brand-badge badge-fashion">Fashion</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="arctic-fox" hidden>
+            <span class="brand-name">Arctic Fox</span>
+            <span class="brand-badge badge-fashion">Fashion</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+          <label class="brand-card">
+            <input type="checkbox" name="brand" value="other" hidden>
+            <span class="brand-name">Other / Not sure yet</span>
+            <span class="brand-badge badge-muted">Skip</span>
+            <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+          </label>
+        </div>
+
+        <div class="onboarding-actions">
+          <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" id="btnBrandContinue" onclick="nextStep()">Continue →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Import Clients -->
+    <div class="step hidden" data-step="4">
+      <div class="step-content">
+        <div class="illustration">
+          <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="20" width="140" height="80" rx="10" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="2"/>
+            <circle cx="60" cy="50" r="10" fill="#5B2D8C" opacity="0.2"/>
+            <rect x="80" y="42" width="60" height="6" rx="3" fill="#cbd5e1"/>
+            <rect x="80" y="54" width="40" height="4" rx="2" fill="#e2e8f0"/>
+            <circle cx="60" cy="85" r="10" fill="#0D9488" opacity="0.2"/>
+            <rect x="80" y="77" width="60" height="6" rx="3" fill="#cbd5e1"/>
+            <rect x="80" y="89" width="40" height="4" rx="2" fill="#e2e8f0"/>
+            <rect x="150" y="30" width="32" height="18" rx="4" fill="#5B2D8C"/>
+            <text x="166" y="42" text-anchor="middle" font-size="8" fill="#fff" font-family="Inter" font-weight="600">24</text>
+          </svg>
+        </div>
+        <h2>Import Clients</h2>
+        <p class="lead">We found clients from your connected POS.</p>
+
+        <div class="import-preview" id="importPreview">
+          <div class="import-header">
+            <span><strong>24 clients</strong> found</span>
+            <label class="toggle-all">
+              <input type="checkbox" id="toggleAll" checked> Select all
+            </label>
+          </div>
+          <div class="client-list" id="clientList">
+            <label class="client-row">
+              <input type="checkbox" checked>
+              <span class="client-avatar">EM</span>
+              <span class="client-name">Emily Miller</span>
+              <span class="client-phone">(555) 012-3456</span>
+            </label>
+            <label class="client-row">
+              <input type="checkbox" checked>
+              <span class="client-avatar">SJ</span>
+              <span class="client-name">Sarah Johnson</span>
+              <span class="client-phone">(555) 023-4567</span>
+            </label>
+            <label class="client-row">
+              <input type="checkbox" checked>
+              <span class="client-avatar">JW</span>
+              <span class="client-name">Jessica Williams</span>
+              <span class="client-phone">(555) 034-5678</span>
+            </label>
+            <label class="client-row">
+              <input type="checkbox" checked>
+              <span class="client-avatar">AD</span>
+              <span class="client-name">Amanda Davis</span>
+              <span class="client-phone">(555) 045-6789</span>
+            </label>
+            <label class="client-row">
+              <input type="checkbox" checked>
+              <span class="client-avatar">LB</span>
+              <span class="client-name">Lauren Brown</span>
+              <span class="client-phone">(555) 056-7890</span>
+            </label>
+          </div>
+          <div class="import-footer">
+            <span class="import-count" id="importCount">5 of 24 selected</span>
+            <span class="import-note">Showing first 5. All 24 will be imported.</span>
+          </div>
+        </div>
+
+        <div class="onboarding-actions">
+          <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep()">Import Selected →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Create First Formula -->
+    <div class="step hidden" data-step="5">
+      <div class="step-content">
+        <div class="illustration">
+          <svg viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
+            <rect x="30" y="10" width="140" height="110" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+            <text x="100" y="35" text-anchor="middle" font-size="9" fill="#5B2D8C" font-family="Inter" font-weight="700">FORMULA</text>
+            <rect x="50" y="48" width="100" height="8" rx="4" fill="#5B2D8C" opacity="0.15"/>
+            <rect x="50" y="62" width="70" height="6" rx="3" fill="#0D9488" opacity="0.15"/>
+            <rect x="50" y="74" width="85" height="6" rx="3" fill="#0D9488" opacity="0.15"/>
+            <circle cx="160" cy="95" r="14" fill="url(#welcomeGrad)"/>
+            <text x="160" y="100" text-anchor="middle" font-size="12" fill="#fff" font-family="Inter" font-weight="700">+</text>
+          </svg>
+        </div>
+        <h2>Create Your First Formula</h2>
+        <p class="lead">Let's build a color formula together.</p>
+
+        <div class="formula-wizard" id="formulaWizard">
+          <div class="wizard-step active" data-wizard="1">
+            <label class="field-label">Choose a client</label>
+            <div class="client-options">
+              <button class="client-pill active" onclick="selectClient(this)">
+                <span class="pill-avatar">EM</span> Emily Miller
+              </button>
+              <button class="client-pill" onclick="selectClient(this)">
+                <span class="pill-avatar">SJ</span> Sarah Johnson
+              </button>
+              <button class="client-pill" onclick="selectClient(this)">
+                <span class="pill-avatar">JW</span> Jessica Williams
+              </button>
+            </div>
+            <button class="btn btn-primary wizard-next" onclick="wizardNext()">Next: Select Brand →</button>
+          </div>
+
+          <div class="wizard-step" data-wizard="2">
+            <label class="field-label">Select brand</label>
+            <div class="brand-options">
+              <button class="brand-pill" onclick="selectBrand(this)">Schwarzkopf</button>
+              <button class="brand-pill" onclick="selectBrand(this)">Wella</button>
+              <button class="brand-pill" onclick="selectBrand(this)">Redken</button>
+              <button class="brand-pill" onclick="selectBrand(this)">L'Oréal</button>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-secondary" onclick="wizardPrev()">← Back</button>
+              <button class="btn btn-primary" onclick="wizardNext()">Next: Mix Shades →</button>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-wizard="3">
+            <label class="field-label">Mix shades</label>
+            <div class="shade-mixer">
+              <div class="shade-row">
+                <span class="shade-color" style="background:#6B3A1F"></span>
+                <span class="shade-name">6N — Natural Dark Blonde</span>
+                <div class="shade-qty">
+                  <button onclick="adjustQty(this, -1)">−</button>
+                  <span>1</span> oz
+                  <button onclick="adjustQty(this, 1)">+</button>
+                </div>
+              </div>
+              <div class="shade-row">
+                <span class="shade-color" style="background:#8B5A3C"></span>
+                <span class="shade-name">6G — Golden Dark Blonde</span>
+                <div class="shade-qty">
+                  <button onclick="adjustQty(this, -1)">−</button>
+                  <span>0.5</span> oz
+                  <button onclick="adjustQty(this, 1)">+</button>
+                </div>
+              </div>
+              <button class="add-shade-btn">+ Add another shade</button>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-secondary" onclick="wizardPrev()">← Back</button>
+              <button class="btn btn-primary" onclick="wizardNext()">Next: Developer →</button>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-wizard="4">
+            <label class="field-label">Developer volume &amp; timing</label>
+            <div class="dev-options">
+              <button class="dev-pill active" onclick="selectDev(this)">10 Vol (3%)</button>
+              <button class="dev-pill" onclick="selectDev(this)">20 Vol (6%)</button>
+              <button class="dev-pill" onclick="selectDev(this)">30 Vol (9%)</button>
+              <button class="dev-pill" onclick="selectDev(this)">40 Vol (12%)</button>
+            </div>
+            <div class="timing-field">
+              <span>Process time:</span>
+              <div class="time-spinner">
+                <button onclick="adjustTime(-5)">−</button>
+                <span id="processTime">35</span> min
+                <button onclick="adjustTime(5)">+</button>
+              </div>
+            </div>
+            <div class="wizard-nav">
+              <button class="btn btn-secondary" onclick="wizardPrev()">← Back</button>
+              <button class="btn btn-primary" onclick="saveFormula()">Save Formula ✓</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="onboarding-actions">
+          <button class="btn btn-secondary" onclick="prevStep()">← Back to Import</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6: Done -->
+    <div class="step hidden" data-step="6">
+      <div class="step-content">
+        <div class="illustration done-illustration">
+          <svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="80" r="50" fill="url(#welcomeGrad)" opacity="0.1"/>
+            <circle cx="100" cy="80" r="35" fill="url(#welcomeGrad)" opacity="0.15"/>
+            <circle cx="100" cy="80" r="22" fill="url(#welcomeGrad)"/>
+            <polyline points="90 80 97 87 110 74" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="55" cy="50" r="6" fill="#5B2D8C" opacity="0.1"/>
+            <circle cx="155" cy="110" r="5" fill="#0D9488" opacity="0.1"/>
+            <circle cx="160" cy="45" r="4" fill="#5B2D8C" opacity="0.08"/>
+          </svg>
+        </div>
+        <h1>You're all set! 🎉</h1>
+        <p class="lead">Your salon is ready to use COLORgenius.</p>
+
+        <div class="done-summary" id="doneSummary">
+          <div class="summary-row">
+            <span class="summary-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span>POS connected</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span>3 color lines selected</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span>24 clients imported</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span>1 formula created</span>
+          </div>
+        </div>
+
+        <div class="onboarding-actions">
+          <a href="../index.html" class="btn btn-primary btn-lg">Go to Dashboard →</a>
+          <a href="../walkthroughs/index.html" class="btn btn-secondary">Explore Walkthroughs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/onboarding.js"></script>
+</body>
+</html>

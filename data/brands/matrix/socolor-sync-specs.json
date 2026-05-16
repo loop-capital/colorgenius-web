@@ -1,0 +1,42 @@
+{
+  "brand": "Matrix",
+  "lines": [
+    {
+      "name": "SoColor Sync Demi-Permanent Color",
+      "shortName": "SoColor Sync",
+      "type": "demi-permanent",
+      "category": "demi-creme",
+      "preBonded": true,
+      "ammonia": false,
+      "lift": false,
+      "greyCoverage": "up to 50% grey blending",
+      "mixingRatio": "1:1",
+      "developerOptions": [
+        { "volume": 10, "purpose": "deposit only / refresh", "liftLevels": 0, "greyCoverage": "good" },
+        { "volume": 20, "purpose": "tone / refresh", "liftLevels": 0, "greyCoverage": "optimal" }
+      ],
+      "developerBrand": "Matrix SoColor Sync Developer",
+      "processingTime": {
+        "standard": "20 min",
+        "heat": "reduce by 5 min"
+      },
+      "longevity": "4-6 weeks",
+      "technology": [
+        "Pre-Bonded Formula (built-in bond protection)",
+        "No ammonia, no lift"
+      ],
+      "collections": [
+        {
+          "name": "Standard Collection",
+          "description": "Levels 2-10 across N, NA, A, AV, M, W, G, C, RV, RR, RC, VR, BR, RB, V, R tones",
+          "levels": "2-10"
+        }
+      ],
+      "clear": {
+        "code": "0N",
+        "name": "Clear",
+        "use": "Dilution and mixing"
+      }
+    }
+  ]
+}

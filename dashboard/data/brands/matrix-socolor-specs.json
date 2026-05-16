@@ -1,0 +1,80 @@
+{
+  "brand": "Matrix",
+  "lines": [
+    {
+      "name": "SoColor Pre-Bonded Permanent Color",
+      "shortName": "SoColor",
+      "type": "permanent",
+      "category": "permanent-creme",
+      "preBonded": true,
+      "ammonia": true,
+      "lift": true,
+      "greyCoverage": "100%",
+      "mixingRatio": "1:1",
+      "developerOptions": [
+        { "volume": 10, "purpose": "deposit only", "liftLevels": 0, "greyCoverage": "optimal" },
+        { "volume": 20, "purpose": "1 level lift", "liftLevels": 1, "greyCoverage": "optimal" },
+        { "volume": 30, "purpose": "2 levels lift", "liftLevels": 2, "greyCoverage": "good" },
+        { "volume": 40, "purpose": "3+ levels lift", "liftLevels": 3, "greyCoverage": "reduced" }
+      ],
+      "developerBrand": "Matrix SoColor Developer",
+      "processingTime": {
+        "standard": "30-35 min",
+        "resistantGrey": "45 min",
+        "heat": "reduce by 5-10 min"
+      },
+      "fragrance": "Citrus-inspired",
+      "technology": [
+        "Pre-Bonded Formula (built-in bond protection)",
+        "Cera-Prim Technology (cuticle protection)"
+      ],
+      "collections": [
+        {
+          "name": "Blended Collection",
+          "subCollections": [
+            { "name": "Cool Palette", "tones": ["A", "AA", "AV", "D"] },
+            { "name": "Neutral Palette", "tones": ["N", "NA", "NJ", "NV", "NW", "NN"] },
+            { "name": "Mocha Palette", "tones": ["M"] },
+            { "name": "Warm Palette", "tones": ["W"] },
+            { "name": "Blended Browns", "tones": ["BR", "RB", "BC"] },
+            { "name": "Blended Bronzes", "tones": ["O", "CO"] }
+          ]
+        },
+        {
+          "name": "Reflect Collection",
+          "subCollections": [
+            { "name": "Red-Violet/Red", "tones": ["RV", "RR", "RC", "VR", "R"] },
+            { "name": "Gold", "tones": ["G"] },
+            { "name": "Copper", "tones": ["C"] },
+            { "name": "Violet", "tones": ["V"] }
+          ]
+        },
+        {
+          "name": "HD Collection",
+          "description": "High Definition intensified pigment",
+          "tones": ["HD-RV", "HD-RR"]
+        },
+        {
+          "name": "SR Collection",
+          "description": "Soft Reflect low-ammonia for gentle lift",
+          "tones": ["SR-HV", "SR-R"]
+        },
+        {
+          "name": "Softnext",
+          "description": "Additive toners for mixing",
+          "tones": ["BLUE", "RED"]
+        },
+        {
+          "name": "Extra Coverage Collection",
+          "description": "500-series with extra grey coverage pigment load",
+          "series": "500"
+        },
+        {
+          "name": "Ultra Blonde / High Lift",
+          "description": "11-series extra light blonde high lift",
+          "series": "11"
+        }
+      ]
+    }
+  ]
+}

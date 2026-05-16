@@ -1,0 +1,14 @@
+{
+  "brand": "R+COLOR",
+  "line": "Super Palette",
+  "type": "additive",
+  "mixingAlone": "1:1 with 10 vol Momentum",
+  "timingAlone": 30,
+  "additiveMax": 15,
+  "shades": [
+    { "code": "J", "name": "INTERGALACTIC", "toneFamily": "neutral", "notes": "black" },
+    { "code": "J", "name": "YELLOW BRICK ROAD", "toneFamily": "gold", "notes": "gold" },
+    { "code": "J44", "name": "METROPOLITAN", "toneFamily": "copper", "notes": "copper/orange" },
+    { "code": "55", "name": "CUPID", "toneFamily": "red", "notes": "red" }
+  ]
+}

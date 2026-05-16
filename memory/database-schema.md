@@ -966,8 +966,8 @@ CREATE TABLE subscriptions (
     tier VARCHAR(20) NOT NULL, -- free, professional, salon, enterprise
     
     -- Billing
-    stripe_customer_id VARCHAR(255),
-    stripe_subscription_id VARCHAR(255),
+    square_customer_id VARCHAR(255),
+    square_subscription_id VARCHAR(255),
     
     -- Pricing
     monthly_price DECIMAL(6,2),

@@ -1,0 +1,233 @@
+{
+  "brand": "Kenra",
+  "displayName": "Kenra Professional",
+  "lines": [
+    {
+      "name": "Kenra Color Permanent",
+      "type": "permanent",
+      "mixRatio": "1:1",
+      "mixRatioParts": [1, 1],
+      "developers": [10, 20, 30, 40],
+      "developerUnit": "vol",
+      "processingTimeMin": 30,
+      "processingTimeMax": 40,
+      "processingTimeUnit": "min",
+      "grayCoverage": "up to 100%",
+      "ammonia": "low",
+      "features": [
+        "Low-ammonia permanent crème",
+        "Up to 100% gray coverage",
+        "Up to 4 levels of lift on natural hair"
+      ],
+      "additives": [
+        {
+          "name": "Blonding Crème",
+          "ratio": "1/4oz per oz of permanent color",
+          "extraDeveloper": false,
+          "effect": "Up to 4 levels lift on its own, +1 level when mixed into formulations"
+        },
+        {
+          "name": "Color Boosters",
+          "ratio": "1/4oz per oz of permanent color",
+          "extraDeveloper": false,
+          "effect": "Additional vibrancy and customization"
+        }
+      ],
+      "heat": false
+    },
+    {
+      "name": "Kenra Color Demi-Permanent",
+      "type": "demi-permanent",
+      "mixRatio": "1:2",
+      "mixRatioParts": [1, 2],
+      "mixRatioNote": "1:2 for standard, toning, and clear gloss; 1:1 for gray blending",
+      "developers": [9],
+      "developerUnit": "vol",
+      "developerName": "9 Vol Activator",
+      "processingTimeMin": 5,
+      "processingTimeMax": 25,
+      "processingTimeUnit": "min",
+      "processingTimeNote": "5-25 min standard, 25 min for gray blending (1:1), 5 min or less for Rapid Toners, 5-25 min for Clear Glossing",
+      "grayCoverage": "up to 75%",
+      "ammonia": "none",
+      "longevity": "Up to 18 shampoos",
+      "features": [
+        "Ammonia-free",
+        "Up to 75% gray coverage",
+        "Up to 18 shampoos longevity"
+      ],
+      "rapidToners": {
+        "name": "Rapid Toners",
+        "description": "For toning on levels 4-6 or 8-10 in 5 min or less",
+        "processingTime": "5 min or less"
+      },
+      "heat": false
+    },
+    {
+      "name": "Kenra Color Studio Stylist Express",
+      "type": "permanent",
+      "subType": "express",
+      "mixRatio": "1:1",
+      "mixRatioParts": [1, 1],
+      "developers": [10, 20, 30],
+      "developerUnit": "vol",
+      "developerUsage": {
+        "10": "Deposit, gray blending",
+        "20": "Lift, deposit, gray coverage",
+        "30": "Increased vibrancy"
+      },
+      "processingTimeMin": 5,
+      "processingTimeMax": 10,
+      "processingTimeUnit": "min",
+      "processingTimeNote": "10 min permanent, 5 min gray blending",
+      "grayCoverage": "up to 100%",
+      "shadeCount": 17,
+      "shadeTypes": ["neutral", "fashion"],
+      "features": [
+        "Permanent results in 10 minutes",
+        "17 shades in neutral and fashion tones",
+        "Up to 100% gray coverage"
+      ],
+      "heat": false
+    },
+    {
+      "name": "Kenra Creatives",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "developerRequired": false,
+      "application": "Apply to dry, pre-lightened hair",
+      "processingTimeMin": 20,
+      "processingTimeMax": 20,
+      "processingTimeUnit": "min",
+      "processingNote": "Process at room temperature",
+      "preLightenTo": "Level 10 for max vibrancy",
+      "shadeCount": 13,
+      "shadeGroups": [
+        {
+          "name": "Classically Bold",
+          "count": 7
+        },
+        {
+          "name": "Trendy Chic",
+          "count": 6
+        }
+      ],
+      "features": [
+        "No developer needed",
+        "Apply to dry, pre-lightened hair",
+        "Pre-lighten to Level 10 for max vibrancy"
+      ],
+      "customization": {
+        "clear": "Mix Clear into any shade for pastel tones",
+        "trueBlack": "Add True Black to deepen or smoke out",
+        "note": "Clear and True Black are for formula customization ONLY"
+      },
+      "heat": false
+    },
+    {
+      "name": "Simply Blonde",
+      "type": "lightener",
+      "subType": "blonding-system",
+      "heat": false,
+      "products": [
+        {
+          "name": "Beyond Bond Lightener",
+          "lift": "Up to 9 levels",
+          "mixRatio": "1:2 or 1:3",
+          "developers": [10, 20, 30],
+          "developerUnit": "vol",
+          "processingTimeMax": 45,
+          "processingTimeUnit": "min"
+        },
+        {
+          "name": "Blue Powder Lightener",
+          "lift": "Up to 8 levels",
+          "mixRatio": "1:2 or 1:3",
+          "developers": [10, 20, 30],
+          "developerUnit": "vol",
+          "processingTimeMax": 40,
+          "processingTimeUnit": "min"
+        },
+        {
+          "name": "Clay Lightener",
+          "lift": "Up to 8 levels",
+          "description": "For open air techniques",
+          "mixRatio": "1:2 or 1:3",
+          "developers": [10, 20, 30],
+          "developerUnit": "vol",
+          "processingTimeMax": 40,
+          "processingTimeUnit": "min"
+        },
+        {
+          "name": "Base Breakers",
+          "description": "Cool & Extra Cool shades",
+          "lift": "Up to 1 level",
+          "mixRatio": "1:1",
+          "developers": [20],
+          "developerUnit": "vol",
+          "processingTimeMax": 5,
+          "processingTimeUnit": "min",
+          "processingTimeNote": "5 min or less"
+        },
+        {
+          "name": "Ultra Lifts",
+          "lift": "Up to 4 levels",
+          "description": "With max neutralization",
+          "mixRatio": "1:2",
+          "developers": [30, 40],
+          "developerUnit": "vol",
+          "processingTimeMax": 20,
+          "processingTimeUnit": "min"
+        }
+      ]
+    }
+  ],
+  "toningSystem": {
+    "notation": "level + toneCode",
+    "example": "7C",
+    "tonePosition": "suffix",
+    "levelSystem": {
+      "10": "Extra Light Blonde",
+      "09": "Light Blonde",
+      "08": "Blonde",
+      "07": "Medium Blonde",
+      "06": "Dark Blonde",
+      "05": "Light Brown",
+      "04": "Medium Brown",
+      "03": "Dark Brown",
+      "01": "Black"
+    },
+    "universalFamilyMap": {
+      "N": "natural",
+      "NA": "natural-ash",
+      "NUA": "natural-ultra-ash",
+      "+": "monochrome",
+      "NB": "natural-brown",
+      "CN": "copper-natural",
+      "A": "ash",
+      "AA": "ash",
+      "UA": "ultra-ash",
+      "VR": "violet-red",
+      "V": "violet",
+      "VV": "violet",
+      "PV": "pearl-violet",
+      "B": "brown-beige",
+      "BC": "brown-copper",
+      "G": "gold",
+      "GG": "gold",
+      "GB": "gold-brown-beige",
+      "C": "copper",
+      "CC": "copper",
+      "R": "red",
+      "RR": "red",
+      "RC": "red-copper",
+      "RB": "red-brown",
+      "RV": "red-violet",
+      "SM": "silver-metallic",
+      "VM": "violet-metallic",
+      "RoM": "rose-metallic",
+      "DF": "diamond-frost",
+      "Clear": "clear"
+    }
+  }
+}

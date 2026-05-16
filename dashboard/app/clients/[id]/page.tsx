@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useToast } from '@/components/ui/use-toast'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { ContactMask } from '@/components/ui/contact-mask'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -22,10 +24,12 @@ import {
   Zap,
   TrendingUp,
   DollarSign,
+  Star,
 } from 'lucide-react'
 
 interface Client {
   id: string
+  salonId?: string
   name: string
   email?: string
   phone?: string
@@ -69,6 +73,7 @@ interface FormulaEntry {
 }
 
 export default function ClientDetailPage() {
+  const { toast } = useToast()
   const params = useParams()
   const router = useRouter()
   const clientId = params.id as string
@@ -77,6 +82,23 @@ export default function ClientDetailPage() {
   const [client, setClient] = useState<Client | null>(null)
   const [formulas, setFormulas] = useState<FormulaEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [favorites, setFavorites] = useState<Set<string>>(() => {
+    if (typeof window === 'undefined') return new Set()
+    try {
+      const stored = localStorage.getItem(`cg-fav-formulas-${clientId}`)
+      return stored ? new Set(JSON.parse(stored)) : new Set()
+    } catch { return new Set() }
+  })
+
+  const toggleFavorite = (formulaId: string) => {
+    setFavorites(prev => {
+      const next = new Set(prev)
+      if (next.has(formulaId)) next.delete(formulaId)
+      else next.add(formulaId)
+      localStorage.setItem(`cg-fav-formulas-${clientId}`, JSON.stringify([...next]))
+      return next
+    })
+  }
 
   useEffect(() => {
     if (!clientId) return
@@ -99,7 +121,7 @@ export default function ClientDetailPage() {
         setFormulas(fData.formulas || [])
       }
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to load client')
+      toast({ title: 'Error', description: err instanceof Error ? err.message : 'Failed to load client', variant: 'destructive' })
     } finally {
       setLoading(false)
     }
@@ -193,17 +215,11 @@ export default function ClientDetailPage() {
                 )}
 
                 <div className="w-full mt-6 space-y-3 text-left">
-                  {client.email && (
-                    <div className="flex items-center gap-3">
-                      <Mail className="h-4 w-4 text-white/40 shrink-0" />
-                      <span className="text-sm text-white/80">{client.email}</span>
-                    </div>
+                  {client.email && client.salonId && (
+                    <ContactMask value={client.email} type="email" label="Email" salonId={client.salonId} />
                   )}
-                  {client.phone && (
-                    <div className="flex items-center gap-3">
-                      <Phone className="h-4 w-4 text-white/40 shrink-0" />
-                      <span className="text-sm text-white/80">{client.phone}</span>
-                    </div>
+                  {client.phone && client.salonId && (
+                    <ContactMask value={client.phone} type="phone" label="Phone" salonId={client.salonId} />
                   )}
                   <div className="flex items-center gap-3">
                     <Calendar className="h-4 w-4 text-white/40 shrink-0" />
@@ -339,15 +355,26 @@ export default function ClientDetailPage() {
                             ))}
                           </div>
                         </div>
-                        <Button
-                          
-                          size="icon"
-                          className="text-white/40 hover:text-white shrink-0"
-                          onClick={() => router.push(`/formulate?formulaId=${formula.id}`)}
-                          title="View formula"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            
+                            size="icon"
+                            className={favorites.has(formula.id) ? "text-yellow-400" : "text-white/20 hover:text-yellow-400"}
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(formula.id) }}
+                            title={favorites.has(formula.id) ? "Remove favorite" : "Add to favorites"}
+                          >
+                            <Star className={`h-4 w-4 ${favorites.has(formula.id) ? "fill-current" : ""}`} />
+                          </Button>
+                          <Button
+                            
+                            size="icon"
+                            className="text-white/40 hover:text-white"
+                            onClick={() => router.push(`/formulate?formulaId=${formula.id}`)}
+                            title="View formula"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                       {formula.formulation.notes.length > 0 && (
                         <div className="mt-3 pt-3 border-t border-white/10">

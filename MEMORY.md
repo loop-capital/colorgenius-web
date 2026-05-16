@@ -126,3 +126,28 @@ Remaining: Analyze, Library, History, Questionnaire
 - `/home/jason/.openclaw/workspaces/colorgenius/data/brands/davines/index.js` - Davines module export
 - `/home/jason/.openclaw/workspaces/colorgenius/memory/2026-05-03.md` - Daily work log
 - `/home/jason/.openclaw/workspaces/colorgenius/packages/api/prisma/schema.prisma` - Inventory tracking system (subagent completed)
+## 2026-05-16 — Brand Database Expansion + Salon Config
+
+### Brands Added Today (21 total)
+- **R+COLOR (brand #18):** 193 shades (64 permanent, 31 HyperMatic demi, 43 Stellar demi, 33 Star Sign demi, 17 Half Truth semi, 4 Super Palette additives) + 4 lighteners. Full 56-page brand book parsed.
+- **SOHO by MOB (brand #19):** 60 shades + NOVA lightener + 14 manufacturer conversion charts (Kenra, Wella KP, Wella Illumina, Paul Mitchell, Goldwell, Pravana, Schwarzkopf, L'Oréal, Matrix, Joico, Kevin Murphy, Keune, Scruples, Framesi)
+- **O&M CØR.color (brand #20):** 102 shades, ammonia/PPD/resorcinol-free, ICCC numbering
+- **CHI Ionic (brand #21):** 180 shades (96 permanent + 84 demi) + 864 manufacturer conversion mappings to 11 brands
+
+### Formulation Engine Status
+- 21 brands, ~3,300+ shades across all lines
+- Manufacturer-verified conversion data: SOHO (14 brand pairs) + CHI (11 brand pairs) = 1,000+ verified mappings
+- All brands integrated into conversion engine (data-loader, tone mappings, engine.ts)
+- 34/34 tests passing, Next.js build clean
+
+### Website Updates
+- Hero updated: "3,000+ professional shades · 21 color brands · 90%+ formulation accuracy"
+- Generate Formula button: LoaderCircle spinner (gold/orange) replaces Sparkles
+- Pushed to main branch, Vercel auto-deploying
+
+### Salon Brand Configuration (deployed by Che)
+- **Pricing tiers:** Starter (1 brand, $29/mo), Salon (3 brands, $49/mo), Pro (5 brands, $79/mo), Elite (unlimited, $119/mo)
+- **Add-on:** $7.50/mo per extra brand
+- **Pleij Salon (Tiche):** Created in DB, Salon tier, brands: Davines, L'ANZA, Schwarzkopf
+- **API:** GET /api/user/brands
+- **Docs:** docs/SALON-BRAND-CONFIG.md

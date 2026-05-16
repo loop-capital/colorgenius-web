@@ -1,0 +1,128 @@
+{
+  "brand": "Wella Professionals",
+  "line": "Koleston Perfect",
+  "fullName": "Koleston Perfect with Surreal Color",
+  "type": "permanent",
+  "year": "2025",
+  "source": "WP_Koleston Perfect_Surreal Color_Technical Guide_2025_07.pdf",
+  "description": "Wella's flagship permanent hair color with ME+ (MEA) technology and Metal Purifier. Surreal Color (2025) adds Pure Lift Technology with 1/3 caring lipids. Up to 100% gray coverage. 155 shades including Pure Naturals, Rich Naturals, Vibrant Reds, Deep Browns, Special Mix correctors, and Special Blonde high-lifts.",
+  "mixingRatio": "1:1",
+  "developer": "Welloxon Perfect",
+  "developers": [
+    {"volume": 6, "percent": "1.9%", "name": "Welloxon Perfect 6 vol", "use": "Deposit only, no lift; toning on pre-lightened hair"},
+    {"volume": 10, "percent": "3%", "name": "Welloxon Perfect 10 vol", "use": "1 level of lift; gray coverage same depth or darker; up to 2 levels with Special Blonde"},
+    {"volume": 20, "percent": "6%", "name": "Welloxon Perfect 20 vol", "use": "2 levels of lift; up to 3 levels with Special Blonde; standard gray coverage"},
+    {"volume": 30, "percent": "9%", "name": "Welloxon Perfect 30 vol", "use": "3 levels of lift; up to 4 levels with Special Blonde; resistant gray"},
+    {"volume": 40, "percent": "12%", "name": "Welloxon Perfect 40 vol", "use": "4 levels of lift; Special Blonde only; maximum lift"}
+  ],
+  "processingTimes": [
+    {"use": "Full head / regrowth same depth or darker", "time": "30-40 min"},
+    {"use": "Lightening regrowth (2-3 levels)", "time": "30-40 min"},
+    {"use": "Special Blonde (high-lift)", "time": "40 min"},
+    {"use": "Virgin application (lengths first)", "time": "20 min lengths + full development"},
+    {"use": "Balancing services (Color Touch on mid-lengths)", "time": "5-20 min"}
+  ],
+  "specialShadeCategories": {
+    "pureNaturals": {
+      "description": "XX/0 (single), XX/02 (resistant cover), /01, /03, /05, /07 — natural base shades for gray coverage",
+      "doublePigment": "XX/0 format (33/0, 44/0, etc.) provides double pigment for resistant gray",
+      "resistantCover": "XX/02 format provides enhanced gray coverage for resistant hair"
+    },
+    "richNaturals": {
+      "description": "Fashion naturals with cool or warm reflects — ash, matte, gold, pearl, cendre and their mixes",
+      "toneFamilies": ["/1 Ash", "/2 Matte", "/3 Gold", "/16 Ash Violet", "/31 Gold Ash", "/36 Gold Violet", "/38 Gold Pearl", "/8 Pearl", "/81 Pearl Ash", "/86 Pearl Violet", "/91 Cendre", "/95 Cendre", "/96 Pearl Violet", "/97 Cendre Ash", "/98 Intense Pearl"]
+    },
+    "vibrantReds": {
+      "description": "Copper, red, and mahogany shades with double-pigment options",
+      "doublePigment": "XX/43, XX/44, XX/46, XX/55, XX/65, XX/66 format provides intensified color"
+    },
+    "deepBrowns": {
+      "description": "Warm brown tones (/7 series) with mixes: /71 Brown Ash, /73 Brown Gold, /74 Brown Copper, /75 Brown Red, /77 Brown Intense"
+    },
+    "specialMix": {
+      "description": "Concentrated correctors and intensifiers — use up to 50g per 30g base shade",
+      "shades": ["0/00 Clear", "0/11 Ash", "0/28 Matte", "0/33 Gold", "0/43 Copper Gold", "0/44 Copper", "0/65 Red Violet", "0/66 Violet", "0/88 Blue"]
+    },
+    "specialBlonde": {
+      "description": "High-lift blonde shades (12/ series) for up to 5 levels of lift without bleach",
+      "technology": "Pure Lift Technology with 1/3 caring lipids in color cream",
+      "developer": "40 vol (12%) required",
+      "processing": "40 min"
+    }
+  },
+  "technology": [
+    "ME+ (MEA) — reduced allergy risk vs PPD",
+    "Metal Purifier — encapsulates metals on hair for accurate color formation",
+    "Idye — intense, long-lasting color",
+    "Pure Lift Technology — 1/3 caring lipids in Special Blonde cream",
+    "Surreal Color (2025) — updated shade palette"
+  ],
+  "applicationNotes": [
+    "1:1 ratio — 60g Koleston Perfect + 60g Welloxon Perfect developer",
+    "Apply to dry, unwashed hair",
+    "For gray coverage: always include a Pure Naturals shade (XX/0 or XX/02)",
+    "Special Blondes (12/) require 40 vol developer",
+    "Correctors (0/) can be mixed up to 50g per 60g base shade",
+    "Double-pigment shades (XX/YY) provide intensified color for vibrancy",
+    "Resistant Cover shades (XX/02) for up to 100% gray coverage on resistant hair",
+    "Easy rinse — rinse thoroughly, no shampoo required",
+    "Post-color: use pH-optimized care products for better color retention"
+  ],
+  "toneSystem": {
+    "description": "Wella International Tone Numbering: Level/Tone format (e.g., 7/43 = level 7 copper-gold)",
+    "format": "Depth/Tone — first digit(s) = level, after slash = tone reflect(s)",
+    "primaryTones": {
+      "/0": "Natural",
+      "/1": "Ash (grey)",
+      "/2": "Matte (green-based)",
+      "/3": "Gold (yellow)",
+      "/4": "Copper/Red (warm)",
+      "/5": "Mahogany (red/violet)",
+      "/6": "Violet (cool)",
+      "/7": "Brown (warm)",
+      "/8": "Pearl (blue)",
+      "/9": "Cendre (soft violet)"
+    },
+    "secondaryTones": {
+      "/01": "Natural Ash",
+      "/02": "Natural Resistant Cover",
+      "/03": "Natural Gold",
+      "/05": "Natural Gold Warm",
+      "/07": "Natural Brown",
+      "/16": "Ash Violet",
+      "/17": "Ash Violet Intense",
+      "/18": "Ash Brown Intense",
+      "/31": "Gold Ash (Beige)",
+      "/34": "Gold Copper",
+      "/36": "Gold Violet",
+      "/38": "Gold Pearl",
+      "/41": "Copper Ash",
+      "/43": "Copper Gold",
+      "/44": "Copper Intense",
+      "/45": "Copper Red",
+      "/46": "Copper Violet",
+      "/47": "Copper Brown",
+      "/65": "Red Violet",
+      "/71": "Brown Ash",
+      "/73": "Brown Gold",
+      "/74": "Brown Copper",
+      "/75": "Brown Red",
+      "/77": "Brown Intense",
+      "/81": "Pearl Ash",
+      "/82": "Pearl Ash Intense",
+      "/86": "Pearl Violet",
+      "/91": "Cendre",
+      "/95": "Cendre Intense",
+      "/96": "Pearl Violet",
+      "/97": "Cendre Ash",
+      "/98": "Intense Pearl"
+    },
+    "doublePigment": "XX/YY format — doubled level digits indicate double pigment intensity (e.g., 77/43 = level 7 with double copper-gold pigment)"
+  },
+  "grayCoverageNotes": [
+    "For 30-100% gray: add Pure Naturals shade (XX/0) proportionally",
+    "XX/02 Resistant Cover shades for very resistant gray",
+    "Double-pigment shades (XX/YY) enhance coverage on gray",
+    "Always perform Allergy Alert Test 48 hours before service"
+  ]
+}

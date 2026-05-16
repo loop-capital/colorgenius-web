@@ -6,7 +6,7 @@ import { VoiceAssistantWrapper } from "@/components/voice-assistant-wrapper";
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideSidebar = pathname === "/" || pathname === "/login" || pathname === "/register";
+  const hideSidebar = pathname === "/" || pathname === "/login" || pathname === "/register" || pathname === "/c";
 
   if (hideSidebar) {
     return <>{children}</>;

@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TreatmentCard } from '@/components/custom'
 import { GlassCard } from '@/components/custom'
 import { ColorWheel3D } from '@/components/custom'
+import { HairSwatch } from '@/components/ui/hair-swatch'
 import {
   Search, Save, Edit3, Trash2, X, FlaskConical, Filter,
   Grid3X3, LayoutList, ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { classifyFormula } from '@/lib/formula-classifier'
 
 /* Inline custom components — no shadcn Card/Badge/Button */
 
@@ -85,6 +87,8 @@ interface Formula {
   notes: string
   shades: { code: string; name: string; hex: string }[]
   confidence: number
+  autoTags?: string[]
+  searchText?: string
 }
 
 const MOCK_FORMULAS: Formula[] = [
@@ -255,30 +259,65 @@ const MOCK_FORMULAS: Formula[] = [
   },
 ]
 
-const BRANDS = Array.from(new Set(MOCK_FORMULAS.map((f) => f.brand)))
 
-const LINES_BY_BRAND: Record<string, string[]> = MOCK_FORMULAS.reduce(
-  (acc, f) => {
-    if (!acc[f.brand]) acc[f.brand] = []
-    if (!acc[f.brand].includes(f.line)) acc[f.brand].push(f.line)
-    return acc
-  },
-  {} as Record<string, string[]>
-)
 
 const TONE_OPTIONS = [
-  { value: 'neutral', label: 'Natural', color: '#9C8B7A' },
-  { value: 'ash', label: 'Ash', color: '#8A7D6E' },
-  { value: 'golden', label: 'Golden', color: '#C4A35A' },
-  { value: 'copper', label: 'Copper', color: '#B87333' },
-  { value: 'red', label: 'Red', color: '#A03030' },
-  { value: 'violet', label: 'Violet', color: '#7B68A6' },
-  { value: 'pearl', label: 'Pearl', color: '#B8B0C4' },
-  { value: 'beige', label: 'Beige', color: '#C4B5A0' },
-  { value: 'silver', label: 'Silver', color: '#C0C0C0' },
-  { value: 'chrome', label: 'Chrome', color: '#A8A8A8' },
-  { value: 'orange', label: 'Orange Kicker', color: '#FF8C00' },
-  { value: 'yellow', label: 'Yellow Kicker', color: '#FFD700' },
+  { value: 'N', label: 'Natural', color: '#9C8B7A' },
+  { value: 'A', label: 'Ash', color: '#8A7D6E' },
+  { value: 'G', label: 'Gold', color: '#C4A35A' },
+  { value: 'K', label: 'Copper', color: '#B87333' },
+  { value: 'R', label: 'Red', color: '#A03030' },
+  { value: 'V', label: 'Violet', color: '#7B68A6' },
+  { value: 'P', label: 'Pearl', color: '#B8B0C4' },
+  { value: 'B', label: 'Beige', color: '#C4B5A0' },
+  { value: 'M', label: 'Mahogany', color: '#6B3A3A' },
+  { value: 'Ch', label: 'Chocolate', color: '#4A2C2A' },
+  { value: 'W', label: 'Warm', color: '#D4A574' },
+  { value: 'C', label: 'Cool', color: '#7D8B9A' },
+]
+
+// Desired Result search vocabulary
+const DESIRED_RESULT_MAP: Record<string, string[]> = {
+  'expensive brunette': ['warm', 'dimensional', 'glossy', 'rich', 'brown', 'natural', 'brunette'],
+  'lived-in bronde': ['balayage', 'warm', 'gold', 'natural', 'blonde', 'bronze', 'dimensional'],
+  'icy level 10': ['platinum', 'ash', 'cool', 'pearl', 'high-lift', 'blonde', 'icy'],
+  'copper cowboy': ['copper', 'warm', 'auburn', 'red', 'dimensional', 'natural'],
+  'root melt': ['shadow', 'dimensional', 'low-maintenance', 'root', 'gradient', 'balayage'],
+  'money piece': ['face-frame', 'highlight', 'blonde', 'dimensional', 'balayage'],
+  'cherry coke': ['red', 'violet', 'mahogany', 'dark', 'rich', 'glossy'],
+  'honey blonde': ['gold', 'warm', 'blonde', 'natural', 'honey', 'amber'],
+  'mushroom brown': ['ash', 'cool', 'muted', 'brown', 'natural', 'dimensional'],
+  'butter blonde': ['gold', 'warm', 'blonde', 'creamy', 'light', 'bright'],
+  'chocolate cherry': ['chocolate', 'red', 'warm', 'brown', 'rich', 'vibrant'],
+  'vanilla chai': ['beige', 'pearl', 'cool', 'blonde', 'soft', 'muted'],
+  'espresso': ['dark', 'brown', 'cool', 'rich', 'natural', 'glossy'],
+  'caramel balayage': ['gold', 'copper', 'warm', 'balayage', 'dimensional', 'blonde'],
+  'smoky quartz': ['ash', 'cool', 'muted', 'brown', 'dimensional', 'soft'],
+  'rose gold': ['copper', 'red', 'warm', 'fashion', 'vibrant'],
+  'strawberry blonde': ['copper', 'gold', 'warm', 'blonde', 'red', 'natural'],
+  'tiger eye': ['gold', 'copper', 'warm', 'dimensional', 'balayage', 'brunette'],
+  'tortoiseshell': ['warm', 'dimensional', 'brown', 'gold', 'copper', 'rich'],
+  'champagne': ['pearl', 'beige', 'cool', 'blonde', 'soft', 'muted'],
+  'sand': ['beige', 'warm', 'neutral', 'blonde', 'soft', 'natural'],
+  'pumpkin spice': ['copper', 'red', 'warm', 'vibrant', 'auburn'],
+  'cinnamon': ['copper', 'red', 'warm', 'brown', 'auburn', 'natural'],
+}
+
+const TREND_CHIPS = [
+  'Expensive Brunette', 'Lived-in Bronde', 'Icy Level 10', 'Copper Cowboy',
+  'Root Melt', 'Money Piece', 'Cherry Coke', 'Honey Blonde',
+  'Mushroom Brown', 'Espresso', 'Caramel Balayage', 'Rose Gold',
+]
+
+const FINISH_DESCRIPTORS = [
+  { label: 'Cool', keywords: ['cool', 'ash', 'muted', 'smoky', 'icy'], color: '#7D8B9A' },
+  { label: 'Neutral', keywords: ['neutral', 'natural', 'balanced', 'soft'], color: '#9C8B7A' },
+  { label: 'Warm', keywords: ['warm', 'gold', 'copper', 'honey', 'amber'], color: '#D4A574' },
+  { label: 'Dimensional', keywords: ['dimensional', 'multi-tonal', 'balayage', 'highlight'], color: '#C08C5A' },
+  { label: 'Muted', keywords: ['muted', 'smoky', 'ash', 'soft', 'matte'], color: '#8A7D6E' },
+  { label: 'Reflective', keywords: ['reflective', 'glossy', 'shiny', 'luminous'], color: '#C4A35A' },
+  { label: 'Vibrant', keywords: ['vibrant', 'vivid', 'fashion', 'saturated'], color: '#A03030' },
+  { label: 'Rich', keywords: ['rich', 'deep', 'intense', 'saturated'], color: '#6B3A3A' },
 ]
 
 type ViewMode = 'grid' | 'table'
@@ -290,31 +329,170 @@ export default function LibraryPage() {
   const [filterTone, setFilterTone] = useState('')
   const [selectedFormula, setSelectedFormula] = useState<Formula | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [formulas, setFormulas] = useState<Formula[]>(MOCK_FORMULAS)
+  const [loading, setLoading] = useState(false)
+  const [selectedTrend, setSelectedTrend] = useState('')
+  const [selectedFinish, setSelectedFinish] = useState('')
+  const [desiredResultQuery, setDesiredResultQuery] = useState('')
+  const [dynamicTrends, setDynamicTrends] = useState<string[]>([])
+
+  // Log a search event for trend analytics
+  const logTrendSearch = (query: string, category: 'trend' | 'finish' | 'free-text') => {
+    fetch('/api/v1/trends', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: query.toLowerCase(), category }),
+    }).catch(() => {}) // fire-and-forget
+  }
+
+  // Fetch dynamic trends from API
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch('/api/v1/trends?days=30&limit=16')
+        if (!res.ok) return
+        const data = await res.json()
+        if (!cancelled && data.trends?.length > 0) {
+          setDynamicTrends(data.trends.map((t: any) => t.name))
+        }
+      } catch (e) {
+        // silent — fallback to hardcoded
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  // Fetch formulas from API
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        setLoading(true)
+        const res = await fetch('/api/v1/formulas/list?limit=100')
+        if (!res.ok) {
+          console.warn('Library API returned', res.status, '- using fallback data')
+          // Keep default mock data, don't set empty
+          return
+        }
+        const data = await res.json()
+        if (!cancelled && data.items?.length > 0) {
+            const mapped = data.items.map((f: any) => ({
+              id: f.id,
+              name: f.name || 'Untitled Formula',
+              clientName: f.clientName || 'Unknown',
+              brand: f.brand || 'Unknown',
+              line: f.productLine || '',
+              createdAt: f.createdAt || new Date().toISOString(),
+              tags: f.tags || [],
+              developer: f.developerVolume ? f.developerVolume + 'Vol' : '20Vol',
+              developerVolume: f.developerVolume ? f.developerVolume + 'ml' : '60ml',
+              totalVolume: f.totalVolume || '60ml',
+              processingTime: f.processingTime ? f.processingTime + ' min' : '30 min',
+              application: f.application || 'Full Head',
+              coverage: f.coverage || 'Roots',
+              notes: f.notes || '',
+              shades: (f.components || []).filter((c: any) => c.componentType === 'color').map((c: any) => ({
+                code: c.shadeCode || '?',
+                name: c.shadeName || c.shadeCode || 'Unknown',
+                hex: '#9333EA',
+              })),
+              confidence: f.confidence || 85,
+            }))
+            setFormulas(mapped)
+          }
+      } catch (e) {
+        console.error('Failed to fetch formulas:', e)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  const BRANDS = useMemo(() => Array.from(new Set(formulas.map((f) => f.brand))), [formulas])
+  const LINES_BY_BRAND = useMemo(() => formulas.reduce(
+    (acc, f) => {
+      if (!acc[f.brand]) acc[f.brand] = []
+      if (!acc[f.brand].includes(f.line)) acc[f.brand].push(f.line)
+      return acc
+    },
+    {}
+  ), [formulas])
+
+  // Auto-classify all formulas for enriched search
+  const classifiedFormulas = useMemo(() => {
+    return formulas.map(f => {
+      const classification = classifyFormula({
+        shades: f.shades.map(s => ({ code: s.code, name: s.name })),
+        notes: f.notes,
+        application: f.application,
+        coverage: f.coverage,
+        name: f.name,
+        tags: f.tags,
+        brand: f.brand,
+        line: f.line,
+      })
+      return {
+        ...f,
+        autoTags: classification.autoTags,
+        searchText: classification.searchText,
+      }
+    })
+  }, [formulas])
+
+  // Build desired-result search terms from trend, finish, and free text
+  const desiredResultTerms = useMemo(() => {
+    let terms: string[] = []
+    if (selectedTrend) {
+      const trendKey = selectedTrend.toLowerCase()
+      terms = [...terms, ...(DESIRED_RESULT_MAP[trendKey] || [trendKey])]
+    }
+    if (selectedFinish) {
+      const desc = FINISH_DESCRIPTORS.find(d => d.label === selectedFinish)
+      if (desc) terms = [...terms, ...desc.keywords]
+    }
+    if (desiredResultQuery.trim()) {
+      const q = desiredResultQuery.toLowerCase().trim()
+      // Check if the free text matches a known trend
+      if (DESIRED_RESULT_MAP[q]) {
+        terms = [...terms, ...DESIRED_RESULT_MAP[q]]
+      }
+      // Also split into words and check each
+      terms = [...terms, ...q.split(/\s+/).filter(w => w.length > 2)]
+    }
+    return [...new Set(terms)]
+  }, [selectedTrend, selectedFinish, desiredResultQuery])
 
   const filteredFormulas = useMemo(() => {
-    let result = [...MOCK_FORMULAS]
+    let result = [...classifiedFormulas]
+    // Standard text search — uses pre-computed searchText + clientName
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase()
       result = result.filter(
         (f) =>
-          f.name.toLowerCase().includes(q) ||
-          f.clientName.toLowerCase().includes(q) ||
-          f.tags.some((t) => t.toLowerCase().includes(q)) ||
-          f.notes.toLowerCase().includes(q)
+          (f.searchText || '').includes(q) ||
+          f.clientName.toLowerCase().includes(q)
       )
     }
-    if (filterBrand) result = result.filter((f) => f.brand === filterBrand)
-    if (filterLine) result = result.filter((f) => f.line === filterLine)
+    if (filterBrand && filterBrand !== 'all') result = result.filter((f) => f.brand === filterBrand)
+    if (filterLine && filterLine !== 'all') result = result.filter((f) => f.line === filterLine)
+    // Tone filter — now searches the enriched searchText which includes auto-classified tone tags
     if (filterTone) {
-      result = result.filter((f) =>
-        f.tags.some((t) => t.toLowerCase().includes(filterTone.toLowerCase())) ||
-        f.name.toLowerCase().includes(filterTone.toLowerCase())
-      )
+      const toneLabel = TONE_OPTIONS.find(t => t.value === filterTone)?.label?.toLowerCase() || filterTone.toLowerCase()
+      result = result.filter((f) => (f.searchText || '').includes(toneLabel))
+    }
+    // Desired result search — match against enriched searchText
+    if (desiredResultTerms.length > 0) {
+      result = result.filter((f) => {
+        const text = f.searchText || ''
+        return desiredResultTerms.some(term => text.includes(term))
+      })
     }
     return result
-  }, [searchTerm, filterBrand, filterLine, filterTone])
+  }, [searchTerm, filterBrand, filterLine, filterTone, desiredResultTerms, classifiedFormulas])
 
-  const linesForBrand = filterBrand ? LINES_BY_BRAND[filterBrand] || [] : []
+  const linesForBrand = (filterBrand && filterBrand !== 'all') ? LINES_BY_BRAND[filterBrand] || [] : []
 
   return (
     <div className="min-h-screen p-4 md:p-8" style={{ background: 'var(--cg-bg-deep)' }}>
@@ -327,7 +505,7 @@ export default function LibraryPage() {
         >
           <div>
             <h1 className="text-2xl md:text-3xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>
-              Formula <span className="gradient-text-gold">Library</span>
+              Formula <span className="gradient-text-teal">Library</span>
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--cg-text-secondary)' }}>
               Browse, search, and manage your color formulas
@@ -346,6 +524,141 @@ export default function LibraryPage() {
               Save Formula
             </ActionButton>
           </div>
+        </motion.div>
+
+        {/* Desired Result Search */}
+        <motion.div
+          className="mb-6 rounded-xl p-5"
+          style={{ background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)' }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+        >
+          <p className="text-xs uppercase tracking-wider font-semibold mb-3" style={{ color: 'var(--cg-text-tertiary)' }}>
+            Desired Result — Search by look
+          </p>
+          <div className="relative mb-4">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+              style={{ color: 'var(--cg-text-tertiary)' }}
+            />
+            <input
+              type="text"
+              placeholder="Describe the look — creamy beige, lived-in bronde, icy level 10..."
+              value={desiredResultQuery}
+              onChange={(e) => {
+                setDesiredResultQuery(e.target.value)
+              }}
+              onBlur={() => {
+                const val = desiredResultQuery.trim()
+                if (val.length > 2) logTrendSearch(val, 'free-text')
+              }}
+              className={cn(
+                'w-full pl-9 pr-4 py-3 rounded-xl text-sm transition-all duration-200',
+                'placeholder:text-[#71717A]',
+                'focus:outline-none focus:ring-2'
+              )}
+              style={{
+                background: 'var(--cg-surface)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'var(--cg-text-primary)',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(20,184,166,0.4)'
+                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20,184,166,0.1)'
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
+            />
+          </div>
+          {/* Finish / descriptor pills */}
+          <div className="mb-3">
+            <p className="text-[10px] uppercase tracking-wider font-medium mb-2" style={{ color: 'var(--cg-text-tertiary)' }}>
+              Finish
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {FINISH_DESCRIPTORS.map((d) => (
+                <button
+                  key={d.label}
+                  onClick={() => {
+                    const next = selectedFinish === d.label ? '' : d.label
+                    setSelectedFinish(next)
+                    if (next) logTrendSearch(d.label, 'finish')
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                  style={{
+                    background: selectedFinish === d.label ? `${d.color}22` : 'var(--cg-surface)',
+                    border: `1px solid ${selectedFinish === d.label ? d.color + '55' : 'rgba(255,255,255,0.08)'}`,
+                    color: selectedFinish === d.label ? d.color : 'var(--cg-text-secondary)',
+                  }}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Trend chips */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wider font-medium mb-2" style={{ color: 'var(--cg-text-tertiary)' }}>
+              Trend Looks
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(dynamicTrends.length > 0 ? dynamicTrends.map(t => t.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')) : TREND_CHIPS).map((trend) => (
+                <button
+                  key={trend}
+                  onClick={() => {
+                    const next = selectedTrend === trend ? '' : trend
+                    setSelectedTrend(next)
+                    if (next) logTrendSearch(trend, 'trend')
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                  style={{
+                    background: selectedTrend === trend ? 'rgba(20,184,166,0.1)' : 'var(--cg-surface)',
+                    border: `1px solid ${selectedTrend === trend ? 'rgba(20,184,166,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                    color: selectedTrend === trend ? 'var(--cg-teal)' : 'var(--cg-text-secondary)',
+                  }}
+                >
+                  {trend}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Active filter summary */}
+          {(selectedTrend || selectedFinish || desiredResultQuery.trim()) && (
+            <div className="flex items-center gap-2 mt-3 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <span className="text-[10px] uppercase tracking-wider font-medium" style={{ color: 'var(--cg-text-tertiary)' }}>Active:</span>
+              {selectedTrend && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+                  style={{ background: 'rgba(20,184,166,0.1)', color: 'var(--cg-teal)', border: '1px solid rgba(20,184,166,0.2)' }}>
+                  {selectedTrend}
+                  <X size={10} className="cursor-pointer ml-0.5" onClick={() => setSelectedTrend('')} />
+                </span>
+              )}
+              {selectedFinish && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+                  style={{ background: `${FINISH_DESCRIPTORS.find(d => d.label === selectedFinish)?.color}15`, color: FINISH_DESCRIPTORS.find(d => d.label === selectedFinish)?.color, border: `1px solid ${FINISH_DESCRIPTORS.find(d => d.label === selectedFinish)?.color}30` }}>
+                  {selectedFinish}
+                  <X size={10} className="cursor-pointer ml-0.5" onClick={() => setSelectedFinish('')} />
+                </span>
+              )}
+              {desiredResultQuery.trim() && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+                  style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--cg-text-secondary)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  "{desiredResultQuery.trim()}"
+                  <X size={10} className="cursor-pointer ml-0.5" onClick={() => setDesiredResultQuery('')} />
+                </span>
+              )}
+              <button
+                className="text-[10px] underline ml-auto cursor-pointer"
+                style={{ color: 'var(--cg-text-tertiary)' }}
+                onClick={() => { setSelectedTrend(''); setSelectedFinish(''); setDesiredResultQuery('') }}
+              >
+                Clear all
+              </button>
+            </div>
+          )}
         </motion.div>
 
         {/* Filters */}
@@ -404,7 +717,7 @@ export default function LibraryPage() {
                 <SelectValue placeholder="All brands" />
               </SelectTrigger>
               <SelectContent style={{ background: 'var(--cg-surface)', borderColor: 'rgba(255,255,255,0.08)' }}>
-                <SelectItem value="">All brands</SelectItem>
+                <SelectItem value="all" className="text-[#F5F5F7]">All brands</SelectItem>
                 {BRANDS.map((brand) => (
                   <SelectItem key={brand} value={brand} className="text-[#F5F5F7]">{brand}</SelectItem>
                 ))}
@@ -423,7 +736,7 @@ export default function LibraryPage() {
                 <SelectValue placeholder="All lines" />
               </SelectTrigger>
               <SelectContent style={{ background: 'var(--cg-surface)', borderColor: 'rgba(255,255,255,0.08)' }}>
-                <SelectItem value="">All lines</SelectItem>
+                <SelectItem value="all" className="text-[#F5F5F7]">All lines</SelectItem>
                 {linesForBrand.map((line) => (
                   <SelectItem key={line} value={line} className="text-[#F5F5F7]">{line}</SelectItem>
                 ))}
@@ -448,26 +761,31 @@ export default function LibraryPage() {
               selected={filterTone as any}
               onSelect={(val) => setFilterTone(filterTone === val ? '' : val)}
             />
-            <div className="flex flex-wrap gap-2">
-              {TONE_OPTIONS.map((tone) => (
-                <motion.button
-                  key={tone.value}
-                  onClick={() => setFilterTone(filterTone === tone.value ? '' : tone.value)}
-                  className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200'
-                  )}
-                  style={{
-                    backgroundColor: filterTone === tone.value ? `${tone.color}15` : 'rgba(255,255,255,0.03)',
-                    borderColor: filterTone === tone.value ? `${tone.color}40` : 'rgba(255,255,255,0.06)',
-                    color: filterTone === tone.value ? tone.color : 'var(--cg-text-secondary)',
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: tone.color }} />
-                  {tone.label}
-                </motion.button>
-              ))}
+            <div className="flex flex-col gap-2 pt-4">
+              <div className="grid grid-cols-6 gap-2">
+                {TONE_OPTIONS.slice(0, 6).map((tone) => (
+                  <HairSwatch
+                    key={tone.value}
+                    color={tone.color}
+                    label={tone.label}
+                    isActive={filterTone === tone.value}
+                    onClick={() => setFilterTone(filterTone === tone.value ? '' : tone.value)}
+                    size="sm"
+                  />
+                ))}
+              </div>
+              <div className="grid grid-cols-6 gap-2">
+                {TONE_OPTIONS.slice(6, 12).map((tone) => (
+                  <HairSwatch
+                    key={tone.value}
+                    color={tone.color}
+                    label={tone.label}
+                    isActive={filterTone === tone.value}
+                    onClick={() => setFilterTone(filterTone === tone.value ? '' : tone.value)}
+                    size="sm"
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </motion.div>
@@ -475,7 +793,7 @@ export default function LibraryPage() {
         {/* Results count */}
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
-            Showing <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>{filteredFormulas.length}</span> of {MOCK_FORMULAS.length} formulas
+            Showing <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>{filteredFormulas.length}</span> of {classifiedFormulas.length} formulas
           </p>
         </div>
 

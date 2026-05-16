@@ -1,0 +1,282 @@
+[
+  {
+    "code": "4ABn",
+    "name": "Dark Roast",
+    "level": 4,
+    "toneCode": "ABn",
+    "toneFamily": "ash",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "ash-brown"
+  },
+  {
+    "code": "4NN",
+    "name": "Coffee Grounds",
+    "level": 4,
+    "toneCode": "NN",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "double-neutral"
+  },
+  {
+    "code": "5NA",
+    "name": "Smoke",
+    "level": 5,
+    "toneCode": "NA",
+    "toneFamily": "ash",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "neutral-ash"
+  },
+  {
+    "code": "5NN",
+    "name": "Cafe Mocha",
+    "level": 5,
+    "toneCode": "NN",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "double-neutral"
+  },
+  {
+    "code": "5N",
+    "name": "Walnut",
+    "level": 5,
+    "toneCode": "N",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural"
+  },
+  {
+    "code": "5NW",
+    "name": "Macchiato",
+    "level": 5,
+    "toneCode": "NW",
+    "toneFamily": "warm",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural-warm"
+  },
+  {
+    "code": "5CB",
+    "name": "Brownstone",
+    "level": 5,
+    "toneCode": "CB",
+    "toneFamily": "copper",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "copper-brown"
+  },
+  {
+    "code": "6ABn",
+    "name": "Brown Smoke",
+    "level": 6,
+    "toneCode": "ABn",
+    "toneFamily": "ash",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "ash-brown"
+  },
+  {
+    "code": "6NN",
+    "name": "Chocolate Mousse",
+    "level": 6,
+    "toneCode": "NN",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "double-neutral"
+  },
+  {
+    "code": "6N",
+    "name": "Moroccan Sand",
+    "level": 6,
+    "toneCode": "N",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural"
+  },
+  {
+    "code": "6NW",
+    "name": "Brandy",
+    "level": 6,
+    "toneCode": "NW",
+    "toneFamily": "warm",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural-warm"
+  },
+  {
+    "code": "6WG",
+    "name": "Mango",
+    "level": 6,
+    "toneCode": "WG",
+    "toneFamily": "gold",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "warm-gold"
+  },
+  {
+    "code": "6CB",
+    "name": "Amber Glaze",
+    "level": 6,
+    "toneCode": "CB",
+    "toneFamily": "copper",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "copper-brown"
+  },
+  {
+    "code": "6RR",
+    "name": "Blaze",
+    "level": 6,
+    "toneCode": "RR",
+    "toneFamily": "red",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "red-red"
+  },
+  {
+    "code": "7NA",
+    "name": "Pewter",
+    "level": 7,
+    "toneCode": "NA",
+    "toneFamily": "ash",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "neutral-ash"
+  },
+  {
+    "code": "7NN",
+    "name": "Cocoa Powder",
+    "level": 7,
+    "toneCode": "NN",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "double-neutral"
+  },
+  {
+    "code": "7N",
+    "name": "Mirage",
+    "level": 7,
+    "toneCode": "N",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural"
+  },
+  {
+    "code": "7GB",
+    "name": "Butterscotch",
+    "level": 7,
+    "toneCode": "GB",
+    "toneFamily": "gold",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "gold-brown"
+  },
+  {
+    "code": "7NW",
+    "name": "Milk Tea",
+    "level": 7,
+    "toneCode": "NW",
+    "toneFamily": "warm",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural-warm"
+  },
+  {
+    "code": "7RR",
+    "name": "Flame",
+    "level": 7,
+    "toneCode": "RR",
+    "toneFamily": "red",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "red-red"
+  },
+  {
+    "code": "8NA",
+    "name": "Volcanic",
+    "level": 8,
+    "toneCode": "NA",
+    "toneFamily": "ash",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "neutral-ash"
+  },
+  {
+    "code": "8NN",
+    "name": "Creme Brulee",
+    "level": 8,
+    "toneCode": "NN",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "double-neutral"
+  },
+  {
+    "code": "8N",
+    "name": "Mojave",
+    "level": 8,
+    "toneCode": "N",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural"
+  },
+  {
+    "code": "8NW",
+    "name": "Safari",
+    "level": 8,
+    "toneCode": "NW",
+    "toneFamily": "warm",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural-warm"
+  },
+  {
+    "code": "9NA",
+    "name": "Mist",
+    "level": 9,
+    "toneCode": "NA",
+    "toneFamily": "ash",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "neutral-ash"
+  },
+  {
+    "code": "9N",
+    "name": "Cafe au Lait",
+    "level": 9,
+    "toneCode": "N",
+    "toneFamily": "natural",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural"
+  },
+  {
+    "code": "9GB",
+    "name": "Butter Cream",
+    "level": 9,
+    "toneCode": "GB",
+    "toneFamily": "gold",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "gold-brown"
+  },
+  {
+    "code": "9NW",
+    "name": "Cream Soda",
+    "level": 9,
+    "toneCode": "NW",
+    "toneFamily": "warm",
+    "line": "color-gels-lacquers",
+    "brand": "redken",
+    "category": "natural-warm"
+  }
+]

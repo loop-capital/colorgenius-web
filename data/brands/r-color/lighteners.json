@@ -1,0 +1,48 @@
+{
+  "brand": "R+COLOR",
+  "lighteners": [
+    {
+      "name": "Chairlift Powder Lightener",
+      "type": "powder",
+      "lift": 9,
+      "application": "on+off-scalp",
+      "mixingRatio": "1:1.5 or 1:2",
+      "developer": "5-40 vol (on-scalp: 5, 10, 20 only)",
+      "timing": 50,
+      "idealFor": "highlights, on-scalp lightening, quick lift"
+    },
+    {
+      "name": "Snowfall Ammonia-Free Powder Lightener",
+      "type": "powder",
+      "ammoniaFree": true,
+      "lift": 9,
+      "application": "on+off-scalp",
+      "mixingRatio": "1:1.5 or 1:2",
+      "developer": "5-40 vol (on-scalp: 5, 10, 20 only)",
+      "timing": 50,
+      "idealFor": "highlights, on-scalp lightening"
+    },
+    {
+      "name": "Lunar Dust Clay Lightener",
+      "type": "clay",
+      "lift": 7,
+      "application": "off-scalp only",
+      "mixingRatio": "1:1",
+      "developer": "5-40 vol",
+      "timing": 50,
+      "features": ["coconut oil infused"],
+      "idealFor": "freehand, balayage, open-air techniques"
+    },
+    {
+      "name": "Electronica Crème Lightener",
+      "type": "crème",
+      "lift": 7,
+      "application": "on+off-scalp",
+      "mixingRatio": "1:1.5",
+      "developer": "5-40 vol (on-scalp: 5, 10, 20 only)",
+      "timing": 40,
+      "features": ["fragrance-free", "conditioning"],
+      "idealFor": "on-scalp lightening, all-over lightening"
+    }
+  ]
+}

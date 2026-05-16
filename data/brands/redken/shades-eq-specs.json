@@ -1,0 +1,94 @@
+{
+  "brand": "Redken",
+  "productLine": "Shades EQ",
+  "source": "Redken Shades EQ Paper Chart (official)",
+  "verification_status": "pending_review",
+  "verified_date": null,
+  "distributor": "L'Oréal USA / Redken 5th Avenue NYC",
+  "website": "www.redken.com",
+  "numbering_system": {
+    "description": "Redken Shades EQ uses level + tone letter codes. Levels 0-10, tone letters appended to level.",
+    "level_range": "0-10",
+    "tone_codes": {
+      "N": "Natural",
+      "NA": "Neutral Ash",
+      "NW": "Natural Warm",
+      "NB": "Neutral Brown",
+      "NN": "Double Natural (extra coverage)",
+      "A": "Ash",
+      "T": "Titanium (ash-violet)",
+      "V": "Violet",
+      "B": "Blue",
+      "G": "Gold",
+      "C": "Copper",
+      "R": "Red",
+      "W": "Warm",
+      "P": "Pearl"
+    },
+    "specialty_prefixes": {
+      "010": "Platinum series (level 10 specialty)",
+      "09": "Level 9 specialty",
+      "08": "Level 8 specialty",
+      "07": "Level 7 specialty",
+      "06": "Level 6 specialty"
+    }
+  },
+  "lines": [
+    {
+      "name": "Shades EQ",
+      "type": "demi-permanent",
+      "mixRatio": "1:1 (color : Shades EQ Processing Solution)",
+      "developerVolumes": [0],
+      "processingTime": "20 minutes at room temperature",
+      "description": "Demi-permanent acidic conditioning color gloss. No ammonia, no lift. Lasts 4-6 weeks."
+    }
+  ],
+  "developers": {
+    "shades_eq_processing_solution": {
+      "volumes": [0],
+      "strengths": {
+        "0": "Shades EQ Processing Solution (dedicated acidic developer)"
+      }
+    },
+    "usage": {
+      "processing_solution": {
+        "use": "Dedicated acidic processing solution for all Shades EQ shades",
+        "mixing": "1:1 ratio with Shades EQ color",
+        "processing": "20 minutes at room temperature"
+      }
+    }
+  },
+  "gray_coverage": {
+    "rule": "Shades EQ provides grey blending, not full coverage. For 100% grey coverage, use Color Gels Lacquers or add permanent color.",
+    "blending": "Ideal for blending grey and adding tone without lift",
+    "recommended": "Use NN (Double Natural) shades for best grey blending results"
+  },
+  "formulation_guidelines": {
+    "use_cases": {
+      "glossing": "Apply to pre-lightened or natural hair for shine and tone",
+      "toning": "Neutralize unwanted tones on pre-lightened hair",
+      "refreshing": "Revive faded color between permanent services",
+      "grey_blending": "Blend grey without full coverage using NN or N shades"
+    },
+    "mixing_ratios": {
+      "standard": "1:1 (color : Shades EQ Processing Solution)",
+      "thick_hair": "1:1 (standard)",
+      "dilute": "Mix with 0N (Clear) to dilute intensity"
+    },
+    "processing_times": {
+      "standard": "20 minutes at room temperature",
+      "deeper_penetration": "Up to 25 minutes for resistant hair"
+    },
+    "tonal_direction": {
+      "cooling": ["A", "T", "V", "B"],
+      "warming": ["G", "C", "R", "W", "NW"],
+      "neutral": ["N", "NN", "NA", "NB"],
+      "pearl": ["P"]
+    },
+    "clear": {
+      "code": "0N",
+      "use": "Dilute any shade, add shine without color deposit",
+      "mixing": "Mix with any shade to reduce intensity"
+    }
+  }
+}

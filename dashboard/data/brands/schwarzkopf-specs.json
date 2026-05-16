@@ -1,0 +1,159 @@
+{
+  "brand": "Schwarzkopf Professional",
+  "lines": [
+    {
+      "name": "IGORA ROYAL Permanent Color",
+      "type": "permanent",
+      "mixingRatio": "1:1 (color : IGORA ROYAL Oil Developer)",
+      "developerVolumes": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "processingTime": "30-45 minutes",
+      "description": "Professional permanent color cream with up to 100% white hair coverage"
+    },
+    {
+      "name": "IGORA ROYAL Absolutes",
+      "type": "permanent",
+      "mixingRatio": "1:1",
+      "developerVolumes": [
+        9,
+        12
+      ],
+      "processingTime": "30-45 minutes",
+      "description": "Intensified color series providing 100% white hair coverage on more than 50% white hair without mixing with natural tones"
+    },
+    {
+      "name": "IGORA ROYAL Ultra Blonde (10- Series)",
+      "type": "permanent",
+      "mixingRatio": "1:1",
+      "developerVolumes": [
+        9,
+        12
+      ],
+      "processingTime": "30-45 minutes",
+      "description": "Ultra blonde lifting shades for up to 3-4 levels of lift"
+    },
+    {
+      "name": "IGORA ROYAL Special Blonde (12- Series)",
+      "type": "permanent",
+      "mixingRatio": "1:2 (color : developer)",
+      "developerVolumes": [
+        9,
+        12
+      ],
+      "processingTime": "30-45 minutes",
+      "description": "Maximum lifting blonde shades for up to 4-5 levels of lift on natural base 6 and lighter"
+    },
+    {
+      "name": "IGORA ROYAL Highlifts (9.5- Series)",
+      "type": "permanent",
+      "mixingRatio": "1:1",
+      "developerVolumes": [
+        9,
+        12
+      ],
+      "processingTime": "30-45 minutes",
+      "description": "Highlift shades for pastel and cool blonde results on levels 7 and higher"
+    },
+    {
+      "name": "IGORA ROYAL Silver Whites & Specials",
+      "type": "permanent",
+      "mixingRatio": "1:1",
+      "developerVolumes": [
+        3,
+        6,
+        9
+      ],
+      "processingTime": "30-45 minutes",
+      "description": "Special shades for grey blending, pastel effects, and neutralizing"
+    },
+    {
+      "name": "IGORA ROYAL Fashion Lights",
+      "type": "permanent",
+      "mixingRatio": "1:1",
+      "developerVolumes": [
+        9
+      ],
+      "processingTime": "30-45 minutes",
+      "description": "Fashion-forward shades for creative color effects and highlights"
+    },
+    {
+      "name": "IGORA COLOR10",
+      "type": "permanent",
+      "mixingRatio": "1:1",
+      "developerVolumes": [
+        3,
+        6,
+        9
+      ],
+      "processingTime": "As little as 10 minutes",
+      "description": "10-minute express permanent color for fast results"
+    },
+    {
+      "name": "IGORA VIBRANCE",
+      "type": "demi-permanent",
+      "mixingRatio": "1:1",
+      "developerVolumes": [
+        3,
+        6
+      ],
+      "processingTime": "Up to 20 minutes",
+      "description": "Demi-permanent color for tone, refresh, and gloss. Denoted by underlined codes on chart."
+    }
+  ],
+  "developers": {
+    "igora_royal_oil_developer": {
+      "volumes": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "strengths": {
+        "3": "3% (10 Vol.)",
+        "6": "6% (20 Vol.)",
+        "9": "9% (30 Vol.)",
+        "12": "12% (40 Vol.)"
+      }
+    },
+    "usage": {
+      "3_vol": {
+        "use": "Coloring darker, 100% white coverage, deposit on pre-lightened, pastel shades, tone-on-tone",
+        "lift": "Deposit only"
+      },
+      "6_vol": {
+        "use": "Tone-on-tone, white hair coverage, lifting 1-2 levels, Absolutes on >90% white hair",
+        "lift": "0-2 levels"
+      },
+      "9_vol": {
+        "use": "Lifting 2-3 levels, -00 series, Absolutes white coverage, Ultra Blonde up to 3 levels, Special Blonde up to 3-4 levels, Fashion Lights",
+        "lift": "2-4 levels"
+      },
+      "12_vol": {
+        "use": "Ultra Blonde 3-4 levels, Special Blonde 4-5 levels (base 6+)",
+        "lift": "3-5 levels"
+      }
+    }
+  },
+  "grayCoverage": {
+    "rule": "All IGORA ROYAL shades provide up to 50% or 100% white hair coverage",
+    "absolutes": "100% coverage on more than 50% white hair without mixing with natural tone",
+    "standard_shades_up_to_70_percent": "When used on more than 50% white hair, add 1 part Natural (-0) or Beige (-4) in 2:1 ratio",
+    "example": "40g 6-65 + 20g 6-4 + 60g IGORA ROYAL Oil Developer",
+    "thick_resistant_hair": "Mix 1:1 for thick and resistant hair",
+    "100_percent_cover_shades": [
+      "-0",
+      "-1",
+      "-4",
+      "-63"
+    ],
+    "coverage_notes": {
+      "standard": "Up to 50% or 100% coverage depending on shade",
+      "absolutes": "100% on more than 50% white hair, no natural needed",
+      "natural_extra": "Double pigmented for maximum coverage"
+    }
+  }
+}

@@ -187,7 +187,7 @@ Phase 2 Deliverables:
 │   ├── Client management
 │   └── Formula history
 └── Platform Enhancements
-    ├── Stripe billing
+    ├── Square billing
     ├── Webhooks
     ├── API rate limiting
     └── Advanced monitoring
@@ -439,7 +439,7 @@ Phase 4.5 Deliverables:
 │   ├── Output: Personalized formula with confidence score
 │   └── Fallback: "Requires stylist consultation" for edge cases
 ├── Payment & Distribution
-│   ├── Stripe Connect (split payments to creators)
+│   ├── Square Marketplace (split payments to creators)
 │   ├── Creator dashboard (earnings, analytics, payout settings)
 │   └── Buyer receipt + saved formula to client history
 ├── ByondEdu Integration
@@ -495,7 +495,7 @@ Phase 4.5 Deliverables:
 
 #### Month 22-23: Marketplace Launch
 - AI adaptation engine v1 (parameterized formulas)
-- Stripe Connect integration
+- Square Marketplace integration
 - Creator onboarding flow
 - Buyer purchase + adaptation flow
 - ByondEdu educator verification
@@ -528,7 +528,7 @@ Phase 4.5 Deliverables:
 |----------|--------|-------|
 | Additional Salaries (8 months) | $1,440,000 | 9 FTE avg |
 | Infrastructure | $80,000 | Image hosting, ML inference |
-| Third-party | $60,000 | Stripe fees, CDN, ML platforms |
+| Third-party | $60,000 | Square fees, CDN, ML platforms |
 | Marketing / Creator acquisition | $200,000 | Onboarding, influencer campaigns |
 | **Total Phase 4.5** | **$1,780,000** | |
 | **Cumulative through Phase 4.5** | **$23,393,000** | |
@@ -540,7 +540,7 @@ Phase 4.5 Deliverables:
 | Low creator adoption | Start with champions; showcase earnings; easy upload flow |
 | AI adaptation quality | Conservative confidence thresholds; human review for edge cases |
 | Content moderation | Automated + community flagging; clear guidelines |
-| Payment disputes | Transparent pricing; clear refund policy; Stripe dispute handling |
+| Payment disputes | Transparent pricing; clear refund policy; Square dispute handling |
 | Marketplace chicken-and-egg | Seed with ColorGenius-generated "staff picks"; incentivize early creators |
 ```
 

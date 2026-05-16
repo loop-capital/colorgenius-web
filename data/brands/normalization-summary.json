@@ -1,0 +1,426 @@
+{
+  "totalShades": 2739,
+  "brands": 17,
+  "byBrand": {
+    "alfaparf": {
+      "count": 109,
+      "demi": 0,
+      "highLift": 3,
+      "specialty": 49,
+      "nullGray": 0,
+      "lines": {
+        "evolution": 109
+      },
+      "families": {
+        "natural": 14,
+        "specialty": 49,
+        "ash": 9,
+        "blue-ash": 3,
+        "violet": 10,
+        "gold": 7,
+        "beige": 3,
+        "copper": 3,
+        "mahogany": 1,
+        "red": 9,
+        "matte": 1
+      }
+    },
+    "aveda": {
+      "count": 55,
+      "demi": 0,
+      "highLift": 1,
+      "specialty": 1,
+      "nullGray": 0,
+      "lines": {
+        "Natural": 10,
+        "Double Natural": 7,
+        "Ash": 7,
+        "Violet": 6,
+        "Beige": 6,
+        "Copper": 5,
+        "Red": 4,
+        "Gold": 6,
+        "High Lift (HLA)": 1,
+        "Pastel Additives": 3
+      },
+      "families": {
+        "natural": 17,
+        "ash": 8,
+        "violet": 7,
+        "beige": 6,
+        "copper": 5,
+        "red": 5,
+        "gold": 6,
+        "specialty": 1
+      }
+    },
+    "davines": {
+      "count": 56,
+      "demi": 0,
+      "highLift": 0,
+      "specialty": 3,
+      "nullGray": 0,
+      "lines": {
+        "View": 18,
+        "A New Colour": 19,
+        "Mask with Vibrachrom": 19
+      },
+      "families": {
+        "natural": 25,
+        "ash": 11,
+        "specialty": 3,
+        "gold": 8,
+        "copper": 3,
+        "red": 4,
+        "mahogany": 2
+      }
+    },
+    "joico": {
+      "count": 144,
+      "demi": 58,
+      "highLift": 0,
+      "specialty": 0,
+      "nullGray": 0,
+      "lines": {
+        "lumishine-demi-liquid": 58,
+        "lumishine-dimensional-deposit": 27,
+        "lumishine-permanent": 59
+      },
+      "families": {
+        "natural": 45,
+        "ash": 38,
+        "gold": 31,
+        "warm": 14,
+        "beige": 12,
+        "copper": 2,
+        "red": 2
+      }
+    },
+    "kenra": {
+      "count": 177,
+      "demi": 69,
+      "highLift": 1,
+      "specialty": 5,
+      "nullGray": 0,
+      "lines": {
+        "kenra-demi-permanent": 69,
+        "kenra-permanent": 108
+      },
+      "families": {
+        "natural": 22,
+        "ash": 38,
+        "beige": 23,
+        "copper": 20,
+        "gold": 17,
+        "red": 12,
+        "violet": 26,
+        "pearl": 9,
+        "warm": 1,
+        "mahogany": 4,
+        "specialty": 5
+      }
+    },
+    "kevin-murphy": {
+      "count": 94,
+      "demi": 0,
+      "highLift": 6,
+      "specialty": 9,
+      "nullGray": 0,
+      "lines": {
+        "color-me": 94
+      },
+      "families": {
+        "natural": 14,
+        "gold": 15,
+        "beige": 5,
+        "mahogany": 6,
+        "chocolate": 9,
+        "ash": 20,
+        "violet": 6,
+        "red": 8,
+        "copper": 2,
+        "specialty": 9
+      }
+    },
+    "lanza": {
+      "count": 109,
+      "demi": 0,
+      "highLift": 0,
+      "specialty": 21,
+      "nullGray": 0,
+      "lines": {
+        "Natural": 10,
+        "Double Natural / Ultra Natural": 8,
+        "Natural Ash": 6,
+        "Ash": 9,
+        "Extra Ash": 5,
+        "Natural Violet": 6,
+        "Pearl": 6,
+        "Beige": 5,
+        "Beige Copper": 2,
+        "Copper": 6,
+        "Copper Gold": 4,
+        "Red": 4,
+        "Ultra Red": 5,
+        "Red Copper": 3,
+        "Red Violet": 2,
+        "Violet": 8,
+        "Gold": 6,
+        "Titanium": 2,
+        "Specialty/Fashion Shades": 8,
+        "Kicker Series": 4
+      },
+      "families": {
+        "natural": 18,
+        "ash": 20,
+        "violet": 16,
+        "pearl": 6,
+        "beige": 5,
+        "specialty": 21,
+        "copper": 6,
+        "red": 11,
+        "gold": 6
+      }
+    },
+    "loreal-pro": {
+      "count": 282,
+      "demi": 109,
+      "highLift": 0,
+      "specialty": 23,
+      "nullGray": 0,
+      "lines": {
+        "diacolor": 50,
+        "dialight": 59,
+        "inoa": 84,
+        "majirel": 89
+      },
+      "families": {
+        "ash": 48,
+        "beige": 19,
+        "specialty": 23,
+        "natural": 46,
+        "violet": 25,
+        "gold": 56,
+        "copper": 24,
+        "red": 21,
+        "blue-ash": 12,
+        "chocolate": 8
+      }
+    },
+    "matrix": {
+      "count": 358,
+      "demi": 227,
+      "highLift": 0,
+      "specialty": 12,
+      "nullGray": 0,
+      "lines": {
+        "socolor": 131,
+        "socolor-sync": 67,
+        "super-sync": 121,
+        "tonal-control": 39
+      },
+      "families": {
+        "natural": 46,
+        "gold": 35,
+        "ash": 62,
+        "violet": 29,
+        "warm": 26,
+        "specialty": 12,
+        "chocolate": 28,
+        "mahogany": 35,
+        "copper": 37,
+        "red": 33,
+        "pearl": 14,
+        "beige": 1
+      }
+    },
+    "moroccanoil": {
+      "count": 159,
+      "demi": 60,
+      "highLift": 5,
+      "specialty": 22,
+      "nullGray": 0,
+      "lines": {
+        "Color Rhapsody Permanent Cream Color": 86,
+        "Color Rhapsody High Lift Permanent Cream Color": 5,
+        "Color Calypso Demi-Permanent Gloss": 60,
+        "Color Infusion Pure Color Mixer": 8
+      },
+      "families": {
+        "natural": 22,
+        "ash": 17,
+        "blue-ash": 3,
+        "violet": 23,
+        "gold": 18,
+        "copper": 15,
+        "mahogany": 8,
+        "red": 12,
+        "chocolate": 10,
+        "beige": 9,
+        "specialty": 22
+      }
+    },
+    "oligo": {
+      "count": 253,
+      "demi": 0,
+      "highLift": 5,
+      "specialty": 10,
+      "nullGray": 0,
+      "lines": {
+        "calura-gloss": 39,
+        "calura": 139,
+        "calura-ten": 75
+      },
+      "families": {
+        "natural": 37,
+        "ash": 62,
+        "specialty": 10,
+        "gold": 19,
+        "beige": 37,
+        "copper": 41,
+        "red": 22,
+        "violet": 22,
+        "mahogany": 3
+      }
+    },
+    "paul-mitchell": {
+      "count": 67,
+      "demi": 0,
+      "highLift": 0,
+      "specialty": 31,
+      "nullGray": 0,
+      "lines": {
+        "shines-xg": 67
+      },
+      "families": {
+        "natural": 11,
+        "specialty": 31,
+        "ash": 6,
+        "red": 5,
+        "copper": 4,
+        "gold": 5,
+        "warm": 1,
+        "violet": 4
+      }
+    },
+    "pravana": {
+      "count": 107,
+      "demi": 0,
+      "highLift": 0,
+      "specialty": 27,
+      "nullGray": 0,
+      "lines": {
+        "chromasilk": 79,
+        "vivids": 28
+      },
+      "families": {
+        "natural": 12,
+        "gold": 20,
+        "copper": 13,
+        "beige": 5,
+        "specialty": 27,
+        "mahogany": 7,
+        "red": 10,
+        "ash": 8,
+        "violet": 5
+      }
+    },
+    "pulp-riot": {
+      "count": 121,
+      "demi": 30,
+      "highLift": 6,
+      "specialty": 6,
+      "nullGray": 0,
+      "lines": {
+        "faction8": 91,
+        "liquid-demi": 30
+      },
+      "families": {
+        "natural": 21,
+        "ash": 11,
+        "violet": 17,
+        "gold": 19,
+        "copper": 11,
+        "mahogany": 5,
+        "red": 13,
+        "specialty": 6,
+        "pearl": 18
+      }
+    },
+    "redken": {
+      "count": 137,
+      "demi": 109,
+      "highLift": 0,
+      "specialty": 0,
+      "nullGray": 0,
+      "lines": {
+        "color-gels-lacquers": 28,
+        "shades-eq": 109
+      },
+      "families": {
+        "ash": 28,
+        "natural": 29,
+        "warm": 23,
+        "copper": 11,
+        "gold": 13,
+        "red": 11,
+        "violet": 11,
+        "blue-ash": 3,
+        "pearl": 8
+      }
+    },
+    "schwarzkopf": {
+      "count": 144,
+      "demi": 0,
+      "highLift": 6,
+      "specialty": 0,
+      "nullGray": 0,
+      "lines": {
+        "IGORA ROYAL Permanent Color": 104,
+        "IGORA ROYAL Absolutes": 6,
+        "IGORA ROYAL Ultra Blonde (10- Series)": 5,
+        "IGORA ROYAL Special Blonde (12- Series)": 6,
+        "IGORA ROYAL Highlifts (9.5- Series)": 4,
+        "IGORA ROYAL Silver Whites & Specials": 14,
+        "IGORA ROYAL Fashion Lights": 5
+      },
+      "families": {
+        "natural": 21,
+        "blue-ash": 20,
+        "chocolate": 25,
+        "ash": 13,
+        "beige": 25,
+        "red": 10,
+        "violet": 7,
+        "gold": 16,
+        "copper": 7
+      }
+    },
+    "wella": {
+      "count": 367,
+      "demi": 130,
+      "highLift": 11,
+      "specialty": 106,
+      "nullGray": 0,
+      "lines": {
+        "color-touch": 82,
+        "illumina": 64,
+        "koleston-perfect": 155,
+        "shinefinity": 66
+      },
+      "families": {
+        "natural": 60,
+        "ash": 43,
+        "gold": 39,
+        "violet": 23,
+        "pearl": 14,
+        "chocolate": 41,
+        "copper": 29,
+        "red": 11,
+        "specialty": 106,
+        "mahogany": 1
+      }
+    }
+  },
+  "generatedAt": "2026-05-16T02:57:35.346Z"
+}

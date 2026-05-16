@@ -1,82 +1,66 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 /**
  * POST /api/sessions
- * Create a new photo session for camera capture workflow.
+ * Create a formulation session and generate a 4-digit code for phone-to-iPad photo transfer.
  *
  * Request body:
- *   - clientId: string (optional, link to existing client)
- *   - stylistId: string (optional, defaults to authenticated stylist)
- *   - hairType: string (e.g., "4c", "3b", "2a")
- *   - porosityLevel: "low" | "medium" | "high"
- *   - condition: "virgin" | "colored" | "damaged" | etc.
- *   - lightingConditions: "natural" | "fluorescent" | "led" | etc.
+ *   - salonId: string (required)
+ *   - stylistId: string (optional)
+ *   - clientId: string (optional)
  *
  * Response:
- *   201: { success: true, data: { id, status, createdAt, ... } }
+ *   201: { success: true, data: { sessionId, code, expiresAt } }
  *   400: { error: "Missing required fields" }
- *   401: { error: "Unauthorized" }
  *   500: { error: "Internal server error" }
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Validate required fields
-    const requiredFields = ['hairType', 'porosityLevel', 'condition', 'lightingConditions'];
-    const missingFields = requiredFields.filter(field => !body[field]);
-    if (missingFields.length > 0) {
+    if (!body.salonId) {
       return NextResponse.json(
-        { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { error: 'Missing required field: salonId' },
         { status: 400 }
       );
     }
 
-    // Validate enum values
-    const validPorosity = ['low', 'medium', 'high'];
-    if (!validPorosity.includes(body.porosityLevel)) {
-      return NextResponse.json(
-        { error: `Invalid porosityLevel. Must be one of: ${validPorosity.join(', ')}` },
-        { status: 400 }
-      );
-    }
+    // Create formulation session
+    const session = await prisma.formulation_sessions.create({
+      data: {
+        salonId: body.salonId,
+        stylistId: body.stylistId || null,
+        clientId: body.clientId || null,
+        status: 'active',
+      },
+    });
 
-    const validLighting = ['natural', 'fluorescent', 'led', 'tungsten', 'mixed'];
-    if (!validLighting.includes(body.lightingConditions)) {
-      return NextResponse.json(
-        { error: `Invalid lightingConditions. Must be one of: ${validLighting.join(', ')}` },
-        { status: 400 }
-      );
-    }
+    // Generate 4-digit random code
+    const code = String(Math.floor(1000 + Math.random() * 9000));
 
-    // TODO: Replace with actual Prisma call
-    // const session = await prisma.photoSession.create({
-    //   data: {
-    //     clientId: body.clientId,
-    //     stylistId: body.stylistId || authenticatedStylistId,
-    //     hairType: body.hairType,
-    //     porosityLevel: body.porosityLevel,
-    //     condition: body.condition,
-    //     lightingConditions: body.lightingConditions,
-    //   },
-    // });
+    // 10-minute expiry
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    const session = {
-      id: crypto.randomUUID(),
-      clientId: body.clientId || null,
-      stylistId: body.stylistId || null,
-      hairType: body.hairType,
-      porosityLevel: body.porosityLevel,
-      condition: body.condition,
-      lightingConditions: body.lightingConditions,
-      status: 'active',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    // Create session code
+    await prisma.session_codes.create({
+      data: {
+        salonId: body.salonId,
+        code,
+        formulationSessionId: session.id,
+        expiresAt,
+      },
+    });
 
     return NextResponse.json(
-      { success: true, data: session },
+      {
+        success: true,
+        data: {
+          sessionId: session.id,
+          code,
+          expiresAt: expiresAt.toISOString(),
+        },
+      },
       { status: 201 }
     );
   } catch (error) {
@@ -86,45 +70,70 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/sessions
- * List photo sessions for the authenticated stylist.
+ * GET /api/sessions?code=XXXX
+ * Look up a session by its 4-digit code.
  *
  * Query params:
- *   - status: filter by status ("active" | "completed" | "cancelled")
- *   - clientId: filter by client
- *   - limit: number of results (default 20, max 100)
- *   - offset: pagination offset
+ *   - code: string (required, 4-digit code)
  *
  * Response:
- *   200: { success: true, data: [...sessions], meta: { total, limit, offset } }
+ *   200: { success: true, data: formulation_session + photoUrl }
+ *   400: { error: "Missing code" }
+ *   404: { error: "Session not found or code expired/used" }
+ *   500: { error: "Internal server error" }
  */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const clientId = searchParams.get('clientId');
-    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const code = searchParams.get('code');
 
-    // TODO: Replace with actual Prisma call
-    // const sessions = await prisma.photoSession.findMany({
-    //   where: {
-    //     stylistId: authenticatedStylistId,
-    //     ...(status && { status }),
-    //     ...(clientId && { clientId }),
-    //   },
-    //   take: limit,
-    //   skip: offset,
-    //   orderBy: { createdAt: 'desc' },
-    // });
+    if (!code) {
+      return NextResponse.json(
+        { error: 'Missing required query param: code' },
+        { status: 400 }
+      );
+    }
+
+    const sessionCode = await prisma.session_codes.findFirst({
+      where: {
+        code,
+        used: false,
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (!sessionCode) {
+      return NextResponse.json(
+        { error: 'Session not found or code expired/used' },
+        { status: 404 }
+      );
+    }
+
+    const session = await prisma.formulation_sessions.findUnique({
+      where: { id: sessionCode.formulationSessionId! },
+    });
+
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      data: [],
-      meta: { total: 0, limit, offset },
+      data: {
+        sessionId: session.id,
+        salonId: session.salonId,
+        stylistId: session.stylistId,
+        clientId: session.clientId,
+        status: session.status,
+        photoUrl: session.photoUrl,
+        createdAt: session.createdAt,
+      },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch sessions';
+    const message = error instanceof Error ? error.message : 'Failed to fetch session';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

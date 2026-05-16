@@ -1,91 +1,67 @@
-# ColorGenius Tasks
+# ColorGenius Task Tracker
 
-## Status Legend
-`[ ]` Not started · `[~]` In progress · `[x]` Done · `[!]` Blocked
+## Active Tasks
 
----
+### ADR-012: Chemical History & Safety Intelligence ✅ COMPLETE
+- [x] TypeScript formulation engine updated (`dashboard/lib/formulation.ts`)
+- [x] Dashboard wizard UI updated with Chemical History step (`formulate-content.tsx`)
+- [x] API route updated to accept and forward chemical history (`packages/api/src/routes/formulate.ts`)
+- [x] API types extended with ADR-012 response fields (`packages/api/src/types/index.ts`)
+- [x] Results UI updated to consume new safety fields (hard stops, assessment, strand test, confidence)
+- [x] Implementation summary written to `memory/adr-012-implementation.md`
 
-## Phase 1: Foundation
-
-### Architecture
-- [x] ADR-001: AI recommendation approach (rules-based v1, ML later)
-- [x] ADR-002: Video/storage platform decision (Cloudflare R2)
-- [x] ADR-003: Auth provider decision (JWT + Supabase)
-- [x] Design color science data model (hair state, formula output, brand library schemas)
-- [x] Write OpenAPI spec for formula API
-- [x] Database schema (550 lines, PostgreSQL, production-ready)
-- [x] Deployment plan (Vercel + Railway + Supabase + R2, ~$70-90/mo)
-
-### Research
-- [x] Ingest Redken shade library → `colorgenius/data/brands/redken/shades.json`
-- [x] Ingest Wella shade library → `colorgenius/data/brands/wella/shades.json`
-- [x] Ingest Goldwell shade library → `colorgenius/data/brands/goldwell/shades.json`
-- [x] Ingest Schwarzkopf shade library
-- [x] Ingest Matrix shade library
-- [x] Ingest Joico shade library
-- [x] Ingest Paul Mitchell shade library
-- [x] Ingest Pulp Riot shade library
-- [x] Document color science fundamentals (lift theory, developer ratios)
-- [x] Document correction case studies
-- [x] Photo analysis approach (OpenCV + rule-based for beta)
-- [x] Formulation engine rules (developer logic, tone mapping, condition adjustments)
-- [x] Competitive analysis (Blendsor, SalonScale, Color Coach, ReFa, LG CHI)
-- [x] Face shape AI research (MediaPipe Face Mesh)
-
-### Development
-- [x] Set up Next.js project (mobile-first)
-- [x] Build color level input form (iPad-optimized)
-- [x] Build formula output display with confidence indicator
-- [x] Build brand library browser
-- [x] Build formula history (save/recall by client)
-- [x] Integrate shade data from research (166 shades, 8 brands)
-- [x] Build dashboard with KPIs
-- [x] Build client CRUD + history
-- [x] Build community/marketplace API (12 endpoints)
-- [x] Build gallery page
-- [~] Custom component library (8 of 10+ done)
-- [~] Page redesigns (5 of 9 done — Dashboard, Formulate, Gallery, Community, Clients)
-- [ ] Redesign: Analyze page
-- [ ] Redesign: Library page
-- [ ] Redesign: History page
-- [ ] Redesign: Questionnaire page
-- [ ] Wire /api/formulate to real shade DB algorithm (currently rules-based)
-- [ ] Build consultation questionnaire wizard
-- [ ] Client detail page with formulation history
-- [ ] Tablet-first responsive pass (iPad primary)
-
-### Inventory & Auto-Ordering
-- [x] Inventory tracking schema (Products, UsageLogs, StockTransactions, PurchaseOrders)
-- [x] Client + ClientVisit models (hairProfile, service history)
-- [x] Profit tracking (ServicePricing, ProfitSnapshot)
-- [x] Auto-ordering system (Supplier, AutoOrderLog, reorderThreshold)
-- [x] Client History API endpoints (3 routes)
-- [x] Square API research (integration approach defined)
-- [ ] Auto-order email/PDF generation for Monaco Blue
-- [ ] Square OAuth2 integration
-- [ ] Appointment book integration
-
-### Infrastructure
-- [x] Provision PostgreSQL (Supabase)
-- [x] Deploy frontend (Vercel)
-- [x] Configure Redis helper with fallback
-- [x] Prisma schema + migration applied
-- [~] Deploy backend API (Vercel serverless functions)
-- [ ] Configure UptimeRobot health monitoring
-- [ ] Configure Sentry error tracking
-- [ ] Photo upload service (S3/R2)
+**Status:** All changes complete. Waiting for Python engine ADR-012 implementation (separate workstream).
 
 ---
 
-## Phase 2: Integrations (Post-Beta)
-- [x] UpLook "ColorGenius Certified" badge integration spec
-- [ ] ByondEdu course module API surface
-- [ ] Pleij Salon workstation integration
-- [ ] Che Lace wig coloring recommendations
-- [ ] Consumer app: "ColorGenius Discover" (LookGenius rebrand in Month 8-10)
+## Completed Tasks (Recently)
+
+### Dashboard Enhancements
+- [x] Multi-step formulation wizard (6 steps)
+- [x] Chemical History step with live hard-stop validation
+- [x] Sensitivity flags (PPD allergy, pregnancy, breastfeeding, chemo)
+- [x] Confidence scoring with visual indicator
+- [x] Professional assessment generation
+- [x] Strand test recommendation system
+
+### API Enhancements
+- [x] Formulate endpoint accepts chemical_history and sensitivity
+- [x] Response includes hard_stops, assessment, strand_test_recommended, adjusted_confidence
+- [x] All safety fields persisted to database
 
 ---
 
-## Known Blockers
-- [!] Gateway restarts kill agents at ~13 minutes — need Jason/Che investigation
-- [!] Subagent LLM timeout with Kimi K2.6 on long prompts — using Qwen for small tasks
+## Backlog
+
+### High Priority
+- [x] Brand #14 — Kenra Professional shade data ingestion
+  - [x] 108 permanent shades (levels 1–12, +RT Rapid Toners)
+  - [x] 69 demi-permanent shades
+  - [x] 10 Simply Blonde shades (ultra-lifts + toners)
+  - [x] 17 Studio Stylist Express shades
+  - [x] 13 Kenra Creatives semi-permanent shades
+  - [x] `tone-family-map.json` updated with Kenra tone codes
+  - [x] `data-loader.ts` imports + shade/specs maps wired
+  - [x] `ConversionPanel.tsx` `BRAND_DISPLAY_NAMES` includes kenra
+- [ ] Python formulation engine ADR-012 implementation
+- [ ] Salon inventory integration (stock check on formulas)
+- [ ] Client management (search, save, history)
+- [ ] Formula saving to library
+
+### Medium Priority
+- [ ] Photo analysis integration (auto-detect current level)
+- [ ] Color line management (brand/shade database)
+- [ ] Scale widget integration (Bluetooth scale)
+- [ ] Formula sharing marketplace
+
+### Low Priority
+- [ ] Mobile app companion
+- [ ] AI chat assistant
+- [ ] Educational content (ByondEdu integration)
+- [ ] UpLook profile badge integration
+
+---
+
+## Notes
+
+**2026-05-15:** ADR-012 fully implemented across TypeScript engine, dashboard UI, and API route. The feature is production-ready from the TypeScript/dashboard side. The Python engine will consume the same `chemical_history` payload when its ADR-012 implementation is complete.

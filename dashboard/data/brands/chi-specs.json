@@ -1,0 +1,87 @@
+{
+  "brand": "CHI",
+  "productLine": "CHI Ionic",
+  "type": "ammonia-free",
+  "mixRatio": "1:1",
+  "processingTime": "30-35 minutes",
+  "grayProcessingTime": "35-40 minutes",
+  "developers": [
+    {
+      "volume": 10,
+      "percentage": "3%",
+      "use": "deposit, tone, gray coverage"
+    },
+    {
+      "volume": 20,
+      "percentage": "6%",
+      "use": "1-2 levels lift, gray coverage"
+    },
+    {
+      "volume": 30,
+      "percentage": "9%",
+      "use": "2-3 levels lift"
+    },
+    {
+      "volume": 40,
+      "percentage": "12%",
+      "use": "3-4 levels lift, high-lift shades"
+    }
+  ],
+  "developerVolumes": [10, 20, 30, 40],
+  "volumeSemantics": {
+    "10": "deposit",
+    "20": "1-2lift",
+    "30": "2-3lift",
+    "40": "3-4lift"
+  },
+  "lines": [
+    {
+      "name": "CHI Ionic Permanent",
+      "type": "permanent",
+      "mixRatio": "1:1",
+      "developerVolumes": [10, 20, 30, 40],
+      "processingTime": "30-35 minutes"
+    },
+    {
+      "name": "CHI Ionic Shine",
+      "type": "demi-permanent",
+      "mixRatio": "1:1",
+      "developerVolumes": [10, 20],
+      "processingTime": "20-25 minutes"
+    }
+  ],
+  "formulationGuidelines": {
+    "lift_guidelines": {
+      "10": "Deposit only, tone-on-tone, gray coverage",
+      "20": "1-2 levels lift, up to 100% gray coverage",
+      "30": "2-3 levels lift, vibrant results",
+      "40": "3-4 levels lift, maximum lightening"
+    },
+    "gray_coverage": {
+      "natural": "Use 20vol for up to 100% gray coverage",
+      "resistant": "Use 30vol with extended processing time",
+      "demi": "Use CHI Ionic Shine with 10vol for blending"
+    },
+    "mixing_ratios": {
+      "standard": "1:1 color to developer",
+      "high-lift": "1:2 color to developer"
+    },
+    "processing_times": {
+      "standard": "30-35 minutes at room temperature",
+      "gray": "35-40 minutes at room temperature",
+      "demi": "20-25 minutes at room temperature"
+    },
+    "tonal_direction": {
+      "ash": ["neutralize warmth", "cool down", "gray blending"],
+      "gold": ["add warmth", "brighten", "reflective shine"],
+      "copper": ["intensify red tones", "warmth", "dimension"],
+      "red": ["vibrant fashion tones", "bold color", "statement"],
+      "violet": ["cool tones", "anti-brass", "fashion forward"]
+    }
+  },
+  "grayCoverage": {
+    "requiresNN": false,
+    "recommendedVolume": 20,
+    "processingTimeAdd": 5
+  }
+}

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, FlaskConical, Camera, ImageIcon, MessageCircle, BookOpen,
-  Users, History, ClipboardList, Package, DollarSign, Sparkles, CreditCard, Zap,
+  Users, History, ClipboardList, Package, DollarSign, Sparkles, CreditCard, Zap, Award,
 } from 'lucide-react'
 import { LogoutButton } from '@/components/ui/logout-button'
 import { ColorGeniusLogo } from '@/components/icons/colorgenius-logo'
@@ -20,6 +20,7 @@ const navItems = [
   { href: '/history', label: 'History', icon: History },
   { href: '/questionnaire', label: 'Consultation', icon: ClipboardList },
   { href: '/service', label: 'New Service', icon: Zap },
+  { href: '/certification', label: 'Certification', icon: Award },
   { href: '/dashboard/inventory', label: 'Inventory', icon: Package },
   { href: '/dashboard/pricing', label: 'Pricing Rules', icon: DollarSign },
 ]
