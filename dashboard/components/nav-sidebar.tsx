@@ -4,25 +4,26 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, FlaskConical, Camera, ImageIcon, MessageCircle, BookOpen,
-  Users, History, ClipboardList, Package, DollarSign, Sparkles, CreditCard, Zap, Award,
+  Users, History, ClipboardList, Package, DollarSign, CreditCard, CirclePlus, Settings, Award,
 } from 'lucide-react'
 import { LogoutButton } from '@/components/ui/logout-button'
 import { ColorGeniusLogo } from '@/components/icons/colorgenius-logo'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/service', label: 'New Service', icon: CirclePlus },
   { href: '/formulate', label: 'Formulate', icon: FlaskConical },
+  { href: '/questionnaire', label: 'Consultation', icon: ClipboardList },
+  { href: '/clients', label: 'Clients', icon: Users },
+  { href: '/library', label: 'Library', icon: BookOpen },
   { href: '/analyze', label: 'Analyze', icon: Camera },
+  { href: '/history', label: 'History', icon: History },
   { href: '/gallery', label: 'Gallery', icon: ImageIcon },
   { href: '/community', label: 'Community', icon: MessageCircle },
-  { href: '/library', label: 'Library', icon: BookOpen },
-  { href: '/clients', label: 'Clients', icon: Users },
-  { href: '/history', label: 'History', icon: History },
-  { href: '/questionnaire', label: 'Consultation', icon: ClipboardList },
-  { href: '/service', label: 'New Service', icon: Zap },
-  { href: '/certification', label: 'Certification', icon: Award },
   { href: '/dashboard/inventory', label: 'Inventory', icon: Package },
   { href: '/dashboard/pricing', label: 'Pricing Rules', icon: DollarSign },
+  { href: '/certification', label: 'Certification', icon: Award },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ]
 
 export function Sidebar() {
@@ -90,16 +91,13 @@ export function Sidebar() {
             </div>
             <span className="font-bold text-sm" style={{ color: '#F5F5F7' }}>ColorGenius</span>
           </Link>
-          <div className="flex items-center gap-3 overflow-x-auto">
-            {navItems.slice(0, 5).map((item) => (
-              <Link key={item.href} href={item.href}
-                className="p-2 transition-colors hover:text-[#9333EA] hover:bg-[#161620]"
-                style={{ color: '#A1A1AA', borderRadius: '8px' }}
-              >
-                <item.icon className="w-[18px] h-[18px]" />
-              </Link>
-            ))}
-          </div>
+          <button className="p-2 rounded-lg transition-colors" style={{ color: '#A1A1AA' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="4" y1="2" x2="20" y2="2" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="22" x2="20" y2="22" />
+            </svg>
+          </button>
         </div>
       </div>
     </>

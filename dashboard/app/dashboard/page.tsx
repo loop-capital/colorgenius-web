@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import {
   FlaskConical, Users, Camera, BookOpen, History, ArrowRight,
-  TrendingUp, UserPlus, Sparkles, Zap, Package, DollarSign,
+  TrendingUp, UserPlus, Sparkles, CirclePlus, Package, DollarSign,
 } from 'lucide-react';
 import { ColorGeniusLogo } from '@/components/icons/colorgenius-logo';
 
 const quickActions = [
-  { label: 'New Service', href: '/service', icon: Zap, color: '#10B981' },
+  { label: 'New Service', href: '/service', icon: CirclePlus, color: '#10B981' },
   { label: 'Formulate', href: '/formulate', icon: FlaskConical, color: '#EC4899' },
   { label: 'Inventory', href: '/dashboard/inventory', icon: Package, color: '#F59E0B' },
   { label: 'Pricing', href: '/dashboard/pricing', icon: DollarSign, color: '#8B5CF6' },
