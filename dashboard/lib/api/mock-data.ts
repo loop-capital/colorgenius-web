@@ -3,7 +3,7 @@
  * In-memory storage for community, marketplace, and gallery endpoints
  */
 
-import { CommunityPost, VoteRecord, PostComment, Template, Purchase, GalleryItem, TrendingColor, SeasonalCollection, StylistPortfolio } from './types';
+import { CommunityPost, VoteRecord, PostComment, Template, Purchase, GalleryItem, TrendingColor, SeasonalCollection, StylistPortfolio, Formula, FormulaUseEvent } from './types';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -716,3 +716,61 @@ export function getCommentsForPost(postId: string): PostComment[] {
     new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   );
 }
+
+// ─── Marketplace Data ──────────────────────────────────────────────────────────
+
+export let formulas: Array<{
+  id: string;
+  creator_id: string;
+  creator_name: string;
+  creator_avatar?: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  brand: string;
+  line: string;
+  shade_code: string;
+  shade_name: string;
+  level: number;
+  tone: string;
+  developer_volume: number;
+  processing_time: number;
+  application: string;
+  price_cents: number;
+  tier: string;
+  rating: number;
+  review_count: number;
+  purchase_count: number;
+  usage_count: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}> = [];
+
+export let useEvents: Array<{
+  id: string;
+  stylist_id: string;
+  formula_id: string;
+  client_name?: string;
+  service_id?: string;
+  used_at: string;
+  billed: boolean;
+  invoice_id?: string;
+}> = [];
+
+export let billingInvoices: Array<{
+  id: string;
+  stylist_id: string;
+  billing_period: string;
+  line_items: any[];
+  total_cents: number;
+  total_creator_earnings_cents: number;
+  total_platform_fee_cents: number;
+  status: 'pending' | 'paid' | 'failed';
+  paid_at?: string;
+  square_payment_id?: string;
+  created_at: string;
+}> = [];
+
+export let clientRequests: ClientRequest[] = [];

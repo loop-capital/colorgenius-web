@@ -1,0 +1,72 @@
+{
+  "_comment": "Paul Mitchell Shines XG (Demi-Permanent) technical specifications",
+  "_source": "Paul Mitchell Shines XG reference sheet",
+  "brand": "Paul Mitchell",
+  "line": "Shines XG",
+  "type": "demi-permanent",
+  "levels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "mixRatio": "1:1.5",
+  "mixRatioExample": "2oz color + 3oz developer",
+  "developers": [
+    {
+      "volume": 5,
+      "use": "deposit only",
+      "notes": "Use for depositing color on previously colored or porous hair. Minimal lift."
+    },
+    {
+      "volume": 10,
+      "use": "blend/deposit",
+      "notes": "Use for blending gray, refreshing color, or subtle lift."
+    }
+  ],
+  "processingTime": 25,
+  "processingTimeUnit": "minutes",
+  "grayBlending": {
+    "recommended": "NN (Double Natural) series",
+    "notes": "Use NN series for resistant gray coverage. Mix NN shade with desired fashion tone for gray coverage with tonal refinement."
+  },
+  "clearShade": {
+    "available": true,
+    "use": "Dilute or deposit tone without changing level",
+    "notes": "Use Clear to create sheer color results or soften intensity."
+  },
+  "fashionShadeTips": [
+    "Mix with NN series for gray coverage with fashion tone",
+    "Use 10 Volume for fashion shades on virgin hair",
+    "Use 5 Volume for refreshing or depositing on previously colored hair"
+  ],
+  "numberingSystem": {
+    "format": "level/tone",
+    "level": "Number before the slash (1-10)",
+    "tone": "Number after the slash",
+    "toneMap": {
+      "0": "Natural (N)",
+      "00": "Double Natural (NN)",
+      "07": "Neutral Beige (NB)",
+      "1": "Ash (A)",
+      "11": "Double Ash (AA)",
+      "3": "Gold (G)",
+      "33": "Warm Beige / Double Gold (WB)",
+      "34": "Gold Copper (C)",
+      "43": "Copper Red (RO)",
+      "4": "Red (R)",
+      "46": "Red Violet (RV)",
+      "47": "Red Brown (RB)",
+      "6": "Violet (V)",
+      "64": "Violet Red (VR)",
+      "80": "Pearl Natural (PN)"
+    }
+  },
+  "tonalFamilies": {
+    "warm": ["3", "33", "34", "43", "4", "46", "47"],
+    "cool": ["1", "11", "6", "64"],
+    "neutral": ["0", "00", "07", "80"]
+  },
+  "lines": [
+    {
+      "name": "Shines XG",
+      "type": "demi-permanent",
+      "category": "professional"
+    }
+  ]
+}

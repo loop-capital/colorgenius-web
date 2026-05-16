@@ -1,0 +1,18 @@
+{
+  "brand": "om-cor-color",
+  "name": "O&M CØR.color",
+  "lines": [
+    {
+      "name": "CØR.color Permanent",
+      "type": "permanent",
+      "mixingRatio": "1:1",
+      "developer": "O&M Activator (1.5%/3%/6%/9%/12%)",
+      "timing": { "standard": 35, "gray": 35 },
+      "grayCoverage": "100%",
+      "ammonia": false,
+      "ppdFree": true,
+      "resorcinolFree": true,
+      "features": ["ammonia-free", "PPD-free", "resorcinol-free", "Molecular Blend Technology", "Desert Harvest complex"]
+    }
+  ]
+}

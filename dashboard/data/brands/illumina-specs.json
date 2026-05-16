@@ -1,0 +1,87 @@
+{
+  "brand": "Wella Professionals",
+  "lines": [
+    {
+      "name": "Illumina",
+      "type": "demi-permanent",
+      "description": "Wella Illumina — acidic demi-permanent hair color with zero lift. Luminescence technology for light reflection through the cuticle. Up to 100% grey coverage. Ammonia-free, pH 6.5.",
+      "mixingRatio": "1:1",
+      "developers": [
+        {"volume": 6, "percent": "1.9%", "name": "Welloxon Perfect 1.9%", "use": "Toning, refresh, gentle results"},
+        {"volume": 13, "percent": "4%", "name": "Welloxon Perfect 4%", "use": "Grey coverage, deeper results"}
+      ],
+      "processingTimes": [
+        {"use": "Without heat (room temperature)", "time": "20 min"},
+        {"use": "With heat (climatic hood)", "time": "15 min"},
+        {"use": "Toning / visual development", "time": "5–20 min (visual)"}
+      ],
+      "categories": {
+        "pure-naturals": "Natural base shades for coverage and depth",
+        "rich-naturals": "Fashion naturals with reflect — ash, gold, violet, pearl, cendre",
+        "warm-naturals": "Warm natural shades with gold and brown reflect",
+        "cool-naturals": "Cool natural shades with ash, cendre, pearl reflect",
+        "deep-browns": "Warm and cool brown reflects (/7 series)",
+        "vibrant-reds": "Copper, red, violet intense shades",
+        "special-mix": "Concentrated intensifiers — Matte, Cendre, Red, Violet, Copper, Pearl Ash"
+      },
+      "applicationNotes": [
+        "1:1 ratio — 30g color + 30g Welloxon Perfect developer",
+        "Apply to clean, dry or slightly damp hair",
+        "For toning on pre-lightened hair: use 1.9% (6vol), process 5–20 min visual",
+        "For grey coverage: use 4% (13vol), process 20 min without heat",
+        "Rinse thoroughly; shampoo and condition as normal"
+      ]
+    }
+  ],
+  "toneSystem": {
+    "description": "Wella International Tone Numbering: Level/Tone format (e.g., 7/43 = level 7 copper-gold)",
+    "primaryTones": {
+      "/0": "Natural",
+      "/1": "Ash",
+      "/2": "Matte",
+      "/3": "Gold",
+      "/4": "Copper/Red",
+      "/5": "Red/Warm",
+      "/6": "Violet",
+      "/7": "Brown/Mahogany",
+      "/8": "Cendre (Pearl-Blue)",
+      "/9": "Pearl"
+    },
+    "secondaryTones": {
+      "/01": "Natural Ash",
+      "/02": "Natural Ash (grey coverage)",
+      "/03": "Natural Gold",
+      "/05": "Natural Gold (warm)",
+      "/16": "Ash Violet",
+      "/34": "Gold Copper",
+      "/35": "Gold Brown",
+      "/36": "Gold Violet",
+      "/37": "Gold Brown Warm",
+      "/38": "Gold Cendre",
+      "/41": "Copper Ash",
+      "/43": "Copper Gold",
+      "/45": "Red Warm",
+      "/47": "Copper Brown",
+      "/54": "Red Copper",
+      "/56": "Violet Booster",
+      "/57": "Red Brown",
+      "/65": "Violet Warm",
+      "/66": "Intense Violet",
+      "/68": "Matte (Green)",
+      "/71": "Brown Ash",
+      "/73": "Brown Gold",
+      "/75": "Brown Red",
+      "/81": "Cendre Ash",
+      "/86": "Cendre Violet",
+      "/89": "Ash Booster",
+      "/96": "Pearl Violet",
+      "/97": "Pearl Brown"
+    }
+  },
+  "specialNotes": [
+    "Illumina is Wella's premium acidic demi-permanent with Luminescence technology",
+    "Zero lift — ideal for toning, refreshing, and grey coverage on natural base",
+    "Use Welloxon Perfect developer only (1.9% or 4%)",
+    "Special Mix intensifiers (0/XX) can be used to boost reflect or customize tones"
+  ]
+}

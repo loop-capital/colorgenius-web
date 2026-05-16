@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COLORgenius — AI-Powered Color Formulas for Every Salon</title>
+  <meta name="description" content="AI-powered hair color formula platform for professional stylists. Convert between 15+ brands, manage client profiles, and integrate with your POS.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">COLOR<span>genius</span></a>
+
+      <div class="nav-links" id="navLinks">
+        <a href="#features">Features</a>
+        <a href="formula-conversion.html">Formula Conversion</a>
+        <a href="client-management.html">Clients</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="signup.html" class="btn btn-primary btn-sm nav-cta">Get Started</a>
+        <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-mobile-menu" id="mobileMenu">
+      <a href="#features">Features</a>
+      <a href="formula-conversion.html">Formula Conversion</a>
+      <a href="client-management.html">Clients</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="#pricing">Pricing</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-blob hero-blob-1"></div>
+      <div class="hero-blob hero-blob-2"></div>
+      <div class="hero-blob hero-blob-3"></div>
+    </div>
+
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="hero-badge">Now with 15+ color brands</div>
+          <h1 class="hero-title">AI-Powered Color Formulas for Every Salon</h1>
+          <p class="hero-subtitle">Convert formulas between brands instantly. Track every client's color history. Integrate with Square and Vagaro. Built by stylists, for stylists.</p>
+
+          <div class="hero-buttons">
+            <a href="signup.html" class="btn btn-primary btn-lg">Start Free Trial</a>
+            <a href="#features" class="btn btn-secondary btn-lg">See How It Works</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-value counter" data-target="15" data-suffix="+">0</div>
+              <div class="hero-stat-label">Color Brands</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-value counter" data-target="50" data-suffix="K+">0</div>
+              <div class="hero-stat-label">Formulas Created</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-value counter" data-target="500" data-suffix="+">0</div>
+              <div class="hero-stat-label">Active Salons</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-mockup">
+            <div class="mockup-header">
+              <div class="mockup-dot mockup-dot-1"></div>
+              <div class="mockup-dot mockup-dot-2"></div>
+              <div class="mockup-dot mockup-dot-3"></div>
+            </div>
+            <div class="mockup-body">
+              <div class="mockup-card">
+                <div class="mockup-card-header">
+                  <div class="mockup-avatar"></div>
+                  <div style="flex:1">
+                    <div class="mockup-line mockup-line-short" style="background:#334155;height:10px;margin-bottom:6px;"></div>
+                    <div class="mockup-line" style="width:30%;background:#94a3b8;height:6px;"></div>
+                  </div>
+                </div>
+                <div class="mockup-line mockup-line-medium" style="background:#cbd5e1;height:8px;margin-bottom:4px;"></div>
+                <div class="mockup-line mockup-line-long" style="background:#e2e8f0;height:6px;"></div>
+                <span class="mockup-formula-badge">Wella 6N → Redken 6N</span>
+              </div>
+              <div class="mockup-card">
+                <div class="mockup-card-header">
+                  <div class="mockup-avatar" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);"></div>
+                  <div style="flex:1">
+                    <div class="mockup-line mockup-line-short" style="background:#334155;height:10px;margin-bottom:6px;"></div>
+                    <div class="mockup-line" style="width:30%;background:#94a3b8;height:6px;"></div>
+                  </div>
+                </div>
+                <div class="mockup-line mockup-line-medium" style="background:#cbd5e1;height:8px;margin-bottom:4px;"></div>
+                <div class="mockup-line mockup-line-long" style="background:#e2e8f0;height:6px;"></div>
+                <span class="mockup-formula-badge" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">Schwarzkopf 5-0 → Matrix 5N</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-floating-card hero-floating-card-1">
+            <div class="floating-card-label">Conversion Accuracy</div>
+            <div class="floating-card-value">98.7%</div>
+          </div>
+
+          <div class="hero-floating-card hero-floating-card-2">
+            <div class="floating-card-label">Time Saved / Week</div>
+            <div class="floating-card-value">5+ hrs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem / Solution Section -->
+  <section class="section section-alt problem-solution" id="problem">
+    <div class="container">
+      <div class="problem-block reveal">
+        <div class="problem-icon">😤</div>
+        <h2 class="problem-title">Your salon uses 2-3 color lines. Converting formulas between them is guesswork.</h2>
+        <p class="problem-text">You waste hours cross-referencing shade charts, second-guessing conversions, and hoping the formula turns out right. Your clients deserve better than "close enough."</p>
+      </div>
+
+      <div class="vs-divider reveal reveal-delay-1">VS</div>
+
+      <div class="problem-block reveal reveal-delay-2">
+        <div class="problem-icon solution-icon">🎯</div>
+        <h2 class="problem-title">COLORgenius makes it science.</h2>
+        <p class="problem-text">Our AI converts formulas across 15+ professional brands with 98.7% accuracy. Every conversion is backed by real-world data from thousands of salon professionals. No more guessing. No more surprises.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="features-header reveal">
+        <h2>Everything Your Salon Needs</h2>
+        <p class="mt-4">Built alongside working stylists to solve real problems — not imaginary ones.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon">🔄</div>
+          <h3 class="feature-title">Cross-Brand Conversion</h3>
+          <p class="feature-desc">Convert formulas between 15+ professional color lines instantly. Wella, Redken, Schwarzkopf, Matrix, Goldwell, and more.</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon">👤</div>
+          <h3 class="feature-title">Client Profile Cards</h3>
+          <p class="feature-desc">Complete color history, allergy notes, sensitivity tracking, and formula preferences — all in one beautiful profile.</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-3">
+          <div class="feature-icon">🛒</div>
+          <h3 class="feature-title">POS Integration</h3>
+          <p class="feature-desc">Connect Square or Vagaro to automatically log color services, track inventory usage, and sync client data.</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon">🏪</div>
+          <h3 class="feature-title">Formula Marketplace</h3>
+          <p class="feature-desc">Buy and sell custom formulas with other professionals. Build a reputation and earn from your expertise.</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon">📦</div>
+          <h3 class="feature-title">Inventory Prediction</h3>
+          <p class="feature-desc">AI predicts your color inventory needs based on upcoming appointments. Never run out of 6N on a Saturday again.</p>
+        </div>
+
+        <div class="feature-card reveal reveal-delay-3">
+          <div class="feature-icon">📱</div>
+          <h3 class="feature-title">Works Everywhere</h3>
+          <p class="feature-desc">Desktop, tablet, and mobile-optimized. Use COLORgenius at your station, in the backroom, or on the go.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Deep Dive Features -->
+  <section class="section section-alt">
+    <div class="container">
+      <!-- Feature 1: Formula Conversion -->
+      <div class="feature-showcase reveal">
+        <div class="feature-showcase-content">
+          <h3>Formula Conversion That Actually Works</h3>
+          <p class="mt-4">Our AI has been trained on over 50,000 real salon formulas across 15+ professional brands. It understands nuances like developer strength, tonal differences, and brand-specific pigment loads.</p>
+          <ul style="margin-top:1.5rem;list-style:none;">
+            <li style="padding:0.5rem 0;display:flex;align-items:center;gap:0.75rem;"><span style="color:var(--color-primary);font-weight:700;">✓</span> <span>15+ supported brands</span></li>
+            <li style="padding:0.5rem 0;display:flex;align-items:center;gap:0.75rem;"><span style="color:var(--color-primary);font-weight:700;">✓</span> <span>98.7% conversion accuracy</span></li>
+            <li style="padding:0.5rem 0;display:flex;align-items:center;gap:0.75rem;"><span style="color:var(--color-primary);font-weight:700;">✓</span> <span>Developer strength matching</span></li>
+            <li style="padding:0.5rem 0;display:flex;align-items:center;gap:0.75rem;"><span style="color:var(--color-primary);font-weight:700;">✓</span> <span>Tonal adjustment guidance</span></li>
+          </ul>
+          <a href="formula-conversion.html" class="btn btn-primary mt-8">Learn More →</a>
+        </div>
+        <div class="feature-showcase-mockup">
+          <div class="showcase-bar showcase-bar-accent" style="width:60%;"></div>
+          <div style="display:flex;gap:0.75rem;margin-top:0.5rem;">
+            <div class="showcase-cell showcase-cell-highlight" style="flex:2;"></div>
+            <div class="showcase-cell" style="flex:1;"></div>
+          </div>
+          <div style="display:flex;gap:0.75rem;">
+            <div class="showcase-cell"></div>
+            <div class="showcase-cell showcase-cell-highlight"></div>
+            <div class="showcase-cell"></div>
+          </div>
+          <div class="showcase-bar" style="width:80%;"></div>
+          <div style="display:flex;gap:0.75rem;">
+            <div class="showcase-cell" style="flex:1;"></div>
+            <div class="showcase-cell showcase-cell-highlight" style="flex:2;"></div>
+          </div>
+          <div class="showcase-bar showcase-bar-accent" style="width:40%;"></div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Client Management -->
+      <div class="feature-showcase reveal" style="margin-top:4rem;">
+        <div class="feature-showcase-mockup">
+          <div style="display:flex;gap:0.75rem;align-items:center;margin-bottom:0.5rem;">
+            <div class="showcase-cell" style="width:48px;height:48px;border-radius:50%;flex:none;"></div>
+            <div style="flex:1;">
+              <div class="showcase-bar" style="width:50%;"></div>
+              <div class="showcase-bar" style="width:30%;margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="showcase-bar showcase-bar-accent" style="width:70%;"></div>
+          <div style="display:flex;gap:0.75rem;">
+            <div class="showcase-cell" style="flex:1;height:60px;"></div>
+            <div class="showcase-cell showcase-cell-highlight" style="flex:1;height:60px;"></div>
+            <div class="showcase-cell" style="flex:1;height:60px;"></div>
+          </div>
+          <div class="showcase-bar" style="width:90%;"></div>
+          <div class="showcase-bar" style="width:60%;"></div>
+        </div>
+        <div class="feature-showcase-content">
+          <h3>Know Every Client Inside & Out</h3>
+          <p class="mt-4">Never forget a formula again. Every client's complete color history, allergies, sensitivities, and preferences — organized and searchable. Share profiles across your entire salon team.</p>
+          <ul style="margin-top:1.5rem;list-style:none;">
+            <li style="padding:0.5rem 0;display:flex;align-items:center;gap:0.75rem;"><span style="color:var(--color-primary);font-weight:700;">✓</span> <span>Full color history timeline</span></li>
+            <li style="padding:0.5rem 0;display:flex;align-items:center;gap:0.75rem;"><span style="color:var(--color-primary);font-weight:700;">✓</span> <span>Allergy & sensitivity alerts</span></li>
+            <li style="padding:0.5rem 0;display:flex;align-items:center;gap:0.75rem;"><span style="color:var(--color-primary);font-weight:700;">✓</span> <span>Before/after photo storage</span></li>
+            <li style="padding:0.5rem 0;display:flex;align-items:center;gap:0.75rem;"><span style="color:var(--color-primary);font-weight:700;">✓</span> <span>Team sharing & notes</span></li>
+          </ul>
+          <a href="client-management.html" class="btn btn-primary mt-8">Learn More →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="pricing-header reveal">
+        <h2>Simple, Transparent Pricing</h2>
+        <p class="mt-4">Start free. Scale as your salon grows. No setup fees, no hidden costs.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="pricing-card reveal reveal-delay-1">
+          <div class="pricing-name">Starter</div>
+          <div class="pricing-desc">Perfect for solo stylists just getting started</div>
+          <div class="pricing-price">
+            <span class="pricing-currency">$</span>
+            <span class="pricing-amount">19</span>
+            <span class="pricing-period">/month</span>
+          </div>
+          <ul class="pricing-features">
+            <li>1 color line</li>
+            <li>50 client profiles</li>
+            <li>Basic formula conversion</li>
+            <li>Mobile app access</li>
+            <li class="disabled">POS integration</li>
+            <li class="disabled">Formula marketplace</li>
+            <li class="disabled">Inventory prediction</li>
+            <li class="disabled">Priority support</li>
+          </ul>
+          <a href="signup.html?plan=starter" class="btn btn-secondary btn-block">Get Started</a>
+        </div>
+
+        <div class="pricing-card featured reveal reveal-delay-2">
+          <div class="pricing-name">Professional</div>
+          <div class="pricing-desc">For growing salons with multiple stylists</div>
+          <div class="pricing-price">
+            <span class="pricing-currency">$</span>
+            <span class="pricing-amount">49</span>
+            <span class="pricing-period">/month</span>
+          </div>
+          <ul class="pricing-features">
+            <li>3 color lines</li>
+            <li>Unlimited client profiles</li>
+            <li>Full cross-brand conversion (15+)</li>
+            <li>Mobile & desktop apps</li>
+            <li>Square & Vagaro integration</li>
+            <li>Team collaboration</li>
+            <li class="disabled">Formula marketplace</li>
+            <li class="disabled">Inventory prediction</li>
+          </ul>
+          <a href="signup.html?plan=pro" class="btn btn-primary btn-block">Start Free Trial</a>
+        </div>
+
+        <div class="pricing-card reveal reveal-delay-3">
+          <div class="pricing-name">Unlimited</div>
+          <div class="pricing-desc">Everything for salons that want it all</div>
+          <div class="pricing-price">
+            <span class="pricing-currency">$</span>
+            <span class="pricing-amount">99</span>
+            <span class="pricing-period">/month</span>
+          </div>
+          <ul class="pricing-features">
+            <li>All color lines (15+)</li>
+            <li>Unlimited client profiles</li>
+            <li>Full cross-brand conversion</li>
+            <li>All apps + API access</li>
+            <li>Full POS integration suite</li>
+            <li>Formula marketplace</li>
+            <li>AI inventory prediction</li>
+            <li>Priority support & onboarding</li>
+          </ul>
+          <a href="signup.html?plan=unlimited" class="btn btn-secondary btn-block">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Proof / Testimonials -->
+  <section class="section section-dark" id="testimonials">
+    <div class="container">
+      <div class="testimonials-header reveal">
+        <h2>Loved by Stylists Everywhere</h2>
+        <p class="mt-4">Real feedback from real professionals using COLORgenius every day.</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"I used to spend 20 minutes converting Wella formulas to Redken for one client. Now it takes 20 seconds. COLORgenius literally changed how I work."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">MJ</div>
+            <div>
+              <div class="testimonial-name">Maria Johnson</div>
+              <div class="testimonial-role">Senior Stylist, Salon Lumière</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"The client profiles are a game changer. I can see every color my client has ever had, their reactions, their preferences — all before they sit down."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">DR</div>
+            <div>
+              <div class="testimonial-name">David Rivera</div>
+              <div class="testimonial-role">Color Specialist, Urban Cuts</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal reveal-delay-3">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"We integrated COLORgenius with our Square POS and now inventory basically manages itself. The AI predictions are scarily accurate."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">SC</div>
+            <div>
+              <div class="testimonial-name">Sarah Chen</div>
+              <div class="testimonial-role">Salon Owner, Blush & Co.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section cta-section">
+    <div class="hero-bg">
+      <div class="hero-blob hero-blob-1" style="background:var(--color-primary);opacity:0.08;"></div>
+      <div class="hero-blob hero-blob-2" style="background:var(--color-accent);opacity:0.08;"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="reveal">
+        <h2 class="cta-title">Ready to Transform Your Salon?</h2>
+        <p class="cta-subtitle">Join 500+ salons already using COLORgenius to save time, reduce waste, and deliver better results for every client.</p>
+        <div class="flex justify-center gap-4 flex-wrap">
+          <a href="signup.html" class="btn btn-primary btn-lg">Start Your Free Trial</a>
+          <a href="#features" class="btn btn-secondary btn-lg">Learn More</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">COLOR<span>genius</span></a>
+          <p class="footer-desc">AI-powered color formula management for professional stylists and salons. Built by stylists, for stylists.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram">📷</a>
+            <a href="#" aria-label="Twitter">🐦</a>
+            <a href="#" aria-label="Facebook">📘</a>
+            <a href="#" aria-label="LinkedIn">💼</a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Product</h4>
+          <ul class="footer-links">
+            <li><a href="formula-conversion.html">Formula Conversion</a></li>
+            <li><a href="client-management.html">Client Management</a></li>
+            <li><a href="integrations.html">Integrations</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Company</h4>
+          <ul class="footer-links">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 COLORgenius. All rights reserved.</p>
+        <p>Made with 💚 for stylists everywhere</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

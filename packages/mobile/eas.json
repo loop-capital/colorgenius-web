@@ -1,0 +1,77 @@
+{
+  "cli": {
+    "version": ">= 3.0.0",
+    "prompt": {
+      "push": false,
+      "pull": false,
+      "easJson": true
+    }
+  },
+  "build": {
+    "development": {
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m1-medium",
+        "environment": {
+          "EXPO_PUBLIC_API_URL": "https://api.colorgenius.dev",
+          "EXPO_PUBLIC_SUPABASE_URL": "https://your-project.supabase.co",
+          "EXPO_PUBLIC_SUPABASE_ANON_KEY": "your-anon-key-here"
+        }
+      },
+      "android": {
+        "resourceClass": "m1-medium",
+        "environment": {
+          "EXPO_PUBLIC_API_URL": "https://api.colorgenius.dev",
+          "EXPO_PUBLIC_SUPABASE_URL": "https://your-project.supabase.co",
+          "EXPO_PUBLIC_SUPABASE_ANON_KEY": "your-anon-key-here"
+        }
+      }
+    },
+    "preview": {
+      "distribution": "store",
+      "ios": {
+        "resourceClass": "m1-medium",
+        "environment": {
+          "EXPO_PUBLIC_API_URL": "https://api.colorgenius.app",
+          "EXPO_PUBLIC_SUPABASE_URL": "https://your-project.supabase.co",
+          "EXPO_PUBLIC_SUPABASE_ANON_KEY": "your-anon-key-here"
+        }
+      },
+      "android": {
+        "resourceClass": "m1-medium",
+        "environment": {
+          "EXPO_PUBLIC_API_URL": "https://api.colorgenius.app",
+          "EXPO_PUBLIC_SUPABASE_URL": "https://your-project.supabase.co",
+          "EXPO_PUBLIC_SUPABASE_ANON_KEY": "your-anon-key-here"
+        }
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "ios": {
+        "resourceClass": "m1-medium",
+        "environment": {
+          "EXPO_PUBLIC_API_URL": "https://api.colorgenius.app",
+          "EXPO_PUBLIC_SUPABASE_URL": "https://your-project.supabase.co",
+          "EXPO_PUBLIC_SUPABASE_ANON_KEY": "your-anon-key-here"
+        }
+      },
+      "android": {
+        "resourceClass": "m1-medium",
+        "environment": {
+          "EXPO_PUBLIC_API_URL": "https://api.colorgenius.app",
+          "EXPO_PUBLIC_SUPABASE_URL": "https://your-project.supabase.co",
+          "EXPO_PUBLIC_SUPABASE_ANON_KEY": "your-anon-key-here"
+        }
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "apiKey": "",
+        "apiSecret": ""
+      }
+    }
+  }
+}

@@ -36,7 +36,7 @@
 
 ### GlossGenius
 - **Market share:** Rising star, mobile-first, popular with independent stylists and small salons.
-- **API:** ❌ **Not public.** No developer portal found. Integrates with Google Calendar, Square, Stripe, QuickBooks — but no third-party API.
+- **API:** ❌ **Not public.** No developer portal found. Integrates with Google Calendar, Square, QuickBooks — but no third-party API.
 - **Webhooks:** ❌ No public webhook support.
 - **Pricing:** $24/month basic, higher tiers for multi-location.
 - **Integration route:** Calendar sync via Google Calendar/iCal as bridge only.

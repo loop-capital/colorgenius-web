@@ -1,0 +1,130 @@
+{
+  "brand": "R+COLOR",
+  "lines": [
+    {
+      "name": "Omnipresent Permanent Liqui-Crème",
+      "shortName": "Omnipresent",
+      "type": "permanent",
+      "category": "permanent-liquicreme",
+      "preBonded": false,
+      "ammonia": true,
+      "lift": true,
+      "greyCoverage": "100%",
+      "mixingRatio": "1:1 (color : developer)",
+      "developerOptions": [
+        { "volume": 10, "purpose": "deposit only / gray coverage", "liftLevels": 0, "greyCoverage": "optimal" },
+        { "volume": 20, "purpose": "1 level lift", "liftLevels": 1, "greyCoverage": "optimal" },
+        { "volume": 30, "purpose": "2 levels lift", "liftLevels": 2, "greyCoverage": "good" },
+        { "volume": 40, "purpose": "3+ levels lift", "liftLevels": 3, "greyCoverage": "reduced" }
+      ],
+      "developerBrand": "R+COLOR Omnipresent Developer",
+      "processingTime": {
+        "standard": "35-45 min",
+        "resistantGrey": "45 min",
+        "heat": "reduce by 5-10 min"
+      },
+      "fragrance": "Signature R+COLOR fragrance",
+      "technology": [
+        "Liqui-Crème Technology",
+        "Maximum gray coverage"
+      ]
+    },
+    {
+      "name": "HyperMatic 10-Minute Demi-Permanent Liquid",
+      "shortName": "HyperMatic",
+      "type": "demi-permanent",
+      "category": "demi-liquid",
+      "preBonded": false,
+      "ammonia": false,
+      "lift": false,
+      "greyCoverage": "blending",
+      "mixingRatio": "1:1 (color : developer)",
+      "developerOptions": [
+        { "volume": 5, "purpose": "deposit only / refresh", "liftLevels": 0, "greyCoverage": "blending" },
+        { "volume": 10, "purpose": "deposit / tone", "liftLevels": 0, "greyCoverage": "blending" }
+      ],
+      "developerBrand": "R+COLOR HyperMatic Developer",
+      "processingTime": {
+        "standard": "10 min",
+        "refresh": "10 min"
+      },
+      "fragrance": "Signature R+COLOR fragrance",
+      "technology": [
+        "10-minute processing technology",
+        "Liquid formula for fast application"
+      ]
+    },
+    {
+      "name": "Stellar Demi-Permanent Liquid",
+      "shortName": "Stellar",
+      "type": "demi-permanent",
+      "category": "demi-liquid",
+      "preBonded": false,
+      "ammonia": false,
+      "lift": false,
+      "greyCoverage": "blending",
+      "mixingRatio": "1:1 (color : developer)",
+      "developerOptions": [
+        { "volume": 5, "purpose": "deposit only / refresh", "liftLevels": 0, "greyCoverage": "blending" },
+        { "volume": 10, "purpose": "deposit / tone", "liftLevels": 0, "greyCoverage": "blending" }
+      ],
+      "developerBrand": "R+COLOR Stellar Developer",
+      "processingTime": {
+        "standard": "20 min",
+        "refresh": "20 min"
+      },
+      "fragrance": "Signature R+COLOR fragrance",
+      "technology": [
+        "Demi-permanent liquid formula",
+        "Gentle on hair"
+      ]
+    },
+    {
+      "name": "Star Sign Demi-Permanent Crème",
+      "shortName": "Star Sign",
+      "type": "demi-permanent",
+      "category": "demi-creme",
+      "preBonded": false,
+      "ammonia": false,
+      "lift": false,
+      "greyCoverage": "up to 100%",
+      "mixingRatio": "1:1 (color : developer)",
+      "developerOptions": [
+        { "volume": 5, "purpose": "deposit only / refresh", "liftLevels": 0, "greyCoverage": "up to 100%" },
+        { "volume": 10, "purpose": "deposit / tone", "liftLevels": 0, "greyCoverage": "up to 100%" }
+      ],
+      "developerBrand": "R+COLOR Star Sign Developer",
+      "processingTime": {
+        "standard": "20 min",
+        "refresh": "20 min"
+      },
+      "fragrance": "Signature R+COLOR fragrance",
+      "technology": [
+        "Demi-permanent crème formula",
+        "Up to 100% gray coverage"
+      ]
+    },
+    {
+      "name": "Half Truth Semi-Permanent",
+      "shortName": "Half Truth",
+      "type": "semi-permanent",
+      "category": "semi-permanent",
+      "preBonded": false,
+      "ammonia": false,
+      "lift": false,
+      "greyCoverage": "none",
+      "mixingRatio": "Direct application (no developer)",
+      "developerOptions": [],
+      "developerBrand": "None",
+      "processingTime": {
+        "standard": "20-30 min",
+        "refresh": "20-30 min"
+      },
+      "fragrance": "Signature R+COLOR fragrance",
+      "technology": [
+        "Semi-permanent direct dye",
+        "No developer required"
+      ]
+    }
+  ]
+}

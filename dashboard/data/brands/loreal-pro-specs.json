@@ -1,0 +1,146 @@
+{
+  "brand": "L'Oréal Professionnel",
+  "lines": [
+    {
+      "name": "Diacolor",
+      "type": "demi-permanent",
+      "subtype": "alkaline",
+      "description": "Alkaline demi-permanent. No ammonia. Up to 70% grey coverage, up to 1.5 levels of lift, 6 weeks of gloss color, 2x shine. Melanin Gap Filler Technology reinjects color inside the fiber. Up to 92% natural origin formula. 20 min processing.",
+      "mixingRatio": "1:1.5",
+      "developers": [
+        {
+          "volume": 6,
+          "percent": "1.8%",
+          "name": "DIActivateur 6-vol",
+          "use": "Soft color deposit, more natural result. Shine & first grey coverage."
+        },
+        {
+          "volume": 9,
+          "percent": "2.7%",
+          "name": "DIActivateur 9-vol",
+          "use": "Standard color deposit, tone-on-tone results."
+        },
+        {
+          "volume": 15,
+          "percent": "4.5%",
+          "name": "DIActivateur 15-vol",
+          "use": "Strong color deposit, more visibility and 1.5 levels of lift."
+        }
+      ],
+      "processingTimes": [
+        {
+          "use": "First application (full head)",
+          "time": "20 min (starts at end of application)"
+        },
+        {
+          "use": "Regrowth touch-up: take through immediately",
+          "time": "20 min (deeper result / darken)"
+        },
+        {
+          "use": "Regrowth touch-up: take through after 10 min",
+          "time": "20 min (moderately faded lengths & ends)"
+        },
+        {
+          "use": "Regrowth touch-up: emulsify last 5 min",
+          "time": "20 min (slightly faded)"
+        }
+      ],
+      "applicationNotes": [
+        "1 tube (2 oz.) to 3 oz. DIActivateur developer",
+        "On natural or colored hair",
+        "Rinse thoroughly, shampoo with Metal Detox Shampoo, follow with Metal Detox mask"
+      ]
+    },
+    {
+      "name": "DiaLight",
+      "type": "demi-permanent",
+      "subtype": "acidic",
+      "description": "Acidic gel-crème demi. Zero ammonia. Zero lift. Ultra conditioning. +30% more conditioning. Acid pH close to natural hair pH. Cationic polymers resurface cuticle for shine. Flexible processing: 2-20 minutes.",
+      "mixingRatio": "1:1.5",
+      "developers": [
+        {
+          "volume": 6,
+          "percent": "1.8%",
+          "name": "DIActivateur 6-vol",
+          "use": "Soft color deposit, more transparent result."
+        },
+        {
+          "volume": 9,
+          "percent": "2.7%",
+          "name": "DIActivateur 9-vol",
+          "use": "Standard color deposit."
+        }
+      ],
+      "processingTimes": [
+        {
+          "use": "Flexible processing",
+          "time": "2-20 minutes (depending on desired intensity)"
+        }
+      ],
+      "applicationNotes": [
+        "1 tube (1.7 oz.) to 2.6 oz. DIActivateur developer",
+        "On colored or lightened hair only — no grey coverage, no lift",
+        "Dry hair: spray Metal Detox Pre-Treatment on each section, apply with brush or bottle",
+        "Wet hair: after shampooing with Metal Detox Shampoo, apply on pre-lightened hair",
+        "Liquifier available for fast bottle application: half dose .2 oz., full dose .4 oz.",
+        "Liquifier ONLY to be used with DiaLight + DIActivateur (not a developer)",
+        "Emulsify with warm water at end, rinse thoroughly, shampoo with Metal Detox, follow with Metal Detox mask"
+      ],
+      "warnings": [
+        "DM5 & Rubilane shades must be used ALONE — do NOT combine with any other shade"
+      ]
+    }
+  ],
+  "toneSystem": {
+    "description": "L'Oréal Professionnel dual coding system",
+    "tones": {
+      "N": "Natural",
+      ".1/B": "Blue (ash)",
+      ".2/V": "Violet",
+      ".3/G": "Gold",
+      ".4/C": "Copper",
+      ".5/Rv": "Red-Violet",
+      ".6/R": "Red",
+      ".7/Gr": "Green",
+      ".8/M": "Mocha",
+      ".11/BB": "Intense Blue",
+      ".12/BV": "Blue-Violet",
+      ".13/BG": "Blue-Gold (beige)",
+      ".15/BRv": "Blue-Red Violet",
+      ".18/BM": "Blue-Mocha",
+      ".20/VVV": "Intense Violet (DM5)",
+      ".21/VB": "Violet-Blue",
+      ".22/VV": "Intense Violet",
+      ".23/VG": "Violet-Gold",
+      ".24/VC": "Violet-Copper",
+      ".31/GB": "Gold-Blue",
+      ".32/GV": "Gold-Violet",
+      ".34/GC": "Gold-Copper",
+      ".35/GRv": "Gold-Red Violet",
+      ".40/CCC": "Intense Copper (Rubilane)",
+      ".43/CG": "Copper-Gold",
+      ".44/CC": "Intense Copper",
+      ".45/CRv": "Copper-Red Violet",
+      ".46/CR": "Copper-Red",
+      ".60/RRR": "Intense Red",
+      ".62/RV": "Red-Violet",
+      ".64/RC": "Red-Copper",
+      ".66/RR": "Intense Red (Rubilane)",
+      ".01/NB": "Natural Blue",
+      ".02/NV": "Natural Violet",
+      ".03/NG": "Natural Gold",
+      ".07/NGr": "Natural Green",
+      ".71/GrB": "Green-Blue",
+      ".82/MV": "Mocha-Violet",
+      ".84/MC": "Mocha-Copper"
+    }
+  },
+  "specialNotes": [
+    "Diacolor: alkaline demi-permanent with Melanin Gap Filler Technology",
+    "DiaLight: acidic demi-permanent, zero lift, for color-treated/sensitized hair",
+    "DM5 and Rubilane shades must be used ALONE — do NOT combine with any other shade",
+    "Metal Detox protocol: Pre-Treatment spray → color service → Metal Detox Shampoo → Metal Detox Mask",
+    "DiaLight Liquifier is NOT a developer — only for consistency adjustment",
+    "Diacolor has Clear shade for softening intensity or creating custom lighter shades"
+  ]
+}

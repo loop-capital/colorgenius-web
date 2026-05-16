@@ -1,0 +1,47 @@
+{
+  "brand": "Matrix",
+  "lines": [
+    {
+      "name": "Tonal Control Acidic Gel-Cream Toners",
+      "shortName": "Tonal Control",
+      "type": "acidic-toner",
+      "category": "acidic-gel-cream",
+      "preBonded": false,
+      "ammonia": false,
+      "lift": false,
+      "greyCoverage": "Not for grey coverage",
+      "mixingRatio": "1:1",
+      "developerOptions": [
+        { "volume": 10, "purpose": "toning pre-lightened hair", "liftLevels": 0, "greyCoverage": "none" }
+      ],
+      "developerBrand": "Matrix Tonal Control Developer",
+      "processingTime": {
+        "standard": "10-20 min, visual development",
+        "heat": "reduce by 5 min"
+      },
+      "longevity": "4-6 weeks",
+      "technology": [
+        "pH-balanced acidic gel-cream formula",
+        "Zero lift, deposit-only toning",
+        "For pre-lightened/lightened hair only"
+      ],
+      "collections": [
+        {
+          "name": "Standard Collection",
+          "description": "Levels 4-11 with creative shade names for personalized toning",
+          "levels": "4-11"
+        },
+        {
+          "name": "Clear",
+          "description": "Totally Transparent Clear for dilution and custom mixing",
+          "tones": ["Clear"]
+        }
+      ],
+      "clear": {
+        "code": "Clear",
+        "name": "Clear",
+        "use": "Dilution and custom mixing"
+      }
+    }
+  ]
+}

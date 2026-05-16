@@ -1,0 +1,398 @@
+{
+  "_comment": "CHI Colormaster Cross-Brand Comparison Chart - extracted from PDF",
+  "_source": "REVISED-COLOR-COMPARISON-CHART-CHI-Colormaster-24x16",
+  "_note": "Shades in the same row are approximate equivalents across brands. X = not available. This is cross-brand mapping data for the conversion engine.",
+  "additives": {
+    "_comment": "Additive levels and canister colors from chart header",
+    "clear": { "level": 12 },
+    "beige": { "level": 9, "canister": "9" },
+    "gold": { "level": 8, "canister": "6" },
+    "violet": { "level": 7, "canister": "7" },
+    "ash": { "level": 6.5, "canister": "8" },
+    "red": { "level": 6, "canister": "5" },
+    "blue": { "level": 4, "canister": "10" },
+    "4V": { "level": 4 },
+    "6V": { "level": 6 },
+    "8V": { "level": 8 }
+  },
+  "comparisonRows": [
+    {
+      "toneFamily": "natural",
+      "shades": {
+        "chiShineShades": ["1N","2N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "chiPermanent": ["1N","2N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "biosilk": ["1N","2N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "redkenShadesEQ": ["1B"],
+        "pmShines": ["1N","2N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "wellaCharm": [],
+        "joicoLumishine": ["1N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "missClairol": ["1N","2N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "redkenColorGel": [],
+        "redkenColorFusion": ["1N","2N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "matrix": ["1N","2N","3N","4N","5N","6N","7N","8N","9N","10N","11N"],
+        "paulMitchellXG": ["1N","2N","3N","5N","6N","7N","8N","9N","10N"],
+        "veroKPack": ["1N","3N","4N","5N","6N","7N","8N","9N"],
+        "pravana": ["1A","2N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "kenra": ["1N","2N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "logics": ["1N","2N","3N","4N","5N","6N","7N","8N","10N","12N"],
+        "goldwell": ["2N","3N","4N","5N","6N","7N","8N","9N","10N"],
+        "schwarzkopf": ["1.0","2.0","3.0","4.0","5.0","6.0","7.0","8.0","9.0","10.0"],
+        "lorealMajirel": ["1","3","4","5","6","7","8","9","10"],
+        "wellaKoleston": ["2/0","3/0","4/0","5/0","6/0","7/0","8/0","9/0","10/0","12/0"],
+        "tigiCreative": ["1/1","2/0","3/0","4/0","5/0","6/0","7/0","8/0","9.0","10/0","100/0"]
+      }
+    },
+    {
+      "toneFamily": "ash",
+      "shades": {
+        "chiShineShades": ["9A","10A","11A","12A"],
+        "chiPermanent": [],
+        "redkenShadesEQ": [],
+        "pmShines": [],
+        "joicoLumishine": [],
+        "pravana": [],
+        "kenra": ["4A","5A","6A","7A","6AA","7AA","8AA"],
+        "matrix": ["4A","5A","6A","7A","6AA","7AA","8AA"],
+        "paulMitchellXG": ["4A","5A","6A","7A","6AA"],
+        "veroKPack": ["4A","5A","6A","7A"],
+        "logics": ["5A","6A","7A","8A"],
+        "goldwell": ["5A","6A","7A","8A"],
+        "schwarzkopf": ["5.1","6.1","7.1","8.1","9.1","10.1","6.12","7.12","8.12"],
+        "lorealMajirel": ["5.1","4.1","6.1","7.1","8.1","9.1","10.1","6.11","7.11","8.11","9.11"],
+        "wellaKoleston": ["5/1A","6/1A","7/1A","8/1A","10/16AV"],
+        "tigiCreative": []
+      }
+    },
+    {
+      "toneFamily": "beige",
+      "shades": {
+        "chiShineShades": ["6B","5B","8B","10B"],
+        "chiPermanent": ["6B","7B","8B","9B","10B"],
+        "redkenShadesEQ": ["6NV","6B","8B"],
+        "pmShines": ["8NG"],
+        "joicoLumishine": [],
+        "pravana": [],
+        "kenra": [],
+        "matrix": ["8B","10B"],
+        "paulMitchellXG": [],
+        "veroKPack": ["6B","51/2NG","61/2NG","81/2NG"],
+        "logics": ["4B","6B"],
+        "goldwell": ["5B","6B","7B","8B","10B"],
+        "schwarzkopf": [],
+        "lorealMajirel": [],
+        "wellaKoleston": ["8NG"],
+        "tigiCreative": []
+      }
+    },
+    {
+      "toneFamily": "warm",
+      "shades": {
+        "chiShineShades": ["5W","6W","7W","8W","11W"],
+        "chiPermanent": ["5W","6W","7W","8W"],
+        "redkenShadesEQ": ["5NW","6RB"],
+        "pmShines": [],
+        "matrix": ["5W","6W","7W","8W","11W"],
+        "paulMitchellXG": ["5W","6W","7W","8W"],
+        "kenra": [],
+        "veroKPack": ["4NW","6WN","8WN"],
+        "logics": [],
+        "goldwell": [],
+        "wellaKoleston": []
+      }
+    },
+    {
+      "toneFamily": "gold",
+      "shades": {
+        "chiShineShades": ["6G","5G","8G","7G","9G","10G","11G"],
+        "chiPermanent": ["6G","8G","7G","9G","10G"],
+        "redkenShadesEQ": ["6NG","6GN","8NG","10NG","10G"],
+        "pmShines": [],
+        "joicoLumishine": ["5G","6G","7G","8G","9G"],
+        "pravana": [],
+        "kenra": ["5G","6G","7G","8G","9G","10G"],
+        "matrix": ["5G","7G","9G"],
+        "paulMitchellXG": ["5G","6G","7G","8G","9G","10G"],
+        "veroKPack": ["5Go","7Go","5Gg","6Gg","7Gg"],
+        "logics": ["6G","8G","10G"],
+        "goldwell": ["6G","7G","8G","9GN"],
+        "schwarzkopf": ["6/3G","5/3G","7/3G","8/3G","9/3G","10/3G"],
+        "lorealMajirel": ["6.3","7.3","8.3","9.3"],
+        "wellaKoleston": ["6/3G","5/3G","7/3G","8/3G","9/3G","10/3G"]
+      }
+    },
+    {
+      "toneFamily": "red-brown",
+      "shades": {
+        "chiShineShades": ["4RB","6RB","8RB"],
+        "chiPermanent": ["6RB","7RB"],
+        "redkenShadesEQ": ["347"],
+        "pmShines": ["4R"],
+        "joicoLumishine": ["5RB"],
+        "pravana": ["4RB","6RB","7RB"],
+        "kenra": ["4RB","5RB","6RB","7RB"],
+        "matrix": ["4RB","6RB","7RB","8RB"],
+        "paulMitchellXG": ["4RB","6RB","6RO","6R","6RV"],
+        "veroKPack": [],
+        "logics": ["4B","7RB","8RB","5RB","6RB","7RB","8RB"],
+        "goldwell": ["4B","7RB","8RB","5RB","6RB"],
+        "schwarzkopf": ["4.75","5.75","6.75","7.75"],
+        "wellaKoleston": []
+      }
+    },
+    {
+      "toneFamily": "chocolate-mocha",
+      "shades": {
+        "chiShineShades": ["4CM","6CM","8CM"],
+        "chiPermanent": ["5CM","7CM"],
+        "matrix": ["4CM","5CM","6CM","7CM","8CM"],
+        "pravana": ["4.45","6.34","4.37"]
+      }
+    },
+    {
+      "toneFamily": "copper-gold",
+      "shades": {
+        "chiShineShades": ["5CG","7CG","8CG","9CG"],
+        "chiPermanent": ["6CG"],
+        "redkenShadesEQ": ["5ROG","7ROG"],
+        "pmShines": ["O5C","O7C"],
+        "joicoLumishine": ["5CG","7CG"],
+        "pravana": ["5.35","7.35"],
+        "kenra": ["5CG","7CG","8CG","9CG"],
+        "matrix": ["5CG","7CG","9CG"],
+        "paulMitchellXG": ["5CG","6CG","7CG"],
+        "veroKPack": ["5CG","7CG"],
+        "logics": ["8RO","10RO"]
+      }
+    },
+    {
+      "toneFamily": "copper",
+      "shades": {
+        "chiShineShades": ["4C","5C","6C","7C","8C","9C"],
+        "chiPermanent": ["6C","7C"],
+        "pmShines": [],
+        "joicoLumishine": ["6CC"],
+        "pravana": [],
+        "kenra": ["5C","6C"],
+        "matrix": [],
+        "paulMitchellXG": [],
+        "veroKPack": ["4C","6C"],
+        "logics": ["6RO","7R"],
+        "goldwell": ["7KG","8KG","9KG","7KR","8KR"],
+        "schwarzkopf": ["5.7","9.7","5-88","4-88","6-88","7-887"],
+        "lorealMajirel": ["5.4","8.4","7.44"],
+        "wellaKoleston": ["7/03","8/03"]
+      }
+    },
+    {
+      "toneFamily": "red",
+      "shades": {
+        "chiShineShades": ["4RR","5RR","6RR","7RR","8RR"],
+        "chiPermanent": ["6RCC","6RR"],
+        "redkenShadesEQ": ["4R"],
+        "pmShines": [],
+        "joicoLumishine": ["6RR"],
+        "pravana": ["4RR","6RR"],
+        "kenra": ["4RR","6RR","7RR"],
+        "matrix": ["6RR","8RR"],
+        "paulMitchellXG": [],
+        "veroKPack": ["5RR","6RR"],
+        "logics": ["4R","5R","6R","8RR"],
+        "goldwell": ["4R","5R","6R","8RR"],
+        "schwarzkopf": ["4-88","5-889","6-88","7-887"],
+        "lorealMajirel": ["4.0","5.0","6.0","7.0","8.0"],
+        "wellaKoleston": ["55/44RR","77/44RR"]
+      }
+    },
+    {
+      "toneFamily": "red-violet",
+      "shades": {
+        "chiShineShades": ["4RV","5RV","6RV","7RV","8RV"],
+        "chiPermanent": ["4RRV","6RV"],
+        "pravana": ["4RV","6RV"],
+        "kenra": ["3RV","4RV","5RV","6RV"],
+        "logics": ["4RV"],
+        "goldwell": ["6RV"],
+        "schwarzkopf": ["5.37","7.37","7.34","8.34","5.43","6.43","7.43","8.43"],
+        "lorealMajirel": ["5.62","6.62","7.62"],
+        "wellaKoleston": ["5/46RV","6/45RV","7/45RV"],
+        "tigiCreative": ["5/35","6/34","7/35","8/34"]
+      }
+    },
+    {
+      "toneFamily": "50-coverage",
+      "shades": {
+        "chiShineShades": ["50-4N","50-6N","50-8N","50-10N"],
+        "chiPermanent": ["50-4N","50-6N","50-8N"],
+        "pravana": ["4NN","5NN","6NN","7NN","8NN","10NN"],
+        "kenra": ["4NN","5NN","6NN","7NN","8NN"]
+      }
+    },
+    {
+      "toneFamily": "iridescent",
+      "shades": {
+        "chiShineShades": [],
+        "pravana": ["9.03","7.03","8.03","9.12","9.13","10.03"],
+        "schwarzkopf": ["8.29","9.522","10.21"],
+        "lorealMajirel": ["6.03","7.03","8.03"]
+      }
+    },
+    {
+      "toneFamily": "pearl-violet",
+      "shades": {
+        "kenra": ["9PV","10PV"],
+        "logics": ["10V","12V"],
+        "paulMitchellXG": ["9V"],
+        "wellaKoleston": ["9.97","7.25","9.25","10.25","10.97"],
+        "tigiCreative": ["10/21"]
+      }
+    },
+    {
+      "toneFamily": "double-ash",
+      "shades": {
+        "chiShineShades": [],
+        "chiPermanent": [],
+        "kenra": ["6AA","7AA","8AA"],
+        "matrix": ["6AA","7AA","8AA"],
+        "paulMitchellXG": ["6AA"],
+        "schwarzkopf": ["5-00","6-00","7-00","8-00","9-00"]
+      }
+    },
+    {
+      "toneFamily": "violet",
+      "shades": {
+        "kenra": ["10V"],
+        "logics": ["6V","7V","10V"],
+        "wellaKoleston": ["9.97"],
+        "lorealMajirel": [],
+        "pravana": ["7.7","9V"]
+      }
+    },
+    {
+      "toneFamily": "ultra-lift-palest-blonde",
+      "shades": {
+        "_comment": "Ultra-lift series from chart footer",
+        "chiShineShades": ["ULP-13N","ULP-13B","ULP-13A","UL-12N","UL-12I","UL12A"],
+        "chiPermanent": ["UL"]
+      }
+    },
+    {
+      "toneFamily": "tigi-specific",
+      "shades": {
+        "tigiCreative": ["4/85","5/8","7/8","8/08","9/8","10/08","5/71","6/1","8/71","10/21","8/1","9/02","9/03","7B","9/23","5GM","6GC","6CG","7GB","8GC","100/83","7/3","8//3","7//6","5/35","6/34","7/35","8/34","9/4","4/45","5CG","6/46","7CG","77/66","55/66","4//2","5M","5//6","7//6","3//26","4//85","5//5","8//83"],
+        "tigiGloss": ["6/08","5//38","9//83","8/3","9/03","0/03","6/34","7/4","6/6","0/02","4//85","7//4","5//5"]
+      }
+    },
+    {
+      "toneFamily": "goldwell-specific",
+      "shades": {
+        "goldwell": ["6NA","7NA","6G","7G","8G","9GN","4B","7RB","8RB","5RB","6RB","7RB","8RB","7KG","8KG","9KG","7KR","8KR","7.77","6.77","8.77","4R","5R","6R","8RR","6RV"],
+        "additives": ["P MIX RR MIX KK MIX G MIX A-MIX V-MIX"]
+      }
+    },
+    {
+      "toneFamily": "loreal-majirel-specific",
+      "shades": {
+        "lorealMajirel": ["Cl 10.1","Cl 9.1","Cl 8.1","6.1","8.1","10.1","6.64","7.43","8.43","5.62","6.62","7.62","7,041"],
+        "additives": ["RED .70","GREEN .60","COPPER .40","BLUE .10","VIOLET .20"]
+      }
+    },
+    {
+      "toneFamily": "silver-ice",
+      "shades": {
+        "chiShineShades": ["8S","9S","10S","9T","10 ICE"]
+      }
+    },
+    {
+      "toneFamily": "additives",
+      "shades": {
+        "chiShineShades": ["CLEAR","RED","BEIGE","GREEN","GOLD","ORANGE","YELLOW","BLUE"],
+        "chiPermanent": ["CLEAR","RED"],
+        "redkenShadesEQ": ["BEIGE"],
+        "pmShines": ["ASH","BEIGE"],
+        "joicoLumishine": ["CLEAR","ASH","BLUE"],
+        "pravana": ["4NA","6NA","7NA","6GN","8GN"],
+        "kenra": ["RED","COPPER","GOLD","BLUE","VIOLET"],
+        "logics": ["RED","GOLD","BLUE"],
+        "goldwell": ["P MIX","RR MIX","KK MIX","G MIX","A-MIX","V-MIX"],
+        "lorealMajirel": ["RED .70","GREEN .60","COPPER .40","BLUE .10","VIOLET .20"],
+        "wellaKoleston": ["Q/43RG","Q/33GG","Q/88PP","Q/28MP"],
+        "tigiCreative": ["55/66","66/64"]
+      }
+    },
+    {
+      "toneFamily": "half-levels",
+      "shades": {
+        "chiPermanent": ["5.5","7.5","8.5","5.8","6.8"],
+        "_comment": "Half-level shades from chart"
+      }
+    },
+    {
+      "toneFamily": "vero-k-pack",
+      "shades": {
+        "veroKPack": ["INRR","INC","ING","INB","INV"],
+        "_comment": "Vero K-Pack Intense Naturals series"
+      }
+    },
+    {
+      "toneFamily": "pravana-chart-specific",
+      "shades": {
+        "pravana": ["4NA","5NA","6NA","7NA","6GN","8GN","4RB","7RB","5RN","4RR","6RR","4RRV"]
+      }
+    },
+    {
+      "toneFamily": "silver-iridescent",
+      "shades": {
+        "chiShineShades": ["8I","9I","10I","11I","8NG"],
+        "joicoLumishine": ["7I","8I","9I","10I","11I"],
+        "matrix": ["7I","9I","11I"],
+        "paulMitchellXG": ["6NG"],
+        "logics": ["6NG"],
+        "goldwell": [],
+        "wellaKoleston": ["1070"],
+        "kenra": [],
+        "pravana": []
+      }
+    }
+  ],
+  "_brandColumns": [
+    "CHI Ionic Shine Shades",
+    "CHI Ionic Permanent", 
+    "Biosilk",
+    "Redken Shades EQ",
+    "PM Shines",
+    "Wella Charm",
+    "Joico LumiShine",
+    "Beth Minardi",
+    "Miss Clairol",
+    "Redken Color Gel",
+    "Redken Color Fusion",
+    "Matrix Color",
+    "Paul Mitchell XG",
+    "Vero K Pack",
+    "Pravana",
+    "Kenra",
+    "Logics",
+    "Goldwell",
+    "Schwarzkopf Igora",
+    "L'Oréal Majirel",
+    "Wella Koleston",
+    "TIGI Creative & Live",
+    "TIGI Gloss"
+  ],
+  "_newBrands": {
+    "_comment": "Brands from this chart NOT yet in ColorGenius",
+    "chi": "CHI Ionic - both Shine Shades (demi) and Permanent lines",
+    "biosilk": "Biosilk hair color",
+    "pmShines": "Paul Mitchell PM Shines (demi-permanent)",
+    "wellaCharm": "Wella Charm",
+    "bethMinardi": "Beth Minardi Signature",
+    "missClairol": "Miss Clairol",
+    "veroKPack": "Vero K-Pack (Keratin Complex)",
+    "logics": "Matrix Logics",
+    "goldwell": "Goldwell Topchic/Colorance",
+    "tigi": "TIGI Creative & Live + Gloss",
+    "schwarzkopf": "Igora Royal (already have 160 shades)",
+    "lorealMajirel": "L'Oréal Majirel (already have 89 shades)",
+    "wellaKoleston": "Wella Koleston Perfect (permanent, separate from Color Touch/Illuminate)"
+  }
+}

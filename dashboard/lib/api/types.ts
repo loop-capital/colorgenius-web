@@ -207,3 +207,113 @@ export interface StylistPortfolio {
   recent_work: GalleryItem[];
   specialties: string[];
 }
+
+// ─── Marketplace Billing Types ──────────────────────────────────────────────────
+
+export interface BillingTier {
+  tier: string;
+  per_use_cents: number;
+  creator_share_pct: number;
+  monthly_cap_cents?: number;
+}
+
+export const TIER_PRICING: Record<string, BillingTier> = {
+  free: { tier: 'free', per_use_cents: 0, creator_share_pct: 0 },
+  basic: { tier: 'basic', per_use_cents: 25, creator_share_pct: 70 },
+  premium: { tier: 'premium', per_use_cents: 50, creator_share_pct: 70 },
+  exclusive: { tier: 'exclusive', per_use_cents: 100, creator_share_pct: 70 },
+};
+
+export interface BillingLineItem {
+  formula_id: string;
+  formula_title: string;
+  creator_id: string;
+  tier: string;
+  use_count: number;
+  per_use_cents: number;
+  total_cents: number;
+  creator_earnings_cents: number;
+  platform_fee_cents: number;
+}
+
+export interface MonthlyBillingInvoice {
+  id: string;
+  stylist_id: string;
+  billing_period: string;
+  line_items: BillingLineItem[];
+  total_cents: number;
+  total_creator_earnings_cents: number;
+  total_platform_fee_cents: number;
+  status: 'pending' | 'paid' | 'failed';
+  paid_at?: string;
+  square_payment_id?: string;
+  created_at: string;
+}
+
+export interface FormulaUseEvent {
+  id: string;
+  stylist_id: string;
+  formula_id: string;
+  client_name?: string;
+  service_id?: string;
+  used_at: string;
+  billed: boolean;
+  invoice_id?: string;
+}
+
+// ─── Marketplace Formula Types ──────────────────────────────────────────────────
+
+export type FormulaTier = 'community' | 'professional' | 'master' | 'signature';
+
+export interface Formula {
+  id: string;
+  creator_id: string;
+  creator_name: string;
+  creator_avatar?: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  brand?: string;
+  line?: string;
+  shade_code?: string;
+  shade_name?: string;
+  level?: number;
+  tone?: string;
+  developer_volume?: number;
+  processing_time?: number;
+  application?: string;
+  score: number;
+  tier: FormulaTier;
+  per_use_cents: number;
+  usage_count: number;
+  share_code: string;
+  rating: number;
+  review_count: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export function getTierForScore(score: number): FormulaTier {
+  if (score >= 85) return 'signature';
+  if (score >= 70) return 'master';
+  if (score >= 50) return 'professional';
+  return 'community';
+}
+
+export interface ClientRequest {
+  id: string;
+  stylist_id: string;
+  client_name: string;
+  client_email?: string;
+  client_phone?: string;
+  share_code: string;
+  consumer_notes?: string;
+  appointment_date?: string;
+  status: 'pending' | 'accepted' | 'declined' | 'completed';
+  formula_ready: boolean;
+  formula_id?: string;
+  created_at: string;
+  updated_at: string;
+}

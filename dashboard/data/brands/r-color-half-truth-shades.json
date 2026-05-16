@@ -1,0 +1,19 @@
+[
+  { "code": "CLEAR", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "neutral", "toneCode": "0", "name": "LOOKING GLASS", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-01", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "violet", "toneCode": "0", "name": "NEON ORCHID", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-02", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "red", "toneCode": "0", "name": "COTTON CANDY", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-03", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "neutral", "toneCode": "0", "name": "MERCURY", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-04", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "red", "toneCode": "0", "name": "HEART TO HEART", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-05", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "copper", "toneCode": "0", "name": "CUPCAKE", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-06", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "red", "toneCode": "0", "name": "CANDY APPLE", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-07", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "violet", "toneCode": "0", "name": "NEPTUNE", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-08", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "violet", "toneCode": "0", "name": "VELVET MORNING", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-09", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "red", "toneCode": "0", "name": "LOVER", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-10", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "violet", "toneCode": "0", "name": "BLUE LAGOON", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-11", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "violet", "toneCode": "0", "name": "DAZED", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-12", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "violet", "toneCode": "0", "name": "DENIM JACKET", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-13", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "red", "toneCode": "0", "name": "DRAGON", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-14", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "violet", "toneCode": "0", "name": "BLUE VELVET", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-15", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "red", "toneCode": "0", "name": "RAVE", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" },
+  { "code": "HT-16", "brand": "r-color", "line": "Half Truth Semi-Permanent", "level": 0, "toneFamily": "gold", "toneCode": "0", "name": "SQUEEZE", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none" }
+]
