@@ -1,0 +1,315 @@
+{
+  "brand": "L'Or\u00e9al Professionnel",
+  "lines": [
+    {
+      "name": "Diacolor",
+      "type": "demi-permanent",
+      "subtype": "alkaline",
+      "description": "Alkaline demi-permanent. No ammonia. Up to 70% grey coverage, up to 1.5 levels of lift, 6 weeks of gloss color, 2x shine. Melanin Gap Filler Technology reinjects color inside the fiber. Up to 92% natural origin formula. 20 min processing.",
+      "mixingRatio": "1:1.5",
+      "developers": [
+        {
+          "volume": 6,
+          "percent": "1.8%",
+          "name": "DIActivateur 6-vol",
+          "use": "Soft color deposit, more natural result. Shine & first grey coverage."
+        },
+        {
+          "volume": 9,
+          "percent": "2.7%",
+          "name": "DIActivateur 9-vol",
+          "use": "Standard color deposit, tone-on-tone results."
+        },
+        {
+          "volume": 15,
+          "percent": "4.5%",
+          "name": "DIActivateur 15-vol",
+          "use": "Strong color deposit, more visibility and 1.5 levels of lift."
+        }
+      ],
+      "processingTimes": [
+        {
+          "use": "First application (full head)",
+          "time": "20 min (starts at end of application)"
+        },
+        {
+          "use": "Regrowth touch-up: take through immediately",
+          "time": "20 min (deeper result / darken)"
+        },
+        {
+          "use": "Regrowth touch-up: take through after 10 min",
+          "time": "20 min (moderately faded lengths & ends)"
+        },
+        {
+          "use": "Regrowth touch-up: emulsify last 5 min",
+          "time": "20 min (slightly faded)"
+        }
+      ],
+      "applicationNotes": [
+        "1 tube (2 oz.) to 3 oz. DIActivateur developer",
+        "On natural or colored hair",
+        "Rinse thoroughly, shampoo with Metal Detox Shampoo, follow with Metal Detox mask"
+      ]
+    },
+    {
+      "name": "DiaLight",
+      "type": "demi-permanent",
+      "subtype": "acidic",
+      "description": "Acidic gel-cr\u00e8me demi. Zero ammonia. Zero lift. Ultra conditioning. +30% more conditioning. Acid pH close to natural hair pH. Cationic polymers resurface cuticle for shine. Flexible processing: 2-20 minutes.",
+      "mixingRatio": "1:1.5",
+      "developers": [
+        {
+          "volume": 6,
+          "percent": "1.8%",
+          "name": "DIActivateur 6-vol",
+          "use": "Soft color deposit, more transparent result."
+        },
+        {
+          "volume": 9,
+          "percent": "2.7%",
+          "name": "DIActivateur 9-vol",
+          "use": "Standard color deposit."
+        }
+      ],
+      "processingTimes": [
+        {
+          "use": "Flexible processing",
+          "time": "2-20 minutes (depending on desired intensity)"
+        }
+      ],
+      "applicationNotes": [
+        "1 tube (1.7 oz.) to 2.6 oz. DIActivateur developer",
+        "On colored or lightened hair only \u2014 no grey coverage, no lift",
+        "Dry hair: spray Metal Detox Pre-Treatment on each section, apply with brush or bottle",
+        "Wet hair: after shampooing with Metal Detox Shampoo, apply on pre-lightened hair",
+        "Liquifier available for fast bottle application: half dose .2 oz., full dose .4 oz.",
+        "Liquifier ONLY to be used with DiaLight + DIActivateur (not a developer)",
+        "Emulsify with warm water at end, rinse thoroughly, shampoo with Metal Detox, follow with Metal Detox mask"
+      ],
+      "warnings": [
+        "DM5 & Rubilane shades must be used ALONE \u2014 do NOT combine with any other shade"
+      ]
+    },
+    {
+      "name": "Inoa",
+      "type": "permanent",
+      "subtype": "oil-delivery",
+      "description": "No ammonia vegan permanent color. 100% grey coverage. Powered by Oil Delivery System. Injects dyes deep into cortex for dimensional, long-lasting color. +48% shine, 87% less breakage, maintains curl pattern. No animal-derived ingredients or byproducts.",
+      "mixingRatio": "1:1",
+      "developers": [
+        {
+          "volume": 10,
+          "percent": "3%",
+          "name": "iNOA Oil Developer 10-vol",
+          "use": "Up to 1 level of lift \u2014 toning, refreshing"
+        },
+        {
+          "volume": 20,
+          "percent": "6%",
+          "name": "iNOA Oil Developer 20-vol",
+          "use": "Up to 2 levels of lift \u2014 grey coverage"
+        },
+        {
+          "volume": 30,
+          "percent": "9%",
+          "name": "iNOA Oil Developer 30-vol",
+          "use": "Up to 3 levels of lift \u2014 more visible color change"
+        }
+      ],
+      "processingTimes": [
+        {
+          "use": "Standard processing",
+          "time": "35 min"
+        }
+      ],
+      "applicationNotes": [
+        "On dry hair, mist Metal Detox Pre-Treatment Spray on each section",
+        "Mix iNOA 1:1 with dedicated iNOA Oil Developer (NOT standard developer)",
+        "One tube (60g/2.1oz) + 60g/2.1oz developer",
+        "Development time starts AFTER application is complete",
+        "Rinse thoroughly, shampoo with Metal Detox Shampoo or iNOA Post-Color Shampoo, then Metal Detox Mask"
+      ],
+      "greyCoverage": [
+        "Up to 70% white: use target shade with iNOA Oil Developer",
+        "70-100% white, warm target: \u00bd target shade + \u00bd Gold Natural (.3/G) at same level",
+        "70-100% white, cool target: \u00bd target shade + \u00bd Natural (.0/NN) at same level",
+        "70-100% white, opaque coverage: \u00bd target shade + \u00bd Extra Coverage Natural (-/N) at same level",
+        "For mid-lengths & ends: use target shade only (no mixing with Natural)"
+      ],
+      "takeThrough": [
+        "Dia Light take-through for colored hair:",
+        "  Subtle/moderate change: last 10 min with 9-vol Diactivateur",
+        "  Pronounced change: last 20 min with 9-vol Diactivateur",
+        "iNOA take-through for virgin hair:",
+        "  Subtle change: last 5 min",
+        "  Moderate change: last 20 min",
+        "  Pronounced change: take through immediately"
+      ],
+      "coolBoosters": [
+        {
+          "name": "Blue Booster",
+          "code": "Blue",
+          "use": "Neutralize orange, intensify cool tones on levels 7-10"
+        },
+        {
+          "name": "Violet Booster",
+          "code": "Violet",
+          "use": "Neutralize yellow, intensify cool reflects"
+        },
+        {
+          "name": "Green Booster",
+          "code": "Green",
+          "use": "Neutralize red, intensify cool reflects (NEW)"
+        }
+      ],
+      "specialShades": {
+        "carmilane": "Vibrant garnet reds \u2014 cover up to 100% white alone. Do NOT mix with other shades except Clear.",
+        "rubilane": "Dimensional reds \u2014 cover up to 100% white alone. Do NOT mix with other shades except Clear.",
+        "dm5": "Deep intense shades \u2014 cover up to 100% white alone. Do NOT mix with other shades except Clear.",
+        "extraCoverage": "-/N shades \u2014 for deeper, more opaque coverage on 70-100% white hair",
+        "goldNaturals": ".3/G Gold Naturals \u2014 for warm grey coverage mixing",
+        "clear": "Dilute intensity, create pastels, color matching on mid-lengths & ends"
+      },
+      "warnings": [
+        "Carmilane, Rubilane, and DM5 shades MUST be used ALONE \u2014 do NOT combine with other shades (except Clear)",
+        "iNOA Oil Developer is exclusive to iNOA \u2014 do not use standard developer",
+        "If using cool boosters on levels 7-10, level up in developer or shade to maintain target level"
+      ]
+    },
+    {
+      "name": "Majirel",
+      "type": "permanent",
+      "subtype": "creme",
+      "description": "Permanent cr\u00e8me haircolor. 100% perfect coverage. +45% more conditioned hair. Ion\u00e8ne G + Incell\u00ae Technology for surface, cuticle, and cortex conditioning. #1 choice of top colorists worldwide.",
+      "mixingRatio": "1:1.5",
+      "developers": [
+        {
+          "volume": 12.5,
+          "percent": "3.75%",
+          "name": "Majicr\u00e8me 12.5-vol",
+          "use": "Demi-permanent effect, deposit only"
+        },
+        {
+          "volume": 20,
+          "percent": "6%",
+          "name": "Majicr\u00e8me 20-vol",
+          "use": "Up to 2 levels of lift"
+        },
+        {
+          "volume": 30,
+          "percent": "9%",
+          "name": "Majicr\u00e8me 30-vol",
+          "use": "Up to 3 levels of lift"
+        },
+        {
+          "volume": 40,
+          "percent": "12%",
+          "name": "Majicr\u00e8me 40-vol (High-Lift only)",
+          "use": "Up to 4.5 levels of lift (High-Lift only)"
+        }
+      ],
+      "processingTimes": [
+        {
+          "use": "Standard processing",
+          "time": "35 min"
+        },
+        {
+          "use": "Majirel High-Lift (30-vol)",
+          "time": "35 min"
+        },
+        {
+          "use": "Majirel High-Lift (40-vol)",
+          "time": "50 min"
+        }
+      ],
+      "applicationNotes": [
+        "Mix 1.7 oz. tube + 2.6 oz. Majicr\u00e8me Developer (1:1.5 ratio)",
+        "On dry hair, spray Metal Detox Pre-Treatment",
+        "Virgin application: Apply to mid-lengths/ends \u00bd inch from scalp, develop 15 min, then apply to regrowth and re-apply mid-lengths/ends",
+        "Regrowth application: Spray Metal Detox at regrowth, apply Majirel formula, process full development time",
+        "Rinse thoroughly, shampoo with Metal Detox Shampoo, follow with Metal Detox Mask"
+      ],
+      "greyCoverage": [
+        "Under 50% white: Choose target shade directly",
+        "Over 50% white, warm target: \u00bd target + \u00bd Gold shade (.3/G) at same level",
+        "Over 50% white, cool target: \u00bd target + \u00bd Natural (-/N) at same level",
+        "Majirel Cool Cover: for extreme cool coverage, use alone with 30-vol for up to 30% white",
+        "Majirel Cool Inforced: use alone or mix with Majirel Classic, same mixing guidelines"
+      ],
+      "subLines": {
+        "classic": "Standard Majirel permanent shades",
+        "coolCover": "23 shades \u2014 deeper, more opaque cool coverage for resistant grey. Long-lasting coolness.",
+        "coolInforced": "11 shades \u2014 cool result with boosted cool reflects. Up to 6 weeks neutralization. Use alone or mix with Classic.",
+        "majirouge": "Dimensional coppers and reds \u2014 intense, vibrant, long-lasting",
+        "highLift": "Ultra-light blonding and toning in one step. 1:2 mix ratio with 30 or 40 vol. Not for white coverage."
+      },
+      "specialShades": {
+        "carmilane": "Vibrant garnet reds \u2014 MUST be used alone, do NOT mix with other shades from different technology family",
+        "rubilane": "Dimensional reds \u2014 MUST be used alone, do NOT mix with other shades from different technology family",
+        "lumax": "Intense vibrant reds \u2014 MUST be used alone",
+        "dm5": "Deep intense shades \u2014 MUST be used alone",
+        "extraCoverage": ".0/NN Extra Coverage Natural shades \u2014 for deeper, more opaque coverage on 70-100% white hair",
+        "clear": "Break the base, subdue tone intensity, create lighter shades, create pastels"
+      },
+      "warnings": [
+        "Carmilane, Lumax, Rubilane, and DM5 shades MUST be used ALONE \u2014 do NOT combine with shades from different technology families",
+        "Same-technology mixing OK (e.g., Carmilane 5.60 + Carmilane 6.66)",
+        "Cross-technology mixing FORBIDDEN (e.g., Carmilane 5.60 + Lumax 6.60 = NO)",
+        "Use exclusively with Majicr\u00e8me Developers",
+        "Perform skin allergy test 48 hours before use"
+      ]
+    }
+  ],
+  "toneSystem": {
+    "description": "L'Or\u00e9al Professionnel dual coding system",
+    "tones": {
+      "N": "Natural",
+      ".1/B": "Blue (ash)",
+      ".2/V": "Violet",
+      ".3/G": "Gold",
+      ".4/C": "Copper",
+      ".5/Rv": "Red-Violet",
+      ".6/R": "Red",
+      ".7/Gr": "Green",
+      ".8/M": "Mocha",
+      ".11/BB": "Intense Blue",
+      ".12/BV": "Blue-Violet",
+      ".13/BG": "Blue-Gold (beige)",
+      ".15/BRv": "Blue-Red Violet",
+      ".18/BM": "Blue-Mocha",
+      ".20/VVV": "Intense Violet (DM5)",
+      ".21/VB": "Violet-Blue",
+      ".22/VV": "Intense Violet",
+      ".23/VG": "Violet-Gold",
+      ".24/VC": "Violet-Copper",
+      ".31/GB": "Gold-Blue",
+      ".32/GV": "Gold-Violet",
+      ".34/GC": "Gold-Copper",
+      ".35/GRv": "Gold-Red Violet",
+      ".40/CCC": "Intense Copper (Rubilane)",
+      ".43/CG": "Copper-Gold",
+      ".44/CC": "Intense Copper",
+      ".45/CRv": "Copper-Red Violet",
+      ".46/CR": "Copper-Red",
+      ".60/RRR": "Intense Red",
+      ".62/RV": "Red-Violet",
+      ".64/RC": "Red-Copper",
+      ".66/RR": "Intense Red (Rubilane)",
+      ".01/NB": "Natural Blue",
+      ".02/NV": "Natural Violet",
+      ".03/NG": "Natural Gold",
+      ".07/NGr": "Natural Green",
+      ".71/GrB": "Green-Blue",
+      ".82/MV": "Mocha-Violet",
+      ".84/MC": "Mocha-Copper"
+    }
+  },
+  "specialNotes": [
+    "Diacolor: alkaline demi-permanent with Melanin Gap Filler Technology",
+    "DiaLight: acidic demi-permanent, zero lift, for color-treated/sensitized hair",
+    "DM5 and Rubilane shades must be used ALONE \u2014 do NOT combine with any other shade",
+    "Metal Detox protocol: Pre-Treatment spray \u2192 color service \u2192 Metal Detox Shampoo \u2192 Metal Detox Mask",
+    "DiaLight Liquifier is NOT a developer \u2014 only for consistency adjustment",
+    "Diacolor has Clear shade for softening intensity or creating custom lighter shades"
+  ]
+}

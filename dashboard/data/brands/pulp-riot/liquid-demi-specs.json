@@ -1,0 +1,50 @@
+{
+  "brand": "Pulp Riot",
+  "lines": [
+    {
+      "name": "Faction8",
+      "type": "permanent",
+      "keyIngredients": ["Quinoa", "Vitamin E", "Grapeseed Oil", "Rosemary", "Avocado Oil", "Sunflower Oil"],
+      "attributes": ["Vegan", "Cruelty-Free", "Ammonia-Free"],
+      "mixRatio": "1:1",
+      "developer": "Pulp Riot Faction8 Developer (10-40 vol)",
+      "processingTime": "35 minutes standard",
+      "notes": "See faction8-specs.json for complete details"
+    },
+    {
+      "name": "Liquid Demi",
+      "type": "demi-permanent",
+      "keyIngredients": ["Quinoa", "Vitamin E", "Grapeseed Oil", "Rosemary", "Avocado Oil", "Sunflower Oil"],
+      "attributes": ["Vegan", "Cruelty-Free", "Ammonia-Free", "Acidic", "No-Lift"],
+      "mixRatio": "1:1",
+      "developer": "Pulp Riot Liquid Demi Developer (proprietary, no standard vol number listed)",
+      "processingTime": "20 minutes standard (no heat); 40 minutes for grey blending (20 min no heat + 20 min under dryer); less than 20 minutes for softer deposit",
+      "notes": "Seamless color blending. Numbering system matches Faction8 Permanent Color Line."
+    }
+  ],
+  "numberingSystem": {
+    "format": "level-tone",
+    "description": "Level before separator = depth. Numbers after separator = tone(s). Single tone = 100% that tone. Two different tones = primary + secondary. Two identical = Intense. /prefix = Booster.",
+    "levels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "tones": {
+      "0": "Natural",
+      "03": "Natural + Gold",
+      "1": "Ash",
+      "11": "Ash/Violet",
+      "2": "Violet",
+      "3": "Gold",
+      "4": "Copper",
+      "5": "Red/Violet (Mahogany)",
+      "6": "Red",
+      "7": "Matte (Green base)",
+      "8": "Brown/Pearl"
+    },
+    "boosters": {
+      "-22": "Violet Booster",
+      "-33": "Gold Booster",
+      "-44": "Copper Booster",
+      "-66": "Red Booster"
+    }
+  },
+  "website": "https://pulpriot.com"
+}

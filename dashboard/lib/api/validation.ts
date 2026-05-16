@@ -43,6 +43,33 @@ export const voteSchema = z.object({
 
 export type VoteInput = z.infer<typeof voteSchema>;
 
+// ─── NEW: Community Post Creation ──────────────────────────────────────────────
+
+export const createPostSchema = z.object({
+  type: z.enum(['tip', 'question', 'review', 'formula_share']),
+  content: z.string().min(1).max(5000),
+  caption: z.string().max(2000).optional(),
+  image_urls: z.array(z.string().url()).max(4).default([]),
+  formulation_id: z.string().uuid().optional(),
+  tags: z.array(z.string().min(1).max(50)).max(20).default([]),
+  is_public: z.boolean().default(true),
+});
+
+export type CreatePostInput = z.infer<typeof createPostSchema>;
+
+export const commentSchema = z.object({
+  post_id: z.string().uuid(),
+  content: z.string().min(1).max(2000),
+});
+
+export type CommentInput = z.infer<typeof commentSchema>;
+
+export const postIdParamSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export type PostIdParamInput = z.infer<typeof postIdParamSchema>;
+
 // ─── Marketplace ──────────────────────────────────────────────────────────────
 
 export const listTemplateSchema = z.object({

@@ -3,7 +3,7 @@
  * In-memory storage for community, marketplace, and gallery endpoints
  */
 
-import { CommunityPost, VoteRecord, Template, Purchase, GalleryItem, TrendingColor, SeasonalCollection, StylistPortfolio } from './types';
+import { CommunityPost, VoteRecord, PostComment, Template, Purchase, GalleryItem, TrendingColor, SeasonalCollection, StylistPortfolio, Formula, FormulaUseEvent } from './types';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -25,6 +25,24 @@ function daysAgo(n: number): string {
   return d.toISOString();
 }
 
+function hoursAgo(n: number): string {
+  const d = new Date();
+  d.setHours(d.getHours() - n);
+  return d.toISOString();
+}
+
+function agoLabel(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString();
+}
+
 // ─── Mock Community Posts ───────────────────────────────────────────────────────
 
 export let communityPosts: CommunityPost[] = [
@@ -33,6 +51,9 @@ export let communityPosts: CommunityPost[] = [
     author_id: 'user-1',
     author_name: 'Eiza Martinez',
     author_avatar: 'https://ui-avatars.com/api/?name=Eiza+Martinez&background=d4a574&color=fff',
+    author_handle: '@eizacolor',
+    author_is_educator: true,
+    type: 'tip',
     formulation_id: 'form-1',
     formulation_snapshot: {
       brand: 'Wella',
@@ -47,11 +68,17 @@ export let communityPosts: CommunityPost[] = [
     },
     before_photo: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400',
     after_photo: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400',
+    image_urls: [
+      'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400',
+      'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400',
+    ],
     caption: 'Beautiful caramel balayage on previously colored hair. Processed for 35 mins with 20 vol.',
+    content: 'Beautiful caramel balayage on previously colored hair. Processed for 35 mins with 20 vol. The key is pre-softening the ends first, then working your way up. Always check elasticity before applying lightener!',
     hair_description: 'Previously colored, normal porosity, 15% gray',
-    tags: ['balayage', 'caramel', 'warm', 'wella'],
+    tags: ['balayage', 'caramel', 'warm', 'wella', 'educator'],
     likes: 142,
     saves: 38,
+    comments: 12,
     score: 154,
     is_public: true,
     created_at: daysAgo(2),
@@ -62,25 +89,16 @@ export let communityPosts: CommunityPost[] = [
     author_id: 'user-2',
     author_name: 'Jaden Cole',
     author_avatar: 'https://ui-avatars.com/api/?name=Jaden+Cole&background=7c9cb6&color=fff',
-    formulation_id: 'form-2',
-    formulation_snapshot: {
-      brand: 'Schwarzkopf',
-      line: 'Igora Royal',
-      shade_code: '5-1',
-      shade_name: 'Light Brown Ash',
-      level: 5,
-      tone: 'ash',
-      developer_volume: 20,
-      processing_time: 40,
-      application: 'all_over',
-    },
-    before_photo: 'https://images.unsplash.com/photo-1503951914875-bfcc4c1cf8c3?w=400',
-    after_photo: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400',
-    caption: 'Full gray coverage using Igora Royal 5-1 with 5-0 additive. 60% gray coverage achieved.',
-    hair_description: 'Virgin, low porosity, 60% gray',
-    tags: ['gray-coverage', 'ash', 'natural', 'schwarzkopf'],
-    likes: 98,
-    saves: 45,
+    author_handle: '@jadencolor',
+    author_is_educator: false,
+    type: 'question',
+    caption: undefined,
+    content: 'Question for the community: client with previously box-dyed level 3 hair wants to go ash blonde. Porosity is high on ends. Would you pre-pigment before lifting or use a bond builder? What\'s your go-to approach for this kind of color correction?',
+    hair_description: undefined,
+    tags: ['colorcorrection', 'help', 'boxdye', 'ashblonde'],
+    likes: 89,
+    saves: 15,
+    comments: 34,
     score: 121,
     is_public: true,
     created_at: daysAgo(5),
@@ -91,25 +109,18 @@ export let communityPosts: CommunityPost[] = [
     author_id: 'user-3',
     author_name: 'Maya Sterling',
     author_avatar: 'https://ui-avatars.com/api/?name=Maya+Sterling&background=b67c9c&color=fff',
-    formulation_id: 'form-3',
-    formulation_snapshot: {
-      brand: 'Pulp Riot',
-      line: 'FACTION8',
-      shade_code: '6-6',
-      shade_name: 'Copper',
-      level: 6,
-      tone: 'copper',
-      developer_volume: 10,
-      processing_time: 30,
-      application: 'foilyage',
-    },
+    author_handle: '@maya.sterling',
+    author_is_educator: true,
+    type: 'review',
     after_photo: 'https://images.unsplash.com/photo-1519699047748-de8e4a5e4dc6?w=400',
-    caption: 'Bold copper transformation using Pulp Riot FACTION8! High porosity hair soaked this up beautifully.',
-    hair_description: 'Previously colored, high porosity, 0% gray',
-    tags: ['copper', 'bold', 'pulp-riot', 'foilyage'],
-    likes: 267,
-    saves: 89,
-    score: 340,
+    image_urls: ['https://images.unsplash.com/photo-1519699047748-de8e4a5e4dc6?w=400'],
+    caption: 'New Schwarzkopf IGORA Vibrance shades are incredible.',
+    content: 'Just used 7-88 on a client and got the most vibrant copper. Highly recommend! The coverage was even, the tone was true to swatch, and the client\'s hair felt amazing after. Processing time was 30 min with 10 vol developer.',
+    tags: ['productreview', 'schwarzkopf', 'copper', 'educator'],
+    likes: 156,
+    saves: 42,
+    comments: 28,
+    score: 230,
     is_public: true,
     created_at: daysAgo(1),
     updated_at: daysAgo(1),
@@ -119,6 +130,9 @@ export let communityPosts: CommunityPost[] = [
     author_id: 'user-1',
     author_name: 'Eiza Martinez',
     author_avatar: 'https://ui-avatars.com/api/?name=Eiza+Martinez&background=d4a574&color=fff',
+    author_handle: '@eizacolor',
+    author_is_educator: true,
+    type: 'formula_share',
     formulation_id: 'form-4',
     formulation_snapshot: {
       brand: 'Redken',
@@ -132,11 +146,14 @@ export let communityPosts: CommunityPost[] = [
       application: 'gloss',
     },
     after_photo: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400',
-    caption: 'Platinum gloss refresh using Shades EQ 09V. Perfect toning treatment between lightening sessions.',
+    image_urls: ['https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400'],
+    caption: 'Platinum gloss refresh using Shades EQ 09V',
+    content: 'Platinum gloss refresh using Shades EQ 09V. Perfect toning treatment between lightening sessions. I like to apply on damp hair and process for 15-20 min depending on the desired result.',
     hair_description: 'Previously lightened, high porosity, 0% gray',
-    tags: ['platinum', 'gloss', 'redken', 'toning'],
+    tags: ['platinum', 'gloss', 'redken', 'toning', 'educator'],
     likes: 203,
     saves: 67,
+    comments: 18,
     score: 268,
     is_public: true,
     created_at: daysAgo(3),
@@ -147,6 +164,9 @@ export let communityPosts: CommunityPost[] = [
     author_id: 'user-4',
     author_name: 'Riley Park',
     author_avatar: 'https://ui-avatars.com/api/?name=Riley+Park&background=9cb67c&color=fff',
+    author_handle: '@riley.park',
+    author_is_educator: false,
+    type: 'tip',
     formulation_id: 'form-5',
     formulation_snapshot: {
       brand: 'Matrix',
@@ -161,15 +181,80 @@ export let communityPosts: CommunityPost[] = [
     },
     before_photo: 'https://images.unsplash.com/photo-1503951914875-bfcc4c1cf8c3?w=400',
     after_photo: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400',
-    caption: 'Rich red violet on level 4 — perfect for fall! Matrix SoColor delivers amazing vibrancy.',
+    image_urls: [
+      'https://images.unsplash.com/photo-1503951914875-bfcc4c1cf8c3?w=400',
+      'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400',
+    ],
+    caption: 'Rich red violet on level 4 — perfect for fall!',
+    content: 'Rich red violet on level 4 — perfect for fall! Matrix SoColor delivers amazing vibrancy. I used 4RV with 20 vol developer for 35 minutes. The key to longevity is a color-safe sulfate-free regimen at home.',
     hair_description: 'Previously colored, normal porosity, 10% gray',
     tags: ['red-violet', 'fall', 'matrix', 'vibrant'],
     likes: 178,
     saves: 52,
+    comments: 15,
     score: 230,
     is_public: true,
     created_at: daysAgo(4),
     updated_at: daysAgo(4),
+  },
+];
+
+// ─── Mock Comments ───────────────────────────────────────────────────────────
+
+export let comments: PostComment[] = [
+  {
+    id: uuid(),
+    post_id: communityPosts[0].id,
+    author_id: 'user-2',
+    author_name: 'Jaden Cole',
+    author_avatar: 'https://ui-avatars.com/api/?name=Jaden+Cole&background=7c9cb6&color=fff',
+    content: 'Love this technique! I usually do the same but add Olaplex No.1 to my lightener. Makes such a difference on previously colored hair.',
+    created_at: hoursAgo(18),
+  },
+  {
+    id: uuid(),
+    post_id: communityPosts[0].id,
+    author_id: 'user-3',
+    author_name: 'Maya Sterling',
+    author_avatar: 'https://ui-avatars.com/api/?name=Maya+Sterling&background=b67c9c&color=fff',
+    content: 'Beautiful results! What was the starting level? Looks like a level 6 or 7 base.',
+    created_at: hoursAgo(12),
+  },
+  {
+    id: uuid(),
+    post_id: communityPosts[1].id,
+    author_id: 'user-1',
+    author_name: 'Eiza Martinez',
+    author_avatar: 'https://ui-avatars.com/api/?name=Eiza+Martinez&background=d4a574&color=fff',
+    content: 'For box dye corrections, I always do a Malibu CPR treatment first, then pre-pigment with a level 5 ash before lifting. Bond builder is a must!',
+    created_at: hoursAgo(8),
+  },
+  {
+    id: uuid(),
+    post_id: communityPosts[1].id,
+    author_id: 'user-4',
+    author_name: 'Riley Park',
+    author_avatar: 'https://ui-avatars.com/api/?name=Riley+Park&background=9cb67c&color=fff',
+    content: 'Olaplex all the way! And make sure you strand test first — box dyes can be unpredictable with lightener.',
+    created_at: hoursAgo(6),
+  },
+  {
+    id: uuid(),
+    post_id: communityPosts[2].id,
+    author_id: 'user-1',
+    author_name: 'Eiza Martinez',
+    author_avatar: 'https://ui-avatars.com/api/?name=Eiza+Martinez&background=d4a574&color=fff',
+    content: 'That copper is STUNNING! I\'ve been wanting to try the new Vibrance line. How was the coverage on resistant gray?',
+    created_at: hoursAgo(20),
+  },
+  {
+    id: uuid(),
+    post_id: communityPosts[3].id,
+    author_id: 'user-2',
+    author_name: 'Jaden Cole',
+    author_avatar: 'https://ui-avatars.com/api/?name=Jaden+Cole&background=7c9cb6&color=fff',
+    content: '09V is my go-to for platinum maintenance. I sometimes mix it with 09P for extra cooling power.',
+    created_at: hoursAgo(10),
   },
 ];
 
@@ -369,12 +454,12 @@ export const galleryItems: GalleryItem[] = communityPosts.map((post, i) => ({
   stylist_name: post.author_name,
   stylist_avatar: post.author_avatar,
   formulation_snapshot: {
-    brand: post.formulation_snapshot.brand,
-    line: post.formulation_snapshot.line,
-    shade_code: post.formulation_snapshot.shade_code,
-    shade_name: post.formulation_snapshot.shade_name,
-    level: post.formulation_snapshot.level,
-    tone: post.formulation_snapshot.tone,
+    brand: post.formulation_snapshot?.brand || 'Wella',
+    line: post.formulation_snapshot?.line || 'Koleston',
+    shade_code: post.formulation_snapshot?.shade_code || '6/73',
+    shade_name: post.formulation_snapshot?.shade_name || 'Dark Blonde',
+    level: post.formulation_snapshot?.level || 6,
+    tone: post.formulation_snapshot?.tone || 'golden',
     color_hex: ['#D4A574', '#7C9CB6', '#B67C4A', '#C5B9CD', '#9C6B7C'][i % 5],
     color_family: ['warm-brown', 'cool-blonde', 'copper', 'platinum', 'red-violet'][i % 5],
   },
@@ -613,10 +698,10 @@ export function generateId(): string {
 }
 
 export function calculateScore(post: CommunityPost): number {
-  // Simple scoring algorithm: likes + saves * 2 + recency boost
+  // Simple scoring algorithm: likes + saves * 2 + comments * 1.5 + recency boost
   const ageHours = (Date.now() - new Date(post.created_at).getTime()) / (1000 * 60 * 60);
   const recencyBoost = Math.max(0, 100 - ageHours);
-  return Math.round(post.likes + post.saves * 2 + recencyBoost);
+  return Math.round(post.likes + post.saves * 2 + post.comments * 1.5 + recencyBoost);
 }
 
 export function updatePostScore(postId: string): void {
@@ -625,3 +710,67 @@ export function updatePostScore(postId: string): void {
     post.score = calculateScore(post);
   }
 }
+
+export function getCommentsForPost(postId: string): PostComment[] {
+  return comments.filter(c => c.post_id === postId).sort((a, b) =>
+    new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+}
+
+// ─── Marketplace Data ──────────────────────────────────────────────────────────
+
+export let formulas: Array<{
+  id: string;
+  creator_id: string;
+  creator_name: string;
+  creator_avatar?: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  brand: string;
+  line: string;
+  shade_code: string;
+  shade_name: string;
+  level: number;
+  tone: string;
+  developer_volume: number;
+  processing_time: number;
+  application: string;
+  price_cents: number;
+  tier: string;
+  rating: number;
+  review_count: number;
+  purchase_count: number;
+  usage_count: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}> = [];
+
+export let useEvents: Array<{
+  id: string;
+  stylist_id: string;
+  formula_id: string;
+  client_name?: string;
+  service_id?: string;
+  used_at: string;
+  billed: boolean;
+  invoice_id?: string;
+}> = [];
+
+export let billingInvoices: Array<{
+  id: string;
+  stylist_id: string;
+  billing_period: string;
+  line_items: any[];
+  total_cents: number;
+  total_creator_earnings_cents: number;
+  total_platform_fee_cents: number;
+  status: 'pending' | 'paid' | 'failed';
+  paid_at?: string;
+  square_payment_id?: string;
+  created_at: string;
+}> = [];
+
+export let clientRequests: ClientRequest[] = [];

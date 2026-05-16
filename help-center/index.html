@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COLORgenius Help Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="logo">
+        <span class="logo-mark">CG</span>
+        <span class="logo-text">COLORgenius</span>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html" class="active">Help Center</a>
+        <a href="onboarding/index.html">Onboarding</a>
+        <a href="walkthroughs/index.html">Walkthroughs</a>
+        <a href="#" class="btn btn-sm">Back to App</a>
+      </nav>
+      <button class="mobile-menu-toggle" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <h1 class="hero-title">How can we help?</h1>
+        <p class="hero-subtitle">Find answers, watch walkthroughs, and master COLORgenius.</p>
+        <div class="search-box">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Search articles, topics, or keywords..." autocomplete="off">
+        </div>
+        <div class="quick-tags">
+          <span>Popular:</span>
+          <a href="#formulas">Create a formula</a>
+          <a href="#clients">Client profiles</a>
+          <a href="#pos">POS setup</a>
+          <a href="#convert">Convert brands</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="categories" id="categories">
+      <div class="container">
+        <div class="category-grid">
+          <a href="#getting-started" class="category-card">
+            <div class="category-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l7 4v6c0 5.25-3.5 8.74-7 10-3.5-1.26-7-4.75-7-10V6l7-4z"/></svg>
+            </div>
+            <h3>Getting Started</h3>
+            <p>Onboarding, salon setup, and your first formula.</p>
+            <span class="count">8 articles</span>
+          </a>
+          <a href="#formulas" class="category-card">
+            <div class="category-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.5 4.5-3 6l-4 4-4-4c-1.5-1.5-3-3.5-3-6a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2"/></svg>
+            </div>
+            <h3>Formulas</h3>
+            <p>Create, convert, save, and share color formulas.</p>
+            <span class="count">12 articles</span>
+          </a>
+          <a href="#clients" class="category-card">
+            <div class="category-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <h3>Client Management</h3>
+            <p>Profiles, color history, and client notes.</p>
+            <span class="count">6 articles</span>
+          </a>
+          <a href="#integrations" class="category-card">
+            <div class="category-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </div>
+            <h3>Integrations</h3>
+            <p>Square, Vagaro, and marketplace connections.</p>
+            <span class="count">5 articles</span>
+          </a>
+          <a href="#learning" class="category-card">
+            <div class="category-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <h3>Learning</h3>
+            <p>Color theory, techniques, and best practices.</p>
+            <span class="count">7 articles</span>
+          </a>
+          <a href="walkthroughs/index.html" class="category-card featured">
+            <div class="category-icon" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <h3>Interactive Walkthroughs</h3>
+            <p>Step-by-step guides with annotated screenshots.</p>
+            <span class="count">5 flows</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Getting Started -->
+    <section class="article-section" id="getting-started">
+      <div class="container">
+        <div class="section-header">
+          <h2>Getting Started</h2>
+          <a href="#" class="view-all">View all</a>
+        </div>
+        <div class="article-list">
+          <a href="articles/welcome.html" class="article-row">
+            <span class="article-title">Welcome to COLORgenius</span>
+            <span class="article-meta">2 min read</span>
+          </a>
+          <a href="articles/salon-setup.html" class="article-row">
+            <span class="article-title">Setting Up Your Salon Profile</span>
+            <span class="article-meta">3 min read</span>
+          </a>
+          <a href="articles/connect-pos.html" class="article-row">
+            <span class="article-title">Connecting Your POS (Square / Vagaro)</span>
+            <span class="article-meta">4 min read</span>
+          </a>
+          <a href="articles/select-brands.html" class="article-row">
+            <span class="article-title">Selecting Your Color Lines</span>
+            <span class="article-meta">2 min read</span>
+          </a>
+          <a href="articles/import-clients.html" class="article-row">
+            <span class="article-title">Importing Clients from Your POS</span>
+            <span class="article-meta">3 min read</span>
+          </a>
+          <a href="articles/first-formula.html" class="article-row">
+            <span class="article-title">Creating Your First Formula</span>
+            <span class="article-meta">5 min read</span>
+          </a>
+          <a href="articles/dashboard.html" class="article-row">
+            <span class="article-title">Understanding the Dashboard</span>
+            <span class="article-meta">3 min read</span>
+          </a>
+          <a href="onboarding/index.html" class="article-row featured-link">
+            <span class="article-title">🚀 Launch Interactive Onboarding</span>
+            <span class="article-meta">Interactive</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formulas -->
+    <section class="article-section" id="formulas">
+      <div class="container">
+        <div class="section-header">
+          <h2>Formulas</h2>
+          <a href="#" class="view-all">View all</a>
+        </div>
+        <div class="article-list">
+          <a href="articles/create-formula.html" class="article-row">
+            <span class="article-title">How to Create a Formula</span>
+            <span class="article-meta">4 min read</span>
+          </a>
+          <a href="articles/convert-formula.html" class="article-row">
+            <span class="article-title">Converting Between Brands</span>
+            <span class="article-meta">3 min read</span>
+          </a>
+          <a href="articles/save-formula.html" class="article-row">
+            <span class="article-title">Saving and Organizing Formulas</span>
+            <span class="article-meta">2 min read</span>
+          </a>
+          <a href="articles/share-formula.html" class="article-row">
+            <span class="article-title">Sharing Formulas with Your Team</span>
+            <span class="article-meta">2 min read</span>
+          </a>
+          <a href="articles/sell-marketplace.html" class="article-row">
+            <span class="article-title">Selling Formulas on the Marketplace</span>
+            <span class="article-meta">4 min read</span>
+          </a>
+          <a href="articles/formula-history.html" class="article-row">
+            <span class="article-title">Formula Version History</span>
+            <span class="article-meta">2 min read</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Client Management -->
+    <section class="article-section" id="clients">
+      <div class="container">
+        <div class="section-header">
+          <h2>Client Management</h2>
+          <a href="#" class="view-all">View all</a>
+        </div>
+        <div class="article-list">
+          <a href="articles/client-profiles.html" class="article-row">
+            <span class="article-title">Managing Client Profiles</span>
+            <span class="article-meta">3 min read</span>
+          </a>
+          <a href="articles/color-history.html" class="article-row">
+            <span class="article-title">Tracking Color History</span>
+            <span class="article-meta">3 min read</span>
+          </a>
+          <a href="articles/client-notes.html" class="article-row">
+            <span class="article-title">Adding Photos and Notes</span>
+            <span class="article-meta">2 min read</span>
+          </a>
+          <a href="articles/import-clients.html" class="article-row">
+            <span class="article-title">Importing from POS Systems</span>
+            <span class="article-meta">4 min read</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Integrations -->
+    <section class="article-section" id="integrations">
+      <div class="container">
+        <div class="section-header">
+          <h2>Integrations</h2>
+          <a href="#" class="view-all">View all</a>
+        </div>
+        <div class="article-list">
+          <a href="articles/square-setup.html" class="article-row">
+            <span class="article-title">Square POS Setup</span>
+            <span class="article-meta">4 min read</span>
+          </a>
+          <a href="articles/vagaro-setup.html" class="article-row">
+            <span class="article-title">Vagaro Setup</span>
+            <span class="article-meta">4 min read</span>
+          </a>
+          <a href="articles/inventory-sync.html" class="article-row">
+            <span class="article-title">Inventory Sync</span>
+            <span class="article-meta">3 min read</span>
+          </a>
+          <a href="articles/marketplace-setup.html" class="article-row">
+            <span class="article-title">Marketplace Seller Setup</span>
+            <span class="article-meta">5 min read</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Learning -->
+    <section class="article-section" id="learning">
+      <div class="container">
+        <div class="section-header">
+          <h2>Learning</h2>
+          <a href="#" class="view-all">View all</a>
+        </div>
+        <div class="article-list">
+          <a href="articles/color-theory.html" class="article-row">
+            <span class="article-title">Color Theory Basics for Stylists</span>
+            <span class="article-meta">6 min read</span>
+          </a>
+          <a href="articles/levels-tones.html" class="article-row">
+            <span class="article-title">Understanding Levels and Tones</span>
+            <span class="article-meta">4 min read</span>
+          </a>
+          <a href="articles/brand-guide.html" class="article-row">
+            <span class="article-title">Brand-Specific Guides</span>
+            <span class="article-meta">5 min read</span>
+          </a>
+          <a href="articles/troubleshooting.html" class="article-row">
+            <span class="article-title">Troubleshooting Common Issues</span>
+            <span class="article-meta">4 min read</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <h2>Still need help?</h2>
+        <p>Our team is here for you. Reach out anytime.</p>
+        <a href="mailto:support@colorgenius.co" class="btn btn-primary">Contact Support</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 COLORgenius. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/search.js"></script>
+  <script src="js/mobile-nav.js"></script>
+</body>
+</html>

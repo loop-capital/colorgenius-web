@@ -1,0 +1,158 @@
+{
+  "brand": "Oligo",
+  "line": "Blacklight",
+  "type": "lightener",
+  "description": "Oligo Blacklight lightening system with Powershades toner-deposit shades, 4 lightener formulations, and Smart Developers with Gradual Bond Protection Technology",
+  "lighteners": [
+    {
+      "name": "Blacklight Extra Blonde",
+      "type": "powder",
+      "color": "White",
+      "liftNatural": 9,
+      "liftColorTreated": 8,
+      "mixingRatioOnScalp": "1:2",
+      "mixingRatioOffScalp": "1:1",
+      "speed": "Very Fast",
+      "recommendedDeveloper": "10-30 vol",
+      "offScalpOnly": false,
+      "containsCoolPigments": false,
+      "claims": ["Ionic formula", "Antistatic and porosity control", "Dust free", "Can be mixed with any Blacklight Lightener"]
+    },
+    {
+      "name": "Blacklight Cool Toned Blonde",
+      "type": "powder",
+      "color": "Blue/Violet",
+      "liftNatural": 8,
+      "liftColorTreated": 7,
+      "mixingRatioOnScalp": "1:1.5",
+      "mixingRatioOffScalp": "1:1",
+      "speed": "Faster",
+      "recommendedDeveloper": "10-40 vol",
+      "offScalpOnly": false,
+      "containsCoolPigments": true,
+      "claims": ["Lightens and tones in one single step", "Contains cool pigments and dyes", "Dust free", "Can be mixed with any Blacklight Lightener"]
+    },
+    {
+      "name": "Blacklight Balayage Clay Lightener",
+      "type": "clay",
+      "color": "Light Blue",
+      "liftNatural": 6,
+      "liftColorTreated": 5,
+      "mixingRatioOffScalp": "1:2 (recommended), 1:1.5 (harder), 1:3 (softer)",
+      "speed": "Moderate",
+      "recommendedDeveloper": "10-40 vol",
+      "offScalpOnly": true,
+      "containsCoolPigments": false,
+      "claims": ["Contains clay (Kaolinite)", "Creates accurate and precise balayage, hair painting and ombre", "Can be mixed with any Blacklight Lightener"]
+    },
+    {
+      "name": "Blacklight Original Cream Lightener",
+      "type": "cream",
+      "color": "Blue",
+      "liftNatural": 7,
+      "liftColorTreated": 6,
+      "mixingRatioOnScalp": "1:1",
+      "mixingRatioOffScalp": "1:1",
+      "speed": "Fast",
+      "recommendedDeveloper": "10-40 vol",
+      "offScalpOnly": false,
+      "containsCoolPigments": true,
+      "claims": ["Enriched with jojoba and olive oil", "High lipid content for scalp protection", "Contains pigments", "Can be mixed with any Blacklight Lightener"]
+    }
+  ],
+  "powershades": [
+    {
+      "code": "PS-C",
+      "name": "Powershade Clear",
+      "level": null,
+      "tone": "clear",
+      "description": "Dye-free, used alone to lighten or mixed with another Powershade for less colour deposit",
+      "developer": "30-40 vol",
+      "mixingRatio": "1:1",
+      "processingTime": "30-45 min",
+      "offScalpOnly": true
+    },
+    {
+      "code": "PS-12",
+      "name": "Powershade Ash Pearl",
+      "level": 7,
+      "tone": "ash",
+      "baseTone": "Cool",
+      "description": "Lighten and deposit cool ash-pearl in one step",
+      "developer": "30-40 vol",
+      "mixingRatio": "1:1",
+      "processingTime": "30-45 min",
+      "offScalpOnly": true
+    },
+    {
+      "code": "PS-32",
+      "name": "Powershade Beige",
+      "level": 6,
+      "tone": "beige",
+      "baseTone": "Beige",
+      "description": "Lighten and deposit beige in one step",
+      "developer": "30-40 vol",
+      "mixingRatio": "1:1",
+      "processingTime": "30-45 min",
+      "offScalpOnly": true
+    },
+    {
+      "code": "PS-43",
+      "name": "Powershade Copper Gold",
+      "level": 5,
+      "tone": "copper",
+      "baseTone": "Copper",
+      "description": "Lighten and deposit copper-gold in one step",
+      "developer": "40 vol",
+      "mixingRatio": "1:1",
+      "processingTime": "30-45 min",
+      "offScalpOnly": true
+    },
+    {
+      "code": "PS-55",
+      "name": "Powershade Vibrant Red",
+      "level": 4,
+      "tone": "red",
+      "baseTone": "Intense Red",
+      "description": "Lighten and deposit vibrant red in one step",
+      "developer": "40 vol",
+      "mixingRatio": "1:1",
+      "processingTime": "30-45 min",
+      "offScalpOnly": true
+    }
+  ],
+  "developers": [
+    { "volume": 10, "percent": "3%", "name": "Blacklight Smart Developer 10 Vol", "lift": "Deposit only / toning" },
+    { "volume": 20, "percent": "6%", "name": "Blacklight Smart Developer 20 Vol", "lift": "1-2 levels" },
+    { "volume": 30, "percent": "9%", "name": "Blacklight Smart Developer 30 Vol", "lift": "2-3 levels" },
+    { "volume": 40, "percent": "12%", "name": "Blacklight Smart Developer 40 Vol", "lift": "3-4 levels" }
+  ],
+  "smartSystem": {
+    "bondProtectionConcentrate": {
+      "name": "Blacklight Smart Bond Protection & Strengthening Concentrate",
+      "ratio": "1 pump per 30g/1oz of lightener or colour",
+      "naturallyDerived": "99.23%",
+      "keyIngredients": ["Hydrolyzed Rice Protein", "Polyquaternium-39"],
+      "benefits": ["Bond protection", "Porosity control", "Colour longevity", "Strengthens inner and outer structure"]
+    },
+    "bondBuilder": {
+      "name": "Blacklight Smart Bond Builder & Repair Treatment",
+      "processingTime": "5 min",
+      "naturallyDerived": "90.75%",
+      "keyIngredients": ["Biomimetic Ceramides", "Panthenol", "Vitamin E", "11 Amino Acids"],
+      "benefits": ["Builds new bonds", "Repairs existing bonds", "UV protection", "Frizz control"]
+    }
+  },
+  "applicationNotes": [
+    "All Blacklight lighteners are intermixable",
+    "Do not use artificial heat to process",
+    "Maximum 20 vol for on-scalp applications",
+    "Powershades are off-scalp application ONLY",
+    "Powershades recommended on coloured hair levels 3-7",
+    "Do not apply Powershades on pre-lightened or sensitized hair",
+    "Blacklight Smart Concentrate can be added to lightener AND colour",
+    "Do NOT add Smart Concentrate to Calura Gloss (low alkalinity = poor longevity)",
+    "Can add Smart Concentrate to FunkHue",
+    "Lighteners can be used for: highlighting (foils), global pre-lightening, new growth, colour clarifying, colour cleansing, colour removing"
+  ]
+}

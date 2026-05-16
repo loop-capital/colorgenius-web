@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — COLORgenius</title>
+  <meta name="description" content="Create your COLORgenius account. Start your free trial and transform how your salon manages color formulas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">COLOR<span>genius</span></a>
+
+      <div class="nav-links">
+        <a href="index.html#features">Features</a>
+        <a href="formula-conversion.html">Formula Conversion</a>
+        <a href="client-management.html">Clients</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="index.html#pricing">Pricing</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-mobile-menu" id="mobileMenu">
+      <a href="index.html#features">Features</a>
+      <a href="formula-conversion.html">Formula Conversion</a>
+      <a href="client-management.html">Clients</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Sign Up Page -->
+  <main class="signup-page">
+    <div class="signup-container">
+      <div class="signup-card reveal">
+        <div class="signup-header">
+          <div class="nav-logo" style="justify-content:center;">COLOR<span>genius</span></div>
+          <p>Create your account and start your free trial.</p>
+        </div>
+
+        <form id="signupForm">
+          <div class="form-group">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" id="fullName" name="fullName" class="form-input" placeholder="Jane Doe" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" name="email" class="form-input" placeholder="jane@salon.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="salonName" class="form-label">Salon Name</label>
+            <input type="text" id="salonName" name="salonName" class="form-input" placeholder="Lumière Salon" required>
+          </div>
+
+          <div class="form-group">
+            <label for="numStylists" class="form-label">Number of Stylists</label>
+            <select id="numStylists" name="numStylists" class="form-input" required>
+              <option value="" disabled selected>Select...</option>
+              <option value="1">Just me</option>
+              <option value="2-5">2-5 stylists</option>
+              <option value="6-10">6-10 stylists</option>
+              <option value="11-20">11-20 stylists</option>
+              <option value="20+">20+ stylists</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="primaryColorLine" class="form-label">Primary Color Line</label>
+            <select id="primaryColorLine" name="primaryColorLine" class="form-input" required>
+              <option value="" disabled selected>Select your main brand...</option>
+              <option value="wella">Wella Professionals</option>
+              <option value="redken">Redken</option>
+              <option value="schwarzkopf">Schwarzkopf Professional</option>
+              <option value="matrix">Matrix</option>
+              <option value="goldwell">Goldwell</option>
+              <option value="joico">Joico</option>
+              <option value="loreal">L'Oréal Professionnel</option>
+              <option value="aveda">Aveda</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-input" placeholder="Min. 8 characters" minlength="8" required>
+          </div>
+
+          <div class="form-checkbox-group">
+            <input type="checkbox" id="agreeTerms" name="agreeTerms" class="form-checkbox" required>
+            <label for="agreeTerms" class="form-checkbox-label">
+              I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I also agree to receive product updates and marketing emails.
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Create Your Account</button>
+        </form>
+
+        <div class="signup-footer">
+          Already have an account? <a href="#">Log in</a>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:2rem;">
+        <p style="font-size:0.875rem;color:var(--color-text-muted);">🔒 Your data is secure. We never share your information.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

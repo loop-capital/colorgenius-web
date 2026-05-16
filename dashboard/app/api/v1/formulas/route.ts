@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid input", issues: parsed.error.issues }, { status: 400 });
     }
-    const formula = await prisma.formulation.create({ data: parsed.data });
+    const formula = await prisma.formulas.create({ data: parsed.data });
     return NextResponse.json(formula, { status: 201 });
   } catch (e) {
     console.error("POST /api/v1/formulas error:", e);

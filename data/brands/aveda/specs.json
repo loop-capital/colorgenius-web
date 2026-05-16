@@ -1,0 +1,82 @@
+{
+  "brand": "Aveda",
+  "productLine": "Full Spectrum™ Hair Color System",
+  "type": "permanent",
+  "features": [
+    "99% naturally derived",
+    "Green Chemistry formulation",
+    "Protective Plant Complex (PPF)",
+    "Ammonia-free (alkalizing agent)",
+    "Certified organic essential oils"
+  ],
+  "mixRatio": "1:1",
+  "processingTime": "35 minutes",
+  "grayProcessingTime": "40-45 minutes",
+  "developers": [
+    {
+      "volume": 5,
+      "percentage": "1.5%",
+      "use": "Toning and deposit, gray blending"
+    },
+    {
+      "volume": 10,
+      "percentage": "3%",
+      "use": "Deposit with slight lift (0-1 levels), gray coverage"
+    },
+    {
+      "volume": 20,
+      "percentage": "6%",
+      "use": "Standard lift (1-2 levels), optimal gray coverage"
+    },
+    {
+      "volume": 30,
+      "percentage": "9%",
+      "use": "Maximum lift (2-3 levels), resistant hair"
+    },
+    {
+      "volume": 40,
+      "percentage": "12%",
+      "use": "Super lift (3+ levels), resistant/virgin hair"
+    }
+  ],
+  "formulationGuidelines": {
+    "mixing_ratios": {
+      "Full Spectrum™": "1 part color + 1 part Full Spectrum™ Developer"
+    },
+    "processing_times": {
+      "Full Spectrum™": "35 minutes (up to 40-45 minutes for resistant gray)"
+    },
+    "gray_coverage": {
+      "0_25_percent": "Use N series",
+      "25_50_percent": "Mix N + target shade (equal parts) or use NN shade",
+      "50_100_percent": "Use NN shade alone or mix NN + N shade (equal parts)"
+    },
+    "lift_guidelines": {
+      "tone_on_tone": "5 or 10 vol (1.5-3%)",
+      "1_level": "10 or 20 vol (3-6%)",
+      "2_levels": "20 or 30 vol (6-9%)",
+      "3_levels": "30 or 40 vol (9-12%)"
+    },
+    "tonal_direction": {
+      "cool": [
+        "A",
+        "V",
+        "HLA"
+      ],
+      "warm": [
+        "C",
+        "R",
+        "G"
+      ],
+      "neutral": [
+        "N",
+        "NN",
+        "B"
+      ],
+      "specialty": [
+        "HLA",
+        "P"
+      ]
+    }
+  }
+}

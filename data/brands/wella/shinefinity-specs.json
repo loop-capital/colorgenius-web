@@ -1,0 +1,114 @@
+{
+  "brand": "Wella Professionals",
+  "lines": [
+    {
+      "name": "Shinefinity",
+      "type": "demi-permanent",
+      "description": "Acidic demi-permanent hair color (pH 6.5) with zero ammonia and zero lift. Conditions while coloring for translucent, multi-dimensional results. Up to 100% grey coverage. Fades naturally with no commitment.",
+      "mixingRatio": "1:1",
+      "developers": [
+        {
+          "volume": 6,
+          "percent": "1.9%",
+          "name": "Wella Shinefinity Developer 1.9% (6vol)",
+          "use": "Tone/refresh, subtle depth, gentle grey blending"
+        },
+        {
+          "volume": 13,
+          "percent": "4%",
+          "name": "Wella Shinefinity Developer 4% (13vol)",
+          "use": "Grey coverage, deeper results, more vibrancy"
+        }
+      ],
+      "processingTimes": [
+        {
+          "use": "Without heat (room temperature)",
+          "time": "20 min"
+        },
+        {
+          "use": "With heat (climazon/steamer)",
+          "time": "15 min"
+        },
+        {
+          "use": "Toning / visual development",
+          "time": "5-20 min (visual)"
+        }
+      ],
+      "categories": {
+        "pure-naturals": "Natural base shades — levels 2-10 for coverage and depth",
+        "rich-naturals": "Cool/warm blended naturals with reflect — ash, gold, violet, pearl, cendre",
+        "deep-browns": "Warm and cool brown reflects (/7 series)",
+        "warm-naturals": "Warm-leaning naturals with gold, matte, and pearl-brown",
+        "vibrant-reds": "Copper, red, violet, and intense violet shades",
+        "special-mix": "Concentrated intensifiers — Violet-Cendre, Cendre, Copper-Violet, Violet, Gold-Copper"
+      },
+      "applicationNotes": [
+        "1:1 ratio — 30g color + 30g Shinefinity Developer",
+        "Zero ammonia, zero lift — will not lighten natural or previously colored hair",
+        "Acidic pH 6.5 formula conditions while coloring",
+        "Translucent results for multi-dimensional color",
+        "Fades naturally over time — no harsh grow-out line",
+        "For toning: process 5-20 min until desired result is achieved visually",
+        "Up to 100% grey coverage when using 4% (13vol) developer",
+        "Pairs well with Wella Color Touch and Illumina for full-service color workflows"
+      ],
+      "technology": ["Acidic pH", "Conditioning formula"],
+      "lift": 0,
+      "ammoniaFree": true,
+      "greyCoverage": "100%"
+    }
+  ],
+  "toneSystem": {
+    "description": "Wella International Tone Numbering: Level/Tone format (e.g., 7/43 = level 7 copper-gold). Same system as Color Touch and Illumina.",
+    "primaryTones": {
+      "/0": "Natural",
+      "/1": "Ash",
+      "/2": "Matte",
+      "/3": "Gold",
+      "/4": "Copper",
+      "/5": "Red",
+      "/6": "Violet",
+      "/7": "Brown (warm)",
+      "/8": "Cendre (soft violet)",
+      "/9": "Pearl (blue-violet)"
+    },
+    "secondaryTones": {
+      "/01": "Natural-Ash",
+      "/02": "Natural-Matte",
+      "/03": "Natural-Gold",
+      "/05": "Natural-Violet",
+      "/16": "Ash-Violet",
+      "/34": "Gold-Copper",
+      "/35": "Gold-Violet",
+      "/36": "Gold-Violet",
+      "/37": "Gold-Brown",
+      "/38": "Gold-Cendre",
+      "/41": "Copper-Ash",
+      "/43": "Copper-Gold",
+      "/45": "Copper-Violet",
+      "/47": "Copper-Brown",
+      "/54": "Red-Copper",
+      "/56": "Violet Intensifier",
+      "/57": "Violet-Brown",
+      "/66": "Intense Violet",
+      "/68": "Violet-Cendre",
+      "/71": "Brown-Ash",
+      "/73": "Brown-Gold",
+      "/75": "Brown-Violet",
+      "/81": "Cendre-Ash",
+      "/86": "Cendre-Violet",
+      "/88": "Cendre Intensifier",
+      "/89": "Cendre-Pearl",
+      "/96": "Pearl-Violet",
+      "/97": "Pearl-Brown"
+    }
+  },
+  "specialNotes": [
+    "Shinefinity is an acidic demi-permanent (pH 6.5) — will NOT lift natural or previously colored hair",
+    "Zero ammonia formula conditions while coloring for healthier-feeling hair",
+    "Translucent results create multi-dimensional color that fades naturally",
+    "Up to 100% grey coverage achievable with 4% (13vol) developer",
+    "Special Mix intensifiers (0/XX) are concentrated boosters — use up to 50g per 30g of base shade",
+    "For maximum grey coverage, apply to dry hair and use 4% (13vol) developer for full 20 minutes"
+  ]
+}

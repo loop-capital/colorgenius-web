@@ -1,0 +1,64 @@
+{
+  "brand": "Matrix",
+  "lines": [
+    {
+      "name": "Super Sync Demi-Permanent Color",
+      "shortName": "Super Sync",
+      "type": "demi-permanent",
+      "category": "demi-creme",
+      "preBonded": true,
+      "ammonia": false,
+      "lift": false,
+      "greyCoverage": "up to 75% grey coverage (NN family shades)",
+      "mixingRatio": "1:1",
+      "developerOptions": [
+        { "volume": 10, "purpose": "deposit only / refresh / grey coverage", "liftLevels": 0, "greyCoverage": "optimal" }
+      ],
+      "developerBrand": "Matrix Cream Developer (10vol/3%)",
+      "processingTime": {
+        "standard": "20 min at room temperature",
+        "heat": "reduce by 5 min"
+      },
+      "longevity": "6-8 weeks",
+      "technology": [
+        "Pre-Bonded Formula with bond-protecting concentrate",
+        "Zero lift, deposit-only",
+        "Gradual oxidation for predictable results",
+        "Can be applied immediately after Matrix Opti texture service"
+      ],
+      "collections": [
+        {
+          "name": "Standard Collection",
+          "description": "Levels 2-11 across N, NA, A, AA, M, MM, W, G, C, CG, RV, RR, RC, BR, RB, V, P, T, NV, NW, NJ tones",
+          "levels": "2-11"
+        },
+        {
+          "name": "HD Collection",
+          "description": "High Definition SoRed intensified pigment shades",
+          "tones": ["HD-RR", "HD-RV"]
+        },
+        {
+          "name": "Sheer Pastel Collection",
+          "description": "Sheer pastel toners for subtle effects on pre-lightened hair",
+          "tones": ["SP-N", "SP-A", "SP-P", "SP-V", "SP-M"]
+        },
+        {
+          "name": "SoBoost Mixers",
+          "description": "Intensifier mixers for custom color creation",
+          "tones": ["RED", "BLUE"],
+          "mixingRatio": "1:3 with Super Sync"
+        },
+        {
+          "name": "Clear",
+          "description": "Reduces tonal deposit by approximately 1 level when mixed equally",
+          "tones": ["Clear"]
+        }
+      ],
+      "clear": {
+        "code": "Clear",
+        "name": "Clear",
+        "use": "Dilution and mixing — reduces tonal deposit by ~1 level when mixed equally"
+      }
+    }
+  ]
+}

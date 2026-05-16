@@ -1,0 +1,47 @@
+{
+  "brand": "Moroccanoil",
+  "lines": [
+    {
+      "name": "Color Rhapsody Permanent Cream Color",
+      "type": "permanent",
+      "mixingRatio": "1:1 (color : Oxidative Cream Developer)",
+      "developerVolumes": [
+        5,
+        10,
+        20,
+        30,
+        40
+      ],
+      "processingTime": "30-45 minutes without heat, 15-25 minutes with heat",
+      "grayCoverage": "100% with proper formulation (add N for 25-100% gray)"
+    },
+    {
+      "name": "Color Rhapsody High Lift Permanent Cream Color",
+      "type": "permanent",
+      "mixingRatio": "1:2 (color : Oxidative Cream Developer)",
+      "developerVolumes": [
+        30,
+        40
+      ],
+      "processingTime": "Up to 60 minutes without heat",
+      "liftCapability": "Up to 5 levels on natural base 6+"
+    },
+    {
+      "name": "Color Calypso Demi-Permanent Gloss",
+      "type": "demi-permanent",
+      "mixingRatio": "1:1 (Color Calypso Gloss : Gloss Activator)",
+      "developerVolumes": [
+        5
+      ],
+      "processingTime": "Up to 20 minutes at room temperature"
+    }
+  ],
+  "technology": "ProArginine + ArganID System",
+  "grayFormulation": {
+    "25-50_percent": "1 part N/.0 + 2 parts desired shade",
+    "50-100_percent": "1 part N/.0 + 1 part desired shade",
+    "red_above_50_percent": "1 part N/.0 + 2 parts desired red shade",
+    "max_development": "45 minutes (extend up to 15 min more if needed)"
+  },
+  "maxDevelopmentTime": "45 minutes (up to 60 min with extension)"
+}

@@ -1,0 +1,51 @@
+{
+  "brand": "Pravana",
+  "productLine": "ChromaSilk Vivids",
+  "source": "Pravana ChromaSilk Vivids technical data sheet",
+  "verification_status": "pending_review",
+  "verified_date": null,
+  "distributor": "Pravana Beauty / Henkel",
+  "website": "www.pravana.com",
+  "numbering_system": {
+    "description": "Pravana ChromaSilk Vivids use descriptive names. No developer needed. Semi-permanent direct dye.",
+    "categories": {
+      "standard": "10 core vivid shades",
+      "neon": "5 ultra-bright neon shades",
+      "pastel": "5 soft pastel shades",
+      "locked_in": "6 shades that resist fading"
+    },
+    "additives": {
+      "Clear": "Lighten or pastelize any Vivids shade",
+      "Black": "Deepen or darken any Vivids shade"
+    }
+  },
+  "lines": [
+    {
+      "name": "ChromaSilk Vivids",
+      "type": "semi-permanent",
+      "mixRatio": "No developer needed",
+      "developerVolumes": [],
+      "processingTime": "20-30 minutes at room temperature",
+      "description": "Semi-permanent direct dyes lasting 3-12 weeks. Must pre-lighten hair before application. Mix with Vivids Clear to lighten/pastelize.",
+      "notes": "Available in standard, Neon, Pastel, and Locked-In series."
+    }
+  ],
+  "developers": {
+    "note": "Vivids do not require developer. They are direct dyes applied to pre-lightened hair."
+  },
+  "formulation_guidelines": {
+    "preparation": "Hair must be pre-lightened to the appropriate level before applying Vivids.",
+    "application": "Apply to clean, dry, pre-lightened hair. Process 20-30 minutes at room temperature.",
+    "mixing": {
+      "custom_shades": "Mix Vivids shades together to create custom colors",
+      "pastelize": "Mix with Vivids Clear to lighten/pastelize",
+      "deepen": "Mix with Vivids Black to deepen/darken"
+    },
+    "processing_times": {
+      "standard": "20-30 minutes at room temperature",
+      "vibrant_result": "Up to 30 minutes for maximum vibrancy",
+      "pastel": "20 minutes for softer pastel results"
+    },
+    "longevity": "Lasts 3-12 weeks depending on shade, hair porosity, and aftercare routine."
+  }
+}

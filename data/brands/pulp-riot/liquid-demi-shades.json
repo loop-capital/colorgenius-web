@@ -1,0 +1,309 @@
+{
+  "_brand": "Pulp Riot",
+  "_line": "Liquid Demi",
+  "_type": "demi-permanent",
+  "_totalShades": 29,
+  "_source": "Pulp Riot Liquid Demi official shade chart and technical documentation",
+  "shades": [
+    {
+      "code": "9-0",
+      "name": "9-0 Natural Very Light Blonde",
+      "level": 9,
+      "toneCode": "0",
+      "toneFamily": "natural",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "natural"
+    },
+    {
+      "code": "9-03",
+      "name": "9-03 Natural Gold Very Light Blonde",
+      "level": 9,
+      "toneCode": "03",
+      "toneFamily": "natural",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "natural"
+    },
+    {
+      "code": "9-1",
+      "name": "9-1 Ash Very Light Blonde",
+      "level": 9,
+      "toneCode": "1",
+      "toneFamily": "ash",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "9-11",
+      "name": "9-11 Ash/Violet Very Light Blonde",
+      "level": 9,
+      "toneCode": "11",
+      "toneFamily": "ash",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "9-2",
+      "name": "9-2 Violet Very Light Blonde",
+      "level": 9,
+      "toneCode": "2",
+      "toneFamily": "violet",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "9-3",
+      "name": "9-3 Gold Very Light Blonde",
+      "level": 9,
+      "toneCode": "3",
+      "toneFamily": "gold",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "warm"
+    },
+    {
+      "code": "9-4",
+      "name": "9-4 Copper Very Light Blonde",
+      "level": 9,
+      "toneCode": "4",
+      "toneFamily": "copper",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "warm"
+    },
+    {
+      "code": "8-1",
+      "name": "8-1 Ash Light Blonde",
+      "level": 8,
+      "toneCode": "1",
+      "toneFamily": "ash",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "8-11",
+      "name": "8-11 Ash/Violet Light Blonde",
+      "level": 8,
+      "toneCode": "11",
+      "toneFamily": "ash",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "8-2",
+      "name": "8-2 Violet Light Blonde",
+      "level": 8,
+      "toneCode": "2",
+      "toneFamily": "violet",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "7-0",
+      "name": "7-0 Natural Blonde",
+      "level": 7,
+      "toneCode": "0",
+      "toneFamily": "natural",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "natural"
+    },
+    {
+      "code": "7-03",
+      "name": "7-03 Natural Gold Blonde",
+      "level": 7,
+      "toneCode": "03",
+      "toneFamily": "natural",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "natural"
+    },
+    {
+      "code": "7-4",
+      "name": "7-4 Copper Blonde",
+      "level": 7,
+      "toneCode": "4",
+      "toneFamily": "copper",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "warm"
+    },
+    {
+      "code": "7-8",
+      "name": "7-8 Brown/Pearl Blonde",
+      "level": 7,
+      "toneCode": "8",
+      "toneFamily": "pearl",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "6-0",
+      "name": "6-0 Natural Dark Blonde",
+      "level": 6,
+      "toneCode": "0",
+      "toneFamily": "natural",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "natural"
+    },
+    {
+      "code": "6-03",
+      "name": "6-03 Natural Gold Dark Blonde",
+      "level": 6,
+      "toneCode": "03",
+      "toneFamily": "natural",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "natural"
+    },
+    {
+      "code": "6-1",
+      "name": "6-1 Ash Dark Blonde",
+      "level": 6,
+      "toneCode": "1",
+      "toneFamily": "ash",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "6-3",
+      "name": "6-3 Gold Dark Blonde",
+      "level": 6,
+      "toneCode": "3",
+      "toneFamily": "gold",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "warm"
+    },
+    {
+      "code": "6-6",
+      "name": "6-6 Red Dark Blonde",
+      "level": 6,
+      "toneCode": "6",
+      "toneFamily": "red",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "warm"
+    },
+    {
+      "code": "5-7",
+      "name": "5-7 Matte Light Brown",
+      "level": 5,
+      "toneCode": "7",
+      "toneFamily": "cool",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "5-8",
+      "name": "5-8 Brown/Pearl Light Brown",
+      "level": 5,
+      "toneCode": "8",
+      "toneFamily": "pearl",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "4-03",
+      "name": "4-03 Natural Gold Brown",
+      "level": 4,
+      "toneCode": "03",
+      "toneFamily": "natural",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "natural"
+    },
+    {
+      "code": "4-5",
+      "name": "4-5 Red/Violet Brown",
+      "level": 4,
+      "toneCode": "5",
+      "toneFamily": "mahogany",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "warm"
+    },
+    {
+      "code": "3-0",
+      "name": "3-0 Natural Dark Brown",
+      "level": 3,
+      "toneCode": "0",
+      "toneFamily": "natural",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "natural"
+    },
+    {
+      "code": "3-2",
+      "name": "3-2 Violet Dark Brown",
+      "level": 3,
+      "toneCode": "2",
+      "toneFamily": "violet",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "cool"
+    },
+    {
+      "code": "0-0",
+      "name": "Clear",
+      "level": 0,
+      "toneCode": "0",
+      "toneFamily": "clear",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "clear"
+    },
+    {
+      "code": "-22",
+      "name": "Violet Booster",
+      "level": 0,
+      "toneCode": "22",
+      "toneFamily": "violet",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "booster"
+    },
+    {
+      "code": "-33",
+      "name": "Gold Booster",
+      "level": 0,
+      "toneCode": "33",
+      "toneFamily": "gold",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "booster"
+    },
+    {
+      "code": "-44",
+      "name": "Copper Booster",
+      "level": 0,
+      "toneCode": "44",
+      "toneFamily": "copper",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "booster"
+    },
+    {
+      "code": "-66",
+      "name": "Red Booster",
+      "level": 0,
+      "toneCode": "66",
+      "toneFamily": "red",
+      "line": "liquid-demi",
+      "brand": "pulp-riot",
+      "category": "booster"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "brand": "R+COLOR",
+  "line": "Omnipresent Permanent Liqui-Crème",
+  "type": "permanent",
+  "mixingRatio": "1:1",
+  "hiLiftRatio": "1:2",
+  "developer": "Momentum Liqui-Crème",
+  "developerVolumes": [5, 10, 20, 30, 40],
+  "timing": {
+    "standard": 30,
+    "gray": "30-45",
+    "hiLift": 55
+  },
+  "ammonia": "low",
+  "grayCoverage": "100%"
+}

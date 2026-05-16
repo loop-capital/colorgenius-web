@@ -1,0 +1,13 @@
+{
+  "brand": "R+COLOR",
+  "line": "HyperMatic 10 Minute Demi-Permanent Liquid",
+  "type": "demi-permanent",
+  "mixingRatio": "1:1",
+  "developer": "Momentum Liquid 5 Volume",
+  "timing": { "standard": "up to 10" },
+  "grayCoverage": "blending",
+  "ammonia": "free",
+  "ppdFree": true,
+  "resorcinolFree": true,
+  "features": ["10 minute processing", "ammonia-free", "PPD-free", "resorcinol-free"]
+}

@@ -1,0 +1,88 @@
+{
+  "brand": "Pulp Riot",
+  "displayName": "Pulp Riot Faction8",
+  "lines": [
+    {
+      "name": "Faction8 Permanent Hair Color",
+      "type": "permanent",
+      "mixRatio": "1:1",
+      "mixRatioParts": [1, 1],
+      "mixRatioHighLift": "1:2",
+      "mixRatioHighLiftParts": [1, 2],
+      "developers": [10, 20, 30, 40],
+      "developerUnit": "vol",
+      "developerUsage": {
+        "10": "Deposit, darker, tone-on-tone, same level",
+        "20": "1-2 levels of lift, standard gray coverage",
+        "30": "2-3 levels of lift, enhanced coverage",
+        "40": "3-4 levels of lift, maximum lightening"
+      },
+      "processingTimeMin": 35,
+      "processingTimeMax": 35,
+      "processingTimeUnit": "min",
+      "processingTimeHighLiftMin": 45,
+      "processingTimeHighLiftMax": 55,
+      "processingTimeHighLiftUnit": "min",
+      "grayCoverage": "up to 100%",
+      "ammonia": "low",
+      "features": [
+        "Permanent crème color",
+        "Low-ammonia formulation",
+        "Up to 100% gray coverage",
+        "Up to 4 levels of lift"
+      ],
+      "heat": false
+    }
+  ],
+  "toningSystem": {
+    "notation": "level-tone (e.g., 7-3 or 7/3)",
+    "example": "7-3",
+    "tonePosition": "suffix",
+    "levelSystem": {
+      "1": "Black",
+      "2": "Darkest Brown",
+      "3": "Dark Brown",
+      "4": "Medium Brown",
+      "5": "Light Brown",
+      "6": "Dark Blonde",
+      "7": "Medium Blonde",
+      "8": "Blonde",
+      "9": "Light Blonde",
+      "10": "Extra Light Blonde",
+      "11": "High Lift"
+    },
+    "universalFamilyMap": {
+      "0": "natural",
+      "00": "natural",
+      "1": "ash",
+      "2": "violet",
+      "22": "violet",
+      "23": "violet",
+      "26": "violet",
+      "3": "gold",
+      "32": "gold",
+      "34": "gold",
+      "35": "gold",
+      "4": "copper",
+      "44": "copper",
+      "45": "copper",
+      "46": "copper",
+      "5": "mahogany",
+      "53": "mahogany",
+      "6": "red",
+      "64": "red",
+      "65": "red",
+      "66": "red",
+      "7": "cool",
+      "71": "cool",
+      "8": "pearl",
+      "83": "pearl",
+      "85": "pearl",
+      "88": "pearl",
+      "11": "ash",
+      "02": "violet",
+      "03": "gold",
+      "08": "pearl"
+    }
+  }
+}

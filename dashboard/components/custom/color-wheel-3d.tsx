@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 export interface ToneOption {
   value: string
@@ -20,7 +20,7 @@ interface ColorWheel3DProps {
 export function ColorWheel3D({ tones, selected, onSelect, className }: ColorWheel3DProps) {
   const [hovered, setHovered] = useState<string | null>(null)
   const radius = 100
-  const center = 120
+  const center = 130
 
   // Position tones around the circle
   const positioned = tones.map((tone, i) => {
@@ -33,8 +33,8 @@ export function ColorWheel3D({ tones, selected, onSelect, className }: ColorWhee
   const selectedTone = positioned.find((t) => t.value === selected)
 
   return (
-    <div className={`relative ${className || ''}`} style={{ width: 240, height: 240 }}>
-      <svg width="240" height="240" viewBox="0 0 240 240" className="absolute inset-0">
+    <div className={`relative ${className || ''}`} style={{ width: 260, height: 280 }}>
+      <svg width="260" height="280" viewBox="0 0 260 280" className="absolute inset-0">
         {/* Outer ring gradient */}
         <defs>
           <linearGradient id="wheelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -51,23 +51,32 @@ export function ColorWheel3D({ tones, selected, onSelect, className }: ColorWhee
 
         {/* Connection lines from center to tones */}
         {positioned.map((tone) => (
-          <motion.line
-            key={tone.value}
-            x1={center}
-            y1={center}
-            x2={tone.x}
-            y2={tone.y}
-            stroke={tone.color}
-            strokeWidth={tone.value === selected ? 2 : 0.5}
-            opacity={tone.value === selected ? 0.4 : 0.08}
-            initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 0.6, delay: 0.05 * positioned.indexOf(tone) }}
-          />
+          <g key={`line-${tone.value}`}>
+            <line
+              x1={center}
+              y1={center}
+              x2={tone.x}
+              y2={tone.y}
+              stroke={tone.color}
+              strokeWidth={0.5}
+              opacity={0.08}
+            />
+            {tone.value === selected && (
+              <line
+                x1={center}
+                y1={center}
+                x2={tone.x}
+                y2={tone.y}
+                stroke={tone.color}
+                strokeWidth={2}
+                opacity={0.4}
+              />
+            )}
+          </g>
         ))}
 
         {/* Tone nodes */}
-        {positioned.map((tone) => {
+        {positioned.map((tone, i) => {
           const isSelected = tone.value === selected
           const isHovered = tone.value === hovered
 
@@ -75,20 +84,21 @@ export function ColorWheel3D({ tones, selected, onSelect, className }: ColorWhee
             <g key={tone.value}>
               {/* Glow ring for selected */}
               {isSelected && (
-                <motion.circle
+                <circle
                   cx={tone.x}
                   cy={tone.y}
                   r={20}
                   fill="none"
                   stroke={tone.color}
                   strokeWidth="2"
-                  initial={{ r: 14, opacity: 0 }}
-                  animate={{ r: 20, opacity: 0.4 }}
-                  transition={{ repeat: Infinity, repeatType: 'reverse', duration: 1.5, ease: 'easeInOut' }}
-                />
+                  opacity={0.4}
+                >
+                  <animate attributeName="r" values="14;20;14" dur="1.5s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.4;0.1;0.4" dur="1.5s" repeatCount="indefinite" />
+                </circle>
               )}
 
-              {/* Color circle */}
+              {/* Animated color circle (visual only — no pointer events) */}
               <motion.circle
                 cx={tone.x}
                 cy={tone.y}
@@ -96,18 +106,27 @@ export function ColorWheel3D({ tones, selected, onSelect, className }: ColorWhee
                 fill={tone.gradient || tone.color}
                 stroke={isSelected ? tone.color : 'rgba(255,255,255,0.12)'}
                 strokeWidth={isSelected ? 2.5 : 1}
-                className="cursor-pointer"
-                onHoverStart={() => setHovered(tone.value)}
-                onHoverEnd={() => setHovered(null)}
-                onClick={() => onSelect(tone.value)}
+                className="pointer-events-none"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.03 * positioned.indexOf(tone) }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.03 * i }}
                 style={{ filter: isSelected ? `drop-shadow(0 0 8px ${tone.color})` : 'none' }}
               />
 
+              {/* Invisible hit target (clickable — plain SVG, not framer-motion) */}
+              <circle
+                cx={tone.x}
+                cy={tone.y}
+                r={20}
+                fill="transparent"
+                className="cursor-pointer"
+                onMouseEnter={() => setHovered(tone.value)}
+                onMouseLeave={() => setHovered(null)}
+                onClick={() => onSelect(tone.value)}
+              />
+
               {/* Label */}
-              <motion.text
+              <text
                 x={tone.x}
                 y={tone.y + 28}
                 textAnchor="middle"
@@ -117,12 +136,9 @@ export function ColorWheel3D({ tones, selected, onSelect, className }: ColorWhee
                 fontFamily="system-ui"
                 letterSpacing="0.05em"
                 className="pointer-events-none select-none"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 + 0.03 * positioned.indexOf(tone) }}
               >
                 {tone.label}
-              </motion.text>
+              </text>
             </g>
           )
         })}
@@ -141,25 +157,6 @@ export function ColorWheel3D({ tones, selected, onSelect, className }: ColorWhee
           />
         )}
       </svg>
-
-      {/* Selected tone display below wheel */}
-      <AnimatePresence mode="wait">
-        {selectedTone && (
-          <motion.div
-            key={selectedTone.value}
-            className="text-center mt-2"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-          >
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: selectedTone.color }} />
-              <span className="text-sm font-semibold text-[#F5F5F7]">{selectedTone.label}</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

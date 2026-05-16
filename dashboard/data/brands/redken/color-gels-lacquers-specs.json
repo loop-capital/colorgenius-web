@@ -1,0 +1,105 @@
+{
+  "brand": "Redken",
+  "productLine": "Color Gels Lacquers",
+  "source": "Redken Color Gels Lacquers Paper Chart (official)",
+  "verification_status": "pending_review",
+  "verified_date": null,
+  "distributor": "L'Oréal USA / Redken 5th Avenue NYC",
+  "website": "www.redken.com",
+  "numbering_system": {
+    "description": "Redken Color Gels Lacquers uses a letter-based tone code appended to the level number. Creative shade names are used alongside codes.",
+    "level_range": "4-10",
+    "tone_codes": {
+      "NN": "Double Neutral (extra coverage)",
+      "NA": "Neutral Ash",
+      "N": "Natural",
+      "NW": "Natural Warm",
+      "WG": "Warm Gold",
+      "GB": "Gold Brown",
+      "CB": "Copper Brown",
+      "ABn": "Ash Brown",
+      "RR": "Red Red (contains R5 red dye)",
+      "RV": "Red Violet",
+      "NB": "Neutral Brown"
+    },
+    "specialized_dyes": [
+      "R5 red dye (in RR shades)",
+      "Rubilane copper dye",
+      "Carmin R red dye"
+    ]
+  },
+  "lines": [
+    {
+      "name": "Color Gels Lacquers",
+      "type": "permanent",
+      "mixRatio": "1:1 (color : Redken Color Gels Lacquers Developer)",
+      "developerVolumes": [10, 20, 30, 40],
+      "processingTime": "30-35 minutes",
+      "description": "High saturation permanent liquid lacquer color with 100% grey coverage"
+    }
+  ],
+  "developers": {
+    "color_gels_lacquers_developer": {
+      "volumes": [10, 20, 30, 40],
+      "strengths": {
+        "10": "10 Volume (3%)",
+        "20": "20 Volume (6%)",
+        "30": "30 Volume (9%)",
+        "40": "40 Volume (12%)"
+      }
+    },
+    "usage": {
+      "10_vol": {
+        "use": "Deposit only, tone-on-tone, grey coverage, darker coloring",
+        "lift": "Deposit only"
+      },
+      "20_vol": {
+        "use": "1-2 levels of lift, grey coverage, standard permanent color service",
+        "lift": "1-2 levels"
+      },
+      "30_vol": {
+        "use": "2-3 levels of lift, resistant hair, maximum grey coverage on resistant hair",
+        "lift": "2-3 levels"
+      },
+      "40_vol": {
+        "use": "Maximum lift, high-lift blonde shades, resistant grey hair",
+        "lift": "3-4 levels"
+      }
+    }
+  },
+  "gray_coverage": {
+    "rule": "100% grey coverage on all Color Gels Lacquers shades",
+    "nn_series": "Double Neutral (NN) shades provide extra coverage for resistant grey hair",
+    "resistant_hair": "Use 30-40 volume developer for resistant grey hair",
+    "processing_time": "30-35 minutes standard; up to 40 minutes for resistant grey"
+  },
+  "formulation_guidelines": {
+    "lift_guidelines": {
+      "10_vol": "Deposit only, no lift",
+      "20_vol": "1-2 levels of lift",
+      "30_vol": "2-3 levels of lift",
+      "40_vol": "3-4 levels of lift"
+    },
+    "grey_coverage": {
+      "standard": "100% on all shades with appropriate developer",
+      "resistant": "Use NN series or increase developer volume",
+      "processing": "30-35 min standard; extend to 40 min for resistant"
+    },
+    "mixing_ratios": {
+      "standard": "1:1 (color : developer)",
+      "thick_hair": "1:1 (standard)",
+      "high_lift": "1:1 (standard)"
+    },
+    "processing_times": {
+      "standard": "30-35 minutes at room temperature",
+      "grey_coverage": "30-35 minutes; up to 40 minutes for resistant grey",
+      "high_lift": "35 minutes"
+    },
+    "tonal_direction": {
+      "cooling": ["NA", "ABn", "A"],
+      "warming": ["NW", "WG", "GB", "CB", "W"],
+      "red_family": ["RR", "RV", "R"],
+      "neutral": ["N", "NN", "NB"]
+    }
+  }
+}

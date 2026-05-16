@@ -1,0 +1,160 @@
+{
+  "brand": "Pravana",
+  "productLine": "ChromaSilk Crème Hair Color",
+  "source": "Pravana ChromaSilk Crème Hair Color technical data sheet",
+  "verification_status": "pending_review",
+  "verified_date": null,
+  "distributor": "Pravana Beauty / Henkel",
+  "website": "www.pravana.com",
+  "numbering_system": {
+    "description": "Pravana ChromaSilk uses decimal notation where the number before the decimal = Level (1-10) and numbers after the decimal = Tone(s). Single digit after decimal = 100% that tone. Two digits after decimal = primary + secondary tone ratio (70:30). Second digit 0 = Bright shade (e.g., .40). Two identical digits = Intense shade (e.g., .44). First digit 0 = Sheer version (e.g., .02).",
+    "level_range": "1-10",
+    "tone_codes": {
+      "0": "Bright / Sheer (when first digit)",
+      "1": "Ash",
+      "2": "Beige-Violet",
+      "3": "Gold",
+      "4": "Copper",
+      "5": "Mahogany",
+      "6": "Red",
+      "7": "Violet"
+    },
+    "letter_codes": {
+      "N": "Natural",
+      "A": "Ash",
+      "G": "Gold",
+      "C": "Copper",
+      "M": "Mahogany",
+      "R": "Red",
+      "BV": "Beige-Violet",
+      "BVbv": "Beige-Violet-Beige"
+    },
+    "high_lift": "Ultra Hi-Lifts available for virgin hair level 6+ with 30/40 volume developer"
+  },
+  "lines": [
+    {
+      "name": "ChromaSilk Crème Hair Color (Permanent)",
+      "type": "permanent",
+      "mixRatio": "1:1.5 (color : developer)",
+      "developerVolumes": [0, 10, 20, 30, 40],
+      "processingTime": "30-45 minutes",
+      "description": "100% grey coverage permanent crème hair color. 0 (Zero Lift) developer for demi-permanent results.",
+      "notes": "For max un-toned lift without bleach, use 000 Lightening Booster."
+    },
+    {
+      "name": "ChromaSilk Vivids (Semi-Permanent Direct Dye)",
+      "type": "semi-permanent",
+      "mixRatio": "No developer needed",
+      "developerVolumes": [],
+      "processingTime": "20-30 minutes at room temperature",
+      "description": "Semi-permanent direct dyes lasting 3-12 weeks. Must pre-lighten hair before application. Mix with Vivids Clear to lighten/pastelize.",
+      "notes": "Available in standard, Neon, Pastel, and Locked-In series."
+    },
+    {
+      "name": "ChromaSilk Express Tones (Additives)",
+      "type": "additive",
+      "mixRatio": "Mix into ChromaSilk formula as needed",
+      "developerVolumes": [0, 10, 20, 30, 40],
+      "processingTime": "Same as ChromaSilk Crème Color (30-45 minutes)",
+      "description": "Concentrated tone additives for custom color correction and tonal direction within ChromaSilk formulas.",
+      "notes": "Do not use Express Tones on their own. Always mix with ChromaSilk Crème Color."
+    },
+    {
+      "name": "ChromaSilk Color Correctors + Additives",
+      "type": "corrector",
+      "mixRatio": "Mix into ChromaSilk formula as needed",
+      "developerVolumes": [0, 10, 20, 30, 40],
+      "processingTime": "Same as ChromaSilk Crème Color (30-45 minutes)",
+      "description": "Primary color correctors for neutralizing unwanted tones.",
+      "notes": "Use green to neutralize red, violet to neutralize yellow, blue to neutralize orange, orange to neutralize blue, red to neutralize green, yellow to neutralize violet."
+    }
+  ],
+  "developers": {
+    "pravana_creme_developer": {
+      "volumes": [0, 10, 20, 30, 40],
+      "strengths": {
+        "0": "Zero Lift (Demi-Permanent Results)",
+        "10": "10 Volume (3%)",
+        "20": "20 Volume (6%)",
+        "30": "30 Volume (9%)",
+        "40": "40 Volume (12%)"
+      }
+    },
+    "usage": {
+      "0_vol": {
+        "use": "Deposit only, demi-permanent results, grey blending, tone-on-tone",
+        "lift": "No lift",
+        "processing": "20-30 minutes"
+      },
+      "10_vol": {
+        "use": "Deposit only, grey coverage, tone-on-tone, darker coloring",
+        "lift": "Deposit only, no lift",
+        "processing": "30 minutes"
+      },
+      "20_vol": {
+        "use": "1-2 levels of lift, grey coverage, standard permanent color service",
+        "lift": "1-2 levels",
+        "processing": "30-45 minutes"
+      },
+      "30_vol": {
+        "use": "2-3 levels of lift, resistant hair, Ultra Hi-Lifts on virgin hair level 6+",
+        "lift": "2-3 levels",
+        "processing": "30-45 minutes"
+      },
+      "40_vol": {
+        "use": "3-4 levels of lift, Ultra Hi-Lifts on virgin hair level 6+",
+        "lift": "3-4 levels",
+        "processing": "30-45 minutes"
+      }
+    }
+  },
+  "gray_coverage": {
+    "rule": "100% grey coverage on all ChromaSilk Crème Hair Color shades",
+    "processing_time": "30 minutes minimum; extend to 45 minutes for resistant grey",
+    "resistant_hair": "Use 20-30 volume developer for resistant grey; pre-soften with 000 Booster if needed"
+  },
+  "formulation_guidelines": {
+    "lift_guidelines": {
+      "10_vol": "Deposit only, no lift",
+      "20_vol": "1-2 levels of lift",
+      "30_vol": "2-3 levels of lift",
+      "40_vol": "3-4 levels of lift"
+    },
+    "grey_coverage": {
+      "standard": "100% on all permanent shades with appropriate developer",
+      "resistant": "Use 20-30 volume developer; extend processing to 45 minutes",
+      "processing": "30 minutes standard; 45 minutes for resistant grey"
+    },
+    "mixing_ratios": {
+      "standard": "1:1.5 (color : Pravana Crème Developer)",
+      "example": "2 oz color + 3 oz developer",
+      "thick_hair": "Increase proportionally",
+      "high_lift": "1:1.5 (standard)"
+    },
+    "processing_times": {
+      "10_vol": "30 minutes at room temperature",
+      "20_vol": "30-45 minutes at room temperature",
+      "30_vol": "30-45 minutes at room temperature",
+      "40_vol": "30-45 minutes at room temperature",
+      "zero_lift": "20-30 minutes at room temperature"
+    },
+    "tonal_direction": {
+      "cooling": ["1", "12", "13", "2", "20", "22"],
+      "warming": ["3", "34", "35", "4", "5", "6", "45", "56"],
+      "neutral": ["N"],
+      "violet": ["7", "37", "52", "62"]
+    },
+    "ultra_hi_lifts": {
+      "eligibility": "Virgin hair level 6 or lighter only",
+      "developer": "30 or 40 volume",
+      "lift": "Up to 4 levels",
+      "processing": "30-45 minutes"
+    },
+    "lightening_booster": {
+      "code": "000",
+      "name": "Lightening Booster",
+      "use": "Add to any ChromaSilk formula for maximum un-toned lift without bleach",
+      "mixing": "Mix with chosen ChromaSilk shade and developer as normal"
+    }
+  }
+}

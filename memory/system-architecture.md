@@ -587,7 +587,7 @@ INSERT INTO formulation_rules (rule_type, condition, action, priority) VALUES
 
 | Service | Purpose | Integration Type |
 |---------|---------|------------------|
-| Stripe | Payments, subscriptions | REST API |
+| Square | Payments, subscriptions | REST API |
 | SendGrid | Email notifications | SMTP/API |
 | Twilio | SMS alerts | REST API |
 | S3 | Image storage | SDK |

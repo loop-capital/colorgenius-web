@@ -1,0 +1,13 @@
+{
+  "brand": "SOHO by MOB",
+  "line": "SOHO Permanent + Demi",
+  "type": "permanent+demi",
+  "mixingRatio": "1:1 for permanent/gray, 1:2 for demi",
+  "developer": "20 vol for permanent, 5 vol for demi",
+  "timing": { "permanent": 35, "demi": "20 (wet hair)" },
+  "grayCoverage": "100%",
+  "ppdFree": true,
+  "resorcinolFree": true,
+  "ammonia": true,
+  "features": ["permanent + demi in one tube", "PPD-free", "resorcinol-free", "100% gray coverage"]
+}

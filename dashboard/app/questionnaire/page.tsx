@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GlassCard } from '@/components/custom/glass-card'
 import { StepTransition } from '@/components/custom/step-transition'
+import { BRANDS, LINES_BY_BRAND } from '@/lib/products'
 
 interface FormData {
   clientName: string
@@ -26,13 +27,18 @@ interface FormData {
 }
 
 const TONES = [
-  { value: 'N', label: 'Natural' },
-  { value: 'A', label: 'Ash' },
-  { value: 'G', label: 'Gold' },
-  { value: 'R', label: 'Red' },
-  { value: 'V', label: 'Violet' },
-  { value: 'K', label: 'Copper' },
-  { value: 'B', label: 'Beige' },
+  { value: 'N', label: 'Natural', color: '#9C8B7A' },
+  { value: 'A', label: 'Ash', color: '#8A7D6E' },
+  { value: 'G', label: 'Gold', color: '#C4A35A' },
+  { value: 'K', label: 'Copper', color: '#B87333' },
+  { value: 'R', label: 'Red', color: '#A03030' },
+  { value: 'V', label: 'Violet', color: '#7B68A6' },
+  { value: 'P', label: 'Pearl', color: '#B8B0C4' },
+  { value: 'B', label: 'Beige', color: '#C4B5A0' },
+  { value: 'M', label: 'Mahogany', color: '#6B3A3A' },
+  { value: 'Ch', label: 'Chocolate', color: '#4A2C2A' },
+  { value: 'W', label: 'Warm', color: '#D4A574' },
+  { value: 'C', label: 'Cool', color: '#7D8B9A' },
 ]
 
 const HAIR_CONDITIONS = [
@@ -253,22 +259,27 @@ export default function QuestionnairePage() {
             </div>
 
             <div>
-              <Label htmlFor="currentTone" className="text-[#F5F5F7]">Current Tone</Label>
-              <Select
-                value={formData.currentTone}
-                onValueChange={(value) => updateField('currentTone', value)}
-              >
-                <SelectTrigger className="mt-1.5 w-full bg-white/5 border-white/10 text-[#F5F5F7]">
-                  <SelectValue placeholder="Select tone" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#0F0F0F] border-white/10">
-                  {TONES.map((t) => (
-                    <SelectItem key={t.value} value={t.value} className="text-[#F5F5F7] focus:bg-[#9333EA]/20 focus:text-[#F5F5F7]">
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label className="text-[#F5F5F7] mb-3 block">Current Tone</Label>
+              <div className="grid grid-cols-6 gap-3">
+                {TONES.map((t) => (
+                  <button
+                    type="button"
+                    key={t.value}
+                    onClick={() => updateField('currentTone', t.value)}
+                    className="flex flex-col items-center gap-1.5 cursor-pointer"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full transition-all"
+                      style={{
+                        backgroundColor: t.color,
+                        border: formData.currentTone === t.value ? '3px solid #9333EA' : '2px solid rgba(255,255,255,0.1)',
+                        boxShadow: formData.currentTone === t.value ? '0 0 12px rgba(147,51,234,0.4)' : 'none',
+                      }}
+                    />
+                    <span className="text-xs" style={{ color: formData.currentTone === t.value ? '#9333EA' : '#A1A1AA' }}>{t.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
@@ -333,44 +344,69 @@ export default function QuestionnairePage() {
             </div>
 
             <div>
-              <Label htmlFor="targetTone" className="text-[#F5F5F7]">Target Tone</Label>
-              <Select
-                value={formData.targetTone}
-                onValueChange={(value) => updateField('targetTone', value)}
-              >
-                <SelectTrigger className="mt-1.5 w-full bg-white/5 border-white/10 text-[#F5F5F7]">
-                  <SelectValue placeholder="Select tone" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#0F0F0F] border-white/10">
-                  {TONES.map((t) => (
-                    <SelectItem key={t.value} value={t.value} className="text-[#F5F5F7] focus:bg-[#9333EA]/20 focus:text-[#F5F5F7]">
-                      {t.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label className="text-[#F5F5F7] mb-3 block">Target Tone</Label>
+              <div className="grid grid-cols-6 gap-3">
+                {TONES.map((t) => (
+                  <button
+                    type="button"
+                    key={t.value}
+                    onClick={() => updateField('targetTone', t.value)}
+                    className="flex flex-col items-center gap-1.5 cursor-pointer"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full transition-all"
+                      style={{
+                        backgroundColor: t.color,
+                        border: formData.targetTone === t.value ? '3px solid #9333EA' : '2px solid rgba(255,255,255,0.1)',
+                        boxShadow: formData.targetTone === t.value ? '0 0 12px rgba(147,51,234,0.4)' : 'none',
+                      }}
+                    />
+                    <span className="text-xs" style={{ color: formData.targetTone === t.value ? '#9333EA' : '#A1A1AA' }}>{t.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <Label htmlFor="brandPreference" className="text-[#F5F5F7]">Brand Preference</Label>
-                <Input
-                  id="brandPreference"
-                  placeholder="e.g., Wella, Redken"
+                <Label className="text-[#F5F5F7]">Brand Preference</Label>
+                <Select
                   value={formData.brandPreference}
-                  onChange={(e) => updateField('brandPreference', e.target.value)}
-                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#9333EA] focus:ring-[#9333EA]"
-                />
+                  onValueChange={(v) => {
+                    updateField('brandPreference', v)
+                    updateField('linePreference', '')
+                  }}
+                >
+                  <SelectTrigger className="mt-1.5 w-full bg-white/5 border-white/10 text-[#F5F5F7]">
+                    <SelectValue placeholder="Select brand" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0F0F0F] border-white/10">
+                    {BRANDS.map((b) => (
+                      <SelectItem key={b} value={b} className="text-[#F5F5F7] focus:bg-[#9333EA]/20 focus:text-[#F5F5F7]">
+                        {b}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
-                <Label htmlFor="linePreference" className="text-[#F5F5F7]">Line Preference</Label>
-                <Input
-                  id="linePreference"
-                  placeholder="e.g., Koleston Perfect"
+                <Label className="text-[#F5F5F7]">Line Preference</Label>
+                <Select
                   value={formData.linePreference}
-                  onChange={(e) => updateField('linePreference', e.target.value)}
-                  className="mt-1.5 bg-white/5 border-white/10 text-[#F5F5F7] placeholder:text-white/30 focus:border-[#9333EA] focus:ring-[#9333EA]"
-                />
+                  onValueChange={(v) => updateField('linePreference', v)}
+                  disabled={!formData.brandPreference}
+                >
+                  <SelectTrigger className="mt-1.5 w-full bg-white/5 border-white/10 text-[#F5F5F7]">
+                    <SelectValue placeholder={formData.brandPreference ? "Select line" : "Select brand first"} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0F0F0F] border-white/10">
+                    {(LINES_BY_BRAND[formData.brandPreference] || []).map((l) => (
+                      <SelectItem key={l} value={l} className="text-[#F5F5F7] focus:bg-[#9333EA]/20 focus:text-[#F5F5F7]">
+                        {l}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

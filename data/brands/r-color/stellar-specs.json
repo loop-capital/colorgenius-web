@@ -1,0 +1,11 @@
+{
+  "brand": "R+COLOR",
+  "line": "Stellar Demi-Permanent Liquid",
+  "type": "demi-permanent",
+  "mixingRatio": "1:1",
+  "developer": "Momentum Liqui-Crème 5 or 10 vol",
+  "timing": { "standard": "10-25", "gray": "25-35" },
+  "grayCoverage": "blending",
+  "ammonia": "free",
+  "features": ["very low alkalinity", "no lift", "quick application"]
+}

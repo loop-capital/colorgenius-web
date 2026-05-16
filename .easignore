@@ -1,0 +1,58 @@
+# Dependencies
+**/node_modules/
+
+# Git
+.git
+.git/
+
+# Archive
+.archive/
+
+# Build artifacts
+**/.next/
+**/dist/
+**/build/
+.vercel/
+
+# Large directories
+Davines Color Lnes/
+Vish/
+references/
+packages/
+docs/
+workers/
+data/
+memory/
+graphify-out/
+research/
+prisma/
+shared/
+color-lines/
+components/
+blog/
+temp/
+second-brain/
+hooks/
+lib/
+infrastructure/
+production/
+
+# Large files
+*.log
+colorgenius-logo-reference.jpg
+login-result.png
+login-result.html
+*.backup-*
+*.md
+
+# Test files
+__tests__/
+*.test.*
+*.spec.*
+
+# Development files
+.env*
+.env.local
+
+# Expo cache
+.expo/
