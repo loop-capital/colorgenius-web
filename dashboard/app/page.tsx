@@ -73,7 +73,7 @@ export default function LandingPage() {
           </p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(147,51,234,0.3)', background: 'rgba(147,51,234,0.1)', color: '#A855F7', fontSize: 13, fontWeight: 600, padding: '6px 16px', borderRadius: 999, marginBottom: 32 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80' }} />
-            1,000+ professional shades · 10 color lines · 90%+ formulation accuracy
+            3,000+ professional shades · 21 color brands · 90%+ formulation accuracy
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
             <button onClick={() => setShowLogin(true)} style={{ ...btnPrimary, padding: '16px 32px', boxShadow: '0 0 40px rgba(147,51,234,0.2)' }}>Join the Beta <ArrowRight size={18} /></button>
