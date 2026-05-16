@@ -20,10 +20,11 @@ import type { ToneFamily } from '@/lib/products'
 
 const STEPS = [
   { id: 1, title: 'Photo', desc: 'Capture or upload hair photo' },
-  { id: 2, title: 'Hair Assessment', desc: 'Current color, tone & condition' },
-  { id: 3, title: 'Target Look', desc: 'Desired color result' },
-  { id: 4, title: 'Condition', desc: 'Hair health & history' },
-  { id: 5, title: 'Results', desc: 'Your custom formula' },
+  { id: 2, title: 'Hair Assessment', desc: 'Texture, pattern, density, level & tone' },
+  { id: 3, title: 'Chemical History', desc: 'Past treatments & sensitivities' },
+  { id: 4, title: 'Target Look', desc: 'Desired color result' },
+  { id: 5, title: 'Condition', desc: 'Hair health & problem indicators' },
+  { id: 6, title: 'Results', desc: 'Your custom formula' },
 ]
 
 const POROSITY = [
@@ -241,7 +242,7 @@ export default function FormulatePage() {
         setFormulaDeveloper({ name: `${data.data.developerVolume} Vol`, volume: data.data.developerVolume })
       }
       setFormulaView('edit')
-      setStep(5)
+      setStep(6)
     } catch (e: any) { toast({ title: 'Error', description: e.message, variant: 'destructive' }) }
     setLoading(false)
   }
@@ -254,7 +255,7 @@ export default function FormulatePage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <div>
             <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
-            <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 5 steps</p>
+            <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 6 steps</p>
           </div>
           <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
         </div>
@@ -460,13 +461,39 @@ export default function FormulatePage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
               <button type="button" onClick={() => setStep(1)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
-              <button type="button" onClick={() => setStep(3)} style={btnPrimary}>Next: Target Look <ChevronRight size={16} /></button>
+              <button type="button" onClick={() => setStep(3)} style={btnPrimary}>Next: Chemical History <ChevronRight size={16} /></button>
             </div>
           </div>
         )}
 
-        {/* STEP 3: Target Look */}
+        {/* STEP 3: Chemical History */}
         {step === 3 && (
+          <div style={card}>
+            <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Droplets style={{ color: '#9333EA' }} /> Chemical History</h2>
+            <p style={{ color: '#A1A1AA', fontSize: 13, marginBottom: 24 }}>What chemical treatments has the hair had? This directly affects formula choices.</p>
+
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Hair Condition</Label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                {CONDITION_TYPES.map(o => (
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, type: o.value } }))}
+                    style={{ padding: 14, borderRadius: 12, border: fd.condition.type === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.condition.type === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.condition.type === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'left' }}>
+                    <p style={{ fontSize: 13, fontWeight: 600 }}>{o.label}</p>
+                    <p style={{ fontSize: 11, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <button type="button" onClick={() => setStep(2)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
+              <button type="button" onClick={() => setStep(4)} style={btnPrimary}>Next: Target Look <ChevronRight size={16} /></button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 4: Target Look */}
+        {step === 4 && (
           <div style={card}>
             <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Sparkles style={{ color: '#F59E0B' }} /> Target Look</h2>
             <div style={{ marginBottom: 24 }}>
@@ -515,30 +542,17 @@ export default function FormulatePage() {
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <button type="button" onClick={() => setStep(2)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
-              <button type="button" onClick={() => setStep(4)} style={btnPrimary}>Next: Condition <ChevronRight size={16} /></button>
+              <button type="button" onClick={() => setStep(3)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
+              <button type="button" onClick={() => setStep(5)} style={btnPrimary}>Next: Condition <ChevronRight size={16} /></button>
             </div>
           </div>
         )}
 
-        {/* STEP 4: Condition */}
-        {step === 4 && (
+        {/* STEP 5: Condition */}
+        {step === 5 && (
           <div style={card}>
             <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Droplets style={{ color: '#9333EA' }} /> Hair Condition</h2>
-            <p style={{ color: '#A1A1AA', fontSize: 13, marginBottom: 24 }}>Assess the hair's condition and history. These details directly affect the formula.</p>
-
-            <div style={{ marginBottom: 24 }}>
-              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Hair Condition</Label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-                {CONDITION_TYPES.map(o => (
-                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, type: o.value } }))}
-                    style={{ padding: 14, borderRadius: 12, border: fd.condition.type === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.condition.type === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.condition.type === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'left' }}>
-                    <p style={{ fontSize: 13, fontWeight: 600 }}>{o.label}</p>
-                    <p style={{ fontSize: 11, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <p style={{ color: '#A1A1AA', fontSize: 13, marginBottom: 24 }}>Assess the hair's health indicators. These details directly affect the formula.</p>
 
             <div style={{ marginBottom: 24 }}>
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Porosity</Label>
@@ -580,7 +594,7 @@ export default function FormulatePage() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <button type="button" onClick={() => setStep(3)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
+              <button type="button" onClick={() => setStep(4)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
               <button type="button" onClick={handleSubmit} disabled={loading} style={btnPrimary}>
                 {loading ? <><Sparkles className="animate-spin" size={16} /> Generating...</> : <>Generate Formula <FlaskConical size={16} /></>}
               </button>
@@ -588,8 +602,8 @@ export default function FormulatePage() {
           </div>
         )}
 
-        {/* STEP 5: Results */}
-        {step === 5 && result && (
+        {/* STEP 6: Results */}
+        {step === 6 && result && (
           <div style={{ ...card, padding: 32 }}>
             {/* Header with Edit/Mix toggle */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
