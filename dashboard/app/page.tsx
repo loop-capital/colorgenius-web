@@ -52,21 +52,24 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 80 }}>
             <p style={{ color: '#9333EA', fontWeight: 600, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 16 }}>Simple by Design</p>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Three steps. Zero guesswork.</h2>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, maxWidth: 500, margin: '0 auto' }}>From photo to formula in under 30 seconds.</p>
+            <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Six steps. Zero guesswork.</h2>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, maxWidth: 500, margin: '0 auto' }}>From photo to professional formula.</p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
             {[
-              { icon: <Camera size={28} />, title: 'Capture Your Client\'s Hair', desc: 'Take a photo or upload one. Our AI reads level, tone, and condition — and flags safety concerns like metallic dye or henna.', step: '01' },
-              { icon: <Palette size={28} />, title: 'Choose the Target Shade', desc: 'Pick the shade from your preferred brand\'s catalog. ColorGenius cross-references starting level, underlying pigment, and desired outcome.', step: '02' },
-              { icon: <CheckCircle size={28} />, title: 'Get Your Formula — and Score the Result', desc: 'Receive a complete formula card with mixing ratios, developer volume, and processing time. After the service, our AI scores the result.', step: '03' },
+              { icon: <Camera size={22} />, title: 'Photo', desc: 'Capture or upload hair photo', step: '01' },
+              { icon: <Sparkles size={22} />, title: 'Hair Assessment', desc: 'Texture, density, level & tone', step: '02' },
+              { icon: <Shield size={22} />, title: 'Chemical History', desc: 'Past treatments & sensitivities', step: '03' },
+              { icon: <Palette size={22} />, title: 'Target Look', desc: 'Desired color across 21 brands', step: '04' },
+              { icon: <ClipboardList size={22} />, title: 'Condition', desc: 'Hair health & problem flags', step: '05' },
+              { icon: <CheckCircle size={22} />, title: 'Your Formula', desc: 'Ratios, developer, timing & AI score', step: '06' },
             ].map((s, i) => (
-              <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 32 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-                  <div style={{ width: 56, height: 56, borderRadius: 12, background: 'linear-gradient(135deg, rgba(147,51,234,0.15), rgba(236,72,153,0.15))', border: '1px solid rgba(147,51,234,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9333EA' }}>{s.icon}</div>
+              <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 20 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg, rgba(147,51,234,0.15), rgba(236,72,153,0.15))', border: '1px solid rgba(147,51,234,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9333EA' }}>{s.icon}</div>
                   <span style={{ fontSize: 48, fontWeight: 900, color: 'rgba(255,255,255,0.03)' }}>{s.step}</span>
                 </div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>{s.title}</h3>
+                <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>{s.title}</h3>
                 <p style={{ color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>{s.desc}</p>
               </div>
             ))}
