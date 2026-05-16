@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label'
 import { ColorWheel3D } from '@/components/custom'
 import { ScaleWidget } from '@/components/scale-widget'
-import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle } from 'lucide-react'
+import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle, LoaderCircle } from 'lucide-react'
 import type { ToneFamily } from '@/lib/products'
 
 const STEPS = [
@@ -266,7 +266,7 @@ export default function FormulatePage() {
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <button type="button" onClick={() => setStep(3)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
               <button type="button" onClick={handleSubmit} disabled={loading} style={btnPrimary}>
-                {loading ? <><Sparkles className="animate-spin" size={16} /> Generating...</> : <>Generate Formula <FlaskConical size={16} /></>}
+                {loading ? <><LoaderCircle className="animate-spin" size={16} style={{ color: '#F59E0B' }} /> Generating...</> : <>Generate Formula <FlaskConical size={16} /></>}
               </button>
             </div>
           </div>
