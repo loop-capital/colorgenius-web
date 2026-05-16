@@ -34,6 +34,26 @@ import kenraPermanentShades from '../../data/brands/kenra/kenra-permanent-shades
 import kenraDemiPermanentShades from '../../data/brands/kenra/kenra-demi-permanent-shades.json';
 import kenraSimplyBlondeShades from '../../data/brands/kenra/simply-blonde.json';
 import kenraSpecs from '../../data/brands/kenra/kenra-specs.json';
+import alfaparfEvolutionShades from '../../data/brands/alfaparf/evolution-shades.json';
+import alfaparfEvolutionSpecs from '../../data/brands/alfaparf/evolution-specs.json';
+import paulmitchellShinesXgShades from '../../data/brands/paul-mitchell/shines-xg-shades.json';
+import paulmitchellShinesXgSpecs from '../../data/brands/paul-mitchell/shines-xg-specs.json';
+import pulpriotFaction8Shades from '../../data/brands/pulp-riot/faction8-shades.json';
+import pulpriotFaction8Specs from '../../data/brands/pulp-riot/faction8-specs.json';
+import pulpriotLiquidDemiShades from '../../data/brands/pulp-riot/liquid-demi-shades.json';
+import pulpriotLiquidDemiSpecs from '../../data/brands/pulp-riot/liquid-demi-specs.json';
+import rcolorOmnipresentShades from '../../data/brands/r-color-omnipresent-shades.json';
+import rcolorHypermaticShades from '../../data/brands/r-color-hypermatic-shades.json';
+import rcolorStellarShades from '../../data/brands/r-color-stellar-shades.json';
+import rcolorStarsignShades from '../../data/brands/r-color-starsign-shades.json';
+import rcolorHalfTruthShades from '../../data/brands/r-color-half-truth-shades.json';
+import rcolorSpecs from '../../data/brands/r-color-specs.json';
+import sohoShades from '../../data/brands/soho-shades.json';
+import sohoSpecs from '../../data/brands/soho-specs.json';
+import omcorcolorShades from '../../data/brands/om-cor-color-shades.json';
+import omcorcolorSpecs from '../../data/brands/om-cor-color-specs.json';
+import chiShades from '../../data/brands/chi-shades.json';
+import chiSpecs from '../../data/brands/chi-specs.json';
 import schwarzkopfSpecs from '../../data/brands/schwarzkopf-specs.json';
 import moroccanoilSpecs from '../../data/brands/moroccanoil-specs.json';
 import lanzaSpecs from '../../data/brands/lanza-specs.json';
@@ -93,6 +113,22 @@ const shadeData: Record<string, NormalizedShade[]> = {
     ...(kenraDemiPermanentShades as unknown as NormalizedShade[]),
     ...(kenraSimplyBlondeShades.toners as unknown as NormalizedShade[]),
   ],
+  alfaparf: (alfaparfEvolutionShades as any).shades as unknown as NormalizedShade[],
+  paulmitchell: paulmitchellShinesXgShades as unknown as NormalizedShade[],
+  pulpriot: [
+    ...(pulpriotFaction8Shades as unknown as NormalizedShade[]),
+    ...(pulpriotLiquidDemiShades as any).shades as unknown as NormalizedShade[],
+  ],
+  rcolor: [
+    ...(rcolorOmnipresentShades as unknown as NormalizedShade[]),
+    ...(rcolorHypermaticShades as unknown as NormalizedShade[]),
+    ...(rcolorStellarShades as unknown as NormalizedShade[]),
+    ...(rcolorStarsignShades as unknown as NormalizedShade[]),
+    ...(rcolorHalfTruthShades as unknown as NormalizedShade[]),
+  ],
+  soho: sohoShades as unknown as NormalizedShade[],
+  omcorcolor: omcorcolorShades as unknown as NormalizedShade[],
+  chi: chiShades as unknown as NormalizedShade[],
 };
 
 const specsData: Record<string, BrandSpecs> = {
@@ -110,6 +146,13 @@ const specsData: Record<string, BrandSpecs> = {
   matrix: matrixSoColorSpecs as unknown as BrandSpecs,
   pravana: pravanaChromaSilkSpecs as unknown as BrandSpecs,
   kenra: kenraSpecs as unknown as BrandSpecs,
+  alfaparf: alfaparfEvolutionSpecs as unknown as BrandSpecs,
+  paulmitchell: paulmitchellShinesXgSpecs as unknown as BrandSpecs,
+  pulpriot: pulpriotFaction8Specs as unknown as BrandSpecs,
+  rcolor: rcolorSpecs as unknown as BrandSpecs,
+  soho: sohoSpecs as unknown as BrandSpecs,
+  omcorcolor: omcorcolorSpecs as unknown as BrandSpecs,
+  chi: chiSpecs as unknown as BrandSpecs,
 };
 
 const BRAND_NAMES: Record<string, string> = {
@@ -127,6 +170,13 @@ const BRAND_NAMES: Record<string, string> = {
   matrix: 'Matrix',
   pravana: 'Pravana',
   kenra: 'Kenra Professional',
+  alfaparf: 'Alfaparf',
+  paulmitchell: 'Paul Mitchell',
+  pulpriot: 'Pulp Riot',
+  rcolor: 'R+Color',
+  soho: 'SOHO',
+  omcorcolor: 'Om Cor Color',
+  chi: 'CHI',
 };
 
 export function loadBrandShades(brand: string): NormalizedShade[] {
