@@ -1,29 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Camera, Sparkles, CheckCircle, Shield, ClipboardList, Palette, BarChart3, Package, DollarSign, Scale, History, ArrowRight } from 'lucide-react'
 
 export default function LandingPage() {
-  const [showLogin, setShowLogin] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-    try {
-      const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) })
-      const data = await res.json()
-      if (res.ok && data.success) window.location.href = '/dashboard'
-      else setError(data.error || 'Login failed')
-    } catch (err: any) { setError('Network error: ' + err.message) }
-    setLoading(false)
-  }
-
   const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 999, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 16, display: 'inline-flex', alignItems: 'center', gap: 8 }
 
   return (
@@ -41,24 +21,9 @@ export default function LandingPage() {
             <a href="#tools" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>Color Tools</a>
             <a href="#pricing" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>Pricing</a>
           </div>
-          <button onClick={() => setShowLogin(true)} style={{ ...btnPrimary, padding: '8px 20px', fontSize: 14 }}>Sign In</button>
+          <a href="/login" style={{ ...btnPrimary, padding: '8px 20px', fontSize: 14, textDecoration: 'none' }}>Sign In</a>
         </div>
       </nav>
-
-      {/* Login Modal */}
-      {showLogin && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', padding: 16 }} onClick={() => setShowLogin(false)}>
-          <div style={{ background: '#161620', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: 32, width: '100%', maxWidth: 400 }} onClick={e => e.stopPropagation()}>
-            <h2 style={{ fontSize: 20, marginBottom: 24 }}>Welcome back</h2>
-            <form onSubmit={handleLogin}>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@salon.com" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '12px 16px', color: 'white', fontSize: 14, marginBottom: 12, outline: 'none', boxSizing: 'border-box' }} />
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="Password" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: '12px 16px', color: 'white', fontSize: 14, marginBottom: 16, outline: 'none', boxSizing: 'border-box' }} />
-              {error && <p style={{ color: '#EF4444', fontSize: 14, marginBottom: 12 }}>{error}</p>}
-              <button type="submit" disabled={loading} style={{ ...btnPrimary, width: '100%', justifyContent: 'center', padding: '14px 24px' }}>{loading ? 'Signing in...' : 'Sign In'}</button>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Hero */}
       <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 24px 0' }}>
@@ -73,10 +38,10 @@ export default function LandingPage() {
           </p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(147,51,234,0.3)', background: 'rgba(147,51,234,0.1)', color: '#A855F7', fontSize: 13, fontWeight: 600, padding: '6px 16px', borderRadius: 999, marginBottom: 32 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80' }} />
-            1,000+ professional shades · 10 color lines · 90%+ formulation accuracy
+            3,000+ professional shades · 21 color brands · 90%+ formulation accuracy
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
-            <button onClick={() => setShowLogin(true)} style={{ ...btnPrimary, padding: '16px 32px', boxShadow: '0 0 40px rgba(147,51,234,0.2)' }}>Join the Beta <ArrowRight size={18} /></button>
+            <a href="/login" style={{ ...btnPrimary, padding: '16px 32px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
             <a href="#how-it-works" style={{ ...btnPrimary, background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', textDecoration: 'none' }}>See How It Works</a>
           </div>
         </div>
@@ -125,7 +90,7 @@ export default function LandingPage() {
               { icon: <Package size={22} />, title: 'Inventory Management', desc: 'Track color stock levels, set reorder alerts, and auto-deduct usage per service. Never run out of a shade mid-appointment.' },
               { icon: <BarChart3 size={22} />, title: 'Salon Analytics', desc: 'Color service revenue, most popular shades, product usage trends, and stylist performance — all in one dashboard.' },
               { icon: <Shield size={22} />, title: 'Client Safety Flags', desc: 'Automatic alerts for metallic dye, henna, previous chemical treatments, and allergies. Safety checks before every formulation.' },
-              { icon: <Package size={22} />, title: 'Formula Marketplace', desc: 'Browse and purchase verified formulas from top stylists. Every formula includes before/after photos, client hair type, and step-by-step instructions. Buy once, use forever.' },
+              { icon: <Package size={22} />, title: 'Formula Marketplace', desc: 'Browse and purchase verified formulas from top stylists. Every formula includes before/after photos, client hair profile, and step-by-step instructions. Buy once, use forever.' },
               { icon: <DollarSign size={22} />, title: 'Sell Your Formulas', desc: 'Monetize your expertise. Upload your signature formulas with photos and instructions. Set your price and earn every time another stylist purchases your creation.' },
               { icon: <ClipboardList size={22} />, title: 'Community Feed', desc: 'Share your best work, get feedback from fellow stylists, and discover trending techniques. Build a following and establish yourself as a color authority.' },
               { icon: <Palette size={22} />, title: 'Color Management System', desc: 'Centralized color catalog across all brands. Create custom shade palettes, organize by client preference, and streamline your color selection workflow.' },
@@ -178,7 +143,7 @@ export default function LandingPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
             {[
-              { icon: <Package size={22} />, title: 'Formula Marketplace', desc: 'Browse and purchase verified formulas from top stylists. Every formula includes before/after photos, client hair type, and step-by-step instructions. Buy once, use forever.' },
+              { icon: <Package size={22} />, title: 'Formula Marketplace', desc: 'Browse and purchase verified formulas from top stylists. Every formula includes before/after photos, client hair profile, and step-by-step instructions. Buy once, use forever.' },
               { icon: <DollarSign size={22} />, title: 'Sell Your Formulas', desc: 'Monetize your expertise. Upload your signature formulas with photos and instructions. Set your price and earn every time another stylist purchases your creation.' },
               { icon: <ClipboardList size={22} />, title: 'Community Feed', desc: 'Share your best work, get feedback from fellow stylists, and discover trending techniques. Build a following and establish yourself as a color authority.' },
               { icon: <Shield size={22} />, title: 'Verified Reviews', desc: 'Every purchased formula can be reviewed by the buyer. Build trust with verified ratings and detailed feedback on formula accuracy and results.' },
@@ -231,7 +196,7 @@ export default function LandingPage() {
           <div style={{ width: 64, height: 64, borderRadius: 16, background: 'linear-gradient(135deg, #9333EA, #EC4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}><span style={{ color: 'white', fontWeight: 900, fontSize: 20 }}>CG</span></div>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Your next great formulation starts here.</h2>
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, marginBottom: 40 }}>Join 50 founding stylists shaping the future of professional hair color. Free during beta. No credit card required.</p>
-          <button onClick={() => setShowLogin(true)} style={{ ...btnPrimary, padding: '16px 40px', boxShadow: '0 0 40px rgba(147,51,234,0.2)' }}>Join the Beta <ArrowRight size={18} /></button>
+          <a href="/login" style={{ ...btnPrimary, padding: '16px 40px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
         </div>
       </section>
 
