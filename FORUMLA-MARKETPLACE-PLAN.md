@@ -142,7 +142,7 @@ CREATE TABLE revenue_splits (
     amount_cents INT,
     status VARCHAR(20) DEFAULT 'pending', -- pending, paid, failed
     paid_at TIMESTAMP,
-    stripe_transfer_id TEXT
+    square_transfer_id TEXT
 );
 
 -- Trending / seasonal feeds
@@ -239,7 +239,7 @@ OUTPUT: Personalized formula + confidence score + warnings
 
 ### Phase 3 (Months 9-14): Preparation
 - **Month 9-10:** AI adaptation engine v0 (parameterized formulas)
-- **Month 10-11:** Stripe Connect architecture, payout system
+- **Month 10-11:** Square Marketplace architecture, payout system
 - **Month 11-12:** Creator onboarding flow, analytics dashboard
 - **Month 12-14:** Beta marketplace with 50 creators, internal testing
 
@@ -292,7 +292,7 @@ OUTPUT: Personalized formula + confidence score + warnings
 | Low creator adoption | Medium | High | Start with champions; showcase earnings; easy upload |
 | AI adaptation quality poor | Medium | Critical | Conservative thresholds; human review; refund policy |
 | Content moderation failures | Medium | High | Automated + community flagging; clear guidelines |
-| Payment/chargeback issues | Low | High | Stripe Connect handles disputes; clear refund policy |
+| Payment/chargeback issues | Low | High | Square handles disputes; clear refund policy |
 | Marketplace chicken-and-egg | High | Medium | Seed with "staff picks"; incentivize early creators |
 | ByondEdu integration delays | Low | Medium | Parallel track; can launch without educator tier |
 
@@ -301,7 +301,7 @@ OUTPUT: Personalized formula + confidence score + warnings
 ## Next Steps
 
 1. **Architecture (Month 5-6):** Design marketplace schema extensions, API contracts
-2. **Stripe Connect Setup (Month 9):** Configure split payment flows, creator onboarding
+2. **Square Marketplace Setup (Month 9):** Configure split payment flows, creator onboarding
 3. **AI Adaptation v0 (Month 9-10):** Parameterized formula engine, confidence scoring
 4. **Community Beta (Month 6-7):** Before/after sharing, opt-in only
 5. **Creator Outreach (Month 12-14):** Recruit 50 beta creators from existing user base

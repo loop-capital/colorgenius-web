@@ -1,0 +1,145 @@
+[
+  { "code": "1N", "name": "1N Natural Black", "level": 1, "toneCode": "N", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "3N", "name": "3N Natural", "level": 3, "toneCode": "N", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "4N", "name": "4N Natural", "level": 4, "toneCode": "N", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "5N", "name": "5N Natural", "level": 5, "toneCode": "N", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "6N", "name": "6N Natural", "level": 6, "toneCode": "N", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "7N", "name": "7N Natural", "level": 7, "toneCode": "N", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "8N", "name": "8N Natural", "level": 8, "toneCode": "N", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "9N", "name": "9N Natural", "level": 9, "toneCode": "N", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "10N", "name": "10N Natural", "level": 10, "toneCode": "N", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+
+  { "code": "4N+", "name": "4N+ Monochrome", "level": 4, "toneCode": "N+", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "5N+", "name": "5N+ Monochrome", "level": 5, "toneCode": "N+", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "6N+", "name": "6N+ Monochrome", "level": 6, "toneCode": "N+", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "7N+", "name": "7N+ Monochrome", "level": 7, "toneCode": "N+", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+  { "code": "8N+", "name": "8N+ Monochrome", "level": 8, "toneCode": "N+", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "natural" },
+
+  { "code": "5NA", "name": "5NA Natural Ash", "level": 5, "toneCode": "NA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "6NA", "name": "6NA Natural Ash", "level": 6, "toneCode": "NA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "7NA", "name": "7NA Natural Ash", "level": 7, "toneCode": "NA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "8NA", "name": "8NA Natural Ash", "level": 8, "toneCode": "NA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+
+  { "code": "3NUA", "name": "3NUA Natural Ultra Ash", "level": 3, "toneCode": "NUA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "4NUA", "name": "4NUA Natural Ultra Ash", "level": 4, "toneCode": "NUA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "5NUA", "name": "5NUA Natural Ultra Ash", "level": 5, "toneCode": "NUA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "6NUA", "name": "6NUA Natural Ultra Ash", "level": 6, "toneCode": "NUA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "8NUA", "name": "8NUA Natural Ultra Ash", "level": 8, "toneCode": "NUA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+
+  { "code": "5NB", "name": "5NB Natural Brown", "level": 5, "toneCode": "NB", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+  { "code": "6NB", "name": "6NB Natural Brown", "level": 6, "toneCode": "NB", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+  { "code": "7NB", "name": "7NB Natural Brown", "level": 7, "toneCode": "NB", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+
+  { "code": "8NW+", "name": "8NW+ Natural Warm+", "level": 8, "toneCode": "NW+", "toneFamily": "warm", "line": "permanent", "brand": "kenra", "category": "warm" },
+
+  { "code": "6CN", "name": "6CN Copper Natural", "level": 6, "toneCode": "CN", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+  { "code": "7CN", "name": "7CN Copper Natural", "level": 7, "toneCode": "CN", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+
+  { "code": "4A", "name": "4A Ash", "level": 4, "toneCode": "A", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "5A", "name": "5A Ash", "level": 5, "toneCode": "A", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "6A", "name": "6A Ash", "level": 6, "toneCode": "A", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "7A", "name": "7A Ash", "level": 7, "toneCode": "A", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "8A", "name": "8A Ash", "level": 8, "toneCode": "A", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "9A", "name": "9A Ash", "level": 9, "toneCode": "A", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "10A", "name": "10A Ash", "level": 10, "toneCode": "A", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+
+  { "code": "6AA", "name": "6AA Ash Ash", "level": 6, "toneCode": "AA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "7AA", "name": "7AA Ash Ash", "level": 7, "toneCode": "AA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+  { "code": "8AA", "name": "8AA Ash Ash", "level": 8, "toneCode": "AA", "toneFamily": "ash", "line": "permanent", "brand": "kenra", "category": "ash" },
+
+  { "code": "3VR", "name": "3VR Violet Red", "level": 3, "toneCode": "VR", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+  { "code": "5VR", "name": "5VR Violet Red", "level": 5, "toneCode": "VR", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+
+  { "code": "5R", "name": "5R Red", "level": 5, "toneCode": "R", "toneFamily": "red", "line": "permanent", "brand": "kenra", "category": "red" },
+  { "code": "6R", "name": "6R Red", "level": 6, "toneCode": "R", "toneFamily": "red", "line": "permanent", "brand": "kenra", "category": "red" },
+
+  { "code": "4RR", "name": "4RR Red Red", "level": 4, "toneCode": "RR", "toneFamily": "red", "line": "permanent", "brand": "kenra", "category": "red" },
+  { "code": "6RR", "name": "6RR Red Red", "level": 6, "toneCode": "RR", "toneFamily": "red", "line": "permanent", "brand": "kenra", "category": "red" },
+  { "code": "7RR", "name": "7RR Red Red", "level": 7, "toneCode": "RR", "toneFamily": "red", "line": "permanent", "brand": "kenra", "category": "red" },
+
+  { "code": "5RC", "name": "5RC Red Copper", "level": 5, "toneCode": "RC", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+  { "code": "6RC", "name": "6RC Red Copper", "level": 6, "toneCode": "RC", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+
+  { "code": "4RB", "name": "4RB Red Brown", "level": 4, "toneCode": "RB", "toneFamily": "mahogany", "line": "permanent", "brand": "kenra", "category": "mahogany" },
+  { "code": "5RB", "name": "5RB Red Brown", "level": 5, "toneCode": "RB", "toneFamily": "mahogany", "line": "permanent", "brand": "kenra", "category": "mahogany" },
+  { "code": "6RB", "name": "6RB Red Brown", "level": 6, "toneCode": "RB", "toneFamily": "mahogany", "line": "permanent", "brand": "kenra", "category": "mahogany" },
+  { "code": "7RB", "name": "7RB Red Brown", "level": 7, "toneCode": "RB", "toneFamily": "mahogany", "line": "permanent", "brand": "kenra", "category": "mahogany" },
+
+  { "code": "3RV", "name": "3RV Red Violet", "level": 3, "toneCode": "RV", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+  { "code": "4RV", "name": "4RV Red Violet", "level": 4, "toneCode": "RV", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+  { "code": "5RV", "name": "5RV Red Violet", "level": 5, "toneCode": "RV", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+
+  { "code": "10V", "name": "10V Violet", "level": 10, "toneCode": "V", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+
+  { "code": "4VV", "name": "4VV Violet Violet", "level": 4, "toneCode": "VV", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+  { "code": "6VV", "name": "6VV Violet Violet", "level": 6, "toneCode": "VV", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+  { "code": "8VV", "name": "8VV Violet Violet", "level": 8, "toneCode": "VV", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+
+  { "code": "9PV", "name": "9PV Pearl Violet", "level": 9, "toneCode": "PV", "toneFamily": "pearl", "line": "permanent", "brand": "kenra", "category": "pearl" },
+
+  { "code": "7VM", "name": "7VM Violet Metallic", "level": 7, "toneCode": "VM", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+  { "code": "8VM", "name": "8VM Violet Metallic", "level": 8, "toneCode": "VM", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+  { "code": "9VM", "name": "9VM Violet Metallic", "level": 9, "toneCode": "VM", "toneFamily": "violet", "line": "permanent", "brand": "kenra", "category": "violet" },
+
+  { "code": "7SM", "name": "7SM Silver Metallic", "level": 7, "toneCode": "SM", "toneFamily": "cool", "line": "permanent", "brand": "kenra", "category": "cool" },
+  { "code": "8SM", "name": "8SM Silver Metallic", "level": 8, "toneCode": "SM", "toneFamily": "cool", "line": "permanent", "brand": "kenra", "category": "cool" },
+  { "code": "10SM", "name": "10SM Silver Metallic", "level": 10, "toneCode": "SM", "toneFamily": "cool", "line": "permanent", "brand": "kenra", "category": "cool" },
+
+  { "code": "8RoM", "name": "8RoM Rose Metallic", "level": 8, "toneCode": "RoM", "toneFamily": "red", "line": "permanent", "brand": "kenra", "category": "red" },
+  { "code": "10RoM", "name": "10RoM Rose Metallic", "level": 10, "toneCode": "RoM", "toneFamily": "red", "line": "permanent", "brand": "kenra", "category": "red" },
+
+  { "code": "4B", "name": "4B Brown Beige", "level": 4, "toneCode": "B", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+  { "code": "5B", "name": "5B Brown Beige", "level": 5, "toneCode": "B", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+  { "code": "6B", "name": "6B Brown Beige", "level": 6, "toneCode": "B", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+  { "code": "7B", "name": "7B Brown Beige", "level": 7, "toneCode": "B", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+  { "code": "8B", "name": "8B Brown Beige", "level": 8, "toneCode": "B", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+  { "code": "10B", "name": "10B Brown Beige", "level": 10, "toneCode": "B", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+
+  { "code": "6B+", "name": "6B+ Monochrome Brown", "level": 6, "toneCode": "B+", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+
+  { "code": "4BC", "name": "4BC Brown Copper", "level": 4, "toneCode": "BC", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+  { "code": "6BC", "name": "6BC Brown Copper", "level": 6, "toneCode": "BC", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+  { "code": "7BC", "name": "7BC Brown Copper", "level": 7, "toneCode": "BC", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+
+  { "code": "4BV+", "name": "4BV+ Beige Violet+", "level": 4, "toneCode": "BV+", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+  { "code": "5BV+", "name": "5BV+ Beige Violet+", "level": 5, "toneCode": "BV+", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+
+  { "code": "5MB+", "name": "5MB+ Monochrome Brown+", "level": 5, "toneCode": "MB+", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+  { "code": "7MB+", "name": "7MB+ Monochrome Brown+", "level": 7, "toneCode": "MB+", "toneFamily": "beige", "line": "permanent", "brand": "kenra", "category": "beige" },
+
+  { "code": "5G", "name": "5G Gold", "level": 5, "toneCode": "G", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+  { "code": "6G", "name": "6G Gold", "level": 6, "toneCode": "G", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+  { "code": "7G", "name": "7G Gold", "level": 7, "toneCode": "G", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+  { "code": "8G", "name": "8G Gold", "level": 8, "toneCode": "G", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+  { "code": "9G", "name": "9G Gold", "level": 9, "toneCode": "G", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+
+  { "code": "6GG", "name": "6GG Gold Gold", "level": 6, "toneCode": "GG", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+  { "code": "9GG", "name": "9GG Gold Gold", "level": 9, "toneCode": "GG", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+
+  { "code": "5GB", "name": "5GB Gold Brown Beige", "level": 5, "toneCode": "GB", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+  { "code": "8GB", "name": "8GB Gold Brown Beige", "level": 8, "toneCode": "GB", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+
+  { "code": "7GV+", "name": "7GV+ Gold Violet+", "level": 7, "toneCode": "GV+", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+  { "code": "9GV+", "name": "9GV+ Gold Violet+", "level": 9, "toneCode": "GV+", "toneFamily": "gold", "line": "permanent", "brand": "kenra", "category": "gold" },
+
+  { "code": "5C", "name": "5C Copper", "level": 5, "toneCode": "C", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+  { "code": "6C", "name": "6C Copper", "level": 6, "toneCode": "C", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+  { "code": "8C", "name": "8C Copper", "level": 8, "toneCode": "C", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+
+  { "code": "7CC", "name": "7CC Copper Copper", "level": 7, "toneCode": "CC", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+  { "code": "9CC", "name": "9CC Copper Copper", "level": 9, "toneCode": "CC", "toneFamily": "copper", "line": "permanent", "brand": "kenra", "category": "copper" },
+
+  { "code": "DF", "name": "DF Diamond Frost", "level": 12, "toneCode": "DF", "toneFamily": "pearl", "line": "permanent", "brand": "kenra", "category": "pearl" },
+
+  { "code": "1Bl+", "name": "1Bl+ Blonding Creme", "level": 1, "toneCode": "Bl+", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "lightener" },
+
+  { "code": "Clear", "name": "Clear Gloss", "level": 0, "toneCode": "Clear", "toneFamily": "natural", "line": "permanent", "brand": "kenra", "category": "clear" },
+
+  { "code": "RT SA", "name": "RT Rapid Toner Silver Ash", "level": 10, "toneCode": "RT-SA", "toneFamily": "ash", "line": "demi-permanent", "brand": "kenra", "category": "rapid-toner" },
+  { "code": "RT SV", "name": "RT Rapid Toner Silver Violet", "level": 10, "toneCode": "RT-SV", "toneFamily": "violet", "line": "demi-permanent", "brand": "kenra", "category": "rapid-toner" },
+  { "code": "RT VP", "name": "RT Rapid Toner Violet Pearl", "level": 10, "toneCode": "RT-VP", "toneFamily": "pearl", "line": "demi-permanent", "brand": "kenra", "category": "rapid-toner" },
+  { "code": "RT GrBl", "name": "RT Rapid Toner Gray Blue", "level": 10, "toneCode": "RT-GrBl", "toneFamily": "cool", "line": "demi-permanent", "brand": "kenra", "category": "rapid-toner" },
+  { "code": "RT B", "name": "RT Rapid Toner Blue", "level": 10, "toneCode": "RT-B", "toneFamily": "cool", "line": "demi-permanent", "brand": "kenra", "category": "rapid-toner" },
+  { "code": "RT GV", "name": "RT Rapid Toner Green Violet", "level": 10, "toneCode": "RT-GV", "toneFamily": "violet", "line": "demi-permanent", "brand": "kenra", "category": "rapid-toner" },
+  { "code": "RT RoV", "name": "RT Rapid Toner Rose Violet", "level": 10, "toneCode": "RT-RoV", "toneFamily": "violet", "line": "demi-permanent", "brand": "kenra", "category": "rapid-toner" }
+]

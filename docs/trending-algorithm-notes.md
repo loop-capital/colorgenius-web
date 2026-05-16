@@ -224,7 +224,7 @@ template_score = (sales_count × 10 + review_count × 4 + avg_rating × 20) / da
 |------|-----------|
 | Like-botting | Rate limit: max 1 like/5 sec per IP fingerprint. Require account age > 7 days. |
 | Self-promotion spam | Max 3 posts/day per stylist. Auto-flag posts with same photo hash. |
-| Purchase ring fraud | Require verified Stripe payment. Min purchase price: 500¢. Flag same-card multiple purchases. |
+| Purchase ring fraud | Require verified Square payment. Min purchase price: 500¢. Flag same-card multiple purchases. |
 | Review bombing | Only verified purchasers can review. Review cooldown: 7 days after purchase. |
 | Engagement farming | Weight saves/comments higher than likes. Track session duration — bots have 0 dwell time. |
 

@@ -1,0 +1,190 @@
+{
+  "brand": "kenra",
+  "line": "creatives",
+  "displayName": "Kenra Creatives",
+  "description": "Semi-permanent direct dye — 13 total shades: 7 Classically Bold + 6 Trendy Chic",
+  "type": "semi-permanent",
+  "subType": "direct-dye",
+  "developerRequired": false,
+  "shadeCount": 13,
+  "shadeGroups": [
+    {
+      "name": "Classically Bold",
+      "shades": [
+        { "code": "Red", "name": "Red", "toneFamily": "red" },
+        { "code": "Orange", "name": "Orange", "toneFamily": "copper" },
+        { "code": "Yellow", "name": "Yellow", "toneFamily": "gold" },
+        { "code": "Green", "name": "Green", "toneFamily": "green" },
+        { "code": "Blue", "name": "Blue", "toneFamily": "blue" },
+        { "code": "Violet", "name": "Violet", "toneFamily": "violet" },
+        { "code": "Pink", "name": "Pink", "toneFamily": "pink" }
+      ]
+    },
+    {
+      "name": "Trendy Chic",
+      "shades": [
+        { "code": "Teal", "name": "Teal", "toneFamily": "teal" },
+        { "code": "Turquoise", "name": "Turquoise", "toneFamily": "turquoise" },
+        { "code": "Magenta", "name": "Magenta", "toneFamily": "magenta" },
+        { "code": "Rose", "name": "Rose", "toneFamily": "rose" },
+        { "code": "Lavender", "name": "Lavender", "toneFamily": "lavender" },
+        { "code": "Silver", "name": "Silver", "toneFamily": "silver" }
+      ]
+    }
+  ],
+  "customizationShades": [
+    {
+      "code": "Clear",
+      "name": "Clear",
+      "purpose": "Mix into any shade for pastel tones",
+      "note": "For formula customization ONLY"
+    },
+    {
+      "code": "TrueBlack",
+      "name": "True Black",
+      "purpose": "Add to deepen or smoke out any shade",
+      "note": "For formula customization ONLY"
+    }
+  ],
+  "application": {
+    "hairState": "dry, pre-lightened hair",
+    "preLightenTo": "Level 10 for max vibrancy",
+    "processingTimeMin": 20,
+    "processingTimeMax": 20,
+    "processingTimeUnit": "min",
+    "temperature": "room temperature",
+    "heat": false
+  },
+  "shades": [
+    {
+      "code": "Red",
+      "name": "Red",
+      "toneFamily": "red",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Classically Bold"
+    },
+    {
+      "code": "Orange",
+      "name": "Orange",
+      "toneFamily": "copper",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Classically Bold"
+    },
+    {
+      "code": "Yellow",
+      "name": "Yellow",
+      "toneFamily": "gold",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Classically Bold"
+    },
+    {
+      "code": "Green",
+      "name": "Green",
+      "toneFamily": "green",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Classically Bold"
+    },
+    {
+      "code": "Blue",
+      "name": "Blue",
+      "toneFamily": "blue",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Classically Bold"
+    },
+    {
+      "code": "Violet",
+      "name": "Violet",
+      "toneFamily": "violet",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Classically Bold"
+    },
+    {
+      "code": "Pink",
+      "name": "Pink",
+      "toneFamily": "pink",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Classically Bold"
+    },
+    {
+      "code": "Teal",
+      "name": "Teal",
+      "toneFamily": "teal",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Trendy Chic"
+    },
+    {
+      "code": "Turquoise",
+      "name": "Turquoise",
+      "toneFamily": "turquoise",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Trendy Chic"
+    },
+    {
+      "code": "Magenta",
+      "name": "Magenta",
+      "toneFamily": "magenta",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Trendy Chic"
+    },
+    {
+      "code": "Rose",
+      "name": "Rose",
+      "toneFamily": "rose",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Trendy Chic"
+    },
+    {
+      "code": "Lavender",
+      "name": "Lavender",
+      "toneFamily": "lavender",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Trendy Chic"
+    },
+    {
+      "code": "Silver",
+      "name": "Silver",
+      "toneFamily": "silver",
+      "line": "creatives",
+      "brand": "kenra",
+      "type": "semi-permanent",
+      "subType": "direct-dye",
+      "group": "Trendy Chic"
+    }
+  ]
+}

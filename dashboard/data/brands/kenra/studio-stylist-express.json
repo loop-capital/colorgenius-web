@@ -1,0 +1,197 @@
+{
+  "brand": "kenra",
+  "line": "studio-stylist-express",
+  "displayName": "Kenra Color Studio Stylist Express",
+  "description": "10-minute permanent color — 17 shades in neutral and fashion tones",
+  "shadeCount": 17,
+  "shadeTypes": ["neutral", "fashion"],
+  "shades": [
+    {
+      "code": "10N",
+      "name": "Extra Light Blonde Natural",
+      "level": 10,
+      "toneCode": "N",
+      "toneFamily": "natural",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "9N",
+      "name": "Light Blonde Natural",
+      "level": 9,
+      "toneCode": "N",
+      "toneFamily": "natural",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "8N",
+      "name": "Blonde Natural",
+      "level": 8,
+      "toneCode": "N",
+      "toneFamily": "natural",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "7N",
+      "name": "Medium Blonde Natural",
+      "level": 7,
+      "toneCode": "N",
+      "toneFamily": "natural",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "6N",
+      "name": "Dark Blonde Natural",
+      "level": 6,
+      "toneCode": "N",
+      "toneFamily": "natural",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "5N",
+      "name": "Light Brown Natural",
+      "level": 5,
+      "toneCode": "N",
+      "toneFamily": "natural",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "4N",
+      "name": "Medium Brown Natural",
+      "level": 4,
+      "toneCode": "N",
+      "toneFamily": "natural",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "3N",
+      "name": "Dark Brown Natural",
+      "level": 3,
+      "toneCode": "N",
+      "toneFamily": "natural",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "7A",
+      "name": "Medium Blonde Ash",
+      "level": 7,
+      "toneCode": "A",
+      "toneFamily": "ash",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "6A",
+      "name": "Dark Blonde Ash",
+      "level": 6,
+      "toneCode": "A",
+      "toneFamily": "ash",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "7G",
+      "name": "Medium Blonde Gold",
+      "level": 7,
+      "toneCode": "G",
+      "toneFamily": "gold",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "6G",
+      "name": "Dark Blonde Gold",
+      "level": 6,
+      "toneCode": "G",
+      "toneFamily": "gold",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "7C",
+      "name": "Medium Blonde Copper",
+      "level": 7,
+      "toneCode": "C",
+      "toneFamily": "copper",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "6C",
+      "name": "Dark Blonde Copper",
+      "level": 6,
+      "toneCode": "C",
+      "toneFamily": "copper",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "7RV",
+      "name": "Medium Blonde Red Violet",
+      "level": 7,
+      "toneCode": "RV",
+      "toneFamily": "red-violet",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "6RV",
+      "name": "Dark Blonde Red Violet",
+      "level": 6,
+      "toneCode": "RV",
+      "toneFamily": "red-violet",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    },
+    {
+      "code": "5RV",
+      "name": "Light Brown Red Violet",
+      "level": 5,
+      "toneCode": "RV",
+      "toneFamily": "red-violet",
+      "line": "studio-stylist-express",
+      "brand": "kenra",
+      "type": "permanent",
+      "subType": "express"
+    }
+  ]
+}

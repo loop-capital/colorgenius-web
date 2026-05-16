@@ -1,0 +1,52 @@
+[
+  {"code":"3","level":3,"tone":"0","name":"Dark Brown Intense Neutral","family":"natural","line":"Calura Gloss"},
+  {"code":"5","level":5,"tone":"0","name":"Light Brown Neutral","family":"natural","line":"Calura Gloss"},
+  {"code":"6","level":6,"tone":"0","name":"Dark Blonde Neutral","family":"natural","line":"Calura Gloss"},
+  {"code":"7","level":7,"tone":"0","name":"Medium Blonde Neutral","family":"natural","line":"Calura Gloss"},
+  {"code":"8","level":8,"tone":"0","name":"Light Blonde Neutral","family":"natural","line":"Calura Gloss"},
+  {"code":"9","level":9,"tone":"0","name":"Very Light Blonde Neutral","family":"natural","line":"Calura Gloss"},
+  {"code":"10","level":10,"tone":"0","name":"Pale Blonde Neutral","family":"natural","line":"Calura Gloss"},
+
+  {"code":"5-1","level":5,"tone":"1","name":"Light Brown Ash","family":"ash","line":"Calura Gloss"},
+  {"code":"6-1","level":6,"tone":"1","name":"Dark Blonde Ash","family":"ash","line":"Calura Gloss"},
+  {"code":"7-1","level":7,"tone":"1","name":"Medium Blonde Ash","family":"ash","line":"Calura Gloss"},
+  {"code":"8-1","level":8,"tone":"1","name":"Light Blonde Ash","family":"ash","line":"Calura Gloss"},
+  {"code":"9-1","level":9,"tone":"1","name":"Very Light Blonde Ash","family":"ash","line":"Calura Gloss"},
+  {"code":"10-1","level":10,"tone":"1","name":"Pale Blonde Ash","family":"ash","line":"Calura Gloss"},
+
+  {"code":"6-11","level":6,"tone":"11","name":"Dark Blonde Intense Ash","family":"ash","line":"Calura Gloss"},
+  {"code":"8-11","level":8,"tone":"11","name":"Light Blonde Intense Ash","family":"ash","line":"Calura Gloss"},
+
+  {"code":"9-18","level":9,"tone":"18","name":"Very Light Blonde Ash Brown","family":"ash","line":"Calura Gloss"},
+  {"code":"10-18","level":10,"tone":"18","name":"Pale Blonde Ash Brown","family":"ash","line":"Calura Gloss"},
+
+  {"code":"9-2","level":9,"tone":"2","name":"Very Light Blonde Iridescent","family":"iridescent","line":"Calura Gloss"},
+
+  {"code":"3-3","level":3,"tone":"3","name":"Dark Brown Gold","family":"gold","line":"Calura Gloss"},
+  {"code":"5-3","level":5,"tone":"3","name":"Light Brown Gold","family":"gold","line":"Calura Gloss"},
+  {"code":"7-3","level":7,"tone":"3","name":"Medium Blonde Gold","family":"gold","line":"Calura Gloss"},
+  {"code":"8-3","level":8,"tone":"3","name":"Light Blonde Gold","family":"gold","line":"Calura Gloss"},
+  {"code":"9-3","level":9,"tone":"3","name":"Very Light Blonde Gold","family":"gold","line":"Calura Gloss"},
+  {"code":"10-3","level":10,"tone":"3","name":"Pale Blonde Gold","family":"gold","line":"Calura Gloss"},
+
+  {"code":"4-318","level":4,"tone":"318","name":"Medium Brown Cool Brown","family":"beige","line":"Calura Gloss"},
+  {"code":"6-318","level":6,"tone":"318","name":"Dark Blonde Cool Brown","family":"beige","line":"Calura Gloss"},
+  {"code":"8-318","level":8,"tone":"318","name":"Light Blonde Cool Brown","family":"beige","line":"Calura Gloss"},
+  {"code":"10-318","level":10,"tone":"318","name":"Pale Blonde Cool Brown","family":"beige","line":"Calura Gloss"},
+
+  {"code":"8-4","level":8,"tone":"4","name":"Light Blonde Copper","family":"copper","line":"Calura Gloss"},
+  {"code":"4-34","level":4,"tone":"34","name":"Medium Brown Gold Copper","family":"copper","line":"Calura Gloss"},
+  {"code":"6-34","level":6,"tone":"34","name":"Dark Blonde Gold Copper","family":"copper","line":"Calura Gloss"},
+  {"code":"8-34","level":8,"tone":"34","name":"Light Blonde Gold Copper","family":"copper","line":"Calura Gloss"},
+  {"code":"10-34","level":10,"tone":"34","name":"Pale Blonde Gold Copper","family":"copper","line":"Calura Gloss"},
+
+  {"code":"6-55","level":6,"tone":"55","name":"Dark Blonde Intense Red","family":"red","line":"Calura Gloss"},
+
+  {"code":"5-6","level":5,"tone":"6","name":"Light Brown Violet","family":"violet","line":"Calura Gloss"},
+
+  {"code":"4-8","level":4,"tone":"8","name":"Medium Brown Brown","family":"natural","line":"Calura Gloss"},
+  {"code":"6-8","level":6,"tone":"8","name":"Dark Blonde Brown","family":"natural","line":"Calura Gloss"},
+  {"code":"8-8","level":8,"tone":"8","name":"Light Blonde Brown","family":"natural","line":"Calura Gloss"},
+
+  {"code":"CLEAR","level":0,"tone":"0","name":"Clear","family":"natural","line":"Calura Gloss"}
+]

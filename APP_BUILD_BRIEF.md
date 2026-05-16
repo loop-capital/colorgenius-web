@@ -163,7 +163,7 @@ ReFa uses 7 tabbed steps: Client → Pre-Treatment → Hair Analysis → Desired
 - **Formula Detail** (`/formula/:id`) — Before/after, products, technique, adapt CTA
 - **Marketplace Browse** (`/marketplace`) — Trending, seasonal, search templates
 - **Creator Dashboard** (`/creator`) — Earnings, analytics, template management
-- **Purchase Flow** (`/marketplace/checkout`) — Stripe Connect purchase + adaptation
+- **Purchase Flow** (`/marketplace/checkout`) — Square Marketplace purchase + adaptation
 
 ## Timeline
 - **Week 1 (April 16-23):** App shell, Dashboard, Formulation page (mock data)

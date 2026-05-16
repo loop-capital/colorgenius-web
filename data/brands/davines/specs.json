@@ -1,0 +1,84 @@
+{
+  "brand": "Davines",
+  "productLine": "Multiple Lines (View, A New Colour, Mask with Vibrachrom)",
+  "lines": [
+    {
+      "name": "View",
+      "description": "Tone-on-tone color line with acidic pH for shine and fullness",
+      "mixingRatio": "Mixing ratio: 1 part color + 1 part Activator 10 vol",
+      "processingTime": "Processing time: 5-20 minutes (visual control)",
+      "levelRange": "1-10",
+      "toneSystem": {
+        ".1": "ash",
+        ".2": "green",
+        ".3": "gold",
+        ".4": "copper",
+        ".5": "mahogany",
+        ".6": "red",
+        ".7": "mat/green",
+        ".8": "mocha/brown",
+        ".9": "soft ash blue"
+      }
+    },
+    {
+      "name": "A New Colour",
+      "description": "Ammonia-free permanent color system for total gray coverage",
+      "mixingRatio": "Mixing ratio: 1 part color + 1 part Activator (5, 10, 20, 30, or 40 vol)",
+      "processingTime": "Processing time: 30-40 minutes",
+      "levelRange": "1-10",
+      "toneSystem": {
+        ".0": "natural",
+        ".1": "ash",
+        ".2": "iridescent",
+        ".3": "gold",
+        ".4": "copper",
+        ".5": "mahogany",
+        ".6": "red",
+        ".7": "mat",
+        ".8": "mocha",
+        ".9": "soft"
+      }
+    },
+    {
+      "name": "Mask with Vibrachrom",
+      "description": "Permanent cream-based color with Vibrachrom™ technology for intense conditioning",
+      "mixingRatio": "1:1",
+      "processingTime": "Processing time varies based on desired result",
+      "levelRange": "1-10",
+      "toneSystem": {
+        ".0": "natural",
+        ".1": "ash",
+        ".2": "iridescent",
+        ".3": "gold",
+        ".4": "copper",
+        ".5": "mahogany",
+        ".6": "red",
+        ".7": "mat",
+        ".8": "mocha",
+        ".9": "soft"
+      }
+    }
+  ],
+  "formulationGuidelines": {
+    "mixing_ratios": {
+      "View": "1 part color + 1 part Activator 10 vol",
+      "A New Colour": "1 part color + 1 part Activator (5, 10, 20, 30, or 40 vol)",
+      "Mask with Vibrachrom": "1 part color + 1 part Activator (varies based on desired lift)"
+    },
+    "processing_times": {
+      "View": "5-20 minutes (visual control)",
+      "A New Colour": "30-40 minutes",
+      "Mask with Vibrachrom": "Varies based on desired result"
+    },
+    "gray_coverage": {
+      "View": "Up to 50% white hair",
+      "A New Colour": "Up to 100%",
+      "Mask with Vibrachrom": "Varies based on formulation"
+    },
+    "lift_capability": {
+      "View": "Tone-on-tone (minimal level change)",
+      "A New Colour": "Up to 7 levels of lift",
+      "Mask with Vibrachrom": "Can be mixed with activators for lift"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "brand": "Kevin Murphy",
+  "lines": [
+    {
+      "name": "COLOR.ME",
+      "type": "permanent",
+      "description": "Kevin Murphy COLOR.ME — naturally-derived, ammonia-free permanent hair color. Features Moisture Memory, ChromaSilk Complex, and PPD-free formulations. Organized into Natural, Cool, Warm, and Special categories with unique tone numbering system.",
+      "mixingRatio": "1:1.5",
+      "developers": [
+        {"volume": 10, "percent": "3%", "name": "COLOR.ME 10 Volume Developer", "use": "Deposit only, tone-on-tone"},
+        {"volume": 20, "percent": "6%", "name": "COLOR.ME 20 Volume Developer", "use": "Up to 1 level of lift, grey coverage"},
+        {"volume": 30, "percent": "9%", "name": "COLOR.ME 30 Volume Developer", "use": "Up to 2 levels of lift"},
+        {"volume": 40, "percent": "12%", "name": "COLOR.ME 40 Volume Developer", "use": "Up to 3 levels of lift, high-lift shades only"}
+      ],
+      "processingTimes": [
+        {"use": "Standard (20vol)", "time": "30-35 min"},
+        {"use": "Grey coverage (20vol)", "time": "35-40 min"},
+        {"use": "High-lift (30-40vol)", "time": "40-50 min"}
+      ],
+      "categories": {
+        "natural": "Natural, Golden, Taupe, Chocolate, Intense, Mahogany",
+        "cool": "Intense Ash, Ash, Ash Gold, Violet, Violet Ash, Matte",
+        "warm": "Gold, Gold Ash, Copper, Red, Red Gold, Red Violet",
+        "special": "Clear + 8 Mixers (Yellow, Orange, Red, Pink, Violet, Blue, Ash, Teal)",
+        "highLift": "Level 12 high-lift blondes"
+      },
+      "features": [
+        "Moisture Memory — recalls lost moisture, restores shine and condition",
+        "ChromaSilk Complex — micro-pigments for even color deposit and long-lasting results",
+        "PPD-free formulations available",
+        "Naturally-derived ingredients where possible",
+        "9 Mixers for custom color creation"
+      ]
+    }
+  ],
+  "toneSystem": {
+    "description": "Kevin Murphy COLOR.ME tone numbering system",
+    "tones": {
+      ".0": "Natural (intense coverage)",
+      ".00": "Natural (extra coverage)",
+      ".1": "Intense Ash",
+      ".13": "Ash",
+      ".16": "Ash Gold",
+      ".18": "Violet (cool)",
+      ".21": "Golden",
+      ".3": "Gold",
+      ".34": "Copper",
+      ".38": "Gold Ash",
+      ".4": "Red",
+      ".43": "Red Gold",
+      ".5": "Mahogany",
+      ".6": "Red Violet",
+      ".65": "Red Violet (intense)",
+      ".7": "Chocolate / Mahogany",
+      ".73": "Intense Chocolate",
+      ".75": "Mahogany (intense)",
+      ".77": "Taupe",
+      ".8": "Violet",
+      ".81": "Violet Ash",
+      ".86": "Gold (warm)",
+      ".9": "Matte Ash"
+    }
+  },
+  "specialNotes": [
+    "COLOR.ME uses a unique tone numbering system — not directly compatible with standard international tone numbers",
+    ".00 shades are extra-coverage naturals for resistant grey",
+    "Mixers can be used to intensify or neutralize (max 10-15% of formula)",
+    "High Lift shades (12.x) are level 12 — require 30 or 40 vol developer"
+  ]
+}

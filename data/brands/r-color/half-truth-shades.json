@@ -1,0 +1,19 @@
+[
+  { "code": "CLEAR", "name": "LOOKING GLASS", "level": 0, "toneCode": "0", "toneFamily": "neutral", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-01", "name": "NEON ORCHID", "level": 0, "toneCode": "0", "toneFamily": "violet", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-02", "name": "COTTON CANDY", "level": 0, "toneCode": "0", "toneFamily": "red", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-03", "name": "MERCURY", "level": 0, "toneCode": "0", "toneFamily": "neutral", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-04", "name": "HEART TO HEART", "level": 0, "toneCode": "0", "toneFamily": "red", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-05", "name": "CUPCAKE", "level": 0, "toneCode": "0", "toneFamily": "copper", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-06", "name": "CANDY APPLE", "level": 0, "toneCode": "0", "toneFamily": "red", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-07", "name": "NEPTUNE", "level": 0, "toneCode": "0", "toneFamily": "violet", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-08", "name": "VELVET MORNING", "level": 0, "toneCode": "0", "toneFamily": "violet", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-09", "name": "LOVER", "level": 0, "toneCode": "0", "toneFamily": "red", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-10", "name": "BLUE LAGOON", "level": 0, "toneCode": "0", "toneFamily": "violet", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-11", "name": "DAZED", "level": 0, "toneCode": "0", "toneFamily": "violet", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-12", "name": "DENIM JACKET", "level": 0, "toneCode": "0", "toneFamily": "violet", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-13", "name": "DRAGON", "level": 0, "toneCode": "0", "toneFamily": "red", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-14", "name": "BLUE VELVET", "level": 0, "toneCode": "0", "toneFamily": "violet", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-15", "name": "RAVE", "level": 0, "toneCode": "0", "toneFamily": "red", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true },
+  { "code": "HT-16", "name": "SQUEEZE", "level": 0, "toneCode": "0", "toneFamily": "gold", "hex": null, "isHighLift": false, "isDemi": false, "grayCoverage": "none", "isSemiPermanent": true }
+]

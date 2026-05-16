@@ -1,0 +1,21 @@
+{
+  "name": "@colorgenius/integration",
+  "version": "1.0.0",
+  "private": true,
+  "description": "COLORgenius POS & Scheduling Integration Layer",
+  "workspaces": [
+    "square",
+    "vagaro"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces",
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspaces"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

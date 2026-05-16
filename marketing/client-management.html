@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Management — COLORgenius</title>
+  <meta name="description" content="Complete client profile management for salons. Track color history, allergies, sensitivities, before/after photos, and team notes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">COLOR<span>genius</span></a>
+
+      <div class="nav-links">
+        <a href="index.html#features">Features</a>
+        <a href="formula-conversion.html">Formula Conversion</a>
+        <a href="client-management.html">Clients</a>
+        <a href="integrations.html">Integrations</a>
+        <a href="index.html#pricing">Pricing</a>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="signup.html" class="btn btn-primary btn-sm nav-cta">Get Started</a>
+        <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-mobile-menu" id="mobileMenu">
+      <a href="index.html#features">Features</a>
+      <a href="formula-conversion.html">Formula Conversion</a>
+      <a href="client-management.html">Clients</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="signup.html" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="container">
+      <h1 class="page-title">Client Management</h1>
+      <p class="page-subtitle">Know every client inside and out. Complete color history, allergy tracking, sensitivities, and team notes — all in one place.</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <section class="product-section">
+    <div class="container">
+      <div class="feature-showcase reveal">
+        <div class="feature-showcase-mockup">
+          <div style="padding:1rem;background:linear-gradient(135deg,var(--color-primary),var(--color-accent));border-radius:var(--radius-md);color:#fff;text-align:center;margin-bottom:1rem;">
+            <div style="font-size:0.75rem;opacity:0.8;">Client Profile</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--color-primary),var(--color-accent));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;">JD</div>
+            <div>
+              <div style="font-weight:700;color:var(--color-text);">Jane Doe</div>
+              <div style="font-size:0.75rem;color:var(--color-text-muted);">Client since Mar 2024</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+            <div style="flex:1;background:linear-gradient(135deg,rgba(13,148,136,0.1),rgba(124,58,237,0.1));border-radius:var(--radius-sm);padding:0.5rem;text-align:center;">
+              <div style="font-size:1.25rem;font-weight:800;color:var(--color-primary);">12</div>
+              <div style="font-size:0.6875rem;color:var(--color-text-muted);">Visits</div>
+            </div>
+            <div style="flex:1;background:linear-gradient(135deg,rgba(13,148,136,0.1),rgba(124,58,237,0.1));border-radius:var(--radius-sm);padding:0.5rem;text-align:center;">
+              <div style="font-size:1.25rem;font-weight:800;color:var(--color-primary);">8</div>
+              <div style="font-size:0.6875rem;color:var(--color-text-muted);">Formulas</div>
+            </div>
+            <div style="flex:1;background:linear-gradient(135deg,rgba(13,148,136,0.1),rgba(124,58,237,0.1));border-radius:var(--radius-sm);padding:0.5rem;text-align:center;">
+              <div style="font-size:1.25rem;font-weight:800;color:var(--color-primary);">3</div>
+              <div style="font-size:0.6875rem;color:var(--color-text-muted);">Photos</div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:0.75rem;margin-bottom:0.5rem;">
+            <div style="font-size:0.6875rem;color:var(--color-text-muted);margin-bottom:0.25rem;">Last Visit</div>
+            <div style="font-size:0.875rem;color:var(--color-text);">Wella 6N + 20vol — Root touch-up</div>
+            <div style="font-size:0.75rem;color:var(--color-primary);margin-top:0.25rem;">May 12, 2026</div>
+          </div>
+
+          <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius-sm);padding:0.75rem;">
+            <div style="font-size:0.6875rem;color:#dc2626;font-weight:600;margin-bottom:0.25rem;">⚠️ Allergy Alert</div>
+            <div style="font-size:0.8125rem;color:#7f1d1d;">Sensitive to PPD — Use ammonia-free formulas</div>
+          </div>
+        </div>
+
+        <div class="feature-showcase-content">
+          <h2>Never Forget a Client Again</h2>
+          <p class="mt-4">Every client gets a beautiful, comprehensive profile card. Their complete color history, allergies, sensitivities, preferences, and your personal notes — organized and instantly accessible.</p>
+
+          <div class="product-features-list">
+            <div class="product-feature-item">
+              <div class="product-feature-icon">📋</div>
+              <div class="product-feature-content">
+                <h4>Complete Color History</h4>
+                <p>Every formula, every brand, every visit — chronological and searchable.</p>
+              </div>
+            </div>
+
+            <div class="product-feature-item">
+              <div class="product-feature-icon">⚠️</div>
+              <div class="product-feature-content">
+                <h4>Allergy & Sensitivity Alerts</h4>
+                <p>Prominent warnings for PPD, ammonia, and custom sensitivities.</p>
+              </div>
+            </div>
+
+            <div class="product-feature-item">
+              <div class="product-feature-icon">📸</div>
+              <div class="product-feature-content">
+                <h4>Before/After Photos</h4>
+                <p>Attach photos to any visit. Build a visual reference for every client.</p>
+              </div>
+            </div>
+
+            <div class="product-feature-item">
+              <div class="product-feature-icon">📝</div>
+              <div class="product-feature-content">
+                <h4>Team Notes</h4>
+                <p>Share observations across your salon team. Everyone stays in sync.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Detail -->
+  <section class="section section-alt">
+    <div class="container">
+      <div class="text-center reveal">
+        <h2>Everything in One Profile</h2>
+        <p class="mt-4" style="max-width:600px;margin:1rem auto 0;">One card. All the information you need. No more sticky notes, no more guessing.</p>
+      </div>
+
+      <div class="grid-3" style="margin-top:3rem;">
+        <div class="reveal reveal-delay-1">
+          <div style="background:#fff;border-radius:var(--radius-lg);padding:2rem;border:1px solid var(--color-border);">
+            <div style="width:48px;height:48px;border-radius:var(--radius-md);background:linear-gradient(135deg,rgba(13,148,136,0.1),rgba(124,58,237,0.1));display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;">🔍</div>
+            <h3 style="font-size:1.125rem;margin-bottom:0.5rem;">Instant Search</h3>
+            <p style="font-size:0.9375rem;">Find any client by name, phone, or even their last formula. Results in milliseconds.</p>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+          <div style="background:#fff;border-radius:var(--radius-lg);padding:2rem;border:1px solid var(--color-border);">
+            <div style="width:48px;height:48px;border-radius:var(--radius-md);background:linear-gradient(135deg,rgba(13,148,136,0.1),rgba(124,58,237,0.1));display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;">🔔</div>
+            <h3 style="font-size:1.125rem;margin-bottom:0.5rem;">Smart Reminders</h3>
+            <p style="font-size:0.9375rem;">Get notified when a client is due for a touch-up or color refresh.</p>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-3">
+          <div style="background:#fff;border-radius:var(--radius-lg);padding:2rem;border:1px solid var(--color-border);">
+            <div style="width:48px;height:48px;border-radius:var(--radius-md);background:linear-gradient(135deg,rgba(13,148,136,0.1),rgba(124,58,237,0.1));display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1rem;">👥</div>
+            <h3 style="font-size:1.125rem;margin-bottom:0.5rem;">Multi-Stylist Support</h3>
+            <p style="font-size:0.9375rem;">Clients can see multiple stylists. Every professional sees the full history.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="reveal">
+        <h2 class="cta-title">Give Every Client VIP Treatment</h2>
+        <p class="cta-subtitle">Start managing client profiles like the professional you are.</p>
+        <div class="flex justify-center">
+          <a href="signup.html" class="btn btn-primary btn-lg">Start Free Trial</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="footer-logo">COLOR<span>genius</span></a>
+          <p class="footer-desc">AI-powered color formula management for professional stylists and salons.</p>
+        </div>
+        <div>
+          <h4 class="footer-title">Product</h4>
+          <ul class="footer-links">
+            <li><a href="formula-conversion.html">Formula Conversion</a></li>
+            <li><a href="client-management.html">Client Management</a></li>
+            <li><a href="integrations.html">Integrations</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Company</h4>
+          <ul class="footer-links">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="footer-title">Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 COLORgenius. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

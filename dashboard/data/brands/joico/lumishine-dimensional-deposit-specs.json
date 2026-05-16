@@ -1,0 +1,77 @@
+{
+  "brand": "Joico",
+  "productLine": "LumiShine Repair+ Dimensional Deposit Demi-Permanent Crème Color",
+  "source": "Joico LumiShine Repair+ Dimensional Deposit technical data sheet",
+  "verification_status": "pending_review",
+  "verified_date": null,
+  "distributor": "Joico / Shiseido Americas",
+  "website": "www.joico.com",
+  "numbering_system": {
+    "description": "Joico LumiShine Dimensional Deposit uses a simplified shade range from the standard LumiShine numbering system. Focused on deposit-only application with fewer tonal variations.",
+    "level_range": "2-8",
+    "tone_codes": {
+      "NN": "Double Natural",
+      "N": "Natural",
+      "NA": "Natural Ash",
+      "NW": "Natural Warm",
+      "NG": "Natural Gold"
+    }
+  },
+  "lines": [
+    {
+      "name": "LumiShine Repair+ Dimensional Deposit Demi-Permanent Crème Color",
+      "type": "demi-permanent",
+      "mixRatio": "1:1 (color : LumiShine Demi-Permanent Developer)",
+      "developerVolumes": [6, 10],
+      "processingTime": "20 minutes at room temperature",
+      "description": "Ammonia-free demi-permanent crème color. Can go light to dark in one step without pre-pigmentation. Grey blending on level 6+, grey coverage on level 5 and darker. ArgiPlex and Quadramine Complex technology."
+    }
+  ],
+  "developers": {
+    "lumishine_demi_developer": {
+      "volumes": [6, 10],
+      "strengths": {
+        "6": "6 Volume (1.8%)",
+        "10": "10 Volume (3%)"
+      }
+    },
+    "usage": {
+      "6_vol": {
+        "use": "Gentle deposit, grey blending, sensitive scalp",
+        "lift": "No lift"
+      },
+      "10_vol": {
+        "use": "Standard demi-permanent deposit, toning, refreshing",
+        "lift": "No lift"
+      }
+    }
+  },
+  "gray_coverage": {
+    "rule": "Grey blending on level 6 and lighter; grey coverage on level 5 and darker",
+    "blending": "Subtle grey blending without full coverage on lighter levels",
+    "coverage": "Full grey coverage on level 5 and darker shades",
+    "recommended": "Use NN (Double Natural) or N (Natural) shades for best grey results"
+  },
+  "formulation_guidelines": {
+    "use_cases": {
+      "deposit_only": "Deposit color without lift — can go light to dark in one step",
+      "grey_coverage": "Full coverage on level 5 and darker without pre-pigmentation",
+      "grey_blending": "Blend grey on level 6 and lighter",
+      "toning": "Add tone and dimension to pre-lightened or natural hair"
+    },
+    "mixing_ratios": {
+      "standard": "1:1 (color : LumiShine Demi-Permanent Developer)",
+      "thick_hair": "1:1 (standard)"
+    },
+    "processing_times": {
+      "standard": "20 minutes at room temperature",
+      "deeper_penetration": "Up to 25 minutes for resistant hair or grey coverage"
+    },
+    "tonal_direction": {
+      "cooling": ["NA"],
+      "warming": ["NW", "NG"],
+      "neutral": ["N", "NN"]
+    },
+    "dimensional_deposit_note": "Simplified shade range designed for deposit-only services. Can go light to dark without pre-pigmentation."
+  }
+}

@@ -1,0 +1,80 @@
+name: EAS Build and Submit to TestFlight
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+        
+      - name: Login to Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-username: ${{ secrets.EXPO_USERNAME }}
+          expo-password: ${{ secrets.EXPO_PASSWORD }}
+          
+      - name: Run lint and type check
+        run: |
+          npm run lint
+          npx tsc --noEmit
+          
+      - name: Build iOS app for TestFlight
+        run: |
+          eas build --platform ios --profile preview --auto-submit
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          
+      - name: Build Android app (optional)
+        run: |
+          eas build --platform android --profile preview
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        if: false  # Set to true if you want Android builds too
+
+  # Optional: Deploy to TestFlight on version tags
+  release:
+    needs: build
+    runs-on: macos-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+        
+      - name: Login to Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-username: ${{ secrets.EXPO_USERNAME }}
+          expo-password: ${{ secrets.EXPO_PASSWORD }}
+          
+      - name: Submit to TestFlight
+        run: |
+          eas submit --platform ios --latest
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

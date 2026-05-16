@@ -1,0 +1,106 @@
+{
+  "brand": "Wella Professionals",
+  "lines": [
+    {
+      "name": "Color Touch",
+      "type": "demi-permanent",
+      "description": "Wella Professionals' most versatile demi-permanent hair colour. Ammonia-free, silicone-free, mineral oil-free, vegan emulsion. Up to 85% naturally derived ingredients. Built-in Metal Purifier encapsulates metals for true-to-tone vibrancy. Up to 70% grey coverage with soft regrowth. Lasts up to 28 washes.",
+      "mixingRatio": "1:2",
+      "developers": [
+        {"volume": 6, "percent": "1.9%", "name": "Color Touch Emulsion 1.9%", "use": "Same depth or darkening, soft regrowth, toning blondes, soft grey blending"},
+        {"volume": 13, "percent": "4%", "name": "Color Touch Emulsion 4%", "use": "Increased vibrancy, coarse hair, intense grey blending, up to 70% grey coverage (with Plus), low lift"}
+      ],
+      "processingTimes": [
+        {"use": "With Climazon (heated)", "time": "15 min"},
+        {"use": "Without heat (room temp)", "time": "20 min"},
+        {"use": "Toning", "time": "5-20 min (visual development)"}
+      ],
+      "categories": {
+        "pure-naturals": "Natural base shades for coverage and depth",
+        "rich-naturals": "Fashion naturals with reflect — ash, gold, violet, pearl, cendre",
+        "deep-browns": "Warm and cool brown reflects (/7 series)",
+        "vibrant-reds": "Copper, red, violet intense shades — includes double-pigment shades (XX/YY format)",
+        "special-mix": "Concentrated boosters — Copper, Red, Violet, Matte, Ash"
+      },
+      "applicationNotes": [
+        "1:2 ratio — 30g color + 60g emulsion",
+        "Apply to shampooed, towel-dried hair",
+        "Pairs seamlessly with Koleston Perfect for regrowth + Color Touch on lengths/ends",
+        "For toning: process until desired neutralization is achieved visually",
+        "Rinse thoroughly, no shampoo required"
+      ]
+    },
+    {
+      "name": "Color Touch Plus",
+      "type": "demi-permanent",
+      "subtype": "increased-grey-coverage",
+      "description": "Increased grey coverage variant of Color Touch. Alkaline formula with MEA and low-ammonia for up to 70% grey coverage with soft regrowth line. Apply to dry hair.",
+      "mixingRatio": "1:2",
+      "developers": [
+        {"volume": 13, "percent": "4%", "name": "Color Touch Emulsion 4%", "use": "Up to 70% grey coverage. Apply to dry hair."}
+      ],
+      "processingTimes": [
+        {"use": "Standard", "time": "20 min"}
+      ],
+      "notes": [
+        "Only available in natural shades at levels 4-8 (XX/07 format)",
+        "Apply to DRY hair (unlike standard Color Touch)",
+        "Contains MEA and low ammonia for increased coverage",
+        "Use 4% emulsion only"
+      ]
+    }
+  ],
+  "toneSystem": {
+    "description": "Wella International Tone Numbering: Level/Tone format (e.g., 7/43 = level 7 copper-gold)",
+    "primaryTones": {
+      "/0": "Natural",
+      "/1": "Ash",
+      "/2": "Matte",
+      "/3": "Gold",
+      "/4": "Copper/Red",
+      "/5": "Red/Warm",
+      "/6": "Violet",
+      "/7": "Brown/Mahogany",
+      "/8": "Cendre (Pearl-Blue)",
+      "/9": "Pearl"
+    },
+    "secondaryTones": {
+      "/01": "Natural Ash",
+      "/02": "Natural Ash (grey coverage)",
+      "/03": "Natural Gold",
+      "/05": "Natural Gold (warm)",
+      "/16": "Ash Violet",
+      "/34": "Gold Copper",
+      "/35": "Gold Brown",
+      "/36": "Gold Violet",
+      "/37": "Gold Brown Warm",
+      "/38": "Gold Cendre",
+      "/41": "Copper Ash",
+      "/43": "Copper Gold",
+      "/45": "Red Warm",
+      "/47": "Copper Brown",
+      "/54": "Red Copper",
+      "/56": "Violet Booster",
+      "/57": "Red Brown",
+      "/65": "Violet Warm",
+      "/66": "Intense Violet",
+      "/68": "Matte (Green)",
+      "/71": "Brown Ash",
+      "/73": "Brown Gold",
+      "/75": "Brown Red",
+      "/81": "Cendre Ash",
+      "/86": "Cendre Violet",
+      "/89": "Ash Booster",
+      "/96": "Pearl Violet",
+      "/97": "Pearl Brown"
+    },
+    "doublePigment": "XX/YY format — first two digits = level with doubled pigment intensity (e.g., 66/44 = level 6 intense red-copper)"
+  },
+  "specialNotes": [
+    "Color Touch is Wella's #1 demi-permanent — pairs with Koleston Perfect for full service",
+    "Double-pigment shades (XX/YY) provide intensified color — use for vibrancy on pre-lightened or resistant hair",
+    "Metal Purifier technology encapsulates metals on hair for accurate color formation",
+    "Color Touch Plus (XX/07) is the increased grey coverage variant — apply to DRY hair",
+    "Special Mix boosters (0/XX) are concentrated — use up to 50g per 30g of base shade"
+  ]
+}

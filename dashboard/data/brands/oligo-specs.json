@@ -1,0 +1,104 @@
+{
+  "brand": "Oligo",
+  "lines": [
+    {
+      "name": "Calura Permanent",
+      "type": "permanent",
+      "description": "Permanent shine hair colour with exothermic technology",
+      "mixingRatio": "1:1",
+      "developers": [
+        { "volume": 8.5, "percent": "2.6%", "name": "Demi Effect Developer Lotion", "use": "Toning, deposit, colour balancing" },
+        { "volume": 10, "percent": "3%", "name": "Calura 10 Volume", "use": "Toning, pastels, white blending up to 75%" },
+        { "volume": 20, "percent": "6%", "name": "Calura 20 Volume", "use": "1-2 levels lift, white hair coverage, colour balancing" },
+        { "volume": 30, "percent": "9%", "name": "Calura 30 Volume", "use": "3 levels lift, resistant white hair" },
+        { "volume": 40, "percent": "12%", "name": "Calura 40 Volume", "use": "4-5 levels lift" }
+      ],
+      "processingTimes": [
+        { "use": "Toning", "developer": "10vol/Demi Effect", "time": "3-10 min" },
+        { "use": "Tone on tone or darker", "developer": "20vol", "time": "30 min" },
+        { "use": "Colour balancing", "developer": "20vol", "time": "30 min" },
+        { "use": "White hair coverage", "developer": "20vol", "time": "40-45 min" },
+        { "use": "White blending (up to 75%)", "developer": "10vol/Demi Effect", "time": "30-35 min" },
+        { "use": "1 level lift", "developer": "20vol", "time": "35 min" },
+        { "use": "2 levels lift", "developer": "20vol", "time": "40 min" },
+        { "use": "3 levels lift", "developer": "30vol", "time": "45 min" },
+        { "use": "4 levels lift", "developer": "40vol", "time": "50 min" },
+        { "use": "5 levels lift (Pure Blonde)", "developer": "40vol", "time": "60 min" }
+      ]
+    },
+    {
+      "name": "Calura Permanent Pure Blonde",
+      "type": "permanent",
+      "description": "High-lift permanent colour for levels 6+ natural hair",
+      "mixingRatio": "1:2",
+      "developers": [
+        { "volume": 30, "percent": "9%", "name": "Calura 30 Volume", "use": "High lift on levels 6+" },
+        { "volume": 40, "percent": "12%", "name": "Calura 40 Volume", "use": "Maximum lift on levels 6+" }
+      ],
+      "processingTimes": [
+        { "use": "Virgin application", "developer": "30-40vol", "time": "Up to 60 min" },
+        { "use": "New growth", "developer": "30-40vol", "time": "Up to 60 min" }
+      ]
+    },
+    {
+      "name": "CaluraTEN",
+      "type": "permanent",
+      "description": "10-minute permanent hair colour, PPD-free, fast processing",
+      "mixingRatio": "1:1",
+      "developers": [
+        { "volume": 20, "percent": "6%", "name": "CaluraTEN 20 Volume", "use": "Deposit and lift up to 3 levels" }
+      ],
+      "processingTimes": [
+        { "use": "Deposit only", "developer": "20vol", "time": "10 min" },
+        { "use": "Lifting", "developer": "20vol", "time": "15 min" },
+        { "use": "Resistant white hair", "developer": "20vol", "time": "15 min" }
+      ]
+    },
+    {
+      "name": "Calura Gloss",
+      "type": "demi-permanent",
+      "description": "Demi-permanent liquid hair colour, zero lift, alcohol-free",
+      "mixingRatio": "1:1",
+      "developers": [
+        { "volume": 7, "percent": "2%", "name": "Calura Gloss 7 Volume Cream", "use": "Enhancing natural hair, shine treatments" },
+        { "volume": 13, "percent": "4%", "name": "Calura Gloss 13 Volume", "use": "White blending up to 50%, intense deposit" }
+      ],
+      "processingTimes": [
+        { "use": "Colour balancing", "developer": "Gloss Developer", "time": "Up to 20 min" },
+        { "use": "Toning pre-lightened", "developer": "Gloss Developer", "time": "3-10 min" },
+        { "use": "Enhancing natural hair", "developer": "7vol (2%)", "time": "20 min" },
+        { "use": "White hair blending", "developer": "13vol (4%)", "time": "30-35 min" },
+        { "use": "Shine treatment", "developer": "7vol (2%)", "time": "10-15 min" }
+      ]
+    },
+    {
+      "name": "Calura Permanent 8 Ultra",
+      "type": "permanent",
+      "description": "For 30-100% white hair, lighter softer blondes, anti-breakage",
+      "mixingRatio": "1:1",
+      "developers": [
+        { "volume": 30, "percent": "9%", "name": "Calura 30 Volume", "use": "White hair coverage on levels 6-7" },
+        { "volume": 40, "percent": "12%", "name": "Calura 40 Volume", "use": "White hair coverage on levels 4-5" }
+      ],
+      "processingTimes": [
+        { "use": "100% white hair", "developer": "30vol", "time": "40-45 min" },
+        { "use": "Levels 6-7", "developer": "30vol", "time": "40-45 min" },
+        { "use": "Levels 4-5", "developer": "40vol", "time": "40-45 min" }
+      ]
+    }
+  ],
+  "specialNotes": [
+    "Exothermic technology generates +4°C to +11°C temperature increase",
+    "Do not use heat or blow dryer to process",
+    "For 44/KK, 55/RR, 444/K3, 556/RRV, 66/VV: processing time is 40 minutes",
+    "Calura Permanent is ammonia-free",
+    "CaluraTEN is PPD-free, paraben-free, cruelty-free, gluten-free",
+    "Calura Gloss is PPD-free, alcohol-free",
+    "8 Ultra series for 30-100% white hair",
+    "Mix Series intensifiers/neutralizers: use up to 25% of formula",
+    "Pure Blonde 1:2 ratio, up to 60 min processing",
+    "51/RA Framboise series available in TEN and Permanent (2026 addition)",
+    "Calura Gloss can be diluted with Clear for lighter deposit",
+    "For porous hair: spray Porosity Equalizer before Gloss application"
+  ]
+}

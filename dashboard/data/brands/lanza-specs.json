@@ -1,0 +1,78 @@
+{
+  "brand": "L'ANZA",
+  "productLine": "Healing Color Cream",
+  "type": "permanent",
+  "features": [
+    "Keratin Healing System",
+    "Flower Shield Complex",
+    "3-in-1 versatile formulation",
+    "Gray coverage up to 100%"
+  ],
+  "mixRatio": "1:1.5",
+  "processingTime": "30 minutes",
+  "grayProcessingTime": "30-40 minutes",
+  "developers": [
+    {
+      "volume": 10,
+      "percentage": "3%",
+      "use": "Deposit only, gray coverage"
+    },
+    {
+      "volume": 20,
+      "percentage": "6%",
+      "use": "Standard lift (1-2 levels)"
+    },
+    {
+      "volume": 30,
+      "percentage": "9%",
+      "use": "Maximum lift (2-3 levels)"
+    },
+    {
+      "volume": 40,
+      "percentage": "12%",
+      "use": "Super lift"
+    }
+  ],
+  "formulationGuidelines": {
+    "gray_coverage": {
+      "0_25_percent": "Use N series",
+      "25_50_percent": "Mix N + target shade (equal parts)",
+      "50_100_percent": "Use NN series + N series (equal parts)",
+      "processing_time": "30-40 minutes for resistant gray"
+    },
+    "lift_guidelines": {
+      "1_level": "10 Volume (3%) developer",
+      "2_levels": "20 Volume (6%) developer",
+      "3_levels": "30 Volume (9%) developer",
+      "super_lift": "40 Volume (12%) developer + high lift shades"
+    },
+    "tonal_direction": {
+      "cool": [
+        "A",
+        "V",
+        "P",
+        "NA",
+        "AX",
+        "T"
+      ],
+      "warm": [
+        "G",
+        "C",
+        "R",
+        "B",
+        "CG",
+        "RR",
+        "RRC",
+        "RV"
+      ],
+      "neutral": [
+        "N",
+        "NN"
+      ],
+      "fashion": [
+        "SPECIALTY",
+        "KICKER"
+      ]
+    }
+  }
+}
