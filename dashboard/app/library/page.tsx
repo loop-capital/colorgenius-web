@@ -526,6 +526,12 @@ export default function LibraryPage() {
           </div>
         </motion.div>
 
+        {/* My Formulas / Marketplace Tabs */}
+        <div className="flex gap-1 mb-6 p-1 rounded-xl w-fit" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <button className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ background: 'var(--cg-gradient-teal)', color: '#0A0A0A' }}>My Formulas</button>
+          <button className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ color: 'var(--cg-text-tertiary)' }}>Marketplace</button>
+        </div>
+
         {/* Desired Result Search */}
         <motion.div
           className="mb-6 rounded-xl p-5"
