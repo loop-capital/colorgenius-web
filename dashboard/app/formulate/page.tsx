@@ -183,6 +183,9 @@ export default function FormulatePage() {
   const [showClientSearch, setShowClientSearch] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [convertTargetBrand, setConvertTargetBrand] = useState('')
+  const [converting, setConverting] = useState(false)
+  const [conversionResult, setConversionResult] = useState<any>(null)
 
   // Fetch salon context and shades on mount
   useEffect(() => {
@@ -286,6 +289,28 @@ export default function FormulatePage() {
     }
     setFormulaIngredients(prev => [...prev, newIngredient])
     setShowProductSearch(false)
+  }
+
+  const handleConvertBrand = async () => {
+    if (!convertTargetBrand || converting) return
+    setConverting(true)
+    setConversionResult(null)
+    try {
+      const shades = (result.steps || [])
+        .filter((s: any) => s.role === 'primary' || s.role === 'secondary')
+        .map((s: any) => ({ shadeCode: s.product?.shadeCode, brand: result.brand, line: result.line, grams: s.grams }))
+      const res = await fetch('/api/formulate/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shades, targetBrand: convertTargetBrand, developerVolume: result.developerVolume || 20 }),
+      })
+      const data = await res.json()
+      if (data.success) setConversionResult(data.data)
+      else toast({ title: 'Conversion failed', description: data.error || 'No equivalent shades found', variant: 'destructive' })
+    } catch (e: any) {
+      toast({ title: 'Error', description: e.message, variant: 'destructive' })
+    }
+    setConverting(false)
   }
 
   const handleSubmit = async () => {
@@ -813,6 +838,55 @@ export default function FormulatePage() {
                 <button type="button" onClick={() => setFormulaView('bowl')} style={{ padding: '6px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: formulaView === 'bowl' ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: formulaView === 'bowl' ? 'rgba(147,51,234,0.1)' : 'transparent', color: formulaView === 'bowl' ? '#9333EA' : '#71717A', cursor: 'pointer' }}>Mix</button>
               </div>
             </div>
+            {/* Formula Confidence */}
+            <div style={{ marginBottom: 24, padding: 20, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 20 }}>
+              <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
+                <svg width="72" height="72" viewBox="0 0 72 72">
+                  <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
+                  <circle cx="36" cy="36" r="30" fill="none" stroke="#10B981" strokeWidth="6" strokeDasharray={`${(result.confidence ?? 100) * 1.884} 188.4`} strokeLinecap="round" transform="rotate(-90 36 36)" />
+                </svg>
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: '#10B981' }}>{result.confidence ?? 100}%</span>
+                </div>
+              </div>
+              <div>
+                <p style={{ fontSize: 11, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>Formula Confidence</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: result.confidence >= 80 ? '#10B981' : result.confidence >= 50 ? '#F59E0B' : '#EF4444' }}>{result.confidence >= 80 ? 'High' : result.confidence >= 50 ? 'Medium' : 'Low'}</p>
+              </div>
+            </div>
+
+            {/* Brand Conversion */}
+            <div style={{ marginBottom: 24, padding: 20, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
+              <p style={{ fontSize: 11, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 12 }}>Brand Conversion</p>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <select
+                  value={convertTargetBrand}
+                  onChange={e => setConvertTargetBrand(e.target.value)}
+                  style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(22,22,32,0.8)', color: '#F5F5F7', fontSize: 14, cursor: 'pointer' }}
+                >
+                  <option value="">Select target brand...</option>
+                  {brands.filter(b => b !== result.brand).map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+                <button
+                  type="button"
+                  onClick={handleConvertBrand}
+                  disabled={!convertTargetBrand || converting}
+                  style={{ padding: '10px 20px', borderRadius: 10, background: !convertTargetBrand || converting ? 'rgba(147,51,234,0.3)' : 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', fontWeight: 600, fontSize: 14, cursor: !convertTargetBrand || converting ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
+                >Convert Formula</button>
+              </div>
+              {conversionResult && (
+                <div style={{ marginTop: 12, padding: 12, background: 'rgba(147,51,234,0.08)', border: '1px solid rgba(147,51,234,0.2)', borderRadius: 10 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#9333EA', marginBottom: 8 }}>Converted to {convertTargetBrand}</p>
+                  {conversionResult.shades?.map((s: any, i: number) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < conversionResult.shades.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+                      <span style={{ fontSize: 13, color: '#F5F5F7' }}>{s.shadeCode} — {s.shadeName}</span>
+                      <span style={{ fontSize: 12, color: '#71717A' }}>{s.grams}g</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Hard Stops */}
             {result.hardStops && result.hardStops.length > 0 && (
               <div style={{ marginBottom: 24 }}>
