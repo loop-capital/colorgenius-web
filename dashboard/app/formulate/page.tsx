@@ -55,6 +55,42 @@ const DENSITIES = [
   { value: 'thick', label: 'Thick', desc: 'High density' },
 ]
 
+const SERVICE_TYPES = [
+  { value: 'full_head', label: 'Full Head', desc: 'All-over application' },
+  { value: 'retouch', label: 'Retouch', desc: 'Root regrowth only' },
+  { value: 'balayage', label: 'Balayage', desc: 'Hand-painted highlights' },
+  { value: 'foils', label: 'Foils', desc: 'Foil highlights/lowlights' },
+  { value: 'corrective', label: 'Corrective', desc: 'Color correction' },
+  { value: 'gloss_toner', label: 'Gloss/Toner', desc: 'Tone refresh or gloss' },
+]
+
+const CHEMICAL_HISTORY_ITEMS = [
+  { value: 'box_dye', label: 'Box Dye', desc: 'Drugstore/home color kit — MAJOR HAZARD', warning: true },
+  { value: 'metallic_salts', label: 'Metallic Salts', desc: 'Metallic dye or mineral buildup — HARD STOP for lightening', warning: false },
+  { value: 'henna', label: 'Henna', desc: 'Henna color — lightener = green disaster', warning: false },
+  { value: 'keratin', label: 'Keratin Treatment', desc: 'Keratin smoothing in last 6 months', warning: false },
+  { value: 'relaxer', label: 'Relaxer / Straightening', desc: 'Chemical relaxer or Japanese straightening', warning: false },
+  { value: 'hard_water', label: 'Hard Water', desc: 'Hard water or well water at home', warning: false },
+  { value: 'medication', label: 'Medication/Mineral Buildup', desc: 'Thyroid meds, iron, copper, etc.', warning: false },
+]
+
+const SENSITIVITIES = [
+  { value: 'ppd_allergy', label: 'PPD Allergy', desc: 'Allergic to PPD — use PPD-free alternatives', warning: true },
+  { value: 'pregnancy', label: 'Pregnancy', desc: 'Client is pregnant' },
+  { value: 'breastfeeding', label: 'Breastfeeding', desc: 'Client is breastfeeding' },
+  { value: 'chemotherapy', label: 'Active Chemotherapy', desc: 'Currently receiving chemo' },
+]
+
+const LAST_CHEMICAL_TIMES = [
+  { value: 'never', label: 'Never' },
+  { value: '6_plus_months', label: '6+ months ago' },
+  { value: '3_to_6_months', label: '3-6 months ago' },
+  { value: '1_to_3_months', label: '1-3 months ago' },
+  { value: '3_to_4_weeks', label: '3-4 weeks ago' },
+  { value: '1_to_2_weeks', label: '1-2 weeks ago' },
+  { value: 'this_week', label: 'This week' },
+]
+
 const CONDITION_TYPES = [
   { value: 'virgin', label: 'Virgin Hair', desc: 'Never chemically treated' },
   { value: 'bleached', label: 'Bleached/Lightened', desc: 'Lifted from natural' },
@@ -108,6 +144,10 @@ export default function FormulatePage() {
     texture: 'medium',
     hairPattern: 'straight',
     density: 'medium',
+    serviceType: 'full_head',
+    chemicalHistory: [] as string[],
+    sensitivities: [] as string[],
+    lastChemicalService: 'never',
     condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0, banding: false, hotRoots: false, previousLightener: false, multipleColors: false, greenCast: false, muddyToner: false, overAshy: false, colorGrab: false, hollowEnds: false },
     brandPreference: '', linePreference: '',
   })
@@ -275,7 +315,7 @@ export default function FormulatePage() {
             <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
             <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 6 steps</p>
           </div>
-          <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', texture: 'medium', hairPattern: 'straight', density: 'medium', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
+          <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', texture: 'medium', hairPattern: 'straight', density: 'medium', serviceType: 'full_head', chemicalHistory: [], sensitivities: [], lastChemicalService: 'never', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
         </div>
 
         {/* Client Picker */}
@@ -511,17 +551,79 @@ export default function FormulatePage() {
         {/* STEP 3: Chemical History */}
         {step === 3 && (
           <div style={card}>
-            <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Droplets style={{ color: '#9333EA' }} /> Chemical History</h2>
-            <p style={{ color: '#A1A1AA', fontSize: 13, marginBottom: 24 }}>What chemical treatments has the hair had? This directly affects formula choices.</p>
+            <h2 style={{ fontSize: 18, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><FlaskConical style={{ color: '#9333EA' }} /> Chemical History</h2>
+            <p style={{ color: '#71717A', fontSize: 13, marginBottom: 24 }}>Past treatments that affect formulation</p>
 
+            {/* Service Type */}
             <div style={{ marginBottom: 24 }}>
-              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Hair Condition</Label>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4, display: 'block' }}>Service Type</Label>
+              <p style={{ color: '#71717A', fontSize: 12, marginBottom: 8 }}>What type of service are you performing?</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-                {CONDITION_TYPES.map(o => (
-                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, type: o.value } }))}
-                    style={{ padding: 14, borderRadius: 12, border: fd.condition.type === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.condition.type === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.condition.type === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'left' }}>
+                {SERVICE_TYPES.map(o => (
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, serviceType: o.value }))}
+                    style={{ padding: 14, borderRadius: 12, border: fd.serviceType === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.serviceType === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.serviceType === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'center' }}>
                     <p style={{ fontSize: 13, fontWeight: 600 }}>{o.label}</p>
                     <p style={{ fontSize: 11, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Chemical History */}
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4, display: 'block' }}>Chemical History</Label>
+              <p style={{ color: '#71717A', fontSize: 12, marginBottom: 8 }}>Past treatments that affect formulation</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+                {CHEMICAL_HISTORY_ITEMS.map(o => {
+                  const active = fd.chemicalHistory.includes(o.value)
+                  return (
+                    <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, chemicalHistory: active ? p.chemicalHistory.filter(v => v !== o.value) : [...p.chemicalHistory, o.value] }))}
+                      style={{ padding: 14, borderRadius: 12, border: active ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: active ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: '#F5F5F7', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <p style={{ fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>{o.warning && <AlertTriangle size={14} style={{ color: '#FBBF24' }} />}{o.label}</p>
+                        <p style={{ fontSize: 11, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
+                      </div>
+                      <div style={{ width: 18, height: 18, borderRadius: '50%', border: active ? 'none' : '2px solid rgba(255,255,255,0.2)', background: active ? '#9333EA' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        {active && <span style={{ color: 'white', fontSize: 10 }}>✓</span>}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Sensitivities & Contraindications */}
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4, display: 'block' }}>Sensitivities & Contraindications</Label>
+              <p style={{ color: '#71717A', fontSize: 12, marginBottom: 8 }}>Safety-critical information</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {SENSITIVITIES.map(o => {
+                  const active = fd.sensitivities.includes(o.value)
+                  return (
+                    <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, sensitivities: active ? p.sensitivities.filter(v => v !== o.value) : [...p.sensitivities, o.value] }))}
+                      style={{ padding: 14, borderRadius: 12, border: active ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: active ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: '#F5F5F7', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 18, height: 18, borderRadius: 4, border: active ? 'none' : '2px solid rgba(255,255,255,0.2)', background: active ? '#9333EA' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        {active && <span style={{ color: 'white', fontSize: 10 }}>✓</span>}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>{o.warning && <AlertTriangle size={14} style={{ color: '#FBBF24' }} />}{o.label}</p>
+                        <p style={{ fontSize: 11, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Last Chemical Service */}
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4, display: 'block' }}>Last Chemical Service</Label>
+              <p style={{ color: '#71717A', fontSize: 12, marginBottom: 8 }}>How recently was the last treatment?</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {LAST_CHEMICAL_TIMES.map(o => (
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, lastChemicalService: o.value }))}
+                    style={{ padding: '8px 16px', borderRadius: 20, border: fd.lastChemicalService === o.value ? 'none' : '1px solid rgba(255,255,255,0.12)', background: fd.lastChemicalService === o.value ? 'rgba(147,51,234,0.3)' : 'rgba(30,30,45,0.6)', color: fd.lastChemicalService === o.value ? '#F5F5F7' : '#A1A1AA', cursor: 'pointer', fontSize: 13, fontWeight: fd.lastChemicalService === o.value ? 600 : 400 }}>
+                    {o.label}
                   </button>
                 ))}
               </div>
