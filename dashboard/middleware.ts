@@ -22,8 +22,11 @@ const PUBLIC_PATHS = [
 ];
 
 export async function middleware(request: NextRequest) {
-  // All routes public — auth disabled for debugging
-  return NextResponse.next();
+  // Cache bust — force edge revalidation after deploy
+  const response = NextResponse.next();
+  response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
+  response.headers.set('Vercel-CDN-Cache-Control', 'public, max-age=0, must-revalidate');
+  return response;
 }
 
 function redirectToLogin(request: NextRequest) {

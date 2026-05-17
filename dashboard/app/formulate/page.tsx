@@ -14,6 +14,9 @@ import { ScaleBowl, type BowlIngredient } from '@/components/scale-bowl'
 import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle, Smartphone, User, Search, UserPlus } from 'lucide-react'
 import { ProductSearch, type SelectedProduct } from '@/components/product-search'
 import { StockCheck } from '@/components/stock-check'
+import VisualOutcomeSimulator from '@/components/visual-outcome/VisualOutcomeSimulator'
+import WarmthExposureBar from '@/components/visual-outcome/WarmthExposureBar'
+import ContextualEducation from '@/components/education/ContextualEducation'
 import CorrectiveColorPanel, { CorrectiveBadge } from '@/lib/corrective-color/CorrectiveColorPanel'
 import { diagnose, type CorrectiveIssue, type HairState } from '@/lib/corrective-color/engine'
 import type { ToneFamily } from '@/lib/products'
@@ -90,7 +93,7 @@ export default function FormulatePage() {
   const [fd, setFd] = useState({
     currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N',
     hairType: 'normal',
-    condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 },
+    condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0, banding: false, hotRoots: false, previousLightener: false, multipleColors: false, greenCast: false, muddyToner: false, overAshy: false, colorGrab: false, hollowEnds: false },
     brandPreference: '', linePreference: '',
   })
   const [loading, setLoading] = useState(false)
@@ -220,7 +223,7 @@ export default function FormulatePage() {
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/formulate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(fd) })
+      const res = await fetch('/api/formulate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...fd, currentTone: toneMap[fd.currentTone] || fd.currentTone, targetTone: toneMap[fd.targetTone] || fd.targetTone }) })
       if (!res.ok) throw new Error('Formulation failed')
       const data = await res.json()
       setResult(data.data)
@@ -333,18 +336,27 @@ export default function FormulatePage() {
           </div>
         </div>
 
-        {/* Step indicators */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 32 }}>
-          {STEPS.map((s, i) => (
-            <div key={s.id} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-              <div style={{ textAlign: 'center', flex: 1 }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', background: s.id === step ? '#9333EA' : s.id < step ? 'rgba(147,51,234,0.2)' : 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', margin: '0 auto', fontSize: 14 }}>{s.id < step ? '✓' : s.id}</div>
-                <p style={{ fontSize: 13, marginTop: 4, color: s.id === step ? '#F5F5F7' : '#71717A', fontWeight: s.id === step ? 600 : 400 }}>{s.title}</p>
-                <p style={{ fontSize: 11, color: '#71717A', marginTop: 1 }}>{s.desc}</p>
+        {/* Step progress bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm" style={{ background: '#9333EA', color: '#fff' }}>{step}</div>
+              <div>
+                <p className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>{STEPS[step - 1].title}</p>
+                <p className="text-xs" style={{ color: '#71717A' }}>{STEPS[step - 1].desc}</p>
               </div>
-              {i < STEPS.length - 1 && <div style={{ width: 40, height: 2, background: s.id < step ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)', flexShrink: 0, marginTop: -20 }} />}
             </div>
-          ))}
+            {step < STEPS.length && (
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-wider" style={{ color: '#71717A' }}>Next</p>
+                <p className="text-xs" style={{ color: '#A1A1AA' }}>{STEPS[step].title}</p>
+              </div>
+            )}
+          </div>
+          <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="h-1.5 rounded-full transition-all duration-300" style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', width: `${step / STEPS.length * 100}%` }} />
+          </div>
+          <p className="text-[10px] mt-1 text-right" style={{ color: '#71717A' }}>Step {step} of {STEPS.length}</p>
         </div>
 
         {/* STEP 1: Photo */}
@@ -613,7 +625,98 @@ export default function FormulatePage() {
                 <button type="button" onClick={() => setFormulaView('bowl')} style={{ padding: '6px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: formulaView === 'bowl' ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: formulaView === 'bowl' ? 'rgba(147,51,234,0.1)' : 'transparent', color: formulaView === 'bowl' ? '#9333EA' : '#71717A', cursor: 'pointer' }}>Mix</button>
               </div>
             </div>
-            {result.warnings?.map((w: string, i: number) => <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#FBBF24', marginBottom: 8 }}><AlertTriangle size={16} /><span>{w}</span></div>)}
+            {/* Hard Stops */}
+            {result.hardStops && result.hardStops.length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ color: '#EF4444', fontSize: 16, fontWeight: 700, marginBottom: 12 }}>🛑 Safety Stops</h3>
+                {result.hardStops.map((stop: any, i: number) => (
+                  <div key={i} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 12, padding: 16, marginBottom: 8 }}>
+                    <p style={{ color: '#F5F5F7', fontSize: 14 }}>{stop.message}</p>
+                    <p style={{ color: '#A1A1AA', fontSize: 12, marginTop: 4, textTransform: 'capitalize' }}>{stop.type}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Safer Alternatives */}
+            {result.alternatives && result.alternatives.length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ color: '#10B981', fontSize: 16, fontWeight: 700, marginBottom: 12 }}>💡 Safer Alternatives</h3>
+                {result.alternatives.map((alt: string, i: number) => (
+                  <div key={i} style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 12, padding: 16, marginBottom: 8 }}>
+                    <p style={{ color: '#F5F5F7', fontSize: 14 }}>{alt}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Warnings (card style) */}
+            {result.warnings && result.warnings.length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ color: '#F59E0B', fontSize: 16, fontWeight: 700, marginBottom: 12 }}>⚠️ Warnings</h3>
+                {result.warnings.map((w: string, i: number) => (
+                  <div key={i} style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 12, padding: 16, marginBottom: 8 }}>
+                    <p style={{ color: '#F5F5F7', fontSize: 14 }}>{w}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Professional Assessment */}
+            {result.assessment && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ color: '#3B82F6', fontSize: 16, fontWeight: 700, marginBottom: 12 }}>💡 Professional Assessment</h3>
+                <div style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: 12, padding: 16 }}>
+                  <p style={{ color: '#F5F5F7', fontSize: 14, lineHeight: 1.6 }}>{result.assessment}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Strand Test Recommended */}
+            {result.strandTestRecommended && (
+              <div style={{ marginBottom: 24, padding: 16, background: 'rgba(147,51,234,0.08)', border: '1px solid rgba(147,51,234,0.3)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 20 }}>🔬</span>
+                <span style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600 }}>Strand Test Recommended</span>
+              </div>
+            )}
+
+            {/* Underlying Pigment */}
+            {result.underlyingPigment && (
+              <div style={{ marginBottom: 24, padding: 16, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
+                <p style={{ color: '#71717A', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>Underlying Pigment</p>
+                <p style={{ color: '#F5F5F7', fontSize: 14 }}>{result.underlyingPigment.description}</p>
+              </div>
+            )}
+
+            {/* Product Quantity */}
+            {result.quantity && (
+              <div style={{ marginBottom: 24, padding: 16, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
+                <p style={{ color: '#71717A', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>Product Quantity</p>
+                <p style={{ color: '#F5F5F7', fontSize: 14 }}>{result.quantity.description}</p>
+              </div>
+            )}
+
+            {/* Multi-Session Plan */}
+            {result.multiSessionPlan && result.multiSessionPlan.length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <h3 style={{ color: '#F5F5F7', fontSize: 16, fontWeight: 700, marginBottom: 12 }}>📋 Multi-Session Plan</h3>
+                {result.multiSessionPlan.map((step: string, i: number) => (
+                  <div key={i} style={{ background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(147,51,234,0.2)', color: '#9333EA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 14 }}>{i + 1}</span>
+                    <p style={{ color: '#F5F5F7', fontSize: 14 }}>{step}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Warnings inline (legacy style) */}
+            {result.warnings?.map((w: string, i: number) => <div key={`w-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#FBBF24', marginBottom: 8 }}><AlertTriangle size={16} /><span>{w}</span></div>)}
+
+            {/* Visual Outcome Simulator */}
+            <VisualOutcomeSimulator input={fd as any} result={result} />
+
+            {/* Warmth Exposure / Conversion Panel */}
+            <WarmthExposureBar input={fd as any} result={result} />
 
             {/* Stock Check */}
             <div style={{ marginBottom: 16, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -621,7 +724,6 @@ export default function FormulatePage() {
                 steps={result.steps || []}
                 salonId={salonId}
                 onAcceptAlternative={(originalCode, altCode) => {
-                  // Replace the shade code in the ingredients
                   setFormulaIngredients(prev => prev.map(ing =>
                     ing.shadeCode === originalCode ? { ...ing, shadeCode: altCode, name: altCode } : ing
                   ))
@@ -654,20 +756,31 @@ export default function FormulatePage() {
               <button type="button" onClick={handleSaveFormula} disabled={saving || saved} style={{ ...btnPrimary, flex: 1, justifyContent: 'center', opacity: saved ? 0.6 : 1 }}><Save size={14} /> {saving ? 'Saving...' : saved ? 'Saved ✓' : 'Save to Library'}</button>
             </div>
 
+            {/* Contextual Education */}
+            {result && formulaIngredients.length > 0 && (
+              <ContextualEducation
+                brand={result.brand || fd.brandPreference || ''}
+                service={fd.serviceType || ''}
+                shades={formulaIngredients.map(i => i.shadeCode).filter(Boolean)}
+                hairType={`${fd.texture || ''}_${fd.hairPattern || ''}`}
+                compact={false}
+              />
+            )}
+
             {/* Corrective Color Assistant */}
             {result && (
               <CorrectiveColorPanel
                 hairState={{
                   currentLevel: fd.currentLevel,
-                  currentTone: fd.currentTone,
+                  currentTone: fd.currentTone as any,
                   targetLevel: fd.targetLevel,
-                  targetTone: fd.targetTone,
+                  targetTone: fd.targetTone as any,
                   porosity: fd.condition.porosity as 'low' | 'normal' | 'high',
                   condition: fd.condition.type,
-                  banding: fd.condition.highlights && fd.condition.highlightedPercent > 30,
-                  hotRoots: fd.currentLevel < fd.targetLevel && fd.condition.type === 'previously_colored',
-                  previousLightener: fd.condition.type === 'bleached',
-                  multipleColors: fd.condition.type === 'previously_colored',
+                  banding: fd.condition.banding || false,
+                  hotRoots: fd.condition.hotRoots || false,
+                  previousLightener: fd.condition.previousLightener || false,
+                  multipleColors: fd.condition.multipleColors || false,
                 }}
                 onApplyFix={(fix) => {
                   toast({
