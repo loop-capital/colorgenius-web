@@ -28,6 +28,11 @@ export interface FormulationStep {
   notes?: string;
 }
 
+export interface ConfidenceAdjustment {
+  factor: string;
+  reduction: number; // 0-1
+}
+
 export interface FormulationResult {
   success: boolean;
   steps: FormulationStep[];
@@ -41,6 +46,16 @@ export interface FormulationResult {
   warnings: string[];
   brand: string;
   line: string;
+  assessment?: string;
+  underlyingPigment?: { description: string };
+  quantity?: { description: string };
+  confidence?: number; // 0-100
+  adjustedConfidence?: number; // 0-1, for UI
+  confidenceAdjustments?: ConfidenceAdjustment[];
+  strandTestRecommended?: boolean;
+  hardStops?: { type: string; message: string }[];
+  alternatives?: string[];
+  multiSessionPlan?: string[];
 }
 
 // ─── Lifting Chart ─────────────────────────────────────────────────────────────
@@ -242,7 +257,8 @@ export function formulate(input: FormulationInput): FormulationResult {
   const primary = findPrimaryColor(
     Math.min(input.targetLevel, 10),
     input.targetTone,
-    input.brandPreference
+    input.brandPreference,
+    input.linePreference
   );
 
   if (!primary) {
@@ -257,8 +273,8 @@ export function formulate(input: FormulationInput): FormulationResult {
       coverage: 'full',
       notes: [],
       warnings: ['No matching color found. Try adjusting target level or tone.'],
-      brand: input.brandPreference || 'Wella',
-      line: input.linePreference || 'Koleston Perfect ME+',
+      brand: primary?.brand || input.brandPreference || 'Wella',
+      line: primary?.line || input.linePreference || 'Koleston Perfect ME+',
     };
   }
 
@@ -342,6 +358,29 @@ export function formulate(input: FormulationInput): FormulationResult {
   if (input.condition.grayPercent > 50) assessment += 'High gray percentage requires full coverage approach with lower-level anchor shade. '
   if (input.condition.highlights) assessment += 'Existing highlights create multi-zone porosity — consider zone-by-zone application. '
 
+  // Build confidence adjustments for UI
+  const confidenceAdjustments: ConfidenceAdjustment[] = []
+  if (liftAmount > 3) confidenceAdjustments.push({ factor: 'high_lift', reduction: 0.25 })
+  if (input.condition.porosity === 'high') confidenceAdjustments.push({ factor: 'high_porosity', reduction: 0.15 })
+  if (input.condition.grayPercent > 50) confidenceAdjustments.push({ factor: 'high_gray', reduction: 0.10 })
+  if (input.condition.highlights) confidenceAdjustments.push({ factor: 'existing_highlights', reduction: 0.10 })
+  if (warnings.length > 0) confidenceAdjustments.push({ factor: 'warnings', reduction: Math.min(0.3, warnings.length * 0.08) })
+  
+  const baseConfidence = warnings.length === 0 ? 0.95 : Math.max(0.5, 0.90 - warnings.length * 0.08)
+  const totalReduction = confidenceAdjustments.reduce((sum, a) => sum + a.reduction, 0)
+  const adjustedConfidence = Math.max(0.3, baseConfidence - totalReduction)
+
+  // Multi-session plan for ambitious lifts
+  const multiSessionPlan: string[] = []
+  if (liftAmount > 4) {
+    multiSessionPlan.push(`Session 1: Pre-lighten to level ${input.currentLevel + 3} with bond builder`)
+    multiSessionPlan.push(`Session 2: Lift to level ${input.targetLevel - 1} and tone`)
+    multiSessionPlan.push(`Session 3: Final lift to ${input.targetLevel} ${input.targetTone} with gloss`)
+  } else if (liftAmount > 3) {
+    multiSessionPlan.push(`Session 1: Lift to level ${input.targetLevel - 1}`)
+    multiSessionPlan.push(`Session 2: Final lift and tone to ${input.targetLevel} ${input.targetTone}`)
+  }
+
   return {
     success: true,
     steps,
@@ -358,10 +397,13 @@ export function formulate(input: FormulationInput): FormulationResult {
     assessment,
     underlyingPigment: { description: `Level ${input.targetLevel} will have ${input.targetLevel <= 5 ? 'red-orange to orange' : input.targetLevel <= 7 ? 'orange to yellow-orange' : 'yellow to pale yellow'} undertone` },
     quantity: { description: `${Math.ceil(totalColorGrams / 60)} color tube${Math.ceil(totalColorGrams / 60) > 1 ? 's' : ''} (2oz) + ${developerMl}oz developer` },
-    confidence: warnings.length === 0 ? 95 : Math.max(50, 90 - warnings.length * 15),
+    confidence: Math.round(adjustedConfidence * 100),
+    adjustedConfidence,
+    confidenceAdjustments,
     strandTestRecommended: input.condition.porosity === 'high' || liftAmount > 3,
     hardStops: [],
     alternatives: [],
+    multiSessionPlan: multiSessionPlan.length > 0 ? multiSessionPlan : undefined,
   };
 }
 

@@ -199,3 +199,19 @@ input[type="range"]::-moz-range-thumb {
 @media (min-width: 768px) and (max-width: 1024px) {
   .tablet-grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
 }
+
+/* Force bright purple on Convert Formula button */
+button.convert-formula-btn,
+button.convert-formula-btn:disabled,
+button.convert-formula-btn[disabled] {
+  background-color: #9333EA !important;
+  opacity: 1 !important;
+  border: none !important;
+  color: white !important;
+}
+
+button.convert-formula-btn:disabled,
+button.convert-formula-btn[disabled] {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}

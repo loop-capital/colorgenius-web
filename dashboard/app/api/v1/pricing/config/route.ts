@@ -1,0 +1,102 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { jwtVerify } from 'jose';
+
+const JWT_SECRET = new TextEncoder().encode('colorgenius-prod-secret-2026');
+
+const DEFAULT_CONFIG = {
+  costPlusMode: true,
+  markupPercent: 100, // 2x (cost * 2 = cost + 100%)
+  applyToColor: true,
+  applyToDeveloper: true,
+};
+
+async function getSalonId(request: NextRequest): Promise<string | null> {
+  const token = request.cookies.get('colorgenius_token')?.value;
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    // Look up user's salon via stylists table
+    const userId = payload.userId as string;
+    const stylist = await prisma.stylists.findUnique({
+      where: { id: userId },
+      select: { salon_id: true },
+    });
+    return stylist?.salon_id || null;
+  } catch {
+    return null;
+  }
+}
+
+// GET /api/v1/pricing/config — get cost-plus config for current user's salon
+export async function GET(request: NextRequest) {
+  try {
+    const salonId = await getSalonId(request);
+
+    if (!salonId) {
+      // No salon linked — return defaults
+      return NextResponse.json({ config: DEFAULT_CONFIG });
+    }
+
+    const salon = await prisma.salons.findUnique({
+      where: { id: salonId },
+      select: { settings: true },
+    });
+
+    const settings = (salon?.settings as any) || {};
+    const pricing = settings.costPlusPricing || DEFAULT_CONFIG;
+
+    return NextResponse.json({ config: pricing });
+  } catch (err: any) {
+    console.error('[pricing/config GET]', err);
+    return NextResponse.json({ config: DEFAULT_CONFIG });
+  }
+}
+
+// PUT /api/v1/pricing/config — update cost-plus config
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { markupPercent, applyToColor, applyToDeveloper } = body;
+
+    const salonId = await getSalonId(request);
+
+    if (!salonId) {
+      return NextResponse.json({ error: 'No salon linked to your account' }, { status: 400 });
+    }
+
+    if (markupPercent === undefined || markupPercent < 0 || markupPercent > 1000) {
+      return NextResponse.json({ error: 'markupPercent must be 0–1000' }, { status: 400 });
+    }
+
+    const salon = await prisma.salons.findUnique({
+      where: { id: salonId },
+      select: { settings: true },
+    });
+
+    const currentSettings = (salon?.settings as any) || {};
+
+    const updatedSettings = {
+      ...currentSettings,
+      costPlusPricing: {
+        costPlusMode: true,
+        markupPercent: Number(markupPercent),
+        applyToColor: applyToColor !== false,
+        applyToDeveloper: applyToDeveloper !== false,
+      },
+    };
+
+    await prisma.salons.update({
+      where: { id: salonId },
+      data: { settings: updatedSettings },
+    });
+
+    return NextResponse.json({
+      success: true,
+      config: updatedSettings.costPlusPricing,
+    });
+  } catch (err: any) {
+    console.error('[pricing/config PUT]', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}

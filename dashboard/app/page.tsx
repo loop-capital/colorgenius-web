@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Camera, Sparkles, CheckCircle, Shield, ClipboardList, Palette, BarChart3, Package, DollarSign, Scale, History, ArrowRight } from 'lucide-react'
+import { Camera, Target, Sparkles, CheckCircle, Shield, ClipboardList, Palette, BarChart3, Package, DollarSign, Scale, History, ArrowRight, Mail } from 'lucide-react'
 
 export default function LandingPage() {
   const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 999, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 16, display: 'inline-flex', alignItems: 'center', gap: 8 }
@@ -38,12 +38,63 @@ export default function LandingPage() {
           </p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(147,51,234,0.3)', background: 'rgba(147,51,234,0.1)', color: '#9333EA', fontSize: 13, fontWeight: 600, padding: '6px 16px', borderRadius: 999, marginBottom: 32 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80' }} />
-            3,000+ professional shades · 10+ color brands · 90%+ formulation accuracy
+            3,273 professional shades · 21 color brands · 90%+ formulation accuracy
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
-            <a href="/login" style={{ ...btnPrimary, padding: '16px 32px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
+            <a href="https://formspree.io/f/xkoenolr" style={{ ...btnPrimary, padding: '16px 32px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
             <a href="#how-it-works" style={{ ...btnPrimary, background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', textDecoration: 'none' }}>See How It Works</a>
           </div>
+        </div>
+      </section>
+
+      {/* Beta Signup */}
+      <section id="beta-signup" style={{ padding: '80px 24px', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(147,51,234,0.03)' }}>
+        <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(147,51,234,0.3)', background: 'rgba(147,51,234,0.1)', color: '#9333EA', fontSize: 12, fontWeight: 600, padding: '4px 12px', borderRadius: 999, marginBottom: 20 }}>
+            <Mail size={13} />
+            Get Early Access
+          </div>
+          <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 36px)', fontWeight: 900, marginBottom: 12 }}>Be first in line for the beta.</h2>
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 15, marginBottom: 32, lineHeight: 1.5 }}>Sign up and we'll notify you as soon as spots open. Beta testers get a permanent discount on all plans.</p>
+          <form action="https://formspree.io/f/xkoenolr" method="POST" style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 460, margin: '0 auto', textAlign: 'left' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <input type="text" name="name" placeholder="Your name" required
+                style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
+                onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
+                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+              />
+              <input type="text" name="salon" placeholder="Your salon"
+                style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
+                onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
+                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+              />
+            </div>
+            <input type="email" name="email" placeholder="you@salon.com" required
+              style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
+              onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+            />
+            <input type="text" name="instagram" placeholder="@yourinstagram"
+              style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
+              onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+            />
+            <input type="text" name="brands_used" placeholder="Color brands you currently use (e.g. Schwarzkopf, Wella, Redken)"
+              style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
+              onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+            />
+            <input type="text" name="brands_to_explore" placeholder="Color brands you'd like to explore"
+              style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
+              onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+            />
+            <input type="hidden" name="source" value="beta-landing-page" />
+            <button type="submit" style={{ ...btnPrimary, padding: '14px 24px', width: '100%', fontSize: 15, justifyContent: 'center' }}>
+              Join the Beta
+            </button>
+          </form>
+          <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, marginTop: 12 }}>No spam. Unsubscribe anytime. We'll only email you about beta access.</p>
         </div>
       </section>
 
@@ -58,9 +109,9 @@ export default function LandingPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
             {[
               { icon: <Camera size={22} />, title: 'Photo', desc: 'Capture or upload hair photo', step: '01' },
-              { icon: <Sparkles size={22} />, title: 'Hair Assessment', desc: 'Texture, density, level & tone', step: '02' },
+              { icon: <Target size={22} />, title: 'Hair Assessment', desc: 'Texture, density, level & tone', step: '02' },
               { icon: <Shield size={22} />, title: 'Chemical History', desc: 'Past treatments & sensitivities', step: '03' },
-              { icon: <Palette size={22} />, title: 'Target Look', desc: 'Desired color across your brands', step: '04' },
+              { icon: <Target size={22} />, title: 'Target Look', desc: 'Desired color across your brands', step: '04' },
               { icon: <ClipboardList size={22} />, title: 'Condition', desc: 'Hair health & problem flags', step: '05' },
               { icon: <CheckCircle size={22} />, title: 'Your Formula', desc: 'Ratios, developer, timing & AI score', step: '06' },
             ].map((s, i) => (
@@ -199,7 +250,7 @@ export default function LandingPage() {
           <div style={{ width: 64, height: 64, borderRadius: 16, background: 'linear-gradient(135deg, #9333EA, #EC4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}><span style={{ color: 'white', fontWeight: 900, fontSize: 20 }}>CG</span></div>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Your next great formulation starts here.</h2>
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, marginBottom: 40 }}>Join 50 founding stylists shaping the future of professional hair color. Free during beta. No credit card required.</p>
-          <a href="/login" style={{ ...btnPrimary, padding: '16px 40px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
+          <a href="#beta-signup" style={{ ...btnPrimary, padding: '16px 40px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
         </div>
       </section>
 

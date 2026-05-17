@@ -11,6 +11,8 @@ import lanzaShades from '../../data/brands/lanza-shades.json';
 import davinesShades from '../../data/brands/davines-shades.json';
 import avedaShades from '../../data/brands/aveda-shades.json';
 import oligoShades from '../../data/brands/oligo-calura-shades.json';
+import oligoTenShades from '../../data/brands/oligo-calura-ten-shades.json';
+import oligoGlossShades from '../../data/brands/oligo-calura-gloss-shades.json';
 import lorealproDiacolorShades from '../../data/brands/diacolor-shades.json';
 import lorealproDialightShades from '../../data/brands/dialight-shades.json';
 import lorealproInoaShades from '../../data/brands/inoa-shades.json';
@@ -18,11 +20,14 @@ import lorealproMajirelShades from '../../data/brands/majirel-shades.json';
 import kevinmurphyShades from '../../data/brands/color-me-shades.json';
 import wellaColorTouchShades from '../../data/brands/color-touch-shades.json';
 import wellaIlluminaShades from '../../data/brands/illumina-shades.json';
+import kolestonShades from '../../data/brands/koleston-perfect-shades.json';
 import wellaShinefinityShades from '../../data/brands/shinefinity-shades.json';
 import redkenColorGelsShades from '../../data/brands/redken/color-gels-lacquers-shades.json';
 import redkenShadesEQShades from '../../data/brands/redken/shades-eq-shades.json';
+import redkenChromaticsShades from '../../data/brands/redken/chromatics-shades.json';
 import joicoLumishinePermanentShades from '../../data/brands/joico/lumishine-permanent-shades.json';
 import joicoLumishineDemiLiquidShades from '../../data/brands/joico/lumishine-demi-liquid-shades.json';
+import joicoVeroKpakShades from '../../data/brands/joico/vero-kpak-shades.json';
 import joicoLumishineDimensionalDepositShades from '../../data/brands/joico/lumishine-dimensional-deposit-shades.json';
 import matrixSoColorShades from '../../data/brands/matrix-socolor-shades.json';
 import matrixSoColorSyncShades from '../../data/brands/matrix-socolor-sync-shades.json';
@@ -76,7 +81,11 @@ const shadeData: Record<string, NormalizedShade[]> = {
   lanza: lanzaShades as unknown as NormalizedShade[],
   davines: davinesShades as unknown as NormalizedShade[],
   aveda: avedaShades as unknown as NormalizedShade[],
-  oligo: oligoShades as unknown as NormalizedShade[],
+  oligo: [
+    ...(oligoShades as unknown as NormalizedShade[]),
+    ...(oligoTenShades as unknown as NormalizedShade[]),
+    ...(oligoGlossShades as unknown as NormalizedShade[]),
+  ],
   lorealpro: [
     ...(lorealproDiacolorShades as unknown as NormalizedShade[]),
     ...(lorealproDialightShades as unknown as NormalizedShade[]),
@@ -88,15 +97,18 @@ const shadeData: Record<string, NormalizedShade[]> = {
     ...(wellaColorTouchShades as unknown as NormalizedShade[]),
     ...(wellaIlluminaShades as unknown as NormalizedShade[]),
     ...(wellaShinefinityShades as unknown as NormalizedShade[]),
+    ...(kolestonShades as unknown as NormalizedShade[]),
   ],
   redken: [
     ...(redkenColorGelsShades as unknown as NormalizedShade[]),
     ...(redkenShadesEQShades as unknown as NormalizedShade[]),
+    ...(redkenChromaticsShades as unknown as NormalizedShade[]),
   ],
   joico: [
     ...(joicoLumishinePermanentShades as unknown as NormalizedShade[]),
     ...(joicoLumishineDemiLiquidShades as unknown as NormalizedShade[]),
     ...(joicoLumishineDimensionalDepositShades as unknown as NormalizedShade[]),
+    ...(joicoVeroKpakShades as unknown as NormalizedShade[]),
   ],
   matrix: [
     ...(matrixSoColorShades as unknown as NormalizedShade[]),

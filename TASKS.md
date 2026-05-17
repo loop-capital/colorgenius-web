@@ -14,6 +14,44 @@
 
 ---
 
+### Beta Sprint — 3 Workstreams ✅ VERIFIED (2026-05-17)
+
+#### 1. Normalization Pipeline ✅
+- [x] Master file: `data/brands/all-shades-normalized.json` (2,991 shades, 19 brands)
+- [x] R+COLOR (brand #18) added: 192 shades across 6 lines (omnipresent, stellar, starsign, hypermatic, half-truth, super-palette)
+- [x] SOHO by MOB (brand #19) added: 60 shades
+- [x] Zero null toneFamily or level entries
+- [x] Cross-brand comparison chart validated (7 entries)
+- [x] `normalization-summary.json` updated with 19-brand data
+
+#### 2. Conversion Engine ✅
+- [x] Engine: `dashboard/lib/conversion/engine.ts` (15.8KB)
+- [x] Data loader: `dashboard/lib/conversion/data-loader.ts` (9.4KB)
+- [x] Tone mappings: `dashboard/lib/conversion/tone-family-mappings.ts` (13.8KB)
+- [x] Manufacturer conversions: SOHO (14 brands) + CHI (11 brands)
+- [x] Types: `dashboard/lib/conversion/types.ts` (3.8KB)
+- [x] API route: `/api/formulate/convert`
+- [x] UI: `ConversionPanel.tsx` integrated into formulate page
+- [x] **Tests: 34/34 passing** (conversion.test.ts + parity.test.ts)
+- [x] Fixed: duplicate keys in tone-family-mappings.ts (r-color, soho, omcorcolor .65)
+- [x] Fixed: import attributes `with { type: 'json'' }` → `require()` in manufacturer-conversions.ts
+- [x] Fixed: jest.config.js missing → created with ts-jest + tsconfig.test.json
+- [x] Fixed: ts-jest test dependencies installed (jest, ts-jest, @types/jest, @jest/globals, typescript)
+- [x] Next.js build: passes clean
+
+#### 3. Expo/iOS Build Pipeline ✅
+- [x] `packages/mobile/app.json` + `eas.json` configured
+- [x] CI/CD: `.github/workflows/eas-build.yml` ready (EAS Build → TestFlight)
+- [x] Camera/photo permissions set
+- [x] Expo SDK 54, React Native 0.81.5
+
+### Remaining (Blocked on External Dependencies)
+- Expert validation (Jason's wife reviews tone mappings)
+- TestFlight submission (needs Apple Developer account + EAS secrets)
+- End-to-end test with live data
+
+---
+
 ## Completed Tasks (Recently)
 
 ### Dashboard Enhancements
@@ -29,20 +67,15 @@
 - [x] Response includes hard_stops, assessment, strand_test_recommended, adjusted_confidence
 - [x] All safety fields persisted to database
 
+### Brand Database
+- [x] 19 brands, ~2,991 shades across all lines
+- [x] Manufacturer-verified conversion data: SOHO (14 brand pairs) + CHI (11 brand pairs)
+
 ---
 
 ## Backlog
 
 ### High Priority
-- [x] Brand #14 — Kenra Professional shade data ingestion
-  - [x] 108 permanent shades (levels 1–12, +RT Rapid Toners)
-  - [x] 69 demi-permanent shades
-  - [x] 10 Simply Blonde shades (ultra-lifts + toners)
-  - [x] 17 Studio Stylist Express shades
-  - [x] 13 Kenra Creatives semi-permanent shades
-  - [x] `tone-family-map.json` updated with Kenra tone codes
-  - [x] `data-loader.ts` imports + shade/specs maps wired
-  - [x] `ConversionPanel.tsx` `BRAND_DISPLAY_NAMES` includes kenra
 - [ ] Python formulation engine ADR-012 implementation
 - [ ] Salon inventory integration (stock check on formulas)
 - [ ] Client management (search, save, history)
@@ -64,4 +97,4 @@
 
 ## Notes
 
-**2026-05-15:** ADR-012 fully implemented across TypeScript engine, dashboard UI, and API route. The feature is production-ready from the TypeScript/dashboard side. The Python engine will consume the same `chemical_history` payload when its ADR-012 implementation is complete.
+**2026-05-17:** Beta sprint verification complete. All 3 workstreams verified. Test infrastructure fixed (jest config, ts-jest, duplicate keys, import attributes). Normalization pipeline expanded from 17→19 brands (R+COLOR + SOHO added). 34/34 tests passing, Next.js build clean. Expo pipeline ready but blocked on Apple Developer account.
