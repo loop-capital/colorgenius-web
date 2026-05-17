@@ -328,6 +328,20 @@ export function formulate(input: FormulationInput): FormulationResult {
   notes.push(`${primary.brand} ${primary.line}: mix ${primary.mixingRatio} with ${volume} vol developer`);
   notes.push(`Processing time: ${processingTime} minutes at room temperature`);
 
+  // Assessment
+  const liftAmount = input.targetLevel - input.currentLevel
+  let assessment = `Hair has ${input.condition.type === 'virgin' ? 'virgin' : 'permanent'} level ${input.currentLevel} pigment. `
+  if (liftAmount > 0) {
+    assessment += `Level ${input.targetLevel} ${input.targetTone} result is ${liftAmount <= 3 ? 'achievable in one session' : 'ambitious and may require multiple sessions'}. `
+  } else if (liftAmount === 0) {
+    assessment += `Same-level ${input.targetTone} deposit — straightforward tonal shift. `
+  } else {
+    assessment += `Deposing ${Math.abs(liftAmount)} levels darker — straightforward deposit. `
+  }
+  if (input.condition.porosity === 'high') assessment += 'High porosity may cause faster fading and uneven absorption. '
+  if (input.condition.grayPercent > 50) assessment += 'High gray percentage requires full coverage approach with lower-level anchor shade. '
+  if (input.condition.highlights) assessment += 'Existing highlights create multi-zone porosity — consider zone-by-zone application. '
+
   return {
     success: true,
     steps,
@@ -341,6 +355,13 @@ export function formulate(input: FormulationInput): FormulationResult {
     warnings,
     brand: primary.brand,
     line: primary.line,
+    assessment,
+    underlyingPigment: { description: `Level ${input.targetLevel} will have ${input.targetLevel <= 5 ? 'red-orange to orange' : input.targetLevel <= 7 ? 'orange to yellow-orange' : 'yellow to pale yellow'} undertone` },
+    quantity: { description: `${Math.ceil(totalColorGrams / 60)} color tube${Math.ceil(totalColorGrams / 60) > 1 ? 's' : ''} (2oz) + ${developerMl}oz developer` },
+    confidence: warnings.length === 0 ? 95 : Math.max(50, 90 - warnings.length * 15),
+    strandTestRecommended: input.condition.porosity === 'high' || liftAmount > 3,
+    hardStops: [],
+    alternatives: [],
   };
 }
 

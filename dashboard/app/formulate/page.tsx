@@ -15,7 +15,6 @@ import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, Chev
 import { ProductSearch, type SelectedProduct } from '@/components/product-search'
 import { StockCheck } from '@/components/stock-check'
 import VisualOutcomeSimulator from '@/components/visual-outcome/VisualOutcomeSimulator'
-import WarmthExposureBar from '@/components/visual-outcome/WarmthExposureBar'
 import ContextualEducation from '@/components/education/ContextualEducation'
 import CorrectiveColorPanel, { CorrectiveBadge } from '@/lib/corrective-color/CorrectiveColorPanel'
 import { diagnose, type CorrectiveIssue, type HairState } from '@/lib/corrective-color/engine'
@@ -958,9 +957,6 @@ export default function FormulatePage() {
 
             {/* Visual Outcome Simulator */}
             <VisualOutcomeSimulator input={fd as any} result={result} />
-
-            {/* Warmth Exposure / Conversion Panel */}
-            <WarmthExposureBar input={fd as any} result={result} />
 
             {/* Stock Check */}
             <div style={{ marginBottom: 16, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
