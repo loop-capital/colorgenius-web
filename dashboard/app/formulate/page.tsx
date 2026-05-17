@@ -143,7 +143,7 @@ function blendColor(levelHex: string, toneHex: string, toneWeight = 0.35): strin
   const b = Math.round(lb + (tb - lb) * toneWeight)
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
 }
-const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
+const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 const btnOutline = { padding: '12px 24px', border: '1px solid rgba(255,255,255,0.12)', color: '#A1A1AA', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 
 export default function FormulatePage() {
@@ -349,7 +349,7 @@ export default function FormulatePage() {
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
+            <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
             <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 6 steps</p>
           </div>
           <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', texture: 'medium', hairPattern: 'straight', density: 'medium', serviceType: 'full_head', chemicalHistory: [], sensitivities: [], lastChemicalService: 'never', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
@@ -446,7 +446,7 @@ export default function FormulatePage() {
             )}
           </div>
           <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
-            <div className="h-1.5 rounded-full transition-all duration-300" style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', width: `${step / STEPS.length * 100}%` }} />
+            <div className="h-1.5 rounded-full transition-all duration-300" style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', width: `${step / STEPS.length * 100}%` }} />
           </div>
           <p className="text-[10px] mt-1 text-right" style={{ color: '#71717A' }}>Step {step} of {STEPS.length}</p>
         </div>

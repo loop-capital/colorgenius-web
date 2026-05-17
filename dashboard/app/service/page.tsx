@@ -244,7 +244,7 @@ function ServiceEntryContent() {
                       border: selectedClient?.id === c.id ? '1px solid rgba(147, 51, 234, 0.3)' : '1px solid rgba(255,255,255,0.06)',
                     }}>
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
-                      style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}>
+                      style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}>
                       {c.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                     </div>
                     <div className="flex-1">
@@ -294,7 +294,7 @@ function ServiceEntryContent() {
                   {formulaSteps.map((s, i) => (
                     <div key={i} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9333EA]/30 to-[#EC4899]/10 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#A855F7 to-[#D946EF]/10 flex items-center justify-center">
                           <span className="text-[10px] font-mono font-semibold text-[#9333EA]">{s.product.shadeCode.slice(0, 3)}</span>
                         </div>
                         <div>
@@ -413,7 +413,7 @@ function ServiceEntryContent() {
               {/* Continue */}
               <button onClick={() => setStep(3)} disabled={formulaSteps.length === 0}
                 className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-30"
-                style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}>
+                style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}>
                 Continue to Review <ArrowRight className="w-4 h-4" />
               </button>
             </motion.div>
@@ -481,7 +481,7 @@ function ServiceEntryContent() {
                   </button>
                   <button onClick={handleSave} disabled={saving}
                     className="flex-[2] py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2"
-                    style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}>
+                    style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}>
                     <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Complete Service'}
                   </button>
                 </div>

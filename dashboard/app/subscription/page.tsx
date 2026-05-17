@@ -91,7 +91,7 @@ export default function SubscriptionPage() {
                   ? 'text-white'
                   : 'text-[#A1A1AA] hover:text-[#F5F5F7]'
               }`}
-              style={billingCycle === 'monthly' ? { background: 'linear-gradient(135deg, #9333EA, #EC4899)' } : {}}
+              style={billingCycle === 'monthly' ? { background: 'linear-gradient(135deg, #A855F7, #D946EF)' } : {}}
             >
               Monthly
             </button>
@@ -102,7 +102,7 @@ export default function SubscriptionPage() {
                   ? 'text-white'
                   : 'text-[#A1A1AA] hover:text-[#F5F5F7]'
               }`}
-              style={billingCycle === 'yearly' ? { background: 'linear-gradient(135deg, #9333EA, #EC4899)' } : {}}
+              style={billingCycle === 'yearly' ? { background: 'linear-gradient(135deg, #A855F7, #D946EF)' } : {}}
             >
               Yearly <span className="text-[10px] ml-1 opacity-80">Save 20%</span>
             </button>
@@ -125,14 +125,14 @@ export default function SubscriptionPage() {
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold text-white"
-                  style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)' }}>
+                  style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)' }}>
                   Most Popular
                 </div>
               )}
 
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)' }}>
+                  style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)' }}>
                   <plan.icon className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -166,7 +166,7 @@ export default function SubscriptionPage() {
                 className="w-full py-3 rounded-xl font-semibold text-sm transition-all"
                 style={
                   plan.popular
-                    ? { background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#fff' }
+                    ? { background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#fff' }
                     : { background: 'rgba(255,255,255,0.06)', color: '#F5F5F7' }
                 }
                 onClick={() => {
