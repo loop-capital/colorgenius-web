@@ -17,7 +17,7 @@ No typing. No searching. No leaving the client.
 
 The ColorGenius Voice Assistant isn't a generic chatbot. It's a **color science consultant** trained on:
 
-- **367 professional shades** across 10 brands and 22 color lines
+- **3,273 professional shades** across 21 brands and 40+ color lines
 - **Brand-specific processing times** — knows the difference between Shades EQ and Igora Royal
 - **Underlying pigment data** — level 1 through 10
 - **Client history** — texture, porosity, gray percentage, allergies, past formulas

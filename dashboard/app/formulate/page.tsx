@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { HAIR_LEVELS, BRANDS, LINES_BY_BRAND } from '@/lib/products'
@@ -11,7 +13,7 @@ import { ColorWheel3D } from '@/components/custom'
 import { ScaleWidget } from '@/components/scale-widget'
 import { EditFormula, type FormulaIngredient } from '@/components/edit-formula'
 import { ScaleBowl, type BowlIngredient } from '@/components/scale-bowl'
-import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle, Smartphone, User, Search, UserPlus } from 'lucide-react'
+import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle, Smartphone, User, Search, UserPlus, Target, ChartNoAxesColumn } from 'lucide-react'
 import { ProductSearch, type SelectedProduct } from '@/components/product-search'
 import { StockCheck } from '@/components/stock-check'
 import VisualOutcomeSimulator from '@/components/visual-outcome/VisualOutcomeSimulator'
@@ -350,7 +352,7 @@ export default function FormulatePage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <div>
             <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
-            <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 6 steps</p>
+            <p style={{ color: '#A1A1AA', fontSize: 14 }}>Formulate with absolute precision in 6 steps</p>
           </div>
           <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', texture: 'medium', hairPattern: 'straight', density: 'medium', serviceType: 'full_head', chemicalHistory: [], sensitivities: [], lastChemicalService: 'never', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
         </div>
@@ -500,7 +502,7 @@ export default function FormulatePage() {
                   )}
                 </div>
               )}
-              <p style={{ fontSize: 12, color: '#71717A' }}>{photo ? 'Photo captured ✓' : 'Photo recommended for best results'}</p>
+              {photo && <p style={{ fontSize: 12, color: '#71717A' }}>Photo captured ✓</p>}
               <button type="button" onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Next: Hair Assessment'} <ChevronRight size={16} /></button>
             </div>
           </div>
@@ -509,7 +511,7 @@ export default function FormulatePage() {
         {/* STEP 2: Hair Assessment */}
         {step === 2 && (
           <div style={card}>
-            <h2 style={{ fontSize: 18, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><Droplets style={{ color: '#9333EA' }} /> Hair Assessment</h2>
+            <h2 style={{ fontSize: 18, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><ChartNoAxesColumn style={{ color: '#9333EA' }} /> Hair Assessment</h2>
             <p style={{ color: '#71717A', fontSize: 13, marginBottom: 16 }}>Texture, pattern, density, level & tone</p>
             {/* Texture */}
             <div style={{ marginBottom: 24 }}>
@@ -633,7 +635,7 @@ export default function FormulatePage() {
             <div style={{ marginBottom: 24 }}>
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4, display: 'block' }}>Sensitivities & Contraindications</Label>
               <p style={{ color: '#71717A', fontSize: 12, marginBottom: 8 }}>Safety-critical information</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {SENSITIVITIES.map(o => {
                   const active = fd.sensitivities.includes(o.value)
                   return (
@@ -676,7 +678,7 @@ export default function FormulatePage() {
         {/* STEP 4: Target Look */}
         {step === 4 && (
           <div style={card}>
-            <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Sparkles style={{ color: '#F59E0B' }} /> Target Look</h2>
+            <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Target style={{ color: '#9333EA' }} /> Target Look</h2>
             <div style={{ marginBottom: 24 }}>
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Target Level</Label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -732,7 +734,7 @@ export default function FormulatePage() {
         {/* STEP 5: Condition */}
         {step === 5 && (
           <div style={card}>
-            <h2 style={{ fontSize: 18, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><Droplets style={{ color: '#9333EA' }} /> Hair Condition</h2>
+            <h2 style={{ fontSize: 18, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><ChartNoAxesColumn style={{ color: '#9333EA' }} /> Hair Condition</h2>
             <p style={{ color: '#71717A', fontSize: 13, marginBottom: 24 }}>Assess the hair's condition and history. These details directly affect the formula.</p>
 
             {/* Hair Condition */}
@@ -831,43 +833,12 @@ export default function FormulatePage() {
           <div style={{ ...card, padding: 32 }}>
             {/* Header with Edit/Mix toggle */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h2 style={{ fontSize: 18, margin: 0 }}>✅ Your Formula</h2>
+              <h2 style={{ fontSize: 18, margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, background: 'white', borderRadius: 4, fontSize: 11, fontWeight: 'bold', color: 'black', fontFamily: 'system-ui, sans-serif' }}>Ai</span><span>Your Formula</span></h2>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button type="button" onClick={() => setFormulaView('edit')} style={{ padding: '6px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: formulaView === 'edit' ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: formulaView === 'edit' ? 'rgba(147,51,234,0.1)' : 'transparent', color: formulaView === 'edit' ? '#9333EA' : '#71717A', cursor: 'pointer' }}>Edit</button>
                 <button type="button" onClick={() => setFormulaView('bowl')} style={{ padding: '6px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: formulaView === 'bowl' ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: formulaView === 'bowl' ? 'rgba(147,51,234,0.1)' : 'transparent', color: formulaView === 'bowl' ? '#9333EA' : '#71717A', cursor: 'pointer' }}>Mix</button>
               </div>
             </div>
-            {/* Brand Conversion */}
-            <div style={{ marginBottom: 24 }}>
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <select
-                  value={convertTargetBrand}
-                  onChange={e => setConvertTargetBrand(e.target.value)}
-                  style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(22,22,32,0.8)', color: '#F5F5F7', fontSize: 14, cursor: 'pointer' }}
-                >
-                  <option value="">Select target brand...</option>
-                  {brands.filter(b => b !== result.brand).map(b => <option key={b} value={b}>{b}</option>)}
-                </select>
-                <button
-                  type="button"
-                  onClick={handleConvertBrand}
-                  disabled={!convertTargetBrand || converting}
-                  style={{ padding: '10px 20px', borderRadius: 10, background: !convertTargetBrand || converting ? 'rgba(147,51,234,0.3)' : 'linear-gradient(135deg, #A855F7, #D946EF)', color: 'white', border: 'none', fontWeight: 600, fontSize: 14, cursor: !convertTargetBrand || converting ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
-                >Convert Formula</button>
-              </div>
-              {conversionResult && (
-                <div style={{ marginTop: 12, padding: 12, background: 'rgba(147,51,234,0.08)', border: '1px solid rgba(147,51,234,0.2)', borderRadius: 10 }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#9333EA', marginBottom: 8 }}>Converted to {convertTargetBrand}</p>
-                  {conversionResult.shades?.map((s: any, i: number) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < conversionResult.shades.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
-                      <span style={{ fontSize: 13, color: '#F5F5F7' }}>{s.shadeCode} — {s.shadeName}</span>
-                      <span style={{ fontSize: 12, color: '#71717A' }}>{s.grams}g</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Hard Stops */}
             {result.hardStops && result.hardStops.length > 0 && (
               <div style={{ marginBottom: 24 }}>
@@ -908,7 +879,7 @@ export default function FormulatePage() {
             {/* Professional Assessment */}
             {result.assessment && (
               <div style={{ marginBottom: 24 }}>
-                <h3 style={{ color: '#3B82F6', fontSize: 16, fontWeight: 700, marginBottom: 12 }}>💡 Professional Assessment</h3>
+                <h3 style={{ color: '#3B82F6', fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Professional Assessment</h3>
                 <div style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', borderRadius: 12, padding: 16 }}>
                   <p style={{ color: '#F5F5F7', fontSize: 14, lineHeight: 1.6 }}>{result.assessment}</p>
                 </div>
@@ -957,6 +928,40 @@ export default function FormulatePage() {
 
             {/* Visual Outcome Simulator */}
             <VisualOutcomeSimulator input={fd as any} result={result} />
+
+            {/* Brand Conversion */}
+            <div style={{ marginBottom: 0, padding: 16, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: '#F5F5F7', marginBottom: 6 }}>🔄 Brand Conversion</h3>
+              <p style={{ fontSize: 14, color: '#A1A1AA', marginBottom: 12 }}>Convert this formula to a different brand's equivalent shades.</p>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <select
+                  value={convertTargetBrand}
+                  onChange={e => setConvertTargetBrand(e.target.value)}
+                  style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(22,22,32,0.8)', color: '#F5F5F7', fontSize: 14, cursor: 'pointer' }}
+                >
+                  <option value="">Select target brand...</option>
+                  {brands.filter(b => b !== result.brand).map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+                <button
+                  type="button"
+                  onClick={handleConvertBrand}
+                  className="convert-formula-btn"
+                  disabled={!convertTargetBrand || converting}
+                  style={{ padding: '10px 20px', borderRadius: 10, backgroundColor: '#9333EA', color: 'white', border: 'none', fontWeight: 600, fontSize: 14, cursor: !convertTargetBrand || converting ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
+                >Convert Formula</button>
+              </div>
+              {conversionResult && (
+                <div style={{ marginTop: 12, padding: 12, background: 'rgba(147,51,234,0.08)', border: '1px solid rgba(147,51,234,0.2)', borderRadius: 10 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#9333EA', marginBottom: 8 }}>Converted to {convertTargetBrand}</p>
+                  {conversionResult.shades?.map((s: any, i: number) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: i < conversionResult.shades.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+                      <span style={{ fontSize: 13, color: '#F5F5F7' }}>{s.shadeCode} — {s.shadeName}</span>
+                      <span style={{ fontSize: 12, color: '#71717A' }}>{s.grams}g</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Stock Check */}
             <div style={{ marginBottom: 16, padding: 16, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>

@@ -209,6 +209,7 @@ export async function POST(request: Request) {
     const sessionToken = await new SignJWT({
       userId: user.id,
       email: user.email,
+      username: user.first_name || email.split('@')[0],
     })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
@@ -216,7 +217,7 @@ export async function POST(request: Request) {
       .sign(jwtSecret);
 
     const cookieStore = await cookies();
-    cookieStore.set('auth', sessionToken, {
+    cookieStore.set('colorgenius_token', sessionToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'lax',

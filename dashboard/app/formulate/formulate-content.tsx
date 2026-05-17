@@ -12,7 +12,7 @@ import { ColorWheel3D } from '@/components/custom'
 import { ScaleWidget } from '@/components/scale-widget'
 import { EditFormula, type FormulaIngredient } from '@/components/edit-formula'
 import { ScaleBowl, type BowlIngredient } from '@/components/scale-bowl'
-import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle, Smartphone, User, Search, UserPlus, Target, ChartNoAxesColumn, LoaderCircle } from 'lucide-react'
+import { Camera, Upload, X, Sparkles, Droplets, FlaskConical, ChevronRight, ChevronLeft, RotateCcw, Save, AlertTriangle, Smartphone, User, Search, UserPlus, Target, LoaderCircle, ChartNoAxesColumn } from 'lucide-react'
 import { ProductSearch, type SelectedProduct } from '@/components/product-search'
 import { StockCheck } from '@/components/stock-check'
 import CorrectiveColorPanel, { CorrectiveBadge } from '@/lib/corrective-color/CorrectiveColorPanel'
@@ -368,7 +368,7 @@ export default function FormulatePage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <div>
             <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
-            <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 6 steps</p>
+            <p style={{ color: '#A1A1AA', fontSize: 14 }}>Formulate with absolute precision in 6 steps</p>
           </div>
           <button type="button" onClick={handleReset} style={btnOutline}><RotateCcw size={14} /> Reset</button>
         </div>
@@ -522,7 +522,7 @@ export default function FormulatePage() {
                   )}
                 </div>
               )}
-              <p style={{ fontSize: 12, color: '#71717A' }}>{photo ? 'Photo captured ✓' : 'Photo recommended for best results'}</p>
+              {photo && <p style={{ fontSize: 12, color: '#71717A' }}>Photo captured ✓</p>
               <button type="button" onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Next: Hair Assessment'} <ChevronRight size={16} /></button>
             </div>
           </div>
@@ -685,7 +685,7 @@ export default function FormulatePage() {
             <div style={{ marginBottom: 24 }}>
               <h3 style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Sensitivities & Contraindications</h3>
               <p style={{ color: '#71717A', fontSize: 13, marginBottom: 12 }}>Safety-critical information</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 {SENSITIVITIES.map(s => {
                   const isActive = fd.sensitivity[s.value as keyof typeof fd.sensitivity] as boolean
                   return (
@@ -698,6 +698,7 @@ export default function FormulatePage() {
                       border: isActive ? '1px solid rgba(239,68,68,0.3)' : '1px solid rgba(255,255,255,0.06)',
                       background: isActive ? 'rgba(239,68,68,0.05)' : 'rgba(30,30,45,0.6)',
                       cursor: 'pointer',
+                      minWidth: 0,
                     }}>
                       <input
                         type="checkbox"

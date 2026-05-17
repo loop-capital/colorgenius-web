@@ -3,8 +3,8 @@
 // SOHO by MOB — 14 brand conversion charts
 // CHI — 11 brand conversion charts
 
-import sohoConversions from './soho-manufacturer-conversions.json' with { type: 'json' };
-import chiConversions from './chi-manufacturer-conversions.json' with { type: 'json' };
+const sohoConversions = require('./soho-manufacturer-conversions.json');
+const chiConversions = require('./chi-manufacturer-conversions.json');
 
 export interface ManufacturerMapping {
   sourceBrand: string;

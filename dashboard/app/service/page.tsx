@@ -198,29 +198,43 @@ function ServiceEntryContent() {
         )}
 
         {/* Step Indicator */}
-        <div className="flex items-center gap-2 mb-8">
-          {STEPS.map((s, i) => {
-            const Icon = s.icon;
-            const isActive = i === step;
-            const isComplete = i < step;
-            return (
-              <div key={s.id} className="flex items-center flex-1">
-                <div className="flex flex-col items-center gap-1 flex-1">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
-                    style={{
-                      background: isActive ? '#9333EA' : isComplete ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.05)',
-                      border: !isActive && !isComplete ? '1px solid rgba(255,255,255,0.08)' : 'none',
-                    }}>
-                    {isComplete ? <Check className="w-4 h-4 text-[#10B981]" /> : <Icon className="w-4 h-4" style={{ color: isActive ? '#FFF' : 'var(--cg-text-tertiary)' }} />}
-                  </div>
-                  <span className="text-[10px] font-medium" style={{ color: isActive ? '#A855F7' : 'var(--cg-text-tertiary)' }}>{s.title}</span>
-                </div>
-                {i < STEPS.length - 1 && (
-                  <div className="h-px flex-1 mx-1" style={{ background: isComplete ? '#10B981' : 'rgba(255,255,255,0.06)' }} />
-                )}
+        <div className="mb-8">
+          {/* Active step icon + label */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)' }}>
+                {(() => {
+                  const Icon = STEPS[step].icon;
+                  return <Icon className="w-5 h-5 text-white" />;
+                })()}
               </div>
-            );
-          })}
+              <span className="text-white font-semibold text-lg">{STEPS[step].title}</span>
+            </div>
+            <div className="text-right">
+              <span className="text-xs font-medium uppercase tracking-wider" style={{ color: '#A855F7' }}>Next</span>
+              <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
+                {step < STEPS.length - 1 ? STEPS[step + 1].title : 'Finish'}
+              </p>
+            </div>
+          </div>
+          {/* Progress bar track */}
+          <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <motion.div
+              className="h-full rounded-full"
+              style={{
+                background: 'linear-gradient(90deg, #9333EA, #EC4899)',
+              }}
+              initial={{ width: 0 }}
+              animate={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
+            />
+          </div>
+          <div className="flex justify-end mt-1">
+            <span className="text-xs font-medium" style={{ color: 'var(--cg-text-tertiary)' }}>
+              Step {step + 1} of {STEPS.length}
+            </span>
+          </div>
         </div>
 
         {/* Step Content */}

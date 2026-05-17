@@ -5,7 +5,8 @@ import {
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal,
   Plus, ChevronLeft, ChevronRight, X, Upload, Image as ImageIcon,
   Loader2, Hash, AtSign, Palette, FlaskConical, Sparkles,
-  HelpCircle, Trophy, Camera, Grid3X3, Search, TrendingUp
+  HelpCircle, Trophy, Camera, Grid3X3, Search, TrendingUp,
+  CircleUserRound
 } from 'lucide-react'
 import Link from 'next/link'
 import { BadgeRow } from './ProfileBadges'
@@ -764,7 +765,7 @@ function CommentThread({ postId, commentCount }: { postId: string; commentCount:
 // ─── Main Community Feed ──────────────────────────────────────────────────────
 
 const TABS = [
-  { id: 'all', label: 'For You', icon: Sparkles },
+  { id: 'all', label: 'For You', icon: CircleUserRound },
   { id: 'trending', label: 'Trending', icon: TrendingUp },
   { id: 'following', label: 'Following', icon: AtSign },
   { id: 'my_posts', label: 'My Posts', icon: Grid3X3 },

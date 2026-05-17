@@ -44,6 +44,13 @@ const BRAND_DISPLAY_NAMES: Record<string, string> = {
   matrix: 'Matrix',
   pravana: 'Pravana',
   kenra: 'Kenra Professional',
+  alfaparf: 'Alfaparf',
+  paulmitchell: 'Paul Mitchell',
+  pulpriot: 'Pulp Riot',
+  rcolor: 'R+Color',
+  soho: 'SOHO',
+  omcorcolor: 'O&M CØR.color',
+  chi: 'CHI',
 };
 
 export default function ConversionPanel({
@@ -163,14 +170,15 @@ export default function ConversionPanel({
 
   const buttonStyle: React.CSSProperties = {
     padding: '10px 20px',
-    borderRadius: 8,
+    borderRadius: 10,
     border: 'none',
-    background: '#9333EA',
+    background: !targetBrand || loading ? 'rgba(168,85,247,0.3)' : 'linear-gradient(135deg, #A855F7, #D946EF)',
     color: '#fff',
     fontSize: 14,
-    fontWeight: 500,
-    cursor: loading ? 'not-allowed' : 'pointer',
+    fontWeight: 600,
+    cursor: !targetBrand || loading ? 'not-allowed' : 'pointer',
     opacity: loading ? 0.6 : 1,
+    whiteSpace: 'nowrap',
     transition: 'opacity 0.2s',
   };
 
@@ -245,10 +253,7 @@ export default function ConversionPanel({
 
   return (
     <div style={containerStyle}>
-      <p style={headerStyle}>🔄 Brand Conversion</p>
-      <p style={subHeaderStyle}>
-        Convert this formula to a different brand's equivalent shades.
-      </p>
+      <p style={headerStyle}>Convert this formula to a different brand's equivalent shades</p>
 
       {/* Target brand selector */}
       <div style={rowStyle}>

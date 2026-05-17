@@ -1,0 +1,11 @@
+{
+  "brand": "wella",
+  "productLine": "Koleston Perfect",
+  "type": "permanent",
+  "mixRatio": "1:1",
+  "processingTime": "30-40",
+  "developer": "Welloxon Perfect",
+  "lines": [
+    {"name": "Koleston Perfect", "type": "permanent"}
+  ]
+}

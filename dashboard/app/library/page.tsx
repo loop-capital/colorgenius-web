@@ -333,6 +333,9 @@ export default function LibraryPage() {
   const [loading, setLoading] = useState(false)
   const [selectedTrend, setSelectedTrend] = useState('')
   const [selectedFinish, setSelectedFinish] = useState('')
+  const [activeTab, setActiveTab] = useState<'my-formulas' | 'marketplace'>('my-formulas')
+  const [marketplaceFormulas, setMarketplaceFormulas] = useState<any[]>([])
+  const [marketplaceLoading, setMarketplaceLoading] = useState(false)
   const [desiredResultQuery, setDesiredResultQuery] = useState('')
   const [dynamicTrends, setDynamicTrends] = useState<string[]>([])
 
@@ -353,7 +356,7 @@ export default function LibraryPage() {
         const res = await fetch('/api/v1/trends?days=30&limit=16')
         if (!res.ok) return
         const data = await res.json()
-        if (!cancelled && data.trends?.length > 0) {
+        if (!cancelled && data.trends?.length >= 6) {
           setDynamicTrends(data.trends.map((t: any) => t.name))
         }
       } catch (e) {
@@ -528,8 +531,29 @@ export default function LibraryPage() {
 
         {/* My Formulas / Marketplace Tabs */}
         <div className="flex gap-1 mb-6 p-1 rounded-xl w-fit" style={{ background: 'rgba(255,255,255,0.04)' }}>
-          <button className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ background: 'var(--cg-gradient-teal)', color: '#0A0A0A' }}>My Formulas</button>
-          <button className="px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ color: 'var(--cg-text-tertiary)' }}>Marketplace</button>
+          <button
+            onClick={() => setActiveTab('my-formulas')}
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            style={activeTab === 'my-formulas' ? { background: 'var(--cg-gradient-teal)', color: '#0A0A0A' } : { color: 'var(--cg-text-tertiary)' }}
+          >My Formulas</button>
+          <button
+            onClick={async () => {
+              setActiveTab('marketplace')
+              if (marketplaceFormulas.length === 0) {
+                setMarketplaceLoading(true)
+                try {
+                  const res = await fetch('/api/marketplace/browse')
+                  if (res.ok) {
+                    const data = await res.json()
+                    setMarketplaceFormulas(data.formulas || data.data || [])
+                  }
+                } catch { /* silent */ }
+                setMarketplaceLoading(false)
+              }
+            }}
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            style={activeTab === 'marketplace' ? { background: 'var(--cg-gradient-teal)', color: '#0A0A0A' } : { color: 'var(--cg-text-tertiary)' }}
+          >Marketplace</button>
         </div>
 
         {/* Desired Result Search */}
@@ -796,7 +820,7 @@ export default function LibraryPage() {
           </div>
         </motion.div>
 
-        {/* Results count */}
+        {activeTab === 'my-formulas' ? (<>
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
             Showing <span className="font-medium" style={{ color: 'var(--cg-text-primary)' }}>{filteredFormulas.length}</span> of {classifiedFormulas.length} formulas
@@ -920,6 +944,46 @@ export default function LibraryPage() {
             </table>
           </motion.div>
         )}
+        </>) : (
+        /* Marketplace Tab */
+        <div className="mb-6">
+          {marketplaceLoading ? (
+            <div className="text-center py-16" style={{ color: 'var(--cg-text-tertiary)' }}>
+              <div className="animate-spin h-8 w-8 border-2 border-t-transparent rounded-full mx-auto mb-4" style={{ borderColor: 'var(--cg-teal)', borderTopColor: 'transparent' }}></div>
+              Loading marketplace formulas...
+            </div>
+          ) : marketplaceFormulas.length === 0 ? (
+            <div className="text-center py-16" style={{ color: 'var(--cg-text-tertiary)' }}>
+              <p className="text-lg font-medium mb-2">Marketplace Coming Soon</p>
+              <p className="text-sm">Community formulas will appear here once published.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {marketplaceFormulas.map((f: any, i: number) => (
+                <motion.div
+                  key={f.id || i}
+                  className="rounded-xl p-5 cursor-pointer"
+                  style={{ background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)' }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold" style={{ color: 'var(--cg-text-primary)' }}>{f.name || f.brand + ' Formula'}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(20,184,166,0.1)', color: 'var(--cg-teal)', border: '1px solid rgba(20,184,166,0.2)' }}>{f.brand}</span>
+                  </div>
+                  <div className="text-xs mb-3" style={{ color: 'var(--cg-text-tertiary)' }}>{f.line} • Level {f.level || '?'}</div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>by {f.creator || 'Community'}</span>
+                    <ActionButton variant="primary" className="!text-xs !px-3 !py-1.5">Use Formula</ActionButton>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+        )}
+
       </div>
 
       {/* Detail Modal */}

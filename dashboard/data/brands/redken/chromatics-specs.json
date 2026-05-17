@@ -1,0 +1,13 @@
+{
+  "brand": "redken",
+  "productLine": "Chromatics",
+  "type": "permanent",
+  "mixRatio": "1:1",
+  "processingTime": "35",
+  "developer": "Chromatics Oil in Cream Developer",
+  "lines": [
+    {"name": "Chromatics", "type": "permanent", "technology": "ODS2 Protein Extract"},
+    {"name": "Chromatics Remixed", "type": "permanent", "technology": "ODS2 Tone Modifier"}
+  ],
+  "notes": "Zero ammonia permanent color. Mixed 1:1 with Chromatics Oil in Cream Developer only."
+}

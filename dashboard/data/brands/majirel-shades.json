@@ -1,91 +1,871 @@
 [
-  {"code":"10.01","name":"Very Light Blonde Natural Blue","level":10,"toneFamily":"blue-ash","tone":".01/NB","line":"majirel","subLine":"cool-cover"},
-  {"code":"10.21","name":"Very Light Blonde Violet Blue","level":10,"toneFamily":"violet","tone":".21/VB","line":"majirel"},
-  {"code":"10/10N","name":"Very Light Blonde Natural","level":10,"toneFamily":"natural","tone":"N","line":"majirel"},
-  {"code":"9.11","name":"Light Blonde Intense Blue","level":9,"toneFamily":"blue-ash","tone":".11/BB","line":"majirel"},
-  {"code":"9.1","name":"Light Blonde Blue","level":9,"toneFamily":"ash","tone":".1/B","line":"majirel"},
-  {"code":"CI 9.1","name":"Light Blonde Cool Inforced Blue","level":9,"toneFamily":"ash","tone":".1/B","line":"majirel","subLine":"cool-inforced"},
-  {"code":"9.01","name":"Light Blonde Natural Blue","level":9,"toneFamily":"blue-ash","tone":".01/NB","line":"majirel","subLine":"cool-cover"},
-  {"code":"9.12","name":"Light Blonde Blue Violet High Resist","level":9,"toneFamily":"ash","tone":".12/BV","line":"majirel","subLine":"cool-cover"},
-  {"code":"CI 9.13","name":"Light Blonde Cool Inforced Beige Gold","level":9,"toneFamily":"beige","tone":".13/BG","line":"majirel","subLine":"cool-inforced"},
-  {"code":"9.13","name":"Light Blonde Beige Gold","level":9,"toneFamily":"beige","tone":".13/BG","line":"majirel"},
-  {"code":"9/9N","name":"Light Blonde Natural","level":9,"toneFamily":"natural","tone":"N","line":"majirel"},
-  {"code":"9.31","name":"Light Blonde Gold Blue","level":9,"toneFamily":"gold","tone":".31/GB","line":"majirel"},
-  {"code":"9.3","name":"Light Blonde Gold","level":9,"toneFamily":"gold","tone":".3/G","line":"majirel"},
-  {"code":"9.03","name":"Light Blonde Natural Gold","level":9,"toneFamily":"gold","tone":".03/NG","line":"majirel"},
-  {"code":"8.1","name":"Blonde Blue","level":8,"toneFamily":"ash","tone":".1/B","line":"majirel"},
-  {"code":"CI 8.1","name":"Blonde Cool Inforced Blue","level":8,"toneFamily":"ash","tone":".1/B","line":"majirel","subLine":"cool-inforced"},
-  {"code":"8.01","name":"Blonde Natural Blue","level":8,"toneFamily":"blue-ash","tone":".01/NB","line":"majirel","subLine":"cool-cover"},
-  {"code":"CI 8.13","name":"Blonde Cool Inforced Beige Gold","level":8,"toneFamily":"beige","tone":".13/BG","line":"majirel","subLine":"cool-inforced"},
-  {"code":"8.13","name":"Blonde Beige Gold","level":8,"toneFamily":"beige","tone":".13/BG","line":"majirel"},
-  {"code":"8.0","name":"Blonde Extra Coverage Natural","level":8,"toneFamily":"natural","tone":".0/NN","line":"majirel","isExtraCoverage":true},
-  {"code":"8/8N","name":"Blonde Natural","level":8,"toneFamily":"natural","tone":"N","line":"majirel"},
-  {"code":"8.03","name":"Blonde Natural Gold","level":8,"toneFamily":"gold","tone":".03/NG","line":"majirel"},
-  {"code":"8.3","name":"Blonde Gold","level":8,"toneFamily":"gold","tone":".3/G","line":"majirel"},
-  {"code":"8.34","name":"Blonde Gold Copper","level":8,"toneFamily":"gold","tone":".34/GC","line":"majirel"},
-  {"code":"8.43","name":"Blonde Copper Gold","level":8,"toneFamily":"copper","tone":".43/CG","line":"majirel"},
-  {"code":"7.1","name":"Dark Blonde Blue","level":7,"toneFamily":"ash","tone":".1/B","line":"majirel"},
-  {"code":"CI 7.1","name":"Dark Blonde Cool Inforced Blue","level":7,"toneFamily":"ash","tone":".1/B","line":"majirel","subLine":"cool-inforced"},
-  {"code":"7.01","name":"Dark Blonde Natural Blue","level":7,"toneFamily":"blue-ash","tone":".01/NB","line":"majirel","subLine":"cool-cover"},
-  {"code":"7.12","name":"Dark Blonde Blue Violet","level":7,"toneFamily":"ash","tone":".12/BV","line":"majirel"},
-  {"code":"7.17","name":"Dark Blonde Blue Green","level":7,"toneFamily":"cool","tone":".17/BGr","line":"majirel"},
-  {"code":"CI 7.13","name":"Dark Blonde Cool Inforced Beige Gold","level":7,"toneFamily":"beige","tone":".13/BG","line":"majirel","subLine":"cool-inforced"},
-  {"code":"7.13","name":"Dark Blonde Beige Gold","level":7,"toneFamily":"beige","tone":".13/BG","line":"majirel"},
-  {"code":"7.23","name":"Dark Blonde Violet Gold","level":7,"toneFamily":"violet","tone":".23/VG","line":"majirel"},
-  {"code":"7.8","name":"Dark Blonde Mocha","level":7,"toneFamily":"chocolate","tone":".8/M","line":"majirel"},
-  {"code":"7.0","name":"Dark Blonde Extra Coverage Natural","level":7,"toneFamily":"natural","tone":".0/NN","line":"majirel","isExtraCoverage":true},
-  {"code":"7/7N","name":"Dark Blonde Natural","level":7,"toneFamily":"natural","tone":"N","line":"majirel"},
-  {"code":"7.03","name":"Dark Blonde Natural Gold","level":7,"toneFamily":"gold","tone":".03/NG","line":"majirel"},
-  {"code":"7.3","name":"Dark Blonde Gold","level":7,"toneFamily":"gold","tone":".3/G","line":"majirel"},
-  {"code":"7.31","name":"Dark Blonde Gold Blue","level":7,"toneFamily":"gold","tone":".31/GB","line":"majirel"},
-  {"code":"7.35","name":"Dark Blonde Gold Red Violet","level":7,"toneFamily":"gold","tone":".35/GRv","line":"majirel"},
-  {"code":"7.4","name":"Dark Blonde Copper","level":7,"toneFamily":"copper","tone":".4/C","line":"majirel"},
-  {"code":"7.43","name":"Dark Blonde Copper Gold Rubilane","level":7,"toneFamily":"copper","tone":".43/CG","line":"majirel","isRubilane":true},
-  {"code":"7.40","name":"Dark Blonde Intense Copper Rubilane","level":7,"toneFamily":"copper","tone":".40/CCC","line":"majirel","isRubilane":true},
-  {"code":"6.1","name":"Light Brown Blue","level":6,"toneFamily":"ash","tone":".1/B","line":"majirel"},
-  {"code":"CI 6.1","name":"Light Brown Cool Inforced Blue","level":6,"toneFamily":"ash","tone":".1/B","line":"majirel","subLine":"cool-inforced"},
-  {"code":"6.01","name":"Light Brown Natural Blue","level":6,"toneFamily":"blue-ash","tone":".01/NB","line":"majirel","subLine":"cool-cover"},
-  {"code":"6.07","name":"Light Brown Natural Green","level":6,"toneFamily":"cool","tone":".07/NGr","line":"majirel"},
-  {"code":"CI 6.13","name":"Light Brown Cool Inforced Beige Gold","level":6,"toneFamily":"beige","tone":".13/BG","line":"majirel","subLine":"cool-inforced"},
-  {"code":"6.13","name":"Light Brown Beige Gold","level":6,"toneFamily":"beige","tone":".13/BG","line":"majirel"},
-  {"code":"6.23","name":"Light Brown Violet Gold","level":6,"toneFamily":"violet","tone":".23/VG","line":"majirel"},
-  {"code":"6.8","name":"Light Brown Mocha","level":6,"toneFamily":"chocolate","tone":".8/M","line":"majirel"},
-  {"code":"6.0","name":"Light Brown Extra Coverage Natural","level":6,"toneFamily":"natural","tone":".0/NN","line":"majirel","isExtraCoverage":true},
-  {"code":"6/6N","name":"Light Brown Natural","level":6,"toneFamily":"natural","tone":"N","line":"majirel"},
-  {"code":"6.03","name":"Light Brown Natural Gold","level":6,"toneFamily":"gold","tone":".03/NG","line":"majirel"},
-  {"code":"6.3","name":"Light Brown Gold","level":6,"toneFamily":"gold","tone":".3/G","line":"majirel"},
-  {"code":"6.34","name":"Light Brown Gold Copper","level":6,"toneFamily":"gold","tone":".34/GC","line":"majirel"},
-  {"code":"6.35","name":"Light Brown Gold Red Violet","level":6,"toneFamily":"gold","tone":".35/GRv","line":"majirel"},
-  {"code":"6.45","name":"Light Brown Copper Red Violet","level":6,"toneFamily":"copper","tone":".45/CRv","line":"majirel"},
-  {"code":"6.62","name":"Light Brown Red Violet Rubilane","level":6,"toneFamily":"red","tone":".62/RV","line":"majirel","isRubilane":true},
-  {"code":"6.65","name":"Light Brown Red Red Violet Rubilane","level":6,"toneFamily":"red","tone":".65/RRv","line":"majirel","isRubilane":true},
-  {"code":"6.6","name":"Light Brown Red","level":6,"toneFamily":"red","tone":".6/R","line":"majirel"},
-  {"code":"6.64","name":"Light Brown Red Copper Rubilane","level":6,"toneFamily":"red","tone":".64/RC","line":"majirel","isRubilane":true},
-  {"code":"6.60","name":"Light Brown Intense Red Lumax","level":6,"toneFamily":"red","tone":".60/RRR","line":"majirel","isLumax":true},
-  {"code":"5.1","name":"Brown Blue","level":5,"toneFamily":"ash","tone":".1/B","line":"majirel"},
-  {"code":"CI 5.1","name":"Brown Cool Inforced Blue","level":5,"toneFamily":"ash","tone":".1/B","line":"majirel","subLine":"cool-inforced"},
-  {"code":"5.07","name":"Brown Natural Green","level":5,"toneFamily":"cool","tone":".07/NGr","line":"majirel"},
-  {"code":"5.8","name":"Brown Mocha","level":5,"toneFamily":"chocolate","tone":".8/M","line":"majirel"},
-  {"code":"5.0","name":"Brown Extra Coverage Natural","level":5,"toneFamily":"natural","tone":".0/NN","line":"majirel","isExtraCoverage":true},
-  {"code":"5/5N","name":"Brown Natural","level":5,"toneFamily":"natural","tone":"N","line":"majirel"},
-  {"code":"5.3","name":"Brown Gold","level":5,"toneFamily":"gold","tone":".3/G","line":"majirel"},
-  {"code":"5.32","name":"Brown Gold Violet","level":5,"toneFamily":"gold","tone":".32/GV","line":"majirel"},
-  {"code":"5.35","name":"Brown Gold Red Violet","level":5,"toneFamily":"gold","tone":".35/GRv","line":"majirel"},
-  {"code":"5.4","name":"Brown Copper","level":5,"toneFamily":"copper","tone":".4/C","line":"majirel"},
-  {"code":"5.62","name":"Brown Red Violet Carmilane","level":5,"toneFamily":"red","tone":".62/RV","line":"majirel","isCarmilane":true},
-  {"code":"5.5","name":"Brown Red Violet Carmilane","level":5,"toneFamily":"red","tone":".5/Rv","line":"majirel","isCarmilane":true},
-  {"code":"5.6","name":"Brown Red","level":5,"toneFamily":"red","tone":".6/R","line":"majirel"},
-  {"code":"5.64","name":"Brown Red Copper","level":5,"toneFamily":"red","tone":".64/RC","line":"majirel"},
-  {"code":"4.1","name":"Dark Brown Blue","level":4,"toneFamily":"ash","tone":".1/B","line":"majirel"},
-  {"code":"4.8","name":"Dark Brown Mocha","level":4,"toneFamily":"chocolate","tone":".8/M","line":"majirel"},
-  {"code":"4.0","name":"Dark Brown Extra Coverage Natural","level":4,"toneFamily":"natural","tone":".0/NN","line":"majirel","isExtraCoverage":true},
-  {"code":"4/4N","name":"Dark Brown Natural","level":4,"toneFamily":"natural","tone":"N","line":"majirel"},
-  {"code":"4.3","name":"Dark Brown Gold","level":4,"toneFamily":"gold","tone":".3/G","line":"majirel"},
-  {"code":"4.35","name":"Dark Brown Gold Red Violet","level":4,"toneFamily":"gold","tone":".35/GRv","line":"majirel"},
-  {"code":"4.65","name":"Dark Brown Intense Red Violet Carmilane","level":4,"toneFamily":"red","tone":".65/RRv","line":"majirel","isCarmilane":true},
-  {"code":"3/3N","name":"Very Dark Brown Natural","level":3,"toneFamily":"natural","tone":"N","line":"majirel"},
-  {"code":"1/1N","name":"Black Blue","level":1,"toneFamily":"natural","tone":".1/B","line":"majirel"},
-  {"code":"901S","name":"Special Blonde Natural Blue","level":9,"toneFamily":"blue-ash","tone":"901S/NB","line":"majirel","subLine":"high-lift"},
-  {"code":"900S","name":"Special Blonde Natural","level":9,"toneFamily":"natural","tone":"900S/NN","line":"majirel","subLine":"high-lift"},
-  {"code":"CLEAR","name":"Majirel Clear","level":0,"toneFamily":"clear","tone":"Clear","line":"majirel"}
+  {
+    "code": "10.01",
+    "name": "Very Light Blonde Natural Blue",
+    "level": 10,
+    "toneFamily": "blue-ash",
+    "tone": ".01/NB",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "10.21",
+    "name": "Very Light Blonde Violet Blue",
+    "level": 10,
+    "toneFamily": "violet",
+    "tone": ".21/VB",
+    "line": "majirel"
+  },
+  {
+    "code": "10/10N",
+    "name": "Very Light Blonde Natural",
+    "level": 10,
+    "toneFamily": "natural",
+    "tone": "N",
+    "line": "majirel"
+  },
+  {
+    "code": "9.11",
+    "name": "Light Blonde Intense Blue",
+    "level": 9,
+    "toneFamily": "blue-ash",
+    "tone": ".11/BB",
+    "line": "majirel"
+  },
+  {
+    "code": "9.1",
+    "name": "Light Blonde Blue",
+    "level": 9,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel"
+  },
+  {
+    "code": "CI 9.1",
+    "name": "Light Blonde Cool Inforced Blue",
+    "level": 9,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel",
+    "subLine": "cool-inforced"
+  },
+  {
+    "code": "9.01",
+    "name": "Light Blonde Natural Blue",
+    "level": 9,
+    "toneFamily": "blue-ash",
+    "tone": ".01/NB",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "9.12",
+    "name": "Light Blonde Blue Violet High Resist",
+    "level": 9,
+    "toneFamily": "ash",
+    "tone": ".12/BV",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "CI 9.13",
+    "name": "Light Blonde Cool Inforced Beige Gold",
+    "level": 9,
+    "toneFamily": "beige",
+    "tone": ".13/BG",
+    "line": "majirel",
+    "subLine": "cool-inforced"
+  },
+  {
+    "code": "9.13",
+    "name": "Light Blonde Beige Gold",
+    "level": 9,
+    "toneFamily": "beige",
+    "tone": ".13/BG",
+    "line": "majirel"
+  },
+  {
+    "code": "9/9N",
+    "name": "Light Blonde Natural",
+    "level": 9,
+    "toneFamily": "natural",
+    "tone": "N",
+    "line": "majirel"
+  },
+  {
+    "code": "9.31",
+    "name": "Light Blonde Gold Blue",
+    "level": 9,
+    "toneFamily": "gold",
+    "tone": ".31/GB",
+    "line": "majirel"
+  },
+  {
+    "code": "9.3",
+    "name": "Light Blonde Gold",
+    "level": 9,
+    "toneFamily": "gold",
+    "tone": ".3/G",
+    "line": "majirel"
+  },
+  {
+    "code": "9.03",
+    "name": "Light Blonde Natural Gold",
+    "level": 9,
+    "toneFamily": "gold",
+    "tone": ".03/NG",
+    "line": "majirel"
+  },
+  {
+    "code": "8.1",
+    "name": "Blonde Blue",
+    "level": 8,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel"
+  },
+  {
+    "code": "CI 8.1",
+    "name": "Blonde Cool Inforced Blue",
+    "level": 8,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel",
+    "subLine": "cool-inforced"
+  },
+  {
+    "code": "8.01",
+    "name": "Blonde Natural Blue",
+    "level": 8,
+    "toneFamily": "blue-ash",
+    "tone": ".01/NB",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "CI 8.13",
+    "name": "Blonde Cool Inforced Beige Gold",
+    "level": 8,
+    "toneFamily": "beige",
+    "tone": ".13/BG",
+    "line": "majirel",
+    "subLine": "cool-inforced"
+  },
+  {
+    "code": "8.13",
+    "name": "Blonde Beige Gold",
+    "level": 8,
+    "toneFamily": "beige",
+    "tone": ".13/BG",
+    "line": "majirel"
+  },
+  {
+    "code": "8.0",
+    "name": "Blonde Extra Coverage Natural",
+    "level": 8,
+    "toneFamily": "natural",
+    "tone": ".0/NN",
+    "line": "majirel",
+    "isExtraCoverage": true
+  },
+  {
+    "code": "8/8N",
+    "name": "Blonde Natural",
+    "level": 8,
+    "toneFamily": "natural",
+    "tone": "N",
+    "line": "majirel"
+  },
+  {
+    "code": "8.03",
+    "name": "Blonde Natural Gold",
+    "level": 8,
+    "toneFamily": "gold",
+    "tone": ".03/NG",
+    "line": "majirel"
+  },
+  {
+    "code": "8.3",
+    "name": "Blonde Gold",
+    "level": 8,
+    "toneFamily": "gold",
+    "tone": ".3/G",
+    "line": "majirel"
+  },
+  {
+    "code": "8.34",
+    "name": "Blonde Gold Copper",
+    "level": 8,
+    "toneFamily": "gold",
+    "tone": ".34/GC",
+    "line": "majirel"
+  },
+  {
+    "code": "8.43",
+    "name": "Blonde Copper Gold",
+    "level": 8,
+    "toneFamily": "copper",
+    "tone": ".43/CG",
+    "line": "majirel"
+  },
+  {
+    "code": "7.1",
+    "name": "Dark Blonde Blue",
+    "level": 7,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel"
+  },
+  {
+    "code": "CI 7.1",
+    "name": "Dark Blonde Cool Inforced Blue",
+    "level": 7,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel",
+    "subLine": "cool-inforced"
+  },
+  {
+    "code": "7.01",
+    "name": "Dark Blonde Natural Blue",
+    "level": 7,
+    "toneFamily": "blue-ash",
+    "tone": ".01/NB",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "7.12",
+    "name": "Dark Blonde Blue Violet",
+    "level": 7,
+    "toneFamily": "ash",
+    "tone": ".12/BV",
+    "line": "majirel"
+  },
+  {
+    "code": "7.17",
+    "name": "Dark Blonde Blue Green",
+    "level": 7,
+    "toneFamily": "cool",
+    "tone": ".17/BGr",
+    "line": "majirel"
+  },
+  {
+    "code": "CI 7.13",
+    "name": "Dark Blonde Cool Inforced Beige Gold",
+    "level": 7,
+    "toneFamily": "beige",
+    "tone": ".13/BG",
+    "line": "majirel",
+    "subLine": "cool-inforced"
+  },
+  {
+    "code": "7.13",
+    "name": "Dark Blonde Beige Gold",
+    "level": 7,
+    "toneFamily": "beige",
+    "tone": ".13/BG",
+    "line": "majirel"
+  },
+  {
+    "code": "7.23",
+    "name": "Dark Blonde Violet Gold",
+    "level": 7,
+    "toneFamily": "violet",
+    "tone": ".23/VG",
+    "line": "majirel"
+  },
+  {
+    "code": "7.8",
+    "name": "Dark Blonde Mocha",
+    "level": 7,
+    "toneFamily": "chocolate",
+    "tone": ".8/M",
+    "line": "majirel"
+  },
+  {
+    "code": "7.0",
+    "name": "Dark Blonde Extra Coverage Natural",
+    "level": 7,
+    "toneFamily": "natural",
+    "tone": ".0/NN",
+    "line": "majirel",
+    "isExtraCoverage": true
+  },
+  {
+    "code": "7/7N",
+    "name": "Dark Blonde Natural",
+    "level": 7,
+    "toneFamily": "natural",
+    "tone": "N",
+    "line": "majirel"
+  },
+  {
+    "code": "7.03",
+    "name": "Dark Blonde Natural Gold",
+    "level": 7,
+    "toneFamily": "gold",
+    "tone": ".03/NG",
+    "line": "majirel"
+  },
+  {
+    "code": "7.3",
+    "name": "Dark Blonde Gold",
+    "level": 7,
+    "toneFamily": "gold",
+    "tone": ".3/G",
+    "line": "majirel"
+  },
+  {
+    "code": "7.31",
+    "name": "Dark Blonde Gold Blue",
+    "level": 7,
+    "toneFamily": "gold",
+    "tone": ".31/GB",
+    "line": "majirel"
+  },
+  {
+    "code": "7.35",
+    "name": "Dark Blonde Gold Red Violet",
+    "level": 7,
+    "toneFamily": "gold",
+    "tone": ".35/GRv",
+    "line": "majirel"
+  },
+  {
+    "code": "7.4",
+    "name": "Dark Blonde Copper",
+    "level": 7,
+    "toneFamily": "copper",
+    "tone": ".4/C",
+    "line": "majirel"
+  },
+  {
+    "code": "7.43",
+    "name": "Dark Blonde Copper Gold Rubilane",
+    "level": 7,
+    "toneFamily": "copper",
+    "tone": ".43/CG",
+    "line": "majirel",
+    "isRubilane": true
+  },
+  {
+    "code": "7.40",
+    "name": "Dark Blonde Intense Copper Rubilane",
+    "level": 7,
+    "toneFamily": "copper",
+    "tone": ".40/CCC",
+    "line": "majirel",
+    "isRubilane": true
+  },
+  {
+    "code": "6.1",
+    "name": "Light Brown Blue",
+    "level": 6,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel"
+  },
+  {
+    "code": "CI 6.1",
+    "name": "Light Brown Cool Inforced Blue",
+    "level": 6,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel",
+    "subLine": "cool-inforced"
+  },
+  {
+    "code": "6.01",
+    "name": "Light Brown Natural Blue",
+    "level": 6,
+    "toneFamily": "blue-ash",
+    "tone": ".01/NB",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "6.07",
+    "name": "Light Brown Natural Green",
+    "level": 6,
+    "toneFamily": "cool",
+    "tone": ".07/NGr",
+    "line": "majirel"
+  },
+  {
+    "code": "CI 6.13",
+    "name": "Light Brown Cool Inforced Beige Gold",
+    "level": 6,
+    "toneFamily": "beige",
+    "tone": ".13/BG",
+    "line": "majirel",
+    "subLine": "cool-inforced"
+  },
+  {
+    "code": "6.13",
+    "name": "Light Brown Beige Gold",
+    "level": 6,
+    "toneFamily": "beige",
+    "tone": ".13/BG",
+    "line": "majirel"
+  },
+  {
+    "code": "6.23",
+    "name": "Light Brown Violet Gold",
+    "level": 6,
+    "toneFamily": "violet",
+    "tone": ".23/VG",
+    "line": "majirel"
+  },
+  {
+    "code": "6.8",
+    "name": "Light Brown Mocha",
+    "level": 6,
+    "toneFamily": "chocolate",
+    "tone": ".8/M",
+    "line": "majirel"
+  },
+  {
+    "code": "6.0",
+    "name": "Light Brown Extra Coverage Natural",
+    "level": 6,
+    "toneFamily": "natural",
+    "tone": ".0/NN",
+    "line": "majirel",
+    "isExtraCoverage": true
+  },
+  {
+    "code": "6/6N",
+    "name": "Light Brown Natural",
+    "level": 6,
+    "toneFamily": "natural",
+    "tone": "N",
+    "line": "majirel"
+  },
+  {
+    "code": "6.03",
+    "name": "Light Brown Natural Gold",
+    "level": 6,
+    "toneFamily": "gold",
+    "tone": ".03/NG",
+    "line": "majirel"
+  },
+  {
+    "code": "6.3",
+    "name": "Light Brown Gold",
+    "level": 6,
+    "toneFamily": "gold",
+    "tone": ".3/G",
+    "line": "majirel"
+  },
+  {
+    "code": "6.34",
+    "name": "Light Brown Gold Copper",
+    "level": 6,
+    "toneFamily": "gold",
+    "tone": ".34/GC",
+    "line": "majirel"
+  },
+  {
+    "code": "6.35",
+    "name": "Light Brown Gold Red Violet",
+    "level": 6,
+    "toneFamily": "gold",
+    "tone": ".35/GRv",
+    "line": "majirel"
+  },
+  {
+    "code": "6.45",
+    "name": "Light Brown Copper Red Violet",
+    "level": 6,
+    "toneFamily": "copper",
+    "tone": ".45/CRv",
+    "line": "majirel"
+  },
+  {
+    "code": "6.62",
+    "name": "Light Brown Red Violet Rubilane",
+    "level": 6,
+    "toneFamily": "red",
+    "tone": ".62/RV",
+    "line": "majirel",
+    "isRubilane": true
+  },
+  {
+    "code": "6.65",
+    "name": "Light Brown Red Red Violet Rubilane",
+    "level": 6,
+    "toneFamily": "red",
+    "tone": ".65/RRv",
+    "line": "majirel",
+    "isRubilane": true
+  },
+  {
+    "code": "6.6",
+    "name": "Light Brown Red",
+    "level": 6,
+    "toneFamily": "red",
+    "tone": ".6/R",
+    "line": "majirel"
+  },
+  {
+    "code": "6.64",
+    "name": "Light Brown Red Copper Rubilane",
+    "level": 6,
+    "toneFamily": "red",
+    "tone": ".64/RC",
+    "line": "majirel",
+    "isRubilane": true
+  },
+  {
+    "code": "6.60",
+    "name": "Light Brown Intense Red Lumax",
+    "level": 6,
+    "toneFamily": "red",
+    "tone": ".60/RRR",
+    "line": "majirel",
+    "isLumax": true
+  },
+  {
+    "code": "5.1",
+    "name": "Brown Blue",
+    "level": 5,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel"
+  },
+  {
+    "code": "CI 5.1",
+    "name": "Brown Cool Inforced Blue",
+    "level": 5,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel",
+    "subLine": "cool-inforced"
+  },
+  {
+    "code": "5.07",
+    "name": "Brown Natural Green",
+    "level": 5,
+    "toneFamily": "cool",
+    "tone": ".07/NGr",
+    "line": "majirel"
+  },
+  {
+    "code": "5.8",
+    "name": "Brown Mocha",
+    "level": 5,
+    "toneFamily": "chocolate",
+    "tone": ".8/M",
+    "line": "majirel"
+  },
+  {
+    "code": "5.0",
+    "name": "Brown Extra Coverage Natural",
+    "level": 5,
+    "toneFamily": "natural",
+    "tone": ".0/NN",
+    "line": "majirel",
+    "isExtraCoverage": true
+  },
+  {
+    "code": "5/5N",
+    "name": "Brown Natural",
+    "level": 5,
+    "toneFamily": "natural",
+    "tone": "N",
+    "line": "majirel"
+  },
+  {
+    "code": "5.3",
+    "name": "Brown Gold",
+    "level": 5,
+    "toneFamily": "gold",
+    "tone": ".3/G",
+    "line": "majirel"
+  },
+  {
+    "code": "5.32",
+    "name": "Brown Gold Violet",
+    "level": 5,
+    "toneFamily": "gold",
+    "tone": ".32/GV",
+    "line": "majirel"
+  },
+  {
+    "code": "5.35",
+    "name": "Brown Gold Red Violet",
+    "level": 5,
+    "toneFamily": "gold",
+    "tone": ".35/GRv",
+    "line": "majirel"
+  },
+  {
+    "code": "5.4",
+    "name": "Brown Copper",
+    "level": 5,
+    "toneFamily": "copper",
+    "tone": ".4/C",
+    "line": "majirel"
+  },
+  {
+    "code": "5.62",
+    "name": "Brown Red Violet Carmilane",
+    "level": 5,
+    "toneFamily": "red",
+    "tone": ".62/RV",
+    "line": "majirel",
+    "isCarmilane": true
+  },
+  {
+    "code": "5.5",
+    "name": "Brown Red Violet Carmilane",
+    "level": 5,
+    "toneFamily": "red",
+    "tone": ".5/Rv",
+    "line": "majirel",
+    "isCarmilane": true
+  },
+  {
+    "code": "5.6",
+    "name": "Brown Red",
+    "level": 5,
+    "toneFamily": "red",
+    "tone": ".6/R",
+    "line": "majirel"
+  },
+  {
+    "code": "5.64",
+    "name": "Brown Red Copper",
+    "level": 5,
+    "toneFamily": "red",
+    "tone": ".64/RC",
+    "line": "majirel"
+  },
+  {
+    "code": "4.1",
+    "name": "Dark Brown Blue",
+    "level": 4,
+    "toneFamily": "ash",
+    "tone": ".1/B",
+    "line": "majirel"
+  },
+  {
+    "code": "4.8",
+    "name": "Dark Brown Mocha",
+    "level": 4,
+    "toneFamily": "chocolate",
+    "tone": ".8/M",
+    "line": "majirel"
+  },
+  {
+    "code": "4.0",
+    "name": "Dark Brown Extra Coverage Natural",
+    "level": 4,
+    "toneFamily": "natural",
+    "tone": ".0/NN",
+    "line": "majirel",
+    "isExtraCoverage": true
+  },
+  {
+    "code": "4/4N",
+    "name": "Dark Brown Natural",
+    "level": 4,
+    "toneFamily": "natural",
+    "tone": "N",
+    "line": "majirel"
+  },
+  {
+    "code": "4.3",
+    "name": "Dark Brown Gold",
+    "level": 4,
+    "toneFamily": "gold",
+    "tone": ".3/G",
+    "line": "majirel"
+  },
+  {
+    "code": "4.35",
+    "name": "Dark Brown Gold Red Violet",
+    "level": 4,
+    "toneFamily": "gold",
+    "tone": ".35/GRv",
+    "line": "majirel"
+  },
+  {
+    "code": "4.65",
+    "name": "Dark Brown Intense Red Violet Carmilane",
+    "level": 4,
+    "toneFamily": "red",
+    "tone": ".65/RRv",
+    "line": "majirel",
+    "isCarmilane": true
+  },
+  {
+    "code": "3/3N",
+    "name": "Very Dark Brown Natural",
+    "level": 3,
+    "toneFamily": "natural",
+    "tone": "N",
+    "line": "majirel"
+  },
+  {
+    "code": "1/1N",
+    "name": "Black Blue",
+    "level": 1,
+    "toneFamily": "natural",
+    "tone": ".1/B",
+    "line": "majirel"
+  },
+  {
+    "code": "901S",
+    "name": "Special Blonde Natural Blue",
+    "level": 9,
+    "toneFamily": "blue-ash",
+    "tone": "901S/NB",
+    "line": "majirel",
+    "subLine": "high-lift"
+  },
+  {
+    "code": "900S",
+    "name": "Special Blonde Natural",
+    "level": 9,
+    "toneFamily": "natural",
+    "tone": "900S/NN",
+    "line": "majirel",
+    "subLine": "high-lift"
+  },
+  {
+    "code": "CLEAR",
+    "name": "Majirel Clear",
+    "level": 0,
+    "toneFamily": "clear",
+    "tone": "Clear",
+    "line": "majirel"
+  },
+  {
+    "code": "5.20",
+    "name": "Intense Violet Carmilane",
+    "level": 5,
+    "toneFamily": "violet",
+    "tone": ".20/VVV",
+    "line": "majirel",
+    "subLine": "carmilane"
+  },
+  {
+    "code": "4.55",
+    "name": "Red Violet Red Violet Carmilane",
+    "level": 4,
+    "toneFamily": "red-violet",
+    "tone": ".55/RvRv",
+    "line": "majirel",
+    "subLine": "carmilane"
+  },
+  {
+    "code": "5.60",
+    "name": "Intense Red Carmilane",
+    "level": 5,
+    "toneFamily": "red",
+    "tone": ".60/RRR",
+    "line": "majirel",
+    "subLine": "carmilane"
+  },
+  {
+    "code": "6.46",
+    "name": "Copper Red Carmilane",
+    "level": 6,
+    "toneFamily": "copper-red",
+    "tone": ".46/CR",
+    "line": "majirel",
+    "subLine": "carmilane"
+  },
+  {
+    "code": "6.66",
+    "name": "Intense Red Red Carmilane",
+    "level": 6,
+    "toneFamily": "red",
+    "tone": ".66/RR",
+    "line": "majirel",
+    "subLine": "carmilane"
+  },
+  {
+    "code": "7.11",
+    "name": "Blue Blue Cool Cover",
+    "level": 7,
+    "toneFamily": "blue",
+    "tone": ".11/BB",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "8.11",
+    "name": "Blue Blue Cool Cover",
+    "level": 8,
+    "toneFamily": "blue",
+    "tone": ".11/BB",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "6.11",
+    "name": "Blue Blue Cool Cover",
+    "level": 6,
+    "toneFamily": "blue",
+    "tone": ".11/BB",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "6.17",
+    "name": "Blue Green Cool Cover",
+    "level": 6,
+    "toneFamily": "blue-green",
+    "tone": ".17/BGr",
+    "line": "majirel",
+    "subLine": "cool-cover"
+  },
+  {
+    "code": "BLUE-MIX",
+    "name": "Blue Mix Booster",
+    "level": 0,
+    "toneFamily": "blue",
+    "tone": ".10/B",
+    "line": "majirel",
+    "subLine": "mix"
+  },
+  {
+    "code": "GREEN-MIX",
+    "name": "Green Mix Booster",
+    "level": 0,
+    "toneFamily": "green",
+    "tone": ".70/Gr",
+    "line": "majirel",
+    "subLine": "mix"
+  },
+  {
+    "code": "VIOLET-MIX",
+    "name": "Violet Mix Booster",
+    "level": 0,
+    "toneFamily": "violet",
+    "tone": ".20/V",
+    "line": "majirel",
+    "subLine": "mix"
+  },
+  {
+    "code": "COPPER-MIX",
+    "name": "Copper Mix Booster",
+    "level": 0,
+    "toneFamily": "copper",
+    "tone": ".40/C",
+    "line": "majirel",
+    "subLine": "mix"
+  },
+  {
+    "code": "RED-MIX",
+    "name": "Red Mix Booster",
+    "level": 0,
+    "toneFamily": "red",
+    "tone": ".60/R",
+    "line": "majirel",
+    "subLine": "mix"
+  }
 ]

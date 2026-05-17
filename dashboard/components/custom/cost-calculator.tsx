@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, TrendingUp, AlertCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, AlertCircle, Settings } from 'lucide-react';
+import Link from 'next/link';
 
 // Default product pricing (per gram) — salons can customize
 const DEFAULT_PRICE_PER_GRAM: Record<string, number> = {
@@ -32,7 +33,6 @@ interface CostCalculatorProps {
   steps: FormulaStep[];
   developerMl?: number;
   brand?: string;
-  markup?: number; // salon multiplier (default 3x)
   onChargeChange?: (charge: number) => void;
 }
 
@@ -40,9 +40,23 @@ export function CostCalculator({
   steps,
   developerMl = 60,
   brand = 'Wella',
-  markup = 3,
   onChargeChange,
 }: CostCalculatorProps) {
+  const [markup, setMarkup] = useState(2); // default 2x
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/v1/pricing/config?salonId=default')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.config?.markupPercent != null) {
+          setMarkup(1 + data.config.markupPercent / 100);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   const pricePerGram = DEFAULT_PRICE_PER_GRAM[brand] || 0.40;
 
   const colorCost = steps.reduce((sum, step) => {
@@ -56,6 +70,10 @@ export function CostCalculator({
   const suggestedCharge = totalCost * markup;
   const profit = suggestedCharge - totalCost;
 
+  useEffect(() => {
+    if (onChargeChange) onChargeChange(suggestedCharge);
+  }, [suggestedCharge, onChargeChange]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -63,11 +81,17 @@ export function CostCalculator({
       className="rounded-2xl p-5 space-y-4"
       style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}
     >
-      <div className="flex items-center gap-2">
-        <DollarSign className="w-4 h-4 text-[#9333EA]" />
-        <h3 className="text-sm font-semibold" style={{ color: 'var(--cg-text-primary)' }}>
-          Cost Breakdown
-        </h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <DollarSign className="w-4 h-4 text-[#9333EA]" />
+          <h3 className="text-sm font-semibold" style={{ color: 'var(--cg-text-primary)' }}>
+            Cost Breakdown
+          </h3>
+        </div>
+        <Link href="/dashboard/pricing" className="flex items-center gap-1 text-[10px] text-[#9333EA] hover:text-[#A855F7]">
+          <Settings className="w-3 h-3" />
+          Pricing
+        </Link>
       </div>
 
       {/* Per-shade breakdown */}
@@ -114,7 +138,7 @@ export function CostCalculator({
         </div>
         <div className="flex items-center justify-between">
           <span className="text-sm" style={{ color: 'var(--cg-text-secondary)' }}>
-            Suggested Charge ({markup}x)
+            Client Charge ({markup.toFixed(1)}×)
           </span>
           <span className="text-lg font-mono font-bold text-[#9333EA]">
             ${suggestedCharge.toFixed(2)}
@@ -122,14 +146,15 @@ export function CostCalculator({
         </div>
         <div className="flex items-center gap-1 text-xs" style={{ color: '#10B981' }}>
           <TrendingUp className="w-3 h-3" />
-          <span>Est. profit: ${profit.toFixed(2)}</span>
+          <span>Profit: ${profit.toFixed(2)}</span>
         </div>
       </div>
 
       <div className="flex items-start gap-2 p-2 rounded-lg" style={{ background: 'rgba(147, 51, 234, 0.08)' }}>
         <AlertCircle className="w-3.5 h-3.5 text-[#9333EA] mt-0.5 flex-shrink-0" />
         <p className="text-[10px]" style={{ color: 'var(--cg-text-secondary)' }}>
-          Prices are estimates. Update actual product costs in Settings → Pricing.
+          Cost-plus pricing from your <Link href="/dashboard/pricing" className="text-[#9333EA] underline">Pricing Settings</Link>.
+          Product costs are estimates.
         </p>
       </div>
     </motion.div>

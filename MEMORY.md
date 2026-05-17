@@ -151,3 +151,21 @@ Remaining: Analyze, Library, History, Questionnaire
 - **Pleij Salon (Tiche):** Created in DB, Salon tier, brands: Davines, L'ANZA, Schwarzkopf
 - **API:** GET /api/user/brands
 - **Docs:** docs/SALON-BRAND-CONFIG.md
+
+## 2026-05-17 — Beta Sprint Verification Complete
+
+### All 3 Workstreams Verified ✅
+1. **Normalization Pipeline:** 2,991 shades, 19 brands, zero null entries. R+COLOR and SOHO added from missing brand data.
+2. **Conversion Engine:** 34/34 tests passing, Next.js build clean. Fixed duplicate keys in tone mappings, import attribute syntax, missing jest config.
+3. **Expo Build Pipeline:** EAS + CI/CD ready for TestFlight (blocked on Apple Developer account).
+
+### Fixes Applied
+- `tone-family-mappings.ts`: Removed duplicate 'r-color', 'soho' entries; fixed omcorcolor '.65' conflict (kept 'violet')
+- `manufacturer-conversions.ts`: `import ... with { type: 'json' }` → `require()` (TS 6.0.3 compat)
+- `jest.config.js`: Created with ts-jest config + tsconfig.test.json
+- DevDeps: Installed jest, ts-jest, @types/jest, @jest/globals, typescript
+
+### Brand Database (Verified)
+- 21 brands, 3,273 normalized shades, zero null entries
+- Manufacturer-verified conversions: SOHO (14 brand pairs) + CHI (11 brand pairs) = 1,000+ mappings
+- All 21 brands integrated into conversion engine (data-loader, tone mappings, engine.ts, ConversionPanel, API endpoint)

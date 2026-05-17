@@ -36,7 +36,7 @@ export default function VisualOutcomeSimulator({ input, result }: VisualOutcomeS
   return (
     <div style={containerStyle}>
       <p style={{ fontSize: 14, fontWeight: 600, color: '#F5F5F7', margin: '0 0 4px 0' }}>
-        <HexagonIcon size={16} /> Visual Outcome Simulator
+        Visual Outcome Simulator
       </p>
       <p style={{ fontSize: 12, color: '#71717A', margin: '0 0 8px 0' }}>
         Predicted result based on hair state, formulation, and color science.

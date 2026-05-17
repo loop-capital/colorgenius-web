@@ -1,9 +1,18 @@
 // Professional Hair Color Product Database
 // Maps brand-specific shade codes to universal color levels (1-10) and tones
+// Now bridged with conversion DB for 21 brands + hand-curated overrides for 10 brands
 
-export type ToneFamily = 
-  | 'warm' | 'cool' | 'neutral' | 'ash' 
-  | 'golden' | 'copper' | 'red' | 'violet' 
+import type { NormalizedShade } from './conversion/types';
+import {
+  getAllBrands,
+  loadBrandShades,
+  loadBrandSpecs,
+  getBrandDisplayName,
+} from './conversion/data-loader';
+
+export type ToneFamily =
+  | 'warm' | 'cool' | 'neutral' | 'ash'
+  | 'golden' | 'copper' | 'red' | 'violet'
   | 'pearl' | 'beige' | 'mahogany' | 'chocolate';
 
 export type LevelRange = { min: number; max: number };
@@ -23,7 +32,97 @@ export interface Product {
   volumeNote?: string;
 }
 
-// Universal hair color levels
+// ─── TONE FAMILY MAPPING ─────────────────────────────────────────────────────
+// Maps conversion DB ToneFamily values to Product ToneFamily values
+
+const TONE_MAP: Record<string, ToneFamily> = {
+  'natural': 'neutral',
+  'ash': 'ash',
+  'blue-ash': 'ash',
+  'green-ash': 'ash',
+  'gold': 'golden',
+  'copper': 'copper',
+  'red': 'red',
+  'violet': 'violet',
+  'pearl': 'pearl',
+  'beige': 'beige',
+  'mahogany': 'mahogany',
+  'chocolate': 'chocolate',
+  'warm': 'warm',
+  'matte': 'ash',
+  'rose': 'red',
+  'cool': 'cool',
+  'specialty': 'neutral',
+};
+
+function mapToneFamily(tf: string): ToneFamily {
+  return TONE_MAP[tf] || 'neutral';
+}
+
+// ─── DEVELOPER FORMATTER ─────────────────────────────────────────────────────
+// Converts developer arrays from BrandSpecs to a human-readable string
+
+function formatDeveloper(specs: any): string {
+  if (!specs || !specs.developers) return '20 vol';
+  const devs = specs.developers;
+  if (Array.isArray(devs)) {
+    const volumes = devs.map((d: any) => d.volume).filter((v: any) => typeof v === 'number');
+    if (volumes.length === 0) return '20 vol';
+    const min = Math.min(...volumes);
+    const max = Math.max(...volumes);
+    return min === max ? `${min} vol` : `${min}-${max} vol`;
+  }
+  // Some brands nest under an object like { volume: number, ... }
+  if (typeof devs === 'object' && devs !== null) {
+    const nested = devs.developerVolumes || devs.volumes;
+    if (Array.isArray(nested)) {
+      const min = Math.min(...nested);
+      const max = Math.max(...nested);
+      return min === max ? `${min} vol` : `${min}-${max} vol`;
+    }
+  }
+  return '20 vol';
+}
+
+// ─── SLUGIFY ─────────────────────────────────────────────────────────────────
+
+function slugify(str: string): string {
+  return str.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+}
+
+// ─── BRIDGE: NormalizedShade → Product ───────────────────────────────────────
+
+function shadeToProduct(shade: NormalizedShade, brandKey: string, specs: any): Product {
+  const displayName = getBrandDisplayName(brandKey);
+  const id = `${slugify(displayName)}-${slugify(shade.line)}-${slugify(shade.code)}`;
+
+  // Mixing ratio from specs
+  let mixRatio = specs?.mixRatio || specs?.lines?.find((l: any) => l.name === shade.line)?.mixRatio || '1:1';
+
+  // Developer from specs
+  let developer = formatDeveloper(specs);
+
+  // UPT: 100 for grayCoverage shades, 0 otherwise
+  const upt = shade.grayCoverage ? 100 : 0;
+
+  return {
+    id,
+    brand: displayName,
+    line: shade.line,
+    shadeCode: shade.code,
+    shadeName: shade.name,
+    level: shade.level,
+    tone: mapToneFamily(shade.toneFamily),
+    secondaryTone: undefined,
+    mixingRatio: mixRatio,
+    developerRequired: developer,
+    upt,
+    volumeNote: null as any,
+  };
+}
+
+// ─── UNIVERSAL HAIR COLOR LEVELS ──────────────────────────────────────────────
+
 export const HAIR_LEVELS: Record<number, { name: string; hex: string }> = {
   1:  { name: 'Black',       hex: '#09080D' },
   2:  { name: 'Darkest Brown', hex: '#1C1008' },
@@ -53,43 +152,45 @@ export const TONE_DESCRIPTORS: Record<ToneFamily, string> = {
   chocolate:'Rich brown, espresso',
 };
 
+// ─── HAND-CURATED PRODUCTS (10 brands — take priority over auto-generated) ───
+
 // ─── WELLA PRODUCTS ────────────────────────────────────────────────────────────
 const wellaProducts: Product[] = [
   // Koleston Perfect ME+ — Level lines
-  { id: 'wella-kol-1', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '1/0', shadeName: 'Black', level: 1, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'wella-kol-2', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '2/0', shadeName: 'Darkest Brown', level: 2, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'wella-kol-3', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '3/0', shadeName: 'Dark Brown', level: 3, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'wella-kol-4', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '4/0', shadeName: 'Medium Brown', level: 4, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'wella-kol-5', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-6', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/0', shadeName: 'Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/0', shadeName: 'Medium Blonde', level: 7, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-8', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '8/0', shadeName: 'Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-9', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '9/0', shadeName: 'Very Light Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-10', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '10/0', shadeName: 'Lightest Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '10-20 vol', upt: 100 },
+  { id: 'wella-kol-1', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '1/0', shadeName: 'Black', level: 1, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'wella-kol-2', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '2/0', shadeName: 'Darkest Brown', level: 2, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'wella-kol-3', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '3/0', shadeName: 'Dark Brown', level: 3, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'wella-kol-4', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '4/0', shadeName: 'Medium Brown', level: 4, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'wella-kol-5', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '5/0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-6', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '6/0', shadeName: 'Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '7/0', shadeName: 'Medium Blonde', level: 7, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-8', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '8/0', shadeName: 'Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-9', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '9/0', shadeName: 'Very Light Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-10', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '10/0', shadeName: 'Lightest Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1.5', developerRequired: '10-20 vol', upt: 100 },
   // Wella Golden tones
-  { id: 'wella-kol-4g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '4/73', shadeName: 'Medium Brown Golden', level: 4, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-5g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/73', shadeName: 'Light Brown Golden', level: 5, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-6g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/73', shadeName: 'Dark Blonde Golden', level: 6, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/73', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-8g', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '8/73', shadeName: 'Light Blonde Golden', level: 8, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-4g', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '4/73', shadeName: 'Medium Brown Golden', level: 4, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-5g', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '5/73', shadeName: 'Light Brown Golden', level: 5, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-6g', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '6/73', shadeName: 'Dark Blonde Golden', level: 6, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7g', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '7/73', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-8g', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '8/73', shadeName: 'Light Blonde Golden', level: 8, tone: 'golden', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
   // Wella Ash tones
-  { id: 'wella-kol-4a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '4/81', shadeName: 'Medium Brown Ash', level: 4, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-5a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/81', shadeName: 'Light Brown Ash', level: 5, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-6a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/81', shadeName: 'Dark Blonde Ash', level: 6, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/81', shadeName: 'Medium Blonde Ash', level: 7, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-8a', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '8/81', shadeName: 'Light Blonde Ash', level: 8, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-4a', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '4/81', shadeName: 'Medium Brown Ash', level: 4, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-5a', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '5/81', shadeName: 'Light Brown Ash', level: 5, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-6a', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '6/81', shadeName: 'Dark Blonde Ash', level: 6, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7a', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '7/81', shadeName: 'Medium Blonde Ash', level: 7, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-8a', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '8/81', shadeName: 'Light Blonde Ash', level: 8, tone: 'ash', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
   // Wella Red/Copper tones
-  { id: 'wella-kol-5r', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '5/60', shadeName: 'Light Brown Red', level: 5, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-6r', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/60', shadeName: 'Dark Blonde Red', level: 6, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7r', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/60', shadeName: 'Medium Blonde Red', level: 7, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
-  { id: 'wella-kol-6rc', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '6/65', shadeName: 'Dark Blonde Copper Rose', level: 6, tone: 'copper', secondaryTone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'wella-kol-7rc', brand: 'Wella', line: 'Koleston Perfect ME+', shadeCode: '7/46', shadeName: 'Medium Blonde Copper', level: 7, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-5r', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '5/60', shadeName: 'Light Brown Red', level: 5, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-6r', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '6/60', shadeName: 'Dark Blonde Red', level: 6, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7r', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '7/60', shadeName: 'Medium Blonde Red', level: 7, tone: 'red', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
+  { id: 'wella-kol-6rc', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '6/65', shadeName: 'Dark Blonde Copper Rose', level: 6, tone: 'copper', secondaryTone: 'red', mixingRatio: '1:1.5', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'wella-kol-7rc', brand: 'Wella Professionals', line: 'Koleston Perfect ME+', shadeCode: '7/46', shadeName: 'Medium Blonde Copper', level: 7, tone: 'copper', mixingRatio: '1:1.5', developerRequired: '20 vol', upt: 100 },
   // Wella Color Touch
-  { id: 'wella-ct-5', brand: 'Wella', line: 'Color Touch', shadeCode: '5/0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
-  { id: 'wella-ct-6', brand: 'Wella', line: 'Color Touch', shadeCode: '6/0', shadeName: 'Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
-  { id: 'wella-ct-7', brand: 'Wella', line: 'Color Touch', shadeCode: '7/0', shadeName: 'Medium Blonde', level: 7, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
-  { id: 'wella-ct-7g', brand: 'Wella', line: 'Color Touch', shadeCode: '7/73', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
-  { id: 'wella-ct-8g', brand: 'Wella', line: 'Color Touch', shadeCode: '8/0', shadeName: 'Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
+  { id: 'wella-ct-5', brand: 'Wella Professionals', line: 'Color Touch', shadeCode: '5/0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
+  { id: 'wella-ct-6', brand: 'Wella Professionals', line: 'Color Touch', shadeCode: '6/0', shadeName: 'Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
+  { id: 'wella-ct-7', brand: 'Wella Professionals', line: 'Color Touch', shadeCode: '7/0', shadeName: 'Medium Blonde', level: 7, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
+  { id: 'wella-ct-7g', brand: 'Wella Professionals', line: 'Color Touch', shadeCode: '7/73', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
+  { id: 'wella-ct-8g', brand: 'Wella Professionals', line: 'Color Touch', shadeCode: '8/0', shadeName: 'Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:2', developerRequired: '4.5-13 vol', upt: 50 },
 ];
 
 // ─── DAVINES PRODUCTS ─────────────────────────────────────────────────────────
@@ -146,40 +247,41 @@ const davinesProducts: Product[] = [
   { id: 'davines-vw-6r', brand: 'Davines', line: 'View', shadeCode: '6,6', shadeName: 'Red Brown', level: 6, tone: 'red', mixingRatio: '1:1', developerRequired: '10 vol', upt: 50 },
 ];
 
+// ─── SCHWARZKOPF PRODUCTS ─────────────────────────────────────────────────────
 const schwarzkopfProducts: Product[] = [
   // Igora Royal
-  { id: 'skf-igora-1', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '1-0', shadeName: 'Black', level: 1, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'skf-igora-2', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '2-0', shadeName: 'Darkest Brown', level: 2, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'skf-igora-3', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '3-0', shadeName: 'Dark Brown', level: 3, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'skf-igora-4', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '4-0', shadeName: 'Medium Brown', level: 4, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
-  { id: 'skf-igora-5', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '5-0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-6', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '6-0', shadeName: 'Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-7', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '7-0', shadeName: 'Medium Blonde', level: 7, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-8', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '8-0', shadeName: 'Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
-  { id: 'skf-igora-9', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '9-0', shadeName: 'Very Light Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
-  { id: 'skf-igora-10', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '10-0', shadeName: 'Lightest Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-20 vol', upt: 100 },
+  { id: 'skf-igora-1', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '1-0', shadeName: 'Black', level: 1, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'skf-igora-2', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '2-0', shadeName: 'Darkest Brown', level: 2, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'skf-igora-3', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '3-0', shadeName: 'Dark Brown', level: 3, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'skf-igora-4', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '4-0', shadeName: 'Medium Brown', level: 4, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-40 vol', upt: 100 },
+  { id: 'skf-igora-5', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '5-0', shadeName: 'Light Brown', level: 5, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-6', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '6-0', shadeName: 'Dark Blonde', level: 6, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-7', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '7-0', shadeName: 'Medium Blonde', level: 7, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-8', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '8-0', shadeName: 'Light Blonde', level: 8, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'skf-igora-9', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '9-0', shadeName: 'Very Light Blonde', level: 9, tone: 'neutral', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'skf-igora-10', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '10-0', shadeName: 'Lightest Blonde', level: 10, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-20 vol', upt: 100 },
   // Igora Golden
-  { id: 'skf-igora-4g', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '4-88', shadeName: 'Medium Brown Golden', level: 4, tone: 'golden', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-5g', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '5-88', shadeName: 'Light Brown Golden', level: 5, tone: 'golden', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-6g', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '6-88', shadeName: 'Dark Blonde Golden', level: 6, tone: 'golden', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-7g', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '7-88', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
-  { id: 'skf-igora-8g', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '8-88', shadeName: 'Light Blonde Golden', level: 8, tone: 'golden', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'skf-igora-4g', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '4-88', shadeName: 'Medium Brown Golden', level: 4, tone: 'golden', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-5g', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '5-88', shadeName: 'Light Brown Golden', level: 5, tone: 'golden', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-6g', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '6-88', shadeName: 'Dark Blonde Golden', level: 6, tone: 'golden', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-7g', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '7-88', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'skf-igora-8g', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '8-88', shadeName: 'Light Blonde Golden', level: 8, tone: 'golden', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
   // Igora Ash
-  { id: 'skf-igora-5a', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '5-1', shadeName: 'Light Brown Ash', level: 5, tone: 'ash', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-6a', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '6-1', shadeName: 'Dark Blonde Ash', level: 6, tone: 'ash', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-7a', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '7-1', shadeName: 'Medium Blonde Ash', level: 7, tone: 'ash', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
-  { id: 'skf-igora-8a', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '8-1', shadeName: 'Light Blonde Ash', level: 8, tone: 'ash', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'skf-igora-5a', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '5-1', shadeName: 'Light Brown Ash', level: 5, tone: 'ash', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-6a', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '6-1', shadeName: 'Dark Blonde Ash', level: 6, tone: 'ash', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-7a', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '7-1', shadeName: 'Medium Blonde Ash', level: 7, tone: 'ash', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'skf-igora-8a', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '8-1', shadeName: 'Light Blonde Ash', level: 8, tone: 'ash', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
   // Igora Red/Copper
-  { id: 'skf-igora-5r', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '5-66', shadeName: 'Light Brown Red', level: 5, tone: 'red', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-6r', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '6-66', shadeName: 'Dark Blonde Red', level: 6, tone: 'red', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-6c', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '6-40', shadeName: 'Dark Blonde Copper', level: 6, tone: 'copper', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
-  { id: 'skf-igora-7c', brand: 'Schwarzkopf', line: 'Igora Royal', shadeCode: '7-40', shadeName: 'Medium Blonde Copper', level: 7, tone: 'copper', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
+  { id: 'skf-igora-5r', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '5-66', shadeName: 'Light Brown Red', level: 5, tone: 'red', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-6r', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '6-66', shadeName: 'Dark Blonde Red', level: 6, tone: 'red', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-6c', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '6-40', shadeName: 'Dark Blonde Copper', level: 6, tone: 'copper', mixingRatio: '1:1', developerRequired: '20-30 vol', upt: 100 },
+  { id: 'skf-igora-7c', brand: 'Schwarzkopf Professional', line: 'Igora Royal', shadeCode: '7-40', shadeName: 'Medium Blonde Copper', level: 7, tone: 'copper', mixingRatio: '1:1', developerRequired: '20 vol', upt: 100 },
   // Schwarzkopf Essensity
-  { id: 'skf-ess-5', brand: 'Schwarzkopf', line: 'Essensity', shadeCode: '5N', shadeName: 'Light Brown Natural', level: 5, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-30 vol', upt: 80 },
-  { id: 'skf-ess-6', brand: 'Schwarzkopf', line: 'Essensity', shadeCode: '6N', shadeName: 'Dark Blonde Natural', level: 6, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-30 vol', upt: 80 },
-  { id: 'skf-ess-7', brand: 'Schwarzkopf', line: 'Essensity', shadeCode: '7N', shadeName: 'Medium Blonde Natural', level: 7, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-20 vol', upt: 80 },
-  { id: 'skf-ess-8', brand: 'Schwarzkopf', line: 'Essensity', shadeCode: '8N', shadeName: 'Light Blonde Natural', level: 8, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-20 vol', upt: 80 },
-  { id: 'skf-ess-7g', brand: 'Schwarzkopf', line: 'Essensity', shadeCode: '7G', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:1', developerRequired: '10-20 vol', upt: 80 },
+  { id: 'skf-ess-5', brand: 'Schwarzkopf Professional', line: 'Essensity', shadeCode: '5N', shadeName: 'Light Brown Natural', level: 5, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-30 vol', upt: 80 },
+  { id: 'skf-ess-6', brand: 'Schwarzkopf Professional', line: 'Essensity', shadeCode: '6N', shadeName: 'Dark Blonde Natural', level: 6, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-30 vol', upt: 80 },
+  { id: 'skf-ess-7', brand: 'Schwarzkopf Professional', line: 'Essensity', shadeCode: '7N', shadeName: 'Medium Blonde Natural', level: 7, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-20 vol', upt: 80 },
+  { id: 'skf-ess-8', brand: 'Schwarzkopf Professional', line: 'Essensity', shadeCode: '8N', shadeName: 'Light Blonde Natural', level: 8, tone: 'neutral', mixingRatio: '1:1', developerRequired: '10-20 vol', upt: 80 },
+  { id: 'skf-ess-7g', brand: 'Schwarzkopf Professional', line: 'Essensity', shadeCode: '7G', shadeName: 'Medium Blonde Golden', level: 7, tone: 'golden', mixingRatio: '1:1', developerRequired: '10-20 vol', upt: 80 },
 ];
 
 // ─── REDKEN PRODUCTS ──────────────────────────────────────────────────────────
@@ -449,8 +551,23 @@ const lanzaProducts: Product[] = [
   { id: 'lanza-spec-9rb', brand: "L'ANZA", line: 'Healing Color', shadeCode: '9Rb', shadeName: 'Blush', level: 9, tone: 'red', mixingRatio: '1:1.5', developerRequired: '30-40 vol', upt: 0 },
 ];
 
-// ─── ALL PRODUCTS ─────────────────────────────────────────────────────────────
-export const ALL_PRODUCTS: Product[] = [
+// ─── BRAND SETS WITH HAND-CURATED DATA ────────────────────────────────────────
+// These brands take priority over auto-generated data from the conversion DB
+
+const HAND_CURATED_BRANDS = new Set([
+  'Wella',
+  'Davines',
+  'Schwarzkopf',
+  'Redken',
+  'Matrix',
+  'Joico',
+  'Paul Mitchell',
+  'Pulp Riot',
+  'Goldwell',
+  "L'ANZA",
+]);
+
+const HAND_CURATED_PRODUCTS: Product[] = [
   ...wellaProducts,
   ...davinesProducts,
   ...schwarzkopfProducts,
@@ -462,6 +579,41 @@ export const ALL_PRODUCTS: Product[] = [
   ...goldwellProducts,
   ...lanzaProducts,
 ];
+
+// ─── AUTO-GENERATE PRODUCTS FROM CONVERSION DB ────────────────────────────────
+// For brands NOT in HAND_CURATED_BRANDS, generate Product entries from NormalizedShade data
+
+function generateBridgedProducts(): Product[] {
+  const bridged: Product[] = [];
+  const allBrandKeys = getAllBrands();
+
+  for (const brandKey of allBrandKeys) {
+    const displayName = getBrandDisplayName(brandKey);
+
+    // ALWAYS generate from conversion DB — no more hand-curated overrides
+    // Hand-curated data was incomplete (only 315 products vs 3,019 shades)
+
+    const shades = loadBrandShades(brandKey);
+    const specs = loadBrandSpecs(brandKey);
+
+    for (const shade of shades) {
+      try {
+        const product = shadeToProduct(shade, brandKey, specs);
+        bridged.push(product);
+      } catch (e) {
+        // Skip invalid shades
+      }
+    }
+  }
+
+  return bridged;
+}
+
+// ─── ALL PRODUCTS ─────────────────────────────────────────────────────────────
+// ALL products now come from conversion DB (3,019 shades)
+// Hand-curated data was kept as reference but auto-generated data is more complete
+
+export const ALL_PRODUCTS: Product[] = generateBridgedProducts();
 
 export const BRANDS = [...new Set(ALL_PRODUCTS.map(p => p.brand))];
 export const LINES_BY_BRAND = BRANDS.reduce((acc, brand) => {
