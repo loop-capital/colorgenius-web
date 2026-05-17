@@ -853,7 +853,7 @@ export default function FormulatePage() {
                   type="button"
                   onClick={handleConvertBrand}
                   disabled={!convertTargetBrand || converting}
-                  style={{ padding: '10px 20px', borderRadius: 10, background: !convertTargetBrand || converting ? 'rgba(147,51,234,0.3)' : 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', fontWeight: 600, fontSize: 14, cursor: !convertTargetBrand || converting ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
+                  style={{ padding: '10px 20px', borderRadius: 10, background: !convertTargetBrand || converting ? 'rgba(147,51,234,0.3)' : 'linear-gradient(135deg, #A855F7, #D946EF)', color: 'white', border: 'none', fontWeight: 600, fontSize: 14, cursor: !convertTargetBrand || converting ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
                 >Convert Formula</button>
               </div>
               {conversionResult && (
