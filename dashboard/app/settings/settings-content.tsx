@@ -117,7 +117,7 @@ export default function SettingsContent() {
                   </div>
                   <button onClick={handleSync} disabled={syncing}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#0A0A0A' }}>
+                    style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#0A0A0A' }}>
                     <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
                     {syncing ? 'Syncing...' : 'Sync Now'}
                   </button>

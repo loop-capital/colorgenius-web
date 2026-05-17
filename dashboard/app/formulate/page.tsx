@@ -349,7 +349,7 @@ export default function FormulatePage() {
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
+            <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
             <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 6 steps</p>
           </div>
           <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', texture: 'medium', hairPattern: 'straight', density: 'medium', serviceType: 'full_head', chemicalHistory: [], sensitivities: [], lastChemicalService: 'never', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
@@ -446,7 +446,7 @@ export default function FormulatePage() {
             )}
           </div>
           <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
-            <div className="h-1.5 rounded-full transition-all duration-300" style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', width: `${step / STEPS.length * 100}%` }} />
+            <div className="h-1.5 rounded-full transition-all duration-300" style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', width: `${step / STEPS.length * 100}%` }} />
           </div>
           <p className="text-[10px] mt-1 text-right" style={{ color: '#71717A' }}>Step {step} of {STEPS.length}</p>
         </div>

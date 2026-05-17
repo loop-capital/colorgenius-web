@@ -165,7 +165,7 @@ export default function PricingRulesPage() {
             <button
               onClick={openNew}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium"
-              style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}
+              style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}
             >
               <Plus className="w-4 h-4" /> New Rule
             </button>
@@ -316,7 +316,7 @@ export default function PricingRulesPage() {
                 onClick={handleSave}
                 disabled={!form.serviceType || !form.basePrice || saving}
                 className="w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-40"
-                style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}
+                style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}
               >
                 <Save className="w-4 h-4" />
                 {saving ? 'Saving...' : editingId ? 'Update Rule' : 'Create Rule'}
@@ -357,7 +357,7 @@ export default function PricingRulesPage() {
                 <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--cg-text-primary)' }}>No pricing rules yet</h3>
                 <p className="text-xs mb-4" style={{ color: 'var(--cg-text-tertiary)' }}>Create your first pricing rule to start calculating service charges</p>
                 {canEdit && (
-                  <button onClick={openNew} className="px-4 py-2 rounded-xl text-sm font-medium" style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}>
+                  <button onClick={openNew} className="px-4 py-2 rounded-xl text-sm font-medium" style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}>
                     <Plus className="w-4 h-4 inline mr-1" /> Create Rule
                   </button>
                 )}

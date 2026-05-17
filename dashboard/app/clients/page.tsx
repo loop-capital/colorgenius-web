@@ -92,7 +92,7 @@ export default function ClientsPage() {
             />
           </div>
           <Link href="/questionnaire">
-            <Button className="bg-[#A855F7] hover:bg-[#D946EF] text-[#0A0A0F] font-semibold">
+            <Button className="bg-[#9333EA] hover:bg-[#EC4899] text-[#0A0A0F] font-semibold">
               <Plus className="w-4 h-4 mr-2" /> New Client
             </Button>
           </Link>

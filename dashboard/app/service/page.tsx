@@ -244,7 +244,7 @@ function ServiceEntryContent() {
                       border: selectedClient?.id === c.id ? '1px solid rgba(147, 51, 234, 0.3)' : '1px solid rgba(255,255,255,0.06)',
                     }}>
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
-                      style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}>
+                      style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}>
                       {c.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                     </div>
                     <div className="flex-1">
@@ -413,7 +413,7 @@ function ServiceEntryContent() {
               {/* Continue */}
               <button onClick={() => setStep(3)} disabled={formulaSteps.length === 0}
                 className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-30"
-                style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}>
+                style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}>
                 Continue to Review <ArrowRight className="w-4 h-4" />
               </button>
             </motion.div>
@@ -481,7 +481,7 @@ function ServiceEntryContent() {
                   </button>
                   <button onClick={handleSave} disabled={saving}
                     className="flex-[2] py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2"
-                    style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}>
+                    style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}>
                     <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Complete Service'}
                   </button>
                 </div>

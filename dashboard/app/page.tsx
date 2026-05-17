@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Camera, Sparkles, CheckCircle, Shield, ClipboardList, Palette, BarChart3, Package, DollarSign, Scale, History, ArrowRight } from 'lucide-react'
 
 export default function LandingPage() {
-  const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: 'white', border: 'none', borderRadius: 999, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 16, display: 'inline-flex', alignItems: 'center', gap: 8 }
+  const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 999, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 16, display: 'inline-flex', alignItems: 'center', gap: 8 }
 
   return (
     <main style={{ minHeight: '100vh', background: '#0A0A1A', color: '#F5F5F7', overflow: 'hidden' }}>
@@ -12,7 +12,7 @@ export default function LandingPage() {
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(10,10,26,0.8)', backdropFilter: 'blur(20px)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #A855F7, #D946EF)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ color: 'white', fontWeight: 900, fontSize: 13 }}>CG</span></div>
+            <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #9333EA, #EC4899)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ color: 'white', fontWeight: 900, fontSize: 13 }}>CG</span></div>
             <span style={{ color: 'white', fontWeight: 700, fontSize: 18 }}>ColorGenius</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hide-mobile">
@@ -31,7 +31,7 @@ export default function LandingPage() {
         <div style={{ position: 'absolute', top: '35%', left: '50%', transform: 'translateX(-50%)', width: 400, height: 400, borderRadius: '50%', background: 'rgba(236,72,153,0.1)', filter: 'blur(100px)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: 800 }}>
           <h1 style={{ fontSize: 'clamp(36px, 6vw, 72px)', fontWeight: 900, lineHeight: 1.05, letterSpacing: '-0.02em', marginBottom: 24 }}>
-            Stop Guessing.<br /><span style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Start Formulating.</span>
+            Stop Guessing.<br /><span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Start Formulating.</span>
           </h1>
           <p style={{ fontSize: 'clamp(16px, 2vw, 20px)', color: 'rgba(255,255,255,0.5)', maxWidth: 600, margin: '0 auto 20px', lineHeight: 1.6 }}>
             AI-powered hair color formulation that analyzes your client's hair and delivers a precise formula — shades, developer, ratios, and processing time — in seconds.
@@ -179,7 +179,7 @@ export default function LandingPage() {
               { name: 'Elite', price: '$119', period: '/mo', desc: 'Unlimited brands', features: ['Unlimited brands', 'Full inventory', 'Custom reporting', 'API access'], highlight: false },
             ].map((t, i) => (
               <div key={i} style={{ position: 'relative', border: t.highlight ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.08)', background: t.highlight ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 24 }}>
-                {t.highlight && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: 'white', fontSize: 10, fontWeight: 700, padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase' }}>Popular</div>}
+                {t.highlight && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', fontSize: 10, fontWeight: 700, padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase' }}>Popular</div>}
                 <h3 style={{ fontSize: 15, fontWeight: 700 }}>{t.name}</h3>
                 <p style={{ fontSize: 32, fontWeight: 900, marginTop: 12 }}>{t.price}<span style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)' }}>{t.period}</span></p>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 16 }}>{t.desc}</p>
@@ -196,7 +196,7 @@ export default function LandingPage() {
       {/* CTA */}
       <section style={{ padding: '128px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ width: 64, height: 64, borderRadius: 16, background: 'linear-gradient(135deg, #A855F7, #D946EF)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}><span style={{ color: 'white', fontWeight: 900, fontSize: 20 }}>CG</span></div>
+          <div style={{ width: 64, height: 64, borderRadius: 16, background: 'linear-gradient(135deg, #9333EA, #EC4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}><span style={{ color: 'white', fontWeight: 900, fontSize: 20 }}>CG</span></div>
           <h2 style={{ fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 900, marginBottom: 16 }}>Your next great formulation starts here.</h2>
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, marginBottom: 40 }}>Join 50 founding stylists shaping the future of professional hair color. Free during beta. No credit card required.</p>
           <a href="/login" style={{ ...btnPrimary, padding: '16px 40px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
