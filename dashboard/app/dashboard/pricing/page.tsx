@@ -203,7 +203,7 @@ export default function PricingRulesPage() {
                       style={{
                         background: form.serviceType === st ? 'rgba(147, 51, 234, 0.15)' : 'rgba(255,255,255,0.03)',
                         border: form.serviceType === st ? '1px solid rgba(147, 51, 234, 0.4)' : '1px solid rgba(255,255,255,0.06)',
-                        color: form.serviceType === st ? '#A855F7' : 'var(--cg-text-secondary)',
+                        color: form.serviceType === st ? '#9333EA' : 'var(--cg-text-secondary)',
                       }}
                     >
                       {st}
@@ -298,7 +298,7 @@ export default function PricingRulesPage() {
               {/* Pricing Example */}
               {form.basePrice && (
                 <div className="p-3 rounded-xl" style={{ background: 'rgba(147, 51, 234, 0.08)' }}>
-                  <p className="text-xs font-medium mb-1" style={{ color: '#A855F7' }}>Pricing Preview</p>
+                  <p className="text-xs font-medium mb-1" style={{ color: '#9333EA' }}>Pricing Preview</p>
                   <div className="space-y-1 text-xs" style={{ color: 'var(--cg-text-secondary)' }}>
                     <p>Base charge: <span className="font-mono font-bold" style={{ color: 'var(--cg-text-primary)' }}>${parseFloat(form.basePrice || '0').toFixed(2)}</span></p>
                     {form.pricePerOz && (
@@ -379,7 +379,7 @@ export default function PricingRulesPage() {
                         <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}>Active</span>
                       </div>
                       <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs" style={{ color: 'var(--cg-text-secondary)' }}>
-                        <span>Base: <span className="font-mono font-bold" style={{ color: '#A855F7' }}>${rule.basePrice.toFixed(2)}</span></span>
+                        <span>Base: <span className="font-mono font-bold" style={{ color: '#9333EA' }}>${rule.basePrice.toFixed(2)}</span></span>
                         {rule.pricePerOz != null && (
                           <span>Per Oz: <span className="font-mono" style={{ color: 'var(--cg-text-primary)' }}>${rule.pricePerOz.toFixed(2)}</span></span>
                         )}

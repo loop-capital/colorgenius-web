@@ -143,7 +143,7 @@ function blendColor(levelHex: string, toneHex: string, toneWeight = 0.35): strin
   const b = Math.round(lb + (tb - lb) * toneWeight)
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
 }
-const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
+const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 const btnOutline = { padding: '12px 24px', border: '1px solid rgba(255,255,255,0.12)', color: '#A1A1AA', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 
 export default function FormulatePage() {
@@ -659,7 +659,7 @@ export default function FormulatePage() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {LAST_CHEMICAL_TIMES.map(o => (
                   <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, lastChemicalService: o.value }))}
-                    style={{ padding: '8px 16px', borderRadius: 20, border: fd.lastChemicalService === o.value ? 'none' : '1px solid rgba(255,255,255,0.12)', background: fd.lastChemicalService === o.value ? 'rgba(147,51,234,0.3)' : 'rgba(30,30,45,0.6)', color: fd.lastChemicalService === o.value ? '#F5F5F7' : '#A1A1AA', cursor: 'pointer', fontSize: 13, fontWeight: fd.lastChemicalService === o.value ? 600 : 400 }}>
+                    style={{ padding: '8px 16px', borderRadius: 20, border: fd.lastChemicalService === o.value ? 'none' : '1px solid rgba(255,255,255,0.12)', background: fd.lastChemicalService === o.value ? 'rgba(147,51,234,0.5)' : 'rgba(30,30,45,0.6)', color: fd.lastChemicalService === o.value ? '#F5F5F7' : '#A1A1AA', cursor: 'pointer', fontSize: 13, fontWeight: fd.lastChemicalService === o.value ? 600 : 400 }}>
                     {o.label}
                   </button>
                 ))}

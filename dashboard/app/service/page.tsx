@@ -294,7 +294,7 @@ function ServiceEntryContent() {
                   {formulaSteps.map((s, i) => (
                     <div key={i} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#A855F7 to-[#D946EF]/10 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9333EA] to-[#EC4899]/10 flex items-center justify-center">
                           <span className="text-[10px] font-mono font-semibold text-[#9333EA]">{s.product.shadeCode.slice(0, 3)}</span>
                         </div>
                         <div>
@@ -376,7 +376,7 @@ function ServiceEntryContent() {
                 </div>
                 <button onClick={addShade} disabled={!shadeCode}
                   className="w-full py-2 rounded-xl text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-30"
-                  style={{ background: 'rgba(147, 51, 234, 0.15)', color: '#A855F7' }}>
+                  style={{ background: 'rgba(147, 51, 234, 0.15)', color: '#9333EA' }}>
                   <Plus className="w-4 h-4" /> Add Component
                 </button>
               </div>
@@ -428,7 +428,7 @@ function ServiceEntryContent() {
                 <div className="flex items-center gap-2 pb-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                   <User className="w-4 h-4 text-[#9333EA]" />
                   <span className="text-sm font-medium" style={{ color: 'var(--cg-text-primary)' }}>{selectedClient?.name}</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full ml-auto" style={{ background: 'rgba(147, 51, 234, 0.1)', color: '#A855F7' }}>{serviceType}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-full ml-auto" style={{ background: 'rgba(147, 51, 234, 0.1)', color: '#9333EA' }}>{serviceType}</span>
                 </div>
                 {formulaSteps.map((s, i) => (
                   <div key={i} className="flex items-center justify-between text-sm">

@@ -36,7 +36,7 @@ export default function LandingPage() {
           <p style={{ fontSize: 'clamp(16px, 2vw, 20px)', color: 'rgba(255,255,255,0.5)', maxWidth: 600, margin: '0 auto 20px', lineHeight: 1.6 }}>
             AI-powered hair color formulation that analyzes your client's hair and delivers a precise formula — shades, developer, ratios, and processing time — in seconds.
           </p>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(147,51,234,0.3)', background: 'rgba(147,51,234,0.1)', color: '#A855F7', fontSize: 13, fontWeight: 600, padding: '6px 16px', borderRadius: 999, marginBottom: 32 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(147,51,234,0.3)', background: 'rgba(147,51,234,0.1)', color: '#9333EA', fontSize: 13, fontWeight: 600, padding: '6px 16px', borderRadius: 999, marginBottom: 32 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80' }} />
             3,000+ professional shades · 10+ color brands · 90%+ formulation accuracy
           </div>

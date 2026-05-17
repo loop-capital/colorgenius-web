@@ -166,7 +166,7 @@ export default function ClientPortalPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#A855F7 to-[#D946EF] flex items-center justify-center text-white font-bold text-lg overflow-hidden">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#9333EA] to-[#EC4899] flex items-center justify-center text-white font-bold text-lg overflow-hidden">
               {data.stylist.avatar ? (
                 <img src={data.stylist.avatar} alt={data.stylist.name} className="w-full h-full object-cover" />
               ) : (

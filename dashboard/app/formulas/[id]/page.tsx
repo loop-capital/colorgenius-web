@@ -139,7 +139,7 @@ export default function FormulaDetailPage() {
         {/* Brand & Score */}
         <div className="flex items-center gap-3 mb-4">
           <span className="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider"
-            style={{ background: 'rgba(147, 51, 234, 0.1)', color: '#A855F7' }}>
+            style={{ background: 'rgba(147, 51, 234, 0.1)', color: '#9333EA' }}>
             {brand}
           </span>
           {formula.product_line && (
@@ -168,7 +168,7 @@ export default function FormulaDetailPage() {
               {steps.map((step, i) => (
                 <div key={i} className="flex items-center justify-between p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#A855F7 to-[#D946EF]/10 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9333EA] to-[#EC4899]/10 flex items-center justify-center">
                       <span className="text-[10px] font-mono font-semibold text-[#9333EA]">
                         {step.product?.shadeCode?.slice(0, 3) || '???'}
                       </span>

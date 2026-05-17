@@ -15,7 +15,7 @@ const quickActions = [
   { label: 'Inventory', href: '/dashboard/inventory', icon: Package, color: '#F59E0B' },
   { label: 'Pricing', href: '/dashboard/pricing', icon: DollarSign, color: '#8B5CF6' },
   { label: 'New Consultation', href: '/questionnaire', icon: UserPlus, color: '#9333EA' },
-  { label: 'Analyze Hair', href: '/analyze', icon: Camera, color: '#A855F7' },
+  { label: 'Analyze Hair', href: '/analyze', icon: Camera, color: '#9333EA' },
 ];
 
 const containerVariants = {
