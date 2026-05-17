@@ -36,11 +36,23 @@ const POROSITY = [
   { value: 'high', label: 'High', color: '#EF4444' },
 ]
 
-const HAIR_TYPES = [
-  { value: 'fine', label: 'Fine/Thin', desc: 'Delicate, low density' },
-  { value: 'normal', label: 'Normal', desc: 'Medium texture & density' },
-  { value: 'thick', label: 'Thick/Coarse', desc: 'Strong, high density' },
-  { value: 'curly', label: 'Curly', desc: 'Coiled or wavy texture' },
+const TEXTURES = [
+  { value: 'fine', label: 'Fine', desc: 'Thin strands, processes faster' },
+  { value: 'medium', label: 'Medium', desc: 'Average strand diameter' },
+  { value: 'coarse', label: 'Coarse', desc: 'Thick strands, takes longer' },
+]
+
+const HAIR_PATTERNS = [
+  { value: 'straight', label: 'Straight', type: 'Type 1' },
+  { value: 'wavy', label: 'Wavy', type: 'Type 2' },
+  { value: 'curly', label: 'Curly', type: 'Type 3' },
+  { value: 'coily', label: 'Coily', type: 'Type 4' },
+]
+
+const DENSITIES = [
+  { value: 'thin', label: 'Thin', desc: 'Low density' },
+  { value: 'medium', label: 'Medium', desc: 'Average density' },
+  { value: 'thick', label: 'Thick', desc: 'High density' },
 ]
 
 const CONDITION_TYPES = [
@@ -93,6 +105,9 @@ export default function FormulatePage() {
   const [fd, setFd] = useState({
     currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N',
     hairType: 'normal',
+    texture: 'medium',
+    hairPattern: 'straight',
+    density: 'medium',
     condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0, banding: false, hotRoots: false, previousLightener: false, multipleColors: false, greenCast: false, muddyToner: false, overAshy: false, colorGrab: false, hollowEnds: false },
     brandPreference: '', linePreference: '',
   })
@@ -260,7 +275,7 @@ export default function FormulatePage() {
             <h1 style={{ fontSize: 30, fontWeight: 700, marginBottom: 4 }}>Create <span style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Formulation</span></h1>
             <p style={{ color: '#A1A1AA', fontSize: 14 }}>Build a professional color formula in 6 steps</p>
           </div>
-          <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
+          <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', texture: 'medium', hairPattern: 'straight', density: 'medium', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0 }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
         </div>
 
         {/* Client Picker */}
@@ -417,37 +432,15 @@ export default function FormulatePage() {
         {/* STEP 2: Hair Assessment */}
         {step === 2 && (
           <div style={card}>
-            <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Sparkles style={{ color: '#9333EA' }} /> Current Hair Color</h2>
+            <h2 style={{ fontSize: 18, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><Droplets style={{ color: '#9333EA' }} /> Hair Assessment</h2>
+            <p style={{ color: '#71717A', fontSize: 13, marginBottom: 16 }}>Texture, pattern, density, level & tone</p>
+            {/* Texture */}
             <div style={{ marginBottom: 24 }}>
-              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Current Level</Label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {Object.entries(HAIR_LEVELS).map(([l, i]) => <HairSwatch key={l} color={i.hex} label={i.name} level={Number(l)} isActive={fd.currentLevel === Number(l)} onClick={() => setFd(p => ({ ...p, currentLevel: Number(l) }))} />)}
-              </div>
-
-              {/* Corrective color warning preview */}
-              {<CorrectiveColorPanel
-                hairState={{
-                  currentLevel: fd.currentLevel,
-                  currentTone: fd.currentTone,
-                  targetLevel: fd.targetLevel,
-                  targetTone: fd.targetTone,
-                  porosity: fd.condition.porosity as 'low' | 'normal' | 'high',
-                  condition: fd.condition.type,
-                  banding: fd.condition.highlights && fd.condition.highlightedPercent > 30,
-                  hotRoots: fd.currentLevel < fd.targetLevel && fd.condition.type === 'previously_colored',
-                  previousLightener: fd.condition.type === 'bleached',
-                  multipleColors: fd.condition.type === 'previously_colored',
-                }}
-                compact
-              />}
-            </div>
-
-            <div style={{ marginBottom: 24 }}>
-              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Hair Type</Label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-                {HAIR_TYPES.map(o => (
-                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, hairType: o.value }))}
-                    style={{ padding: 14, borderRadius: 12, border: fd.hairType === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.hairType === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.hairType === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'center' }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Texture</Label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                {TEXTURES.map(o => (
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, texture: o.value }))}
+                    style={{ padding: 14, borderRadius: 12, border: fd.texture === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.texture === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.texture === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'center' }}>
                     <p style={{ fontSize: 13, fontWeight: 600 }}>{o.label}</p>
                     <p style={{ fontSize: 11, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
                   </button>
@@ -455,6 +448,43 @@ export default function FormulatePage() {
               </div>
             </div>
 
+            {/* Hair Pattern */}
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Hair Pattern</Label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                {HAIR_PATTERNS.map(o => (
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, hairPattern: o.value }))}
+                    style={{ padding: 14, borderRadius: 12, border: fd.hairPattern === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.hairPattern === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.hairPattern === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'center' }}>
+                    <p style={{ fontSize: 11, color: '#71717A', marginBottom: 2 }}>{o.type}</p>
+                    <p style={{ fontSize: 13, fontWeight: 600 }}>{o.label}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Density */}
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Density</Label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                {DENSITIES.map(o => (
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, density: o.value }))}
+                    style={{ padding: 14, borderRadius: 12, border: fd.density === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.density === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.density === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'center' }}>
+                    <p style={{ fontSize: 13, fontWeight: 600 }}>{o.label}</p>
+                    <p style={{ fontSize: 11, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Current Level */}
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Current Level</Label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {Object.entries(HAIR_LEVELS).map(([l, i]) => <HairSwatch key={l} color={i.hex} label={i.name} level={Number(l)} isActive={fd.currentLevel === Number(l)} onClick={() => setFd(p => ({ ...p, currentLevel: Number(l) }))} />)}
+              </div>
+            </div>
+
+            {/* Current Tone */}
             <div style={{ marginBottom: 24 }}>
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Current Tone</Label>
               <div style={{ display: 'flex', flexDirection: 'row', gap: 32, alignItems: 'flex-start' }}>
@@ -596,10 +626,10 @@ export default function FormulatePage() {
             {/* Consultation Summary */}
             <div style={{ background: 'rgba(22,22,32,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, marginBottom: 24 }}>
               <p style={{ fontSize: 11, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 8 }}>Consultation Summary</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, fontSize: 13 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 12, fontSize: 13 }}>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Current</span><span>Level {fd.currentLevel} {TONES.find(t => t.value === fd.currentTone)?.label || fd.currentTone}</span></div>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Target</span><span style={{ color: '#9333EA' }}>Level {fd.targetLevel} {TONES.find(t => t.value === fd.targetTone)?.label || fd.targetTone}</span></div>
-                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Type</span><span style={{ textTransform: 'capitalize' }}>{HAIR_TYPES.find(h => h.value === fd.hairType)?.label || fd.hairType}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Texture</span><span style={{ textTransform: 'capitalize' }}>{TEXTURES.find(h => h.value === fd.texture)?.label || fd.texture}</span></div><div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Pattern</span><span style={{ textTransform: 'capitalize' }}>{HAIR_PATTERNS.find(h => h.value === fd.hairPattern)?.label || fd.hairPattern}</span></div><div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Density</span><span style={{ textTransform: 'capitalize' }}>{DENSITIES.find(h => h.value === fd.density)?.label || fd.density}</span></div>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Condition</span><span style={{ textTransform: 'capitalize' }}>{CONDITION_TYPES.find(c => c.value === fd.condition.type)?.label || fd.condition.type.replace('_', ' ')}</span></div>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Gray</span><span>{fd.condition.grayPercent}%</span></div>
               </div>
