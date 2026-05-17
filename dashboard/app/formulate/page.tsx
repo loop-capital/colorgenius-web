@@ -91,6 +91,18 @@ const LAST_CHEMICAL_TIMES = [
   { value: 'this_week', label: 'This week' },
 ]
 
+const PROBLEM_INDICATORS = [
+  { value: 'banding', label: 'Banding', desc: 'Visible color bands from overlapping', field: 'banding' },
+  { value: 'previousLightener', label: 'Previous Lightener', desc: 'Has bleach/lightener in hair', field: 'previousLightener' },
+  { value: 'greenCast', label: 'Green Cast', desc: 'Unwanted green tone present', field: 'greenCast' },
+  { value: 'overAshy', label: 'Over-Ashy', desc: 'Too cool/gray result', field: 'overAshy' },
+  { value: 'hollowEnds', label: 'Hollow Ends', desc: 'Ends appear hollow or see-through', field: 'hollowEnds' },
+  { value: 'hotRoots', label: 'Hot Roots', desc: 'Warmer/lighter roots than mids', field: 'hotRoots' },
+  { value: 'multipleColors', label: 'Multiple Colors', desc: 'Different colors on different sections', field: 'multipleColors' },
+  { value: 'muddyToner', label: 'Muddy Toner', desc: 'Toner has gone muddy/ashy', field: 'muddyToner' },
+  { value: 'colorGrab', label: 'Color Grab', desc: 'Ends absorbing color unevenly', field: 'colorGrab' },
+]
+
 const CONDITION_TYPES = [
   { value: 'virgin', label: 'Virgin Hair', desc: 'Never chemically treated' },
   { value: 'bleached', label: 'Bleached/Lightened', desc: 'Lifted from natural' },
@@ -99,6 +111,7 @@ const CONDITION_TYPES = [
   { value: 'previously_colored', label: 'Previously Colored', desc: 'Has existing color deposit' },
   { value: 'damaged', label: 'Damaged', desc: 'Over-processed or compromised' },
   { value: 'dry_brittle', label: 'Dry/Brittle', desc: 'Lacks moisture, prone to breakage' },
+  { value: 'highly_damaged', label: 'Highly Damaged', desc: 'Severely compromised, needs repair' },
 ]
 
 const TONES = [
@@ -695,9 +708,25 @@ export default function FormulatePage() {
         {/* STEP 5: Condition */}
         {step === 5 && (
           <div style={card}>
-            <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><Droplets style={{ color: '#9333EA' }} /> Hair Condition</h2>
-            <p style={{ color: '#A1A1AA', fontSize: 13, marginBottom: 24 }}>Assess the hair's health indicators. These details directly affect the formula.</p>
+            <h2 style={{ fontSize: 18, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}><Droplets style={{ color: '#9333EA' }} /> Hair Condition</h2>
+            <p style={{ color: '#71717A', fontSize: 13, marginBottom: 24 }}>Assess the hair's condition and history. These details directly affect the formula.</p>
 
+            {/* Hair Condition */}
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4, display: 'block' }}>Hair Condition</Label>
+              <p style={{ color: '#71717A', fontSize: 12, marginBottom: 8 }}>Current state of the hair</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                {CONDITION_TYPES.map(o => (
+                  <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, type: o.value } }))}
+                    style={{ padding: 12, borderRadius: 12, border: fd.condition.type === o.value ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: fd.condition.type === o.value ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: fd.condition.type === o.value ? '#9333EA' : '#F5F5F7', cursor: 'pointer', textAlign: 'center' }}>
+                    <p style={{ fontSize: 12, fontWeight: 600 }}>{o.label}</p>
+                    <p style={{ fontSize: 10, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Porosity */}
             <div style={{ marginBottom: 24 }}>
               <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 8, display: 'block' }}>Porosity</Label>
               <div style={{ display: 'flex', gap: 12 }}>
@@ -711,6 +740,7 @@ export default function FormulatePage() {
               </div>
             </div>
 
+            {/* Gray Coverage */}
             <div style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600 }}>Gray Coverage</Label>
@@ -720,20 +750,46 @@ export default function FormulatePage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: "#71717A", marginTop: 4 }}><span>No gray</span><span>Partial</span><span>Full coverage needed</span></div>
             </div>
 
+            {/* Highlights */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24 }}>
               <input type="checkbox" id="hl" checked={fd.condition.highlights} onChange={e => setFd(p => ({ ...p, condition: { ...p.condition, highlights: e.target.checked } }))} style={{ accentColor: '#9333EA' }} />
               <label htmlFor="hl" style={{ fontSize: 14, color: '#F5F5F7', cursor: 'pointer' }}>Highlights Present</label>
             </div>
 
+            {/* Problem Indicators */}
+            <div style={{ marginBottom: 24 }}>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4, display: 'block' }}>Problem Indicators</Label>
+              <p style={{ color: '#71717A', fontSize: 12, marginBottom: 8 }}>Select any issues present</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                {PROBLEM_INDICATORS.map(o => {
+                  const active = (fd.condition as any)[o.field]
+                  return (
+                    <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, condition: { ...p.condition, [o.field]: !active } }))}
+                      style={{ padding: 12, borderRadius: 12, border: active ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: active ? 'rgba(147,51,234,0.08)' : 'rgba(30,30,45,0.6)', color: '#F5F5F7', cursor: 'pointer', textAlign: 'center' }}>
+                      <p style={{ fontSize: 12, fontWeight: 600 }}>{o.label}</p>
+                      <p style={{ fontSize: 10, color: '#71717A', marginTop: 2 }}>{o.desc}</p>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
             {/* Consultation Summary */}
             <div style={{ background: 'rgba(22,22,32,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, marginBottom: 24 }}>
               <p style={{ fontSize: 11, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 8 }}>Consultation Summary</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 12, fontSize: 13 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, fontSize: 13 }}>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Current</span><span>Level {fd.currentLevel} {TONES.find(t => t.value === fd.currentTone)?.label || fd.currentTone}</span></div>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Target</span><span style={{ color: '#9333EA' }}>Level {fd.targetLevel} {TONES.find(t => t.value === fd.targetTone)?.label || fd.targetTone}</span></div>
-                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Texture</span><span style={{ textTransform: 'capitalize' }}>{TEXTURES.find(h => h.value === fd.texture)?.label || fd.texture}</span></div><div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Pattern</span><span style={{ textTransform: 'capitalize' }}>{HAIR_PATTERNS.find(h => h.value === fd.hairPattern)?.label || fd.hairPattern}</span></div><div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Density</span><span style={{ textTransform: 'capitalize' }}>{DENSITIES.find(h => h.value === fd.density)?.label || fd.density}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Texture</span><span style={{ textTransform: 'capitalize' }}>{TEXTURES.find(h => h.value === fd.texture)?.label || fd.texture}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Pattern</span><span style={{ textTransform: 'capitalize' }}>{HAIR_PATTERNS.find(h => h.value === fd.hairPattern)?.label || fd.hairPattern}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Density</span><span style={{ textTransform: 'capitalize' }}>{DENSITIES.find(h => h.value === fd.density)?.label || fd.density}</span></div>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Condition</span><span style={{ textTransform: 'capitalize' }}>{CONDITION_TYPES.find(c => c.value === fd.condition.type)?.label || fd.condition.type.replace('_', ' ')}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Porosity</span><span style={{ textTransform: 'capitalize' }}>{fd.condition.porosity}</span></div>
                 <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Gray</span><span>{fd.condition.grayPercent}%</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Service</span><span style={{ textTransform: 'capitalize' }}>{SERVICE_TYPES.find(s => s.value === fd.serviceType)?.label || fd.serviceType.replace('_', ' ')}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Chemical History</span><span>{fd.chemicalHistory.length === 0 ? 'None' : fd.chemicalHistory.map(v => CHEMICAL_HISTORY_ITEMS.find(c => c.value === v)?.label || v).join(', ')}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Sensitivities</span><span>{fd.sensitivities.length === 0 ? 'None' : fd.sensitivities.map(v => SENSITIVITIES.find(s => s.value === v)?.label || v).join(', ')}</span></div>
+                <div><span style={{ display: 'block', fontSize: 12, color: '#71717A' }}>Last Service</span><span>{LAST_CHEMICAL_TIMES.find(t => t.value === fd.lastChemicalService)?.label || fd.lastChemicalService.replace('_', ' ')}</span></div>
               </div>
             </div>
 
