@@ -133,7 +133,7 @@ export default function DashboardPage() {
                 <div className="rounded-2xl p-8 text-center" style={{ background: 'var(--cg-surface)', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <Sparkles className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--cg-text-tertiary)' }} />
                   <p className="text-sm" style={{ color: 'var(--cg-text-tertiary)' }}>Your recent formulations will appear here</p>
-                  <Link href="/formulate" className="inline-flex items-center gap-1 mt-3 text-sm font-medium px-4 py-2 rounded-xl" style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#FFF' }}>
+                  <Link href="/formulate" className="inline-flex items-center gap-1 mt-3 text-sm font-medium px-4 py-2 rounded-xl" style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#FFF' }}>
                     <FlaskConical className="w-4 h-4" /> Create Formula
                   </Link>
                 </div>

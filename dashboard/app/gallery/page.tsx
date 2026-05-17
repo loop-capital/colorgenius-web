@@ -16,7 +16,7 @@ export default function GalleryPage() {
             Color{' '}
             <span
               className="bg-clip-text text-transparent"
-              style={{ backgroundImage: 'linear-gradient(135deg, #A855F7, #D946EF)' }}
+              style={{ backgroundImage: 'linear-gradient(135deg, #9333EA, #EC4899)' }}
             >
               Gallery
             </span>

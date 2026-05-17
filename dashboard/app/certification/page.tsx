@@ -464,7 +464,7 @@ export default function CertificationPage() {
                             width: `${progress}%`,
                             background: isComplete
                               ? '#22c55e'
-                              : 'linear-gradient(90deg, #A855F7, #D946EF)',
+                              : 'linear-gradient(90deg, #9333EA, #EC4899)',
                           }}
                         />
                       </div>

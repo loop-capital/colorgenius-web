@@ -84,7 +84,7 @@ function RegisterContent() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)' }}>
+            style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)' }}>
             <span className="text-white font-black text-xl">CG</span>
           </div>
         </div>
@@ -138,7 +138,7 @@ function RegisterContent() {
 
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#fff' }}>
+                style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#fff' }}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Create Account'}
               </button>
             </form>
@@ -200,7 +200,7 @@ function RegisterContent() {
 
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)', color: '#fff' }}>
+                style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#fff' }}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Save & Continue'}
               </button>
 

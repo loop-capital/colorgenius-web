@@ -232,7 +232,7 @@ export default function ClientPortalPage() {
                     {photo.afterUrl && (
                       <div className="relative aspect-square">
                         <img src={photo.afterUrl} alt="After" className="w-full h-full object-cover" />
-                        <span className="absolute top-2 left-2 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full text-white/90" style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)' }}>After</span>
+                        <span className="absolute top-2 left-2 text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full text-white/90" style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)' }}>After</span>
                       </div>
                     )}
                   </div>
@@ -307,7 +307,7 @@ export default function ClientPortalPage() {
         {/* Footer */}
         <div className="text-center pt-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #A855F7, #D946EF)' }}>
+            <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)' }}>
               <Sparkles size={12} color="#0A0A0F" />
             </div>
             <span className="text-xs font-bold text-white/40">ColorGenius</span>
