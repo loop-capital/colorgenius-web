@@ -659,7 +659,7 @@ export default function FormulatePage() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {LAST_CHEMICAL_TIMES.map(o => (
                   <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, lastChemicalService: o.value }))}
-                    style={{ padding: '8px 16px', borderRadius: 20, border: fd.lastChemicalService === o.value ? 'none' : '1px solid rgba(255,255,255,0.12)', background: fd.lastChemicalService === o.value ? 'rgba(147,51,234,0.5)' : 'rgba(30,30,45,0.6)', color: fd.lastChemicalService === o.value ? '#F5F5F7' : '#A1A1AA', cursor: 'pointer', fontSize: 13, fontWeight: fd.lastChemicalService === o.value ? 600 : 400 }}>
+                    style={{ padding: '8px 16px', borderRadius: 20, border: fd.lastChemicalService === o.value ? '1px solid rgba(147,51,234,0.6)' : '1px solid rgba(255,255,255,0.12)', background: fd.lastChemicalService === o.value ? 'rgba(30,30,45,0.6)' : 'rgba(30,30,45,0.6)', color: fd.lastChemicalService === o.value ? '#9333EA' : '#A1A1AA', cursor: 'pointer', fontSize: 13, fontWeight: fd.lastChemicalService === o.value ? 600 : 400 }}>
                     {o.label}
                   </button>
                 ))}
