@@ -107,8 +107,8 @@ function findPrimaryColor(
   let candidates = ALL_PRODUCTS.filter(p => {
     const levelMatch = p.level === level;
     const toneMatch = p.tone === tone || p.secondaryTone === tone;
-    const brandMatch = !brand || p.brand === brand;
-    const lineMatch = !line || p.line === line;
+    const brandMatch = !brand || p.brand.toLowerCase() === brand.toLowerCase();
+    const lineMatch = !line || p.line.toLowerCase() === line.toLowerCase();
     return levelMatch && toneMatch && brandMatch && lineMatch;
   });
 
@@ -121,7 +121,7 @@ function findPrimaryColor(
   candidates = ALL_PRODUCTS.filter(p => {
     const levelMatch = p.level === level;
     const toneMatch = p.tone === tone;
-    const brandMatch = !brand || p.brand === brand;
+    const brandMatch = !brand || p.brand.toLowerCase() === brand.toLowerCase();
     return levelMatch && toneMatch && brandMatch;
   });
 
@@ -131,7 +131,7 @@ function findPrimaryColor(
   candidates = ALL_PRODUCTS.filter(p => {
     const levelMatch = p.level === level;
     const toneMatch = p.tone === 'neutral';
-    const brandMatch = !brand || p.brand === brand;
+    const brandMatch = !brand || p.brand.toLowerCase() === brand.toLowerCase();
     return levelMatch && toneMatch && brandMatch;
   });
 
@@ -155,7 +155,7 @@ function findSecondaryColor(
     const copper = ALL_PRODUCTS.find(p => 
       p.level === targetLevel && 
       (p.tone === 'copper' || p.secondaryTone === 'copper') &&
-      p.brand === brand && p.line === line
+      (p.brand.toLowerCase() === brand.toLowerCase()) && p.line.toLowerCase() === line.toLowerCase()
     );
     if (copper) return copper;
   }

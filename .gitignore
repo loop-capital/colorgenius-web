@@ -53,3 +53,4 @@ coverage/
 *.tmp
 # Archive directory
 .archive/
+.vercel

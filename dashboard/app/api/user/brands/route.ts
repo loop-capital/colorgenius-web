@@ -72,20 +72,18 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Step 3: Default brand list (free tier)
-    const allBrands = [
-      "Davines", "Wella", "Schwarzkopf", "Redken", "Matrix",
-      "Joico", "Paul Mitchell", "Pulp Riot", "Goldwell",
-      "L'Oréal", "Pravana", "Kenra",
-    ];
+    // Step 3: Use all available brands from product database, limited by tier
+    // This is the default for salons that haven't set preferred_brands yet
+    const { BRANDS: ALL_BRANDS } = await import('@/lib/products');
+    const tierLimitedBrands = ALL_BRANDS.slice(0, maxBrands);
 
     return NextResponse.json({
-      brands: allBrands,
-      source: "all",
-      tier: "unlimited",
-      max_brands: 999,
-      used_brands: usedBrands,
-      can_add_more: true,
+      brands: tierLimitedBrands,
+      source: "all-tiered",
+      tier,
+      max_brands: maxBrands,
+      used_brands: tierLimitedBrands.length,
+      can_add_more: tierLimitedBrands.length < ALL_BRANDS.length,
     });
   } catch (error) {
     console.error("GET /api/user/brands error:", error);

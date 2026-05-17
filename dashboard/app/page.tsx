@@ -38,7 +38,7 @@ export default function LandingPage() {
           </p>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(147,51,234,0.3)', background: 'rgba(147,51,234,0.1)', color: '#A855F7', fontSize: 13, fontWeight: 600, padding: '6px 16px', borderRadius: 999, marginBottom: 32 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4ADE80' }} />
-            3,000+ professional shades · 21 color brands · 90%+ formulation accuracy
+            3,000+ professional shades · 10+ color brands · 90%+ formulation accuracy
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
             <a href="/login" style={{ ...btnPrimary, padding: '16px 32px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
@@ -60,7 +60,7 @@ export default function LandingPage() {
               { icon: <Camera size={22} />, title: 'Photo', desc: 'Capture or upload hair photo', step: '01' },
               { icon: <Sparkles size={22} />, title: 'Hair Assessment', desc: 'Texture, density, level & tone', step: '02' },
               { icon: <Shield size={22} />, title: 'Chemical History', desc: 'Past treatments & sensitivities', step: '03' },
-              { icon: <Palette size={22} />, title: 'Target Look', desc: 'Desired color across 21 brands', step: '04' },
+              { icon: <Palette size={22} />, title: 'Target Look', desc: 'Desired color across your brands', step: '04' },
               { icon: <ClipboardList size={22} />, title: 'Condition', desc: 'Hair health & problem flags', step: '05' },
               { icon: <CheckCircle size={22} />, title: 'Your Formula', desc: 'Ratios, developer, timing & AI score', step: '06' },
             ].map((s, i) => (
@@ -173,10 +173,10 @@ export default function LandingPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
             {[
-              { name: 'Professional', price: '$29', period: '/mo', desc: 'Individual stylists', features: ['Unlimited formulations', '8+ color lines', 'AI learning system', 'Client history'], highlight: false },
-              { name: 'Pro+', price: '$49', period: '/mo', desc: 'Power users', features: ['All brands', 'Color Management System', 'Advanced AI', 'Priority support', 'Scale integration'], highlight: false },
-              { name: 'Salon', price: '$149', period: '/mo', desc: 'Teams of 5', features: ['5 seats', 'Team analytics', 'Inventory tracking', 'Client management'], highlight: true },
-              { name: 'Salon+', price: '$289', period: '/mo', desc: 'Larger teams', features: ['10 seats', 'Full inventory', 'Custom reporting', 'API access'], highlight: false },
+              { name: 'Starter', price: '$29', period: '/mo', desc: '1 brand', features: ['Unlimited formulations', '1 color brand', 'AI learning system', 'Client history'], highlight: false },
+              { name: 'Salon', price: '$49', period: '/mo', desc: '3 brands', features: ['3 color brands', 'Color Management System', 'Advanced AI', 'Priority support'], highlight: true },
+              { name: 'Pro', price: '$79', period: '/mo', desc: '5 brands', features: ['5 color brands', 'Inventory tracking', 'Scale integration', 'Client management'], highlight: false },
+              { name: 'Elite', price: '$119', period: '/mo', desc: 'Unlimited brands', features: ['Unlimited brands', 'Full inventory', 'Custom reporting', 'API access'], highlight: false },
             ].map((t, i) => (
               <div key={i} style={{ position: 'relative', border: t.highlight ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.08)', background: t.highlight ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 24 }}>
                 {t.highlight && <div style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', fontSize: 10, fontWeight: 700, padding: '4px 12px', borderRadius: 999, textTransform: 'uppercase' }}>Popular</div>}

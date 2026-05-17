@@ -5,8 +5,11 @@ import { getAllBrands } from '@/lib/conversion/data-loader';
  * GET /api/brands
  * Returns list of all available brands with display names.
  */
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const salonId = searchParams.get('salonId');
+
     const brands = await getAllBrands();
     const displayNames: Record<string, string> = {
       schwarzkopf: 'Schwarzkopf Professional',
@@ -31,10 +34,30 @@ export async function GET() {
       omcorcolor: 'Om Cor Color',
       chi: 'CHI',
     };
-    const data = brands.map((b) => ({
+    let data = brands.map((b) => ({
       id: b,
       name: displayNames[b] || b,
     }));
+
+    // If salonId provided, filter to salon's preferred_brands
+    if (salonId) {
+      try {
+        const { prisma } = await import('@/lib/prisma');
+        const salon = await prisma.salons.findUnique({
+          where: { id: salonId },
+          select: { preferred_brands: true, subscription_tier: true },
+        });
+        if (salon?.preferred_brands?.length) {
+          // Map preferred brand names to their API ids
+          const preferred = salon.preferred_brands;
+          data = data.filter(b => preferred.some(p => 
+            b.id.toLowerCase() === p.toLowerCase() || 
+            b.name.toLowerCase() === p.toLowerCase()
+          ));
+        }
+      } catch { /* fall through to all brands */ }
+    }
+
     return NextResponse.json({
       success: true,
       data,
