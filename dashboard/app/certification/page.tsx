@@ -291,7 +291,7 @@ export default function CertificationPage() {
               </div>
               <div className="w-full h-1 rounded-full bg-white/5 mb-6">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#9333EA] to-[#EC4899] transition-all duration-500"
+                  className="h-full rounded-full bg-gradient-to-r from-[#A855F7 to-[#D946EF] transition-all duration-500"
                   style={{ width: `${((currentQ + 1) / ASSESSMENT_QUESTIONS.length) * 100}%` }}
                 />
               </div>
@@ -360,14 +360,14 @@ export default function CertificationPage() {
                   <button
                     onClick={handleAnswer}
                     disabled={selectedAnswer === null}
-                    className="px-6 py-2.5 bg-gradient-to-r from-[#9333EA] to-[#EC4899] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-30"
+                    className="px-6 py-2.5 bg-gradient-to-r from-[#A855F7 to-[#D946EF] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-30"
                   >
                     Submit Answer
                   </button>
                 ) : (
                   <button
                     onClick={nextQuestion}
-                    className="px-6 py-2.5 bg-gradient-to-r from-[#9333EA] to-[#EC4899] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity flex items-center gap-1.5"
+                    className="px-6 py-2.5 bg-gradient-to-r from-[#A855F7 to-[#D946EF] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity flex items-center gap-1.5"
                   >
                     {currentQ < ASSESSMENT_QUESTIONS.length - 1 ? 'Next Question' : 'See Results'}
                     <ChevronRight size={16} />
@@ -407,7 +407,7 @@ export default function CertificationPage() {
                 <p className="text-sm text-white/50 mb-6">You need 70% to pass. Review the topics below and try again.</p>
                 <button
                   onClick={() => { setShowResult(false); setShowAssessment(true); setCurrentQ(0); setAnswers({}); setSelectedAnswer(null); setShowExplanation(false) }}
-                  className="px-6 py-2.5 bg-gradient-to-r from-[#9333EA] to-[#EC4899] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
+                  className="px-6 py-2.5 bg-gradient-to-r from-[#A855F7 to-[#D946EF] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"
                 >
                   Retake Assessment
                 </button>
@@ -464,7 +464,7 @@ export default function CertificationPage() {
                             width: `${progress}%`,
                             background: isComplete
                               ? '#22c55e'
-                              : 'linear-gradient(90deg, #9333EA, #EC4899)',
+                              : 'linear-gradient(90deg, #A855F7, #D946EF)',
                           }}
                         />
                       </div>
@@ -472,7 +472,7 @@ export default function CertificationPage() {
                     {isAssessment && !isComplete && (
                       <button
                         onClick={() => setShowAssessment(true)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#9333EA] to-[#EC4899] text-white hover:opacity-90 transition-opacity flex-shrink-0"
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-[#A855F7 to-[#D946EF] text-white hover:opacity-90 transition-opacity flex-shrink-0"
                       >
                         Start
                       </button>
