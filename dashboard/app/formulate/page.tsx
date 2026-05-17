@@ -838,26 +838,8 @@ export default function FormulatePage() {
                 <button type="button" onClick={() => setFormulaView('bowl')} style={{ padding: '6px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: formulaView === 'bowl' ? '1px solid rgba(147,51,234,0.4)' : '1px solid rgba(255,255,255,0.06)', background: formulaView === 'bowl' ? 'rgba(147,51,234,0.1)' : 'transparent', color: formulaView === 'bowl' ? '#9333EA' : '#71717A', cursor: 'pointer' }}>Mix</button>
               </div>
             </div>
-            {/* Formula Confidence */}
-            <div style={{ marginBottom: 24, padding: 20, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 20 }}>
-              <div style={{ position: 'relative', width: 72, height: 72, flexShrink: 0 }}>
-                <svg width="72" height="72" viewBox="0 0 72 72">
-                  <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
-                  <circle cx="36" cy="36" r="30" fill="none" stroke="#10B981" strokeWidth="6" strokeDasharray={`${(result.confidence ?? 100) * 1.884} 188.4`} strokeLinecap="round" transform="rotate(-90 36 36)" />
-                </svg>
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 18, fontWeight: 700, color: '#10B981' }}>{result.confidence ?? 100}%</span>
-                </div>
-              </div>
-              <div>
-                <p style={{ fontSize: 11, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>Formula Confidence</p>
-                <p style={{ fontSize: 16, fontWeight: 700, color: result.confidence >= 80 ? '#10B981' : result.confidence >= 50 ? '#F59E0B' : '#EF4444' }}>{result.confidence >= 80 ? 'High' : result.confidence >= 50 ? 'Medium' : 'Low'}</p>
-              </div>
-            </div>
-
             {/* Brand Conversion */}
-            <div style={{ marginBottom: 24, padding: 20, background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12 }}>
-              <p style={{ fontSize: 11, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 12 }}>Brand Conversion</p>
+            <div style={{ marginBottom: 24 }}>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                 <select
                   value={convertTargetBrand}
