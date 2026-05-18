@@ -359,71 +359,80 @@ export function ScaleBowl({
 
           {/* ─── Layer fills (clipped to interior) ───────────────────────── */}
           <g clipPath="url(#bowlInteriorClip)">
-            {layers.map((layer) => {
+            {layers.map((layer, idx) => {
               const isCurrent = layer.ing.id === currentIngredient?.id;
-              const layerTop = layer.y;
-              const layerBottom = layer.y + layer.height;
-              const topW = widthAtY(layerTop);
-              const bottomW = widthAtY(layerBottom);
-              const topX = BOWL_CENTER_X - topW / 2;
-              const bottomX = BOWL_CENTER_X - bottomW / 2;
               return (
                 <g key={layer.ing.id}>
-                  {/* Liquid trapezoid body */}
-                  <path
-                    d={`M ${topX} ${layerTop} L ${topX + topW} ${layerTop} L ${bottomX + bottomW} ${layerBottom} L ${bottomX} ${layerBottom} Z`}
+                  {/* Layer fill rect */}
+                  <motion.rect
+                    x={14}
+                    y={layer.y}
+                    width={BOWL_VIEW_W - 28}
+                    height={layer.height + 2}
                     fill={layer.ing.color}
-                    opacity={isCurrent ? 0.9 : 0.7}
+                    opacity={isCurrent ? 0.9 : 0.65}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isCurrent ? 0.9 : 0.65 }}
+                    transition={{ duration: 0.4 }}
                   />
 
-                  {/* Meniscus at layer top */}
-                  <path
-                    d={`M ${topX} ${layerTop} Q ${BOWL_CENTER_X} ${layerTop + 4} ${topX + topW} ${layerTop}`}
-                    fill={layer.ing.color}
-                    opacity={isCurrent ? 0.95 : 0.75}
-                  />
-
-                  {/* Layer separator */}
+                  {/* Layer separator line */}
                   <line
-                    x1={bottomX}
-                    y1={layerBottom}
-                    x2={bottomX + bottomW}
-                    y2={layerBottom}
-                    stroke="rgba(255,255,255,0.12)"
+                    x1={16}
+                    y1={layer.y}
+                    x2={BOWL_VIEW_W - 16}
+                    y2={layer.y}
+                    stroke="rgba(255,255,255,0.1)"
                     strokeWidth="0.8"
                   />
 
-                  {/* Label */}
-                  {layer.height > 22 && (
+                  {/* Layer label: shadeCode actual/targetg */}
+                  {layer.height > 18 && (
                     <text
                       x={BOWL_CENTER_X}
-                      y={layerTop + layer.height / 2 + 4}
+                      y={layer.y + layer.height / 2 + 4}
                       textAnchor="middle"
                       fill="white"
                       fontSize="10"
                       fontWeight="600"
                       fontFamily="system-ui, sans-serif"
-                      style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}
+                      style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
                     >
-                      {layer.ing.shadeCode} {convertWeight(layer.actual)}/{convertWeight(layer.ing.targetGrams)}{unitLabel}
+                      {layer.ing.shadeCode}{' '}
+                      {convertWeight(layer.actual)}/{convertWeight(layer.ing.targetGrams)}
+                      {unitLabel}
                     </text>
                   )}
                 </g>
               );
             })}
+
+            {/* Surface wave (when filling) */}
+            {fillPercent > 0.03 && (
+              <motion.path
+                d={getSurfacePath(fillTopY, fillPercent)}
+                fill="none"
+                stroke="rgba(255,255,255,0.15)"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                animate={{ d: getSurfacePath(fillTopY, fillPercent) }}
+                transition={{ duration: 0.3 }}
+              />
+            )}
           </g>
 
-          {/* Inner rim ellipse */}
+          {/* Rim line (top flat edge) */}
           <path
-            d={BOWL_INNER_RIM}
+            d={BOWL_RIM}
             fill="none"
-            stroke="rgba(255,255,255,0.12)"
-            strokeWidth="1.5"
+            stroke="rgba(255,255,255,0.15)"
+            strokeWidth="2"
+            strokeLinecap="round"
           />
 
           {/* Rim highlight arc */}
           <path
-            d={`M ${CX - INNER_RIM_RX * 0.92} ${INNER_RIM_CY - INNER_RIM_RY * 1.1} Q ${CX} ${INNER_RIM_CY - INNER_RIM_RY * 1.4} ${CX + INNER_RIM_RX * 0.92} ${INNER_RIM_CY - INNER_RIM_RY * 1.1}`}
+            d={`M 14 36 Q ${BOWL_CENTER_X} 34 ${BOWL_VIEW_W - 14} 36`}
             fill="none"
             stroke="rgba(255,255,255,0.06)"
             strokeWidth="1"
