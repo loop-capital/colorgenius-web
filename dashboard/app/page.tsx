@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Camera, Target, Sparkles, CheckCircle, Shield, ClipboardList, Palette, BarChart3, Package, DollarSign, Scale, History, ArrowRight, Mail } from 'lucide-react'
+import { Camera, Target, Sparkles, CheckCircle, Shield, ClipboardList, Palette, BarChart3, FlaskConical, ChartNoAxesColumn, Package, DollarSign, Scale, History, ArrowRight, Mail } from 'lucide-react'
 
 export default function LandingPage() {
   const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 999, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 16, display: 'inline-flex', alignItems: 'center', gap: 8 }
@@ -58,10 +58,10 @@ export default function LandingPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
             {[
               { icon: <Camera size={22} />, title: 'Photo', desc: 'Capture or upload hair photo', step: '01' },
-              { icon: <Target size={22} />, title: 'Hair Assessment', desc: 'Texture, density, level & tone', step: '02' },
-              { icon: <Shield size={22} />, title: 'Chemical History', desc: 'Past treatments & sensitivities', step: '03' },
+              { icon: <ClipboardList size={22} />, title: 'Hair Assessment', desc: 'Texture, density, level & tone', step: '02' },
+              { icon: <FlaskConical size={22} />, title: 'Chemical History', desc: 'Past treatments & sensitivities', step: '03' },
               { icon: <Target size={22} />, title: 'Target Look', desc: 'Desired color across your brands', step: '04' },
-              { icon: <ClipboardList size={22} />, title: 'Condition', desc: 'Hair health & problem flags', step: '05' },
+              { icon: <ChartNoAxesColumn size={22} />, title: 'Condition', desc: 'Hair health & problem flags', step: '05' },
               { icon: <CheckCircle size={22} />, title: 'Your Formula', desc: 'Ratios, developer, timing & AI score', step: '06' },
             ].map((s, i) => (
               <div key={i} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', borderRadius: 16, padding: 20 }}>
