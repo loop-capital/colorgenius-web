@@ -56,44 +56,7 @@ export default function LandingPage() {
           </div>
           <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 36px)', fontWeight: 900, marginBottom: 12 }}>Be first in line for the beta.</h2>
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 15, marginBottom: 32, lineHeight: 1.5 }}>Sign up and we'll notify you as soon as spots open. Beta testers get a permanent discount on all plans.</p>
-          <form action="https://formspree.io/f/xkoenolr" method="POST" style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 460, margin: '0 auto', textAlign: 'left' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <input type="text" name="name" placeholder="Your name" required
-                style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
-                onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
-                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
-              />
-              <input type="text" name="salon" placeholder="Your salon"
-                style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
-                onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
-                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
-              />
-            </div>
-            <input type="email" name="email" placeholder="you@salon.com" required
-              style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
-            />
-            <input type="text" name="instagram" placeholder="@yourinstagram"
-              style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
-            />
-            <input type="text" name="brands_used" placeholder="Color brands you currently use (e.g. Schwarzkopf, Wella, Redken)"
-              style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
-            />
-            <input type="text" name="brands_to_explore" placeholder="Color brands you'd like to explore"
-              style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
-              onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
-              onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
-            />
-            <input type="hidden" name="source" value="beta-landing-page" />
-            <button type="submit" style={{ ...btnPrimary, padding: '14px 24px', width: '100%', fontSize: 15, justifyContent: 'center' }}>
-              Join the Beta
-            </button>
-          </form>
+          <a href="https://formspree.io/f/xkoenolr" style={{ ...btnPrimary, padding: '14px 32px', fontSize: 15, display: 'inline-flex', textDecoration: 'none' }}>Join the Beta <ArrowRight size={16} /></a>
           <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, marginTop: 12 }}>No spam. Unsubscribe anytime. We'll only email you about beta access.</p>
         </div>
       </section>
