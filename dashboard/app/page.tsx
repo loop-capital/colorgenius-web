@@ -89,40 +89,12 @@ export default function LandingPage() {
               onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
               onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
             />
-            {/* Feature interest */}
-            <div style={{ padding: '8px 0' }}>
-              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, marginBottom: 8 }}>What features matter most to you?</p>
-              {[
-                { name: 'interest_formulation', label: 'AI color formulation' },
-                { name: 'interest_color_mgmt', label: 'Color management & inventory tracking' },
-                { name: 'interest_client_history', label: 'Client history & photos' },
-                { name: 'interest_education', label: 'Education & training' },
-              ].map(opt => (
-                <label key={opt.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '3px 0', cursor: 'pointer' }}>
-                  <input type="checkbox" name={opt.name} value="yes"
-                    style={{ width: 16, height: 16, accentColor: '#9333EA', cursor: 'pointer' }}
-                  />
-                  <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>{opt.label}</span>
-                </label>
-              ))}
-            </div>
-
-            {/* Role preference */}
-            <div style={{ padding: '8px 0' }}>
-              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, marginBottom: 8 }}>How do you want to use COLORgenius?</p>
-              {[
-                { name: 'role', value: 'contribute', label: 'I want to contribute — share formulas, educate, and earn' },
-                { name: 'role', value: 'discover', label: 'I want to discover — learn from others and use their formulas' },
-                { name: 'role', value: 'both', label: 'Both' },
-              ].map(opt => (
-                <label key={opt.value} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '3px 0', cursor: 'pointer' }}>
-                  <input type="radio" name={opt.name} value={opt.value}
-                    style={{ width: 16, height: 16, accentColor: '#9333EA', cursor: 'pointer' }}
-                  />
-                  <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>{opt.label}</span>
-                </label>
-              ))}
-            </div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 0', cursor: 'pointer' }}>
+              <input type="checkbox" name="interest_color_mgmt" value="yes"
+                style={{ width: 18, height: 18, accentColor: '#9333EA', cursor: 'pointer' }}
+              />
+              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>Also interested in color management & waste reduction</span>
+            </label>
             <input type="hidden" name="source" value="beta-landing-page" />
             <button type="submit" style={{ ...btnPrimary, padding: '14px 24px', width: '100%', fontSize: 15, justifyContent: 'center' }}>
               Join the Beta
