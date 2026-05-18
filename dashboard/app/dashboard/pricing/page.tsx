@@ -36,9 +36,15 @@ export default function PricingPage() {
       const res = await fetch('/api/v1/pricing/config');
       if (res.ok) {
         const data = await res.json();
-        setMarkupPercent(data.config.markupPercent ?? 100);
-        setApplyToColor(data.config.applyToColor ?? true);
-        setApplyToDeveloper(data.config.applyToDeveloper ?? true);
+        const cfg = {
+          markupPercent: data.config.markupPercent ?? 100,
+          applyToColor: data.config.applyToColor ?? true,
+          applyToDeveloper: data.config.applyToDeveloper ?? true,
+        };
+        setMarkupPercent(cfg.markupPercent);
+        setApplyToColor(cfg.applyToColor);
+        setApplyToDeveloper(cfg.applyToDeveloper);
+        setInitialConfig(cfg);
       }
     } catch {}
     setLoading(false);
@@ -69,8 +75,11 @@ export default function PricingPage() {
     setSaving(false);
   };
 
+  const [initialConfig, setInitialConfig] = useState({ markupPercent: 100, applyToColor: true, applyToDeveloper: true });
   const multiplier = 1 + markupPercent / 100;
-  const hasChanges = true; // simplified for now
+  const hasChanges = markupPercent !== initialConfig.markupPercent ||
+    applyToColor !== initialConfig.applyToColor ||
+    applyToDeveloper !== initialConfig.applyToDeveloper;
 
   return (
     <div className="min-h-screen p-4 md:p-8" style={{ background: 'var(--cg-bg-deep)' }}>

@@ -1,28 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
+import { analyzeImageBuffer } from '@/lib/photo-analysis-server';
 
-/**
- * POST /api/photos/[id]/analyze
- * Trigger AI analysis on a specific photo.
- *
- * The analysis pipeline:
- * 1. Fetch photo from storage
- * 2. Run color extraction (RGB averages, hex codes per section)
- * 3. Detect underlying pigment (warmth/coolness ratio)
- * 4. Estimate porosity from cuticle visibility
- * 5. Assess damage level
- * 6. Store AnalysisResult record
- *
- * Request body (optional):
- *   - forceReanalyze: boolean (default false, re-runs even if already completed)
- *   - modelVersion: string (override default AI model version)
- *
- * Response:
- *   202: { success: true, data: { photoId, analysisStatus: "processing", estimatedTimeSeconds } }
- *   404: { error: "Photo not found" }
- *   409: { error: "Analysis already completed. Use forceReanalyze=true to override." }
- *   500: { error: "Analysis failed" }
- */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -31,65 +10,57 @@ export async function POST(
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
     const forceReanalyze = body.forceReanalyze || false;
-    const modelVersion = body.modelVersion || 'v1.0.0';
 
-    // TODO: Fetch photo from database
-    // const photo = await prisma.photo.findUnique({
-    //   where: { id },
-    //   include: { session: true },
-    // });
-    //
-    // if (!photo) {
-    //   return NextResponse.json({ error: 'Photo not found' }, { status: 404 });
-    // }
-    //
-    // if (photo.analysisStatus === 'completed' && !forceReanalyze) {
-    //   return NextResponse.json(
-    //     { error: 'Analysis already completed. Use forceReanalyze=true to override.' },
-    //     { status: 409 }
-    //   );
-    // }
+    const photo = await prisma.photo_analyses.findUnique({
+      where: { id },
+      select: { id: true, processing_status: true, original_url: true },
+    });
 
-    // TODO: Update photo status to processing
-    // await prisma.photo.update({
-    //   where: { id },
-    //   data: { analysisStatus: 'processing' },
-    // });
+    if (!photo) {
+      return NextResponse.json({ error: 'Photo not found' }, { status: 404 });
+    }
 
-    // TODO: Queue analysis job (background worker)
-    // Analysis pipeline:
-    // 1. Download image from storage
-    // 2. Run color extraction algorithm
-    //    - Sample regions: roots, mid-shaft, ends
-    //    - Calculate RGB averages per region
-    //    - Convert to hex codes
-    //    - Compute confidence scores based on lighting quality
-    // 3. Detect underlying pigment
-    //    - Calculate warmth/coolness ratio from RGB distribution
-    //    - Map to pigment name: Red, Orange, Yellow, etc.
-    // 4. Estimate porosity
-    //    - Analyze cuticle visibility from surface reflection
-    //    - Score 0-100 (low/medium/high thresholds)
-    // 5. Assess damage level
-    //    - Evaluate texture and color uniformity
-    //    - Classify: none, minimal, moderate, severe
-    // 6. Store AnalysisResult record
-    // 7. Update photo analysisStatus to 'completed'
+    if (photo.processing_status === 'completed' && !forceReanalyze) {
+      return NextResponse.json(
+        { error: 'Analysis already completed. Use forceReanalyze=true to override.' },
+        { status: 409 }
+      );
+    }
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: {
-          photoId: id,
-          analysisStatus: 'processing',
-          estimatedTimeSeconds: 3,
-          modelVersion,
-        },
+    const startMs = Date.now();
+
+    await prisma.photo_analyses.update({
+      where: { id },
+      data: { processing_status: 'processing', processing_started_at: new Date() },
+    });
+
+    const imageRes = await fetch(photo.original_url);
+    if (!imageRes.ok) {
+      await prisma.photo_analyses.update({
+        where: { id },
+        data: { processing_status: 'failed', error_message: `Failed to fetch image: ${imageRes.status}` },
+      });
+      return NextResponse.json({ error: 'Could not retrieve photo for analysis' }, { status: 502 });
+    }
+
+    const buffer = Buffer.from(await imageRes.arrayBuffer());
+    const result = await analyzeImageBuffer(buffer);
+
+    await prisma.photo_analyses.update({
+      where: { id },
+      data: {
+        processing_status: 'completed',
+        processing_completed_at: new Date(),
+        processing_time_ms: Date.now() - startMs,
+        results: result as any,
       },
-      { status: 202 }
-    );
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Analysis failed';
-    return NextResponse.json({ error: message }, { status: 500 });
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: { photoId: id, analysisStatus: 'completed', result },
+    });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Analysis failed' }, { status: 500 });
   }
 }

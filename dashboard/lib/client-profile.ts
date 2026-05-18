@@ -130,7 +130,24 @@ export function normalizeHairProfile(raw: unknown): HairProfile {
 }
 
 /* ───── profile ↔ form state mapping ───── */
-import type { ChemicalHistory, SensitivityFlags } from './formulation';
+
+export interface ChemicalHistory {
+  boxDye?: boolean;
+  metallicSalts?: boolean;
+  henna?: boolean;
+  keratinTreatment?: boolean;
+  relaxer?: boolean;
+  lastService?: string;
+  hardWater?: boolean;
+  medicationBuildup?: boolean;
+}
+
+export interface SensitivityFlags {
+  ppdAllergy?: boolean;
+  isPregnant?: boolean;
+  isBreastfeeding?: boolean;
+  activeChemo?: boolean;
+}
 
 export interface FormState {
   clientId?: string;
@@ -203,21 +220,21 @@ export function mergeProfileFromFormulation(
 
   return {
     ...existing,
-    texture: input.texture ?? existing.texture,
-    hairPattern: input.hairType ?? existing.hairPattern,
-    density: input.density ?? existing.density,
+    texture: (input.texture as HairTexture) ?? existing.texture,
+    hairPattern: (input.hairType as HairPattern) ?? existing.hairPattern,
+    density: (input.density as HairDensity) ?? existing.density,
     porosity: input.condition.porosity ?? existing.porosity,
 
     chemicalHistory: input.chemicalHistory
       ? {
-          boxDye: input.chemicalHistory.boxDye,
-          metallicSalts: input.chemicalHistory.metallicSalts,
-          henna: input.chemicalHistory.henna,
-          keratinTreatment: input.chemicalHistory.keratinTreatment,
-          relaxer: input.chemicalHistory.relaxer,
-          lastService: input.chemicalHistory.lastService,
-          hardWater: input.chemicalHistory.hardWater,
-          medicationBuildup: input.chemicalHistory.medicationBuildup,
+          boxDye: input.chemicalHistory.boxDye ?? false,
+          metallicSalts: input.chemicalHistory.metallicSalts ?? false,
+          henna: input.chemicalHistory.henna ?? false,
+          keratinTreatment: input.chemicalHistory.keratinTreatment ?? false,
+          relaxer: input.chemicalHistory.relaxer ?? false,
+          lastService: (input.chemicalHistory.lastService as LastServiceOption) ?? 'never',
+          hardWater: input.chemicalHistory.hardWater ?? false,
+          medicationBuildup: input.chemicalHistory.medicationBuildup ?? false,
           lastServiceType: input.serviceType ?? existing.chemicalHistory?.lastServiceType,
           lastServiceDate: now,
         }
@@ -239,7 +256,7 @@ export function mergeProfileFromFormulation(
     lastObservedTone: input.currentTone ?? existing.lastObservedTone,
     lastObservedCondition: input.condition.type ?? existing.lastObservedCondition,
     lastServiceDate: now,
-    lastFormulaId: result.formulaId ?? null,
+    lastFormulaId: (result as any).formulaId ?? null,
 
     updatedAt: now,
     updatedBy: stylistId,

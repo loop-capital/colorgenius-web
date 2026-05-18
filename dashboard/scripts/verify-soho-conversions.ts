@@ -1,5 +1,5 @@
 // Manual verification script for SOHO manufacturer conversions
-import { getManufacturerConversion, hasManufacturerMapping, getSupportedBrands } from '../lib/conversion/manufacturer-conversions';
+import { getManufacturerConversion, hasManufacturerMapping, getSupportedCHIBrands } from '../lib/conversion/manufacturer-conversions';
 
 console.log('=== SOHO Manufacturer Conversion Tests ===\n');
 
@@ -28,7 +28,7 @@ console.log('\n--- Utility Checks ---');
 console.log('hasManufacturerMapping(soho → kenra):', hasManufacturerMapping('soho', 'kenra'));
 console.log('hasManufacturerMapping(kenra → soho):', hasManufacturerMapping('kenra', 'soho'));
 console.log('hasManufacturerMapping(kenra → wella):', hasManufacturerMapping('kenra', 'wella'));
-console.log('Supported brands count:', getSupportedBrands().length);
-console.log('Supported brands:', getSupportedBrands().slice(0, 5), '...');
+console.log('Supported brands count:', getSupportedCHIBrands().length);
+console.log('Supported brands:', getSupportedCHIBrands().slice(0, 5), '...');
 
 console.log('\n=== All tests complete ===');

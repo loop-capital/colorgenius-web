@@ -1,33 +1,35 @@
-import { prisma } from './prisma';
+import { prisma as _prisma } from './prisma';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const prisma = _prisma as any;
 import type { User } from './auth';
 import { getTierConfig, countLinesInBrands, type TierConfig } from './subscription-tiers';
 
 export async function getAllUsers(): Promise<User[]> {
-  const dbUsers = await prisma.user.findMany();
-  return dbUsers.map(u => prismaToUser(u));
+  const dbUsers = await prisma.users.findMany();
+  return dbUsers.map((u: Record<string, unknown>) => prismaToUser(u));
 }
 
 export async function findUserById(id: string): Promise<User | null> {
-  const u = await prisma.user.findUnique({ where: { id } });
+  const u = await prisma.users.findUnique({ where: { id } });
   return u ? prismaToUser(u) : null;
 }
 
 export async function findUserByEmail(email: string): Promise<User | null> {
-  const u = await prisma.user.findUnique({
+  const u = await prisma.users.findUnique({
     where: { email: email.toLowerCase() },
   });
   return u ? prismaToUser(u) : null;
 }
 
 export async function findUserByUsername(username: string): Promise<User | null> {
-  const u = await prisma.user.findUnique({
+  const u = await prisma.users.findUnique({
     where: { username: username.toLowerCase() },
   });
   return u ? prismaToUser(u) : null;
 }
 
 export async function findUserByUsernameOrEmail(usernameOrEmail: string): Promise<User | null> {
-  const u = await prisma.user.findFirst({
+  const u = await prisma.users.findFirst({
     where: {
       OR: [
         { username: { equals: usernameOrEmail.toLowerCase() } },
@@ -39,7 +41,7 @@ export async function findUserByUsernameOrEmail(usernameOrEmail: string): Promis
 }
 
 export async function addUser(user: User): Promise<void> {
-  await prisma.user.create({
+  await prisma.users.create({
     data: {
       id: user.id,
       email: user.email,
@@ -102,7 +104,7 @@ export async function updateUser(id: string, data: Partial<User>): Promise<User 
 
   if (Object.keys(updateData).length === 0) return null;
 
-  const u = await prisma.user.update({
+  const u = await prisma.users.update({
     where: { id },
     data: updateData,
   });

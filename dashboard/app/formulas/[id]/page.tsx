@@ -202,7 +202,6 @@ export default function FormulaDetailPage() {
             steps={steps}
             developerMl={developer?.ml || 60}
             brand={brand}
-            markup={markup}
           />
         </div>
 

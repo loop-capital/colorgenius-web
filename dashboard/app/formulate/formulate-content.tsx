@@ -18,7 +18,6 @@ import { StockCheck } from '@/components/stock-check'
 import CorrectiveColorPanel, { CorrectiveBadge } from '@/lib/corrective-color/CorrectiveColorPanel'
 import { diagnose, type CorrectiveIssue, type HairState } from '@/lib/corrective-color/engine'
 import type { ToneFamily } from '@/lib/products'
-import { validateChemicalHardStops } from '@/lib/formulation'
 import VisualOutcomeSimulator from '@/components/visual-outcome/VisualOutcomeSimulator'
 import ConversionPanel from '@/components/conversion/ConversionPanel'
 import ContextualEducation from '@/components/education/ContextualEducation'
@@ -522,8 +521,8 @@ export default function FormulatePage() {
                   )}
                 </div>
               )}
-              {photo && <p style={{ fontSize: 12, color: '#71717A' }}>Photo captured ✓</p>
-              <button type="button" onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Next: Hair Assessment'} <ChevronRight size={16} /></button>
+              {photo && <p style={{ fontSize: 12, color: '#71717A' }}>Photo captured ✓</p>}
+              <button type="button" onClick={() => setStep(2)} style={btnPrimary}>Next: Hair Assessment <ChevronRight size={16} /></button>
             </div>
           </div>
         )}

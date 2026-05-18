@@ -420,7 +420,7 @@ export default function LibraryPage() {
       if (!acc[f.brand].includes(f.line)) acc[f.brand].push(f.line)
       return acc
     },
-    {}
+    {} as Record<string, string[]>
   ), [formulas])
 
   // Auto-classify all formulas for enriched search
@@ -579,10 +579,6 @@ export default function LibraryPage() {
               onChange={(e) => {
                 setDesiredResultQuery(e.target.value)
               }}
-              onBlur={() => {
-                const val = desiredResultQuery.trim()
-                if (val.length > 2) logTrendSearch(val, 'free-text')
-              }}
               className={cn(
                 'w-full pl-9 pr-4 py-3 rounded-xl text-sm transition-all duration-200',
                 'placeholder:text-[#71717A]',
@@ -600,6 +596,8 @@ export default function LibraryPage() {
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
                 e.currentTarget.style.boxShadow = 'none'
+                const val = desiredResultQuery.trim()
+                if (val.length > 2) logTrendSearch(val, 'free-text')
               }}
             />
           </div>

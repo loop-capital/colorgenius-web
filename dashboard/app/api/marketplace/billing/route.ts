@@ -117,12 +117,17 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    const totalCreatorEarnings = lineItems.reduce((sum, l) => sum + l.creator_earnings_cents, 0);
+    const totalPlatformFee = lineItems.reduce((sum, l) => sum + l.platform_fee_cents, 0);
+
     // Create invoice
     const invoice: MonthlyBillingInvoice = {
       id: generateId(),
       stylist_id: targetStylistId,
       billing_period: data.period,
       total_cents: totalCents,
+      total_creator_earnings_cents: totalCreatorEarnings,
+      total_platform_fee_cents: totalPlatformFee,
       line_items: lineItems,
       status: 'pending',
       created_at: new Date().toISOString(),

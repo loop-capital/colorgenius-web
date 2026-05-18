@@ -57,10 +57,12 @@ export async function convertShade(
   targetLine?: string
 ): Promise<MatchCandidate | null> {
   // ── Manufacturer-provided mapping (highest priority) ──
+  // Use displayCode (original unprefixed code) so reverse lookups work for multi-line brands.
+  const lookupCode = sourceShade.displayCode ?? sourceShade.code;
   const manufacturerResult = getManufacturerConversion(
     sourceShade.brand,
     targetBrand,
-    sourceShade.code
+    lookupCode
   );
   if (manufacturerResult) {
     const mappedShade = findShadeByCode(targetBrand, manufacturerResult.targetCode);
@@ -70,7 +72,7 @@ export async function convertShade(
         shade: mappedShade,
         confidence: manufacturerResult.confidence,
         matchType: 'exact',
-        notes: `${chartBrand} mapping: ${sourceShade.code} → ${manufacturerResult.targetCode}`,
+        notes: `${chartBrand} mapping: ${lookupCode} → ${manufacturerResult.targetCode}`,
       };
     }
   }

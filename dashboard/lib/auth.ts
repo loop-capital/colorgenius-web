@@ -1,7 +1,12 @@
 import { SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 
-const JWT_SECRET = new TextEncoder().encode('colorgenius-prod-secret-2026');
+if (!process.env.JWT_SECRET) {
+  console.warn('[auth] JWT_SECRET env var is not set — using insecure fallback. Set JWT_SECRET in production.');
+}
+export const JWT_SECRET_KEY = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'colorgenius-prod-secret-2026'
+);
 const COOKIE_NAME = 'colorgenius_token';
 
 export interface User {
@@ -22,7 +27,7 @@ export async function generateToken(user: User): Promise<string> {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(JWT_SECRET);
+    .sign(JWT_SECRET_KEY);
 }
 
 export async function getTokenFromCookie(): Promise<string | null> {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
+import { uploadToR2, getPresignedUploadUrl, R2_PUBLIC_URL } from '@/lib/r2';
 
 /**
  * POST /api/photos/upload
@@ -7,7 +7,7 @@ import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
  *
  * Supports two upload modes:
  * 1. Direct upload: Multipart form data with file
- * 2. Presigned URL: Returns a signed URL for client-side S3/R2 upload
+ * 2. Presigned URL: Returns a signed URL for client-side R2 upload
  *
  * Request body (multipart):
  *   - file: File (image/jpeg, image/png, image/webp; max 5MB)
@@ -33,7 +33,6 @@ export async function POST(request: NextRequest) {
     // Presigned URL mode (JSON request)
     if (contentType.includes('application/json')) {
       const body = await request.json();
-
       const { sessionId, angle, contentType: fileContentType, contentLength } = body;
 
       if (!sessionId || !angle) {
@@ -51,7 +50,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Validate content length (< 5MB)
       if (contentLength && contentLength > 5 * 1024 * 1024) {
         return NextResponse.json(
           { error: 'File too large. Maximum size is 5MB' },
@@ -59,53 +57,27 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Generate presigned upload URL using our Cloudflare Worker
-      const workerUrl = 'https://colorgenius-r2-upload.shiny-sky-8891.workers.dev/upload';
-      const workerResponse = await fetch(workerUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId,
-          angle,
-          contentType: fileContentType || 'image/jpeg',
-        }),
-      });
+      const mimeType = fileContentType || 'image/jpeg';
+      const ext = mimeType.split('/')[1] || 'jpg';
+      const key = `photos/${sessionId}/${angle}-${Date.now()}.${ext}`;
 
-      if (!workerResponse.ok) {
-        throw new Error(`Worker responded with status: ${workerResponse.status}`);
-      }
-
-      const workerData = await workerResponse.json();
-
-      // Create Photo record in database (commented out for now as prisma isn't set up)
-      // const photo = await prisma.photo.create({
-      //   data: {
-      //     sessionId,
-      //     angle,
-      //     url: workerData.publicUrl,
-      //     original_url: workerData.publicUrl,
-      //     format: fileContentType?.split('/')[1] || 'jpeg',
-      //     file_size_bytes: contentLength,
-      //     analysisStatus: 'pending',
-      //   },
-      // });
+      const uploadUrl = await getPresignedUploadUrl(key, mimeType);
+      const publicUrl = `${R2_PUBLIC_URL}/${key}`;
 
       const photo = {
         id: crypto.randomUUID(),
         sessionId,
         angle,
-        uploadUrl: workerData.uploadUrl,
-        url: workerData.publicUrl,
-        original_url: workerData.publicUrl,
-        format: (fileContentType || 'image/jpeg').split('/')[1],
+        uploadUrl,
+        url: publicUrl,
+        original_url: publicUrl,
+        format: ext,
         file_size_bytes: contentLength,
-        width: null, // extracted after processing
+        width: null,
         height: null,
         analysisStatus: 'pending',
         createdAt: new Date().toISOString(),
-        key: workerData.key,
+        key,
       };
 
       return NextResponse.json({ success: true, data: photo }, { status: 201 });
@@ -147,44 +119,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For direct upload, we still use the worker to get a presigned URL
-    const workerUrl = 'https://colorgenius-r2-upload.shiny-sky-8891.workers.dev/upload';
-    const workerResponse = await fetch(workerUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sessionId,
-        angle,
-        contentType: file.type,
-      }),
-    });
-
-    if (!workerResponse.ok) {
-      throw new Error(`Worker responded with status: ${workerResponse.status}`);
-    }
-
-    const workerData = await workerResponse.json();
-
-    // TODO: Upload file directly to the presigned URL
-    // TODO: Create Photo record in database
-    // TODO: Generate thumbnail
+    const ext = file.type.split('/')[1] || 'jpg';
+    const key = `photos/${sessionId}/${angle}-${Date.now()}.${ext}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const publicUrl = await uploadToR2(key, buffer, file.type);
 
     const photo = {
       id: crypto.randomUUID(),
       sessionId,
       angle,
-      uploadUrl: workerData.uploadUrl,
-      url: workerData.publicUrl,
-      original_url: workerData.publicUrl,
+      url: publicUrl,
+      original_url: publicUrl,
       file_size_bytes: file.size,
-      format: file.type.split('/')[1],
-      width: null, // extracted after processing
+      format: ext,
+      width: null,
       height: null,
       analysisStatus: 'pending',
       createdAt: new Date().toISOString(),
-      key: workerData.key,
+      key,
     };
 
     return NextResponse.json({ success: true, data: photo }, { status: 201 });

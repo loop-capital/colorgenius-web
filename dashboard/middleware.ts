@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = new TextEncoder().encode('colorgenius-prod-secret-2026');
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || 'colorgenius-prod-secret-2026'
+);
 
-// Public paths that don't require auth
 const PUBLIC_PATHS = [
   '/',
   '/login',
@@ -17,17 +18,27 @@ const PUBLIC_PATHS = [
   '/api/auth/apple/callback',
   '/api/auth/google',
   '/api/auth/google/callback',
-  '/api/v1/pricing/config',
   '/api/health',
-  '/api/clients',
-  '/api/v1/formulas',
-  '/api/v1/inventory',
-  '/api/v1/pricing',
-  '/api/formulas',
+  '/monitoring',
 ];
 
 export async function middleware(request: NextRequest) {
-  // Cache bust — force edge revalidation after deploy
+  const { pathname } = request.nextUrl;
+
+  const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'));
+
+  if (!isPublic) {
+    const token = request.cookies.get('colorgenius_token')?.value;
+    if (!token) {
+      return redirectToLogin(request);
+    }
+    try {
+      await jwtVerify(token, JWT_SECRET);
+    } catch {
+      return redirectToLogin(request);
+    }
+  }
+
   const response = NextResponse.next();
   response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
   response.headers.set('Vercel-CDN-Cache-Control', 'public, max-age=0, must-revalidate');

@@ -42,7 +42,7 @@ export default function BeforeAfterSwatch({ input, result }: BeforeAfterSwatchPr
   );
 
   const afterHex = blendColor(
-    HAIR_LEVELS[result.targetLevel ?? input.targetLevel]?.hex || '#C08C5A',
+    HAIR_LEVELS[input.targetLevel]?.hex || '#C08C5A',
     getToneHexFromInput(targetToneCode),
     0.45
   );

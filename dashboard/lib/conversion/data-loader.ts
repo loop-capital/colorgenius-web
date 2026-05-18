@@ -75,6 +75,18 @@ import matrixSoColorSpecs from '../../data/brands/matrix-socolor-specs.json';
 import pravanaChromaSilkSpecs from '../../data/brands/pravana/chromasilk-specs.json';
 import toneFamilyMapData from '../../data/brands/tone-family-map.json';
 
+function prefixShades(shades: NormalizedShade[], prefix: string): NormalizedShade[] {
+  return shades.map(s => ({ ...s, displayCode: s.displayCode ?? s.code, code: `${prefix}-${s.code}` }));
+}
+
+function prefixShadesByLine(shades: NormalizedShade[], lineToPrefix: Record<string, string>): NormalizedShade[] {
+  return shades.map(s => {
+    const prefix = lineToPrefix[s.line];
+    if (!prefix) return { ...s, displayCode: s.displayCode ?? s.code };
+    return { ...s, displayCode: s.displayCode ?? s.code, code: `${prefix}-${s.code}` };
+  });
+}
+
 const shadeData: Record<string, NormalizedShade[]> = {
   schwarzkopf: schwarzkopfShades as unknown as NormalizedShade[],
   moroccanoil: moroccanoilShades as unknown as NormalizedShade[],
@@ -82,39 +94,39 @@ const shadeData: Record<string, NormalizedShade[]> = {
   davines: davinesShades as unknown as NormalizedShade[],
   aveda: avedaShades as unknown as NormalizedShade[],
   oligo: [
-    ...(oligoShades as unknown as NormalizedShade[]),
-    ...(oligoTenShades as unknown as NormalizedShade[]),
-    ...(oligoGlossShades as unknown as NormalizedShade[]),
+    ...prefixShades(oligoShades as unknown as NormalizedShade[], 'CA'),
+    ...prefixShades(oligoTenShades as unknown as NormalizedShade[], 'CT'),
+    ...prefixShades(oligoGlossShades as unknown as NormalizedShade[], 'CG'),
   ],
   lorealpro: [
-    ...(lorealproDiacolorShades as unknown as NormalizedShade[]),
-    ...(lorealproDialightShades as unknown as NormalizedShade[]),
-    ...(lorealproInoaShades as unknown as NormalizedShade[]),
-    ...(lorealproMajirelShades as unknown as NormalizedShade[]),
+    ...prefixShades(lorealproDiacolorShades as unknown as NormalizedShade[], 'DC'),
+    ...prefixShades(lorealproDialightShades as unknown as NormalizedShade[], 'DL'),
+    ...prefixShades(lorealproInoaShades as unknown as NormalizedShade[], 'IN'),
+    ...prefixShades(lorealproMajirelShades as unknown as NormalizedShade[], 'MJ'),
   ],
   kevinmurphy: kevinmurphyShades as unknown as NormalizedShade[],
   wella: [
-    ...(wellaColorTouchShades as unknown as NormalizedShade[]),
-    ...(wellaIlluminaShades as unknown as NormalizedShade[]),
-    ...(wellaShinefinityShades as unknown as NormalizedShade[]),
-    ...(kolestonShades as unknown as NormalizedShade[]),
+    ...prefixShadesByLine(wellaColorTouchShades as unknown as NormalizedShade[], { 'color-touch': 'CT', 'color-touch-plus': 'CP' }),
+    ...prefixShades(wellaIlluminaShades as unknown as NormalizedShade[], 'IL'),
+    ...prefixShades(wellaShinefinityShades as unknown as NormalizedShade[], 'SF'),
+    ...prefixShades(kolestonShades as unknown as NormalizedShade[], 'KP'),
   ],
   redken: [
-    ...(redkenColorGelsShades as unknown as NormalizedShade[]),
-    ...(redkenShadesEQShades as unknown as NormalizedShade[]),
-    ...(redkenChromaticsShades as unknown as NormalizedShade[]),
+    ...prefixShades(redkenColorGelsShades as unknown as NormalizedShade[], 'GL'),
+    ...prefixShades(redkenShadesEQShades as unknown as NormalizedShade[], 'EQ'),
+    ...prefixShadesByLine(redkenChromaticsShades as unknown as NormalizedShade[], { 'chromatics': 'CR', 'chromatics-remixed': 'RX' }),
   ],
   joico: [
-    ...(joicoLumishinePermanentShades as unknown as NormalizedShade[]),
-    ...(joicoLumishineDemiLiquidShades as unknown as NormalizedShade[]),
-    ...(joicoLumishineDimensionalDepositShades as unknown as NormalizedShade[]),
-    ...(joicoVeroKpakShades as unknown as NormalizedShade[]),
+    ...prefixShades(joicoLumishinePermanentShades as unknown as NormalizedShade[], 'LP'),
+    ...prefixShades(joicoLumishineDemiLiquidShades as unknown as NormalizedShade[], 'LD'),
+    ...prefixShades(joicoLumishineDimensionalDepositShades as unknown as NormalizedShade[], 'DD'),
+    ...prefixShades(joicoVeroKpakShades as unknown as NormalizedShade[], 'VK'),
   ],
   matrix: [
-    ...(matrixSoColorShades as unknown as NormalizedShade[]),
-    ...(matrixSoColorSyncShades as unknown as NormalizedShade[]),
-    ...(matrixSuperSyncShades as unknown as NormalizedShade[]),
-    ...(matrixTonalControlShades as unknown as NormalizedShade[]),
+    ...prefixShades(matrixSoColorShades as unknown as NormalizedShade[], 'SC'),
+    ...prefixShades(matrixSoColorSyncShades as unknown as NormalizedShade[], 'SS'),
+    ...prefixShades(matrixSuperSyncShades as unknown as NormalizedShade[], 'SP'),
+    ...prefixShades(matrixTonalControlShades as unknown as NormalizedShade[], 'TC'),
   ],
   pravana: [
     ...(pravanaChromaSilkShades as unknown as NormalizedShade[]),
@@ -213,7 +225,12 @@ export function getBrandDisplayName(brand: string): string {
 
 export function findShadeByCode(brand: string, shadeCode: string): NormalizedShade | null {
   const shades = loadBrandShades(brand);
-  return shades.find(s => s.code === shadeCode || s.code === shadeCode.replace(/-/g, '.')) || null;
+  const normalized = shadeCode.replace(/-/g, '.');
+  return (
+    shades.find(s => s.code === shadeCode || s.code === normalized) ||
+    shades.find(s => s.displayCode === shadeCode || s.displayCode === normalized) ||
+    null
+  );
 }
 
 export function getPreferredLine(brand: string): string {

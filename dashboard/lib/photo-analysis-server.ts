@@ -1,6 +1,6 @@
-// Server-side Photo Analysis — uses sharp for image decoding
-// Mirrors the client-side photo-analysis.ts logic but works in Node.js API routes
+// Server-side Photo Analysis — Kimi vision primary, k-means pixel pipeline as fallback/supplement
 
+// Kimi K2.6 vision via Ollama OpenAI-compatible endpoint (no SDK needed)
 import sharp from 'sharp';
 import { HAIR_LEVELS, TONE_DESCRIPTORS, ToneFamily } from './products';
 
@@ -442,62 +442,181 @@ function kMeans(
     .sort((a, b) => b.count - a.count);
 }
 
+// ─── Vision Analysis (Kimi K2.6 primary, Claude Haiku fallback) ───────────────
+
+const VALID_TONES = new Set([
+  'neutral','ash','golden','copper','red','violet','pearl','beige','mahogany','chocolate','warm','cool',
+]);
+const VALID_CONDITIONS = new Set(['excellent','good','fair','damaged','severely_damaged']);
+
+// Env config — uses Ollama native /api/chat (image_url not supported by kimi-k2.6:cloud)
+const OLLAMA_URL   = process.env.OLLAMA_VISION_URL ?? 'http://127.0.0.1:11434/api/chat';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL      ?? 'kimi-k2.6:cloud';
+const OLLAMA_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 18000); // 18 s
+
+const VISION_PROMPT = `You are a professional colorist. Analyze this hair photo and respond with ONLY a JSON object — no prose, no markdown fences.
+
+Required fields:
+- level: integer 1-10 (1=black, 10=lightest blonde)
+- tone: one of: neutral, ash, golden, copper, red, violet, pearl, beige, mahogany, chocolate, warm, cool
+- grayPercent: integer 0-100 (percentage of visible gray/white hair)
+- condition: one of: excellent, good, fair, damaged, severely_damaged
+- porosity: one of: low, medium, high
+- highlights: boolean (true if balayage, foils, or hand-painted highlights visible)
+- isMultiTonal: boolean (true if two or more distinct color levels/tones are present)
+- recommendations: array of up to 3 short strings, each a specific colorist note
+
+Assess the OVERALL hair color (not just highlights), ignoring background and skin.`;
+
+interface VisionResult {
+  level: number;
+  tone: ToneFamily;
+  grayPercent: number;
+  condition: HairCondition;
+  porosity: 'low' | 'medium' | 'high';
+  highlights: boolean;
+  isMultiTonal: boolean;
+  recommendations: string[];
+}
+
+function parseVisionJSON(text: string): VisionResult | null {
+  const clean = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+  try {
+    const parsed = JSON.parse(clean) as Record<string, unknown>;
+    const level = typeof parsed.level === 'number' ? Math.max(1, Math.min(10, Math.round(parsed.level))) : null;
+    const tone = typeof parsed.tone === 'string' && VALID_TONES.has(parsed.tone) ? parsed.tone as ToneFamily : null;
+    const condition = typeof parsed.condition === 'string' && VALID_CONDITIONS.has(parsed.condition) ? parsed.condition as HairCondition : null;
+    if (level === null || tone === null || condition === null) return null;
+    return {
+      level,
+      tone,
+      grayPercent: typeof parsed.grayPercent === 'number' ? Math.max(0, Math.min(100, Math.round(parsed.grayPercent))) : 0,
+      condition,
+      porosity: (parsed.porosity === 'low' || parsed.porosity === 'high') ? parsed.porosity : 'medium',
+      highlights: parsed.highlights === true,
+      isMultiTonal: parsed.isMultiTonal === true,
+      recommendations: Array.isArray(parsed.recommendations)
+        ? (parsed.recommendations as unknown[]).filter(r => typeof r === 'string').slice(0, 3) as string[]
+        : [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+// Primary: Kimi K2.6 via Ollama native /api/chat (images array format)
+async function analyzeWithKimi(jpegBase64: string): Promise<VisionResult | null> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), OLLAMA_TIMEOUT_MS);
+    const response = await fetch(OLLAMA_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.OLLAMA_API_KEY ? { Authorization: `Bearer ${process.env.OLLAMA_API_KEY}` } : {}),
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: OLLAMA_MODEL,
+        stream: false,
+        messages: [{
+          role: 'user',
+          content: VISION_PROMPT,
+          images: [jpegBase64],
+        }],
+      }),
+    }).finally(() => clearTimeout(timer));
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    // Native Ollama response: { message: { content: "..." } }
+    const text: string = data.message?.content?.trim() || '';
+    return text ? parseVisionJSON(text) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Fallback: Claude Haiku (only when ANTHROPIC_API_KEY is set and Kimi unavailable)
+async function analyzeWithClaude(jpegBase64: string): Promise<VisionResult | null> {
+  if (!process.env.ANTHROPIC_API_KEY) return null;
+  try {
+    const { default: Anthropic } = await import('@anthropic-ai/sdk');
+    const client = new Anthropic();
+    const msg = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 512,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: jpegBase64 } },
+          { type: 'text', text: VISION_PROMPT },
+        ],
+      }],
+    });
+    const text = msg.content[0]?.type === 'text' ? msg.content[0].text.trim() : '';
+    return text ? parseVisionJSON(text) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Orchestrator: Kimi first, Claude fallback
+async function analyzeWithVision(jpegBase64: string): Promise<VisionResult | null> {
+  const kimiResult = await analyzeWithKimi(jpegBase64);
+  if (kimiResult) return kimiResult;
+  return analyzeWithClaude(jpegBase64);
+}
+
 // ─── Main Server-side Entry Point ─────────────────────────────────────────────
 
 export async function analyzeImageBuffer(buffer: Buffer): Promise<HairAnalysisResult> {
-  // 1. Decode image with sharp
-  const { data, info } = await sharp(buffer)
-    .raw()
-    .ensureAlpha()
-    .resize(400, 400, { fit: 'inside', withoutEnlargement: true })
-    .toBuffer({ resolveWithObject: true });
+  // 1. Decode & resize with sharp — produce both raw pixels AND a JPEG for Claude
+  const [pixelResult, jpegBuffer] = await Promise.all([
+    sharp(buffer)
+      .raw()
+      .ensureAlpha()
+      .resize(400, 400, { fit: 'inside', withoutEnlargement: true })
+      .toBuffer({ resolveWithObject: true }),
+    sharp(buffer)
+      .resize(800, 800, { fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality: 85 })
+      .toBuffer(),
+  ]);
 
-  const pixels = new Uint8ClampedArray(data);
-  const width = info.width;
-  const height = info.height;
+  const pixels = new Uint8ClampedArray(pixelResult.data);
+  const width = pixelResult.info.width;
+  const height = pixelResult.info.height;
 
-  // 2. Face detection
+  // 2. K-means pixel pipeline (always runs — provides raw metrics & hex colors)
   const faceRegion = detectFaceRegion(pixels, width, height);
   const faceDetected = faceRegion !== null;
 
-  // 3. Extract hair region
   const hairPixelsRaw = extractHairPixels(pixels, width, height, faceRegion);
   let hairRegionFound = hairPixelsRaw.length > 50;
 
-  // Fallback: sample center region
   if (!hairRegionFound) {
-    const fallbackPixels: Array<{ r: number; g: number; b: number }> = [];
     const marginX = Math.floor(width * 0.2);
     const marginY = Math.floor(height * 0.2);
     for (let y = marginY; y < height - marginY; y += 2) {
       for (let x = marginX; x < width - marginX; x += 2) {
         const i = (y * width + x) * 4;
-        fallbackPixels.push({ r: pixels[i], g: pixels[i + 1], b: pixels[i + 2] });
+        hairPixelsRaw.push({ r: pixels[i], g: pixels[i + 1], b: pixels[i + 2], x, y });
       }
     }
-    hairPixelsRaw.push(...fallbackPixels.map((p, i) => ({
-      ...p,
-      x: marginX + (i % 100),
-      y: marginY + Math.floor(i / 100),
-    })));
     hairRegionFound = hairPixelsRaw.length > 50;
   }
 
-  // 4. Preprocessing
   const hairColors = hairPixelsRaw.map(p => ({ r: p.r, g: p.g, b: p.b }));
   const normalizedColors = normalizeBrightness(hairColors);
   const processedColors = autoContrast(normalizedColors);
 
-  // 5. Gray detection
-  const { grayPercent } = detectGrayPixels(processedColors);
-
-  // 6. Clustering
+  const { grayPercent: pixelGrayPercent } = detectGrayPixels(processedColors);
   const clusters = kMeans(processedColors, 4);
   const hairClusters = clusters.filter(c => {
-    const brightness = (c.r + c.g + c.b) / 3;
-    return brightness > 12 && brightness < 248;
+    const b = (c.r + c.g + c.b) / 3;
+    return b > 12 && b < 248;
   });
-
   const dominant = hairClusters[0] || clusters[0];
   const secondary = hairClusters[1];
 
@@ -505,71 +624,66 @@ export async function analyzeImageBuffer(buffer: Buffer): Promise<HairAnalysisRe
     throw new Error('Could not detect hair color. Please use a clearer, well-lit photo.');
   }
 
-  // 7. Level & Tone
-  const { level: currentLevel, confidence: levelConf } = detectLevel(dominant.r, dominant.g, dominant.b);
-  const { tone: currentTone, warmthRatio, confidence: toneConf } = detectTone(dominant.r, dominant.g, dominant.b, currentLevel);
   const hsl = rgbToHsl(dominant.r, dominant.g, dominant.b);
-
-  // 8. Metrics
   const brightnesses = processedColors.map(p => (p.r + p.g + p.b) / 3);
   const avgBrightness = brightnesses.reduce((a, b) => a + b, 0) / brightnesses.length;
   const brightnessStdDev = Math.sqrt(
     brightnesses.reduce((s, b) => s + Math.pow(b - avgBrightness, 2), 0) / brightnesses.length
   );
-  const redRatio = processedColors.reduce((s, p) => s + p.r, 0) / processedColors.length / 255;
-  const yellowRatio = processedColors.reduce((s, p) => s + Math.min(p.r, p.g) / Math.max(p.b, 1), 0) / processedColors.length;
-  const blueRatio = processedColors.reduce((s, p) => s + p.b, 0) / processedColors.length / 255;
-  const grayPixelRatio = grayPercent / 100;
-  const darkPixelRatio = brightnesses.filter(b => b < 50).length / brightnesses.length;
-  const lightPixelRatio = brightnesses.filter(b => b > 200).length / brightnesses.length;
   const uniformity = 1 - Math.min(1, brightnessStdDev / 80);
-
-  // 9. Condition
-  const { condition, score: conditionScore, indicators } = assessCondition(
-    processedColors, grayPercent, uniformity, brightnessStdDev
+  const { condition: pixelCondition, score: pixelConditionScore, indicators } = assessCondition(
+    processedColors, pixelGrayPercent, uniformity, brightnessStdDev
   );
+  const { level: pixelLevel, confidence: levelConf } = detectLevel(dominant.r, dominant.g, dominant.b);
+  const { tone: pixelTone, warmthRatio, confidence: toneConf } = detectTone(dominant.r, dominant.g, dominant.b, pixelLevel);
 
-  // 10. Confidence
-  const confidence = Math.min(0.95, ((levelConf + toneConf) / 2) * (hairRegionFound ? 1 : 0.7));
+  // 3. Claude vision — runs in parallel (already started above via Promise.all on sharp)
+  const jpegBase64 = jpegBuffer.toString('base64');
+  const vision = await analyzeWithVision(jpegBase64);
 
-  // 11. Recommendations
-  const recommendations: string[] = [];
-  if (grayPercent > 30) {
-    recommendations.push(`High gray coverage (${Math.round(grayPercent)}%) — use permanent color with higher developer volume`);
-  } else if (grayPercent > 10) {
-    recommendations.push(`Moderate gray (${Math.round(grayPercent)}%) — consider demi-permanent or permanent with low-volume developer`);
+  // 4. Merge: Claude wins on semantic fields when available; k-means fills pixel metrics
+  const currentLevel = vision?.level ?? pixelLevel;
+  const currentTone = vision?.tone ?? pixelTone;
+  const grayPercent = vision?.grayPercent ?? Math.round(pixelGrayPercent);
+  const condition = vision?.condition ?? pixelCondition;
+  const conditionScore = VALID_CONDITIONS.has(condition)
+    ? { excellent: 90, good: 77, fair: 62, damaged: 47, severely_damaged: 25 }[condition] ?? pixelConditionScore
+    : pixelConditionScore;
+
+  // Porosity: Claude's read overrides pixel estimate when available
+  if (vision?.porosity) {
+    indicators.porosityEstimate = vision.porosity;
   }
-  if (condition === 'damaged' || condition === 'severely_damaged') {
-    recommendations.push('Hair condition compromised — pre-treat with bond builder, use lower developer volume');
-    if (indicators.porosityEstimate === 'high') {
-      recommendations.push('High porosity detected — color may grab darker; go 1/2 level lighter');
+
+  // 5. Recommendations: Claude's are more nuanced; append pixel-derived ones only if unique
+  const recommendations: string[] = vision ? [...vision.recommendations] : [];
+
+  if (!vision) {
+    if (grayPercent > 30) recommendations.push(`High gray coverage (${grayPercent}%) — use permanent color with higher developer volume`);
+    else if (grayPercent > 10) recommendations.push(`Moderate gray (${grayPercent}%) — consider demi-permanent or permanent with low-volume developer`);
+    if (condition === 'damaged' || condition === 'severely_damaged') {
+      recommendations.push('Hair condition compromised — pre-treat with bond builder, use lower developer volume');
+      if (indicators.porosityEstimate === 'high') recommendations.push('High porosity detected — color may grab darker; go 1/2 level lighter');
     }
   }
-  if (condition === 'fair') {
-    recommendations.push('Fair condition — use demi-permanent or gentle permanent formula');
+  if (vision?.isMultiTonal && !recommendations.some(r => r.toLowerCase().includes('multi'))) {
+    recommendations.push('Multi-tonal hair detected — balayage or color melting technique recommended');
   }
-  if (currentLevel <= 3 && currentTone !== 'ash') {
-    recommendations.push('Dark base with warmth — ash or cool tones will prevent brassiness');
-  }
-  if (warmthRatio > 0.3 && currentLevel >= 6) {
-    recommendations.push('Warm natural base — golden/copper shades will enhance warmth beautifully');
-  }
-  if (warmthRatio < -0.2 && currentLevel >= 5) {
-    recommendations.push('Cool base detected — violet or ash tones will neutralize unwanted warmth');
-  }
-  if (secondary && Math.abs((secondary.r + secondary.g + secondary.b) / 3 - avgBrightness) > 40) {
-    recommendations.push('Multi-tonal hair detected — balayage or color melting techniques recommended');
-  }
-  if (!faceDetected) {
+  if (!faceDetected && !vision) {
     recommendations.push('Face not clearly detected — for best results, use a front-facing photo with good lighting');
   }
+
+  // 6. Confidence: Claude gives 0.92 baseline; k-means fallback gives its own score
+  const confidence = vision
+    ? 0.92 * (hairRegionFound ? 1 : 0.9)
+    : Math.min(0.95, ((levelConf + toneConf) / 2) * (hairRegionFound ? 1 : 0.7));
 
   return {
     currentLevel,
     currentLevelName: HAIR_LEVELS[currentLevel]?.name || 'Unknown',
     currentTone,
     toneName: TONE_DESCRIPTORS[currentTone] || currentTone,
-    grayPercent: Math.round(grayPercent),
+    grayPercent,
     condition,
     conditionScore,
     damageIndicators: indicators,
@@ -584,12 +698,12 @@ export async function analyzeImageBuffer(buffer: Buffer): Promise<HairAnalysisRe
     rawMetrics: {
       avgBrightness: Math.round(avgBrightness),
       brightnessStdDev: Math.round(brightnessStdDev),
-      redRatio: Math.round(redRatio * 100) / 100,
-      yellowRatio: Math.round(yellowRatio * 100) / 100,
-      blueRatio: Math.round(blueRatio * 100) / 100,
-      grayPixelRatio: Math.round(grayPixelRatio * 100) / 100,
-      darkPixelRatio: Math.round(darkPixelRatio * 100) / 100,
-      lightPixelRatio: Math.round(lightPixelRatio * 100) / 100,
+      redRatio: Math.round(processedColors.reduce((s, p) => s + p.r, 0) / processedColors.length / 255 * 100) / 100,
+      yellowRatio: Math.round(processedColors.reduce((s, p) => s + Math.min(p.r, p.g) / Math.max(p.b, 1), 0) / processedColors.length * 100) / 100,
+      blueRatio: Math.round(processedColors.reduce((s, p) => s + p.b, 0) / processedColors.length / 255 * 100) / 100,
+      grayPixelRatio: Math.round(pixelGrayPercent) / 100,
+      darkPixelRatio: Math.round(brightnesses.filter(b => b < 50).length / brightnesses.length * 100) / 100,
+      lightPixelRatio: Math.round(brightnesses.filter(b => b > 200).length / brightnesses.length * 100) / 100,
       uniformity: Math.round(uniformity * 100) / 100,
       sampleSize: processedColors.length,
     },

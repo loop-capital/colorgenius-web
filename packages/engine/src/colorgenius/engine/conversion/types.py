@@ -80,6 +80,7 @@ class NormalizedShade:
     isHighLift: bool
     isDemi: bool
     grayCoverage: Optional[str]
+    displayCode: Optional[str] = None
 
 
 @dataclass

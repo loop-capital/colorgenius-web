@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { generateToken, setAuthCookie } from '@/lib/auth';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://beuiayrnzbgvvqfgsenc.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
@@ -12,9 +14,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
     }
 
-    const crypto = await import('crypto');
-    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-
     const res = await fetch(`${SUPABASE_URL}/rest/v1/users?select=*&email=eq.${encodeURIComponent(email)}&is_active=eq.true&limit=1`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
@@ -25,7 +24,27 @@ export async function POST(request: Request) {
     }
 
     const user = users[0];
-    if (user.password_hash !== passwordHash) {
+    const storedHash: string = user.password_hash;
+
+    // Support bcrypt hashes ($2b$) and legacy SHA256 hashes during migration
+    let passwordValid = false;
+    if (storedHash.startsWith('$2')) {
+      passwordValid = await bcrypt.compare(password, storedHash);
+    } else {
+      // Legacy SHA256 — check and upgrade to bcrypt on success
+      const sha256Hash = crypto.createHash('sha256').update(password).digest('hex');
+      passwordValid = storedHash === sha256Hash;
+      if (passwordValid) {
+        const newHash = await bcrypt.hash(password, 12);
+        await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${user.id}`, {
+          method: 'PATCH',
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password_hash: newHash }),
+        });
+      }
+    }
+
+    if (!passwordValid) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 

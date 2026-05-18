@@ -133,9 +133,7 @@ export async function GET(request: Request) {
     }
 
     // Issue our own session JWT
-    const jwtSecret = new TextEncoder().encode(
-      process.env.JWT_SECRET || 'colorgenius-prod-secret-2026'
-    );
+    const { JWT_SECRET_KEY: jwtSecret } = await import('@/lib/auth');
 
     const sessionToken = await new SignJWT({
       userId: user.id,

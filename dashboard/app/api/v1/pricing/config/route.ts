@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = new TextEncoder().encode('colorgenius-prod-secret-2026');
+import { JWT_SECRET_KEY as JWT_SECRET } from '@/lib/auth';
 
 const DEFAULT_CONFIG = {
   costPlusMode: true,

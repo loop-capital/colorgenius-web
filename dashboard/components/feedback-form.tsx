@@ -35,11 +35,18 @@ export function FeedbackForm({ formulaId, formulaTitle, onSubmit, onClose }: Fee
       rating,
       tags: selectedTags,
       comment,
-      adjustment, // What they did differently — becomes training data
+      adjustment,
     };
 
-    // In production: POST to feedback API
-    console.log('Feedback submitted:', feedback);
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(feedback),
+      });
+    } catch {
+      // Non-fatal — still show thank-you
+    }
     onSubmit?.(feedback);
     setSubmitted(true);
   }

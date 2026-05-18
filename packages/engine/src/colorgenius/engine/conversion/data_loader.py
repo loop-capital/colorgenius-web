@@ -18,6 +18,104 @@ WORKSPACE_ROOT = Path(__file__).resolve().parents[6]
 DATA_DIR = WORKSPACE_ROOT / "data" / "brands"
 
 
+# Line abbreviation prefixes for multi-line brands (mirrors data-loader.ts).
+# Key is the canonical brand slug used by load_brand_shades(); value maps
+# the shade's line field → prefix string.  When a brand has multiple lines
+# sharing the same shade codes, each shade.code is prefixed so it becomes
+# unique.  The original code is preserved as displayCode for the UI.
+_LINE_PREFIXES: Dict[str, Dict[str, str]] = {
+    "matrix": {
+        "socolor": "SC",
+        "socolor-sync": "SS",
+        "super-sync": "SP",
+        "tonal-control": "TC",
+    },
+    "redken": {
+        "color-gels-lacquers": "GL",
+        "shades-eq": "EQ",
+        "chromatics": "CR",
+        "chromatics-remixed": "RX",
+    },
+    "joico": {
+        "lumishine-permanent": "LP",
+        "lumishine-demi-liquid": "LD",
+        "lumishine-dimensional-deposit": "DD",
+        "vero-kpak": "VK",
+    },
+    "lorealpro": {
+        "diacolor": "DC",
+        "dialight": "DL",
+        "inoa": "IN",
+        "majirel": "MJ",
+    },
+    "wella": {
+        "color-touch": "CT",
+        "color-touch-plus": "CP",
+        "illumina": "IL",
+        "shinefinity": "SF",
+        "koleston-perfect": "KP",
+    },
+    "oligo": {
+        "calura": "CA",
+        "calura-ten": "CT",
+        "calura-gloss": "CG",
+    },
+    "kenra": {
+        "kenra-permanent": "KP",
+        "kenra-demi-permanent": "KD",
+    },
+    "pulpriot": {
+        "faction8": "F8",
+        "liquid-demi": "LD",
+    },
+    "pravana": {
+        "chromasilk": "CS",
+        "vivids": "VV",
+    },
+    "schwarzkopf": {
+        "IGORA ROYAL Permanent Color": "IP",
+        "IGORA ROYAL Absolutes": "IA",
+        "IGORA ROYAL Ultra Blonde (10- Series)": "IU",
+        "IGORA ROYAL Special Blonde (12- Series)": "IS",
+        "IGORA ROYAL Highlifts (9.5- Series)": "IH",
+        "IGORA ROYAL Silver Whites & Specials": "IW",
+        "IGORA ROYAL Fashion Lights": "IF",
+    },
+    "moroccanoil": {
+        "Color Rhapsody Permanent Cream Color": "RP",
+        "Color Rhapsody High Lift Permanent Cream Color": "RH",
+        "Color Calypso Demi-Permanent Gloss": "CD",
+        "Color Infusion Pure Color Mixer": "CI",
+    },
+    "davines": {
+        "View": "VW",
+        "A New Colour": "NC",
+        "Mask with Vibrachrom": "MV",
+    },
+    "kevinmurphy": {
+        "color.me": "CM",
+        "color-me": "CM",
+    },
+}
+
+
+def _apply_line_prefix(shade: NormalizedShade, brand_slug: str) -> NormalizedShade:
+    """Prefix shade.code with line abbreviation if the brand has multiple lines.
+    Uses brand_slug (the canonical lookup key) rather than shade.brand, since
+    the brand field in JSON data may differ from the loader's slug convention.
+    Sets displayCode to the original code for use in the UI.
+    """
+    brand_prefixes = _LINE_PREFIXES.get(brand_slug)
+    if not brand_prefixes:
+        return shade
+    prefix = brand_prefixes.get(shade.line)
+    if not prefix:
+        return shade
+    shade.displayCode = shade.code
+    shade.code = f"{prefix}-{shade.code}"
+    return shade
+
+
 # ─── Shade Data Cache ───────────────────────────────────────────────────────
 
 _shade_cache: Dict[str, List[NormalizedShade]] = {}
@@ -103,20 +201,34 @@ def load_brand_shades(brand: str) -> List[NormalizedShade]:
         }
         if brand in subdirs:
             sub = subdirs[brand]
-            # Try to find any shades file in the subdir
             subdir = DATA_DIR / sub
             if subdir.exists():
-                for f in subdir.iterdir():
-                    if f.is_file() and ("shade" in f.name or "toner" in f.name):
-                        file_data = _load_json(f)
-                        if file_data is not None:
-                            if isinstance(file_data, dict):
-                                if "shades" in file_data:
-                                    file_data = file_data["shades"]
-                                elif "toners" in file_data:
-                                    file_data = file_data["toners"]
-                            if isinstance(file_data, list):
-                                all_data.extend(file_data)
+                # Prefer shades-normalized.json if present — it's the pre-merged
+                # canonical file, so loading it alone avoids double-counting shades
+                # that appear in both the normalized file and individual line files.
+                normalized_path = subdir / "shades-normalized.json"
+                if normalized_path.exists():
+                    file_data = _load_json(normalized_path)
+                    if file_data is not None:
+                        if isinstance(file_data, dict):
+                            if "shades" in file_data:
+                                file_data = file_data["shades"]
+                            elif "toners" in file_data:
+                                file_data = file_data["toners"]
+                        if isinstance(file_data, list):
+                            all_data.extend(file_data)
+                else:
+                    for f in subdir.iterdir():
+                        if f.is_file() and ("shade" in f.name or "toner" in f.name):
+                            file_data = _load_json(f)
+                            if file_data is not None:
+                                if isinstance(file_data, dict):
+                                    if "shades" in file_data:
+                                        file_data = file_data["shades"]
+                                    elif "toners" in file_data:
+                                        file_data = file_data["toners"]
+                                if isinstance(file_data, list):
+                                    all_data.extend(file_data)
                 data = all_data if all_data else None
 
     if data is None:
@@ -151,7 +263,9 @@ def load_brand_shades(brand: str) -> List[NormalizedShade]:
                 isHighLift=item.get("isHighLift", False),
                 isDemi=item.get("isDemi", False),
                 grayCoverage=item.get("grayCoverage", None),
+                displayCode=item.get("displayCode", None),
             )
+            shade = _apply_line_prefix(shade, brand)
             shades.append(shade)
         except Exception:
             continue

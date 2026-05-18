@@ -22,6 +22,7 @@ export type ToneFamily =
 
 export interface NormalizedShade {
   code: string;
+  displayCode?: string;
   brand: string;
   line: string;
   level: number;

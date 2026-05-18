@@ -84,6 +84,24 @@ function formatDeveloper(specs: any): string {
   return '20 vol';
 }
 
+// ─── LINE UPT LOOKUP ─────────────────────────────────────────────────────────
+// Maps known product line keywords to gray-coverage UPT (0-100).
+// Permanent color = 100, demi-permanent = 50, semi/toner/gloss = 0.
+const LINE_UPT_MAP: Array<{ pattern: RegExp; upt: number }> = [
+  // Demi-permanents (developer activates but no lift, limited gray coverage)
+  { pattern: /color touch|shades eq|colorync|majirel glow|vibrancy|dialight|acidic color gloss|shinefinity|color balance|ilumina/i, upt: 50 },
+  // Semi-permanent / toners / glosses (zero gray coverage)
+  { pattern: /gloss|toner|semi.?permanent|direct dye|pastel|neon|vivid|chromatics overlay/i, upt: 0 },
+  // Everything else assumed permanent
+];
+
+function getLineUPT(lineName: string, grayCoverage?: boolean): number {
+  for (const { pattern, upt } of LINE_UPT_MAP) {
+    if (pattern.test(lineName)) return upt;
+  }
+  return grayCoverage === false ? 0 : 100;
+}
+
 // ─── SLUGIFY ─────────────────────────────────────────────────────────────────
 
 function slugify(str: string): string {
@@ -102,8 +120,9 @@ function shadeToProduct(shade: NormalizedShade, brandKey: string, specs: any): P
   // Developer from specs
   let developer = formatDeveloper(specs);
 
-  // UPT: 100 for grayCoverage shades, 0 otherwise
-  const upt = shade.grayCoverage ? 100 : 0;
+  // UPT: line-aware gray coverage capacity (permanent=100, demi=50, semi/toner=0)
+  const grayCoverageFlag = shade.grayCoverage !== null ? shade.grayCoverage !== 'none' : undefined;
+  const upt = getLineUPT(shade.line, grayCoverageFlag);
 
   return {
     id,

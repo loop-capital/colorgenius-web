@@ -126,9 +126,6 @@ export async function GET(request: NextRequest) {
   });
 }
 
-/**
- * Get synced products for a salon (internal use)
- */
-export function getSyncedProducts(salonId: string): SyncedProduct[] {
+function getSyncedProducts(salonId: string): SyncedProduct[] {
   return salonProducts.get(salonId) || [];
 }
