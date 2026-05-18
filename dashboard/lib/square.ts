@@ -112,6 +112,19 @@ export async function createSquarePayment(params: {
   return response.payment;
 }
 
+// ── Inventory Counts ──
+export async function getInventoryCounts(catalogObjectIds: string[]): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  if (!catalogObjectIds.length) return counts;
+  const response = await squareClient.inventory.batchGetCounts({ catalogObjectIds });
+  for (const count of response.data ?? []) {
+    if (count.catalogObjectId) {
+      counts.set(count.catalogObjectId, Number(count.quantity ?? 0));
+    }
+  }
+  return counts;
+}
+
 // ── Verify Webhook Signature ──
 import { WebhooksHelper } from 'square';
 

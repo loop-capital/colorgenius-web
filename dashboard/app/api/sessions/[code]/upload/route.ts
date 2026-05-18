@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { uploadToR2 } from '@/lib/r2';
 
 /**
  * POST /api/sessions/[code]/upload
@@ -72,20 +71,12 @@ export async function POST(
       );
     }
 
-    // Save file locally
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     const ext = file.type.split('/')[1] || 'jpg';
-    const filename = `${sessionCode.formulationSessionId}-${Date.now()}.${ext}`;
-
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'sessions');
-    await mkdir(uploadDir, { recursive: true });
-
-    const filepath = path.join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-
-    const photoUrl = `/uploads/sessions/${filename}`;
+    const key = `sessions/${sessionCode.formulationSessionId}-${Date.now()}.${ext}`;
+    const photoUrl = await uploadToR2(key, buffer, file.type);
 
     // Update formulation session with photo URL
     await prisma.formulation_sessions.update({

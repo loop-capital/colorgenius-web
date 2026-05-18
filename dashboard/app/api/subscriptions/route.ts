@@ -14,7 +14,7 @@ import { z } from 'zod';
 
 // ── Subscription Plans ──
 
-export interface SubscriptionPlan {
+interface SubscriptionPlan {
   id: string;
   name: string;
   price_cents: number;
@@ -23,7 +23,7 @@ export interface SubscriptionPlan {
   square_plan_id?: string; // Square subscription plan variation ID
 }
 
-export const PLANS: SubscriptionPlan[] = [
+const PLANS: SubscriptionPlan[] = [
   {
     id: 'starter',
     name: 'Starter',
@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, error: { code: 'VALIDATION_ERROR', message: error.errors[0].message } }, { status: 400 });
+      return NextResponse.json({ success: false, error: { code: 'VALIDATION_ERROR', message: error.issues[0]?.message } }, { status: 400 });
     }
     return NextResponse.json({ success: false, error: { code: 'INTERNAL_ERROR' } }, { status: 500 });
   }

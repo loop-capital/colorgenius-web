@@ -46,15 +46,16 @@ export async function GET(
               select: {
                 id: true,
                 created_at: true,
-                input_data: true,
-                output_data: true,
-                confidence: true,
+                name: true,
+                product_brand: true,
+                product_shade: true,
+                developer_vol: true,
               },
             },
           },
         },
         // Get formula photos
-        formulaPhotos: {
+        formula_photos: {
           orderBy: { created_at: 'desc' },
           take: 20,
           select: {
@@ -73,8 +74,8 @@ export async function GET(
               select: {
                 id: true,
                 name: true,
-                brand: true,
-                line: true,
+                product_brand: true,
+                product_line: true,
               },
             },
           },
@@ -100,7 +101,7 @@ export async function GET(
     }).catch(() => {}) // non-critical
 
     // Check if portal requires phone verification
-    const isPrivate = client.stylist?.portal_privacy === 'private'
+    const isPrivate = client.stylists?.portal_privacy === 'private'
 
     // Build response
     const portalData = {
@@ -112,15 +113,15 @@ export async function GET(
         nextAppointment: client.next_appointment_at,
         memberSince: client.created_at,
       },
-      stylist: client.stylist ? {
-        name: client.stylist.display_name || `${client.stylist.first_name} ${client.stylist.last_name}`,
-        handle: client.stylist.instagram_handle,
-        avatar: client.stylist.avatar_url,
+      stylist: client.stylists ? {
+        name: client.stylists.display_name || `${client.stylists.first_name} ${client.stylists.last_name}`,
+        handle: client.stylists.instagram_handle,
+        avatar: client.stylists.avatar_url,
       } : null,
       hairProfile: client.hair_profile,
       conditions: client.conditions,
       privacy: isPrivate ? 'private' : 'public',
-      photos: client.formulaPhotos.map((p) => ({
+      photos: client.formula_photos.map((p) => ({
         id: p.id,
         beforeUrl: p.before_url,
         afterUrl: p.after_url,
@@ -134,8 +135,8 @@ export async function GET(
         processingTime: p.processing_time,
         formula: p.formulas ? {
           name: p.formulas.name,
-          brand: p.formulas.brand,
-          line: p.formulas.line,
+          brand: p.formulas.product_brand,
+          line: p.formulas.product_line,
         } : null,
       })),
       visits: client.visits.map((v) => ({
@@ -143,12 +144,12 @@ export async function GET(
         date: v.visit_date,
         serviceType: v.service_type,
         notes: v.notes,
-        formulas: v.formulas.map((f: any) => ({
-          id: f.id,
-          date: f.created_at,
-          confidence: f.confidence,
-          output: f.output_data,
-        })),
+        formula: v.formulas ? {
+          id: v.formulas.id,
+          date: v.formulas.created_at,
+          name: v.formulas.name,
+          brand: v.formulas.product_brand,
+        } : null,
       })),
     }
 

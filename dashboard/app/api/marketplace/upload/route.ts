@@ -4,12 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-
-const R2_ENDPOINT = process.env.R2_ENDPOINT || '';
-const R2_ACCESS_KEY = process.env.R2_ACCESS_KEY || '';
-const R2_SECRET_KEY = process.env.R2_SECRET_ACCESS_KEY || '';
-const R2_BUCKET = process.env.R2_BUCKET_NAME || 'colorgenius-photos-beta';
-const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL || 'https://pub-bb99062a526e4db384e390a5bdd65455.r2.dev';
+import { uploadToR2 } from '@/lib/r2';
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,30 +25,13 @@ export async function POST(request: NextRequest) {
     }
 
     const ext = file.name.split('.').pop() || 'jpg';
-    const filename = `formulas/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const key = `formulas/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-
-    // Upload to R2 via S3-compatible API
-    if (R2_ENDPOINT && R2_ACCESS_KEY !== 'placeholder') {
-      const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
-      const s3 = new S3Client({
-        region: 'auto',
-        endpoint: R2_ENDPOINT,
-        credentials: { accessKeyId: R2_ACCESS_KEY, secretAccessKey: R2_SECRET_KEY },
-      });
-      await s3.send(new PutObjectCommand({
-        Bucket: R2_BUCKET,
-        Key: filename,
-        Body: buffer,
-        ContentType: file.type,
-      }));
-    }
-
-    const publicUrl = `${R2_PUBLIC_URL}/${filename}`;
+    const url = await uploadToR2(key, buffer, file.type);
 
     return NextResponse.json({
       success: true,
-      data: { url: publicUrl, filename, size: file.size, type: file.type },
+      data: { url, filename: key, size: file.size, type: file.type },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Upload failed';

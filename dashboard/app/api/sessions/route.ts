@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { jwtVerify } from 'jose';
-
-const JWT_SECRET = new TextEncoder().encode('colorgenius-prod-secret-2026');
+import { JWT_SECRET_KEY } from '@/lib/auth';
+import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 async function getSalonId(request: NextRequest, bodySalonId?: string): Promise<string | null> {
   if (bodySalonId) return bodySalonId;
   const token = request.cookies.get('colorgenius_token')?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, JWT_SECRET_KEY);
     const userId = payload.userId as string;
     const stylist = await prisma.stylists.findUnique({ where: { id: userId }, select: { salon_id: true } });
     return stylist?.salon_id || null;
@@ -70,6 +70,11 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const limit = rateLimit(getClientIdentifier(request), 60_000, 10);
+    if (!limit.success) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
 

@@ -55,7 +55,7 @@ function HairTypeSelector({
         Choose your client's hair texture for optimal framing guidance.
       </p>
       <div className="grid grid-cols-2 gap-3">
-        {options.map(({ type, label, icon, color }) => (
+        {options.map(({ type, label, icon }) => (
           <motion.button
             key={type}
             whileHover={{ scale: 1.02 }}
@@ -67,11 +67,7 @@ function HairTypeSelector({
               border: '1px solid rgba(255,255,255,0.08)',
             }}
           >
-            {typeof icon === 'string' ? (
-              <span style={{ fontSize: 32, color, lineHeight: 1 }}>{icon}</span>
-            ) : (
-              React.cloneElement(icon, { color, size: 32 })
-            )}
+            <span style={{ fontSize: 32, lineHeight: 1 }}>{icon}</span>
             <span className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>
               {label}
             </span>

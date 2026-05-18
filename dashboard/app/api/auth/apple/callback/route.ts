@@ -76,13 +76,14 @@ export async function POST(request: Request) {
 
     let code: string | null = null;
     let error: string | null = null;
+    let nameJson: string | null = null;
 
     if (contentType.includes('application/x-www-form-urlencoded')) {
       const formData = await request.formData();
       code = formData.get('code') as string;
       error = formData.get('error') as string;
-      const user = formData.get('user');
-      console.log('[Apple Callback] form_post - code:', !!code, 'error:', error, 'user:', user);
+      nameJson = formData.get('user') as string;
+      console.log('[Apple Callback] form_post - code:', !!code, 'error:', error, 'user:', !!nameJson);
     } else {
       const { searchParams } = new URL(request.url);
       code = searchParams.get('code');
@@ -122,8 +123,7 @@ export async function POST(request: Request) {
     const appleUserId = payload.sub;
     const email = payload.email;
 
-    // Apple only sends name on first sign-in, parse it from the form data
-    const nameJson = formData.get('user') as string;
+    // Apple only sends name on first sign-in (via form_post only)
     let firstName = '';
     let lastName = '';
     if (nameJson) {
@@ -202,9 +202,7 @@ export async function POST(request: Request) {
     }
 
     // Issue our own session JWT
-    const jwtSecret = new TextEncoder().encode(
-      process.env.JWT_SECRET || 'colorgenius-prod-secret-2026'
-    );
+    const { JWT_SECRET_KEY: jwtSecret } = await import('@/lib/auth');
 
     const sessionToken = await new SignJWT({
       userId: user.id,

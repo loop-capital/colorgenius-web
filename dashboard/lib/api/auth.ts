@@ -3,9 +3,7 @@
  */
 import { jwtVerify } from 'jose';
 import { NextRequest } from 'next/server';
-import { getTokenFromCookie } from '@/lib/auth';
-
-const JWT_SECRET = new TextEncoder().encode('colorgenius-prod-secret-2026');
+import { getTokenFromCookie, JWT_SECRET_KEY as JWT_SECRET } from '@/lib/auth';
 
 export interface CurrentUser {
   id: string;

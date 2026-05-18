@@ -3,7 +3,7 @@
  * In-memory storage for community, marketplace, and gallery endpoints
  */
 
-import { CommunityPost, VoteRecord, PostComment, Template, Purchase, GalleryItem, TrendingColor, SeasonalCollection, StylistPortfolio, Formula, FormulaUseEvent } from './types';
+import { CommunityPost, VoteRecord, PostComment, Template, Purchase, GalleryItem, TrendingColor, SeasonalCollection, StylistPortfolio, Formula, FormulaUseEvent, ClientRequest } from './types';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -738,6 +738,8 @@ export let formulas: Array<{
   processing_time: number;
   application: string;
   price_cents: number;
+  per_use_cents: number;
+  score: number;
   tier: string;
   rating: number;
   review_count: number;
@@ -757,6 +759,7 @@ export let useEvents: Array<{
   used_at: string;
   billed: boolean;
   invoice_id?: string;
+  billing_period?: string;
 }> = [];
 
 export let billingInvoices: Array<{

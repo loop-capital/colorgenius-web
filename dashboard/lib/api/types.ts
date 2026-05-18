@@ -259,6 +259,7 @@ export interface FormulaUseEvent {
   used_at: string;
   billed: boolean;
   invoice_id?: string;
+  billing_period?: string;
 }
 
 // ─── Marketplace Formula Types ──────────────────────────────────────────────────
@@ -285,8 +286,10 @@ export interface Formula {
   application?: string;
   score: number;
   tier: FormulaTier;
+  price_cents: number;
   per_use_cents: number;
   usage_count: number;
+  purchase_count: number;
   share_code: string;
   rating: number;
   review_count: number;
@@ -314,6 +317,13 @@ export interface ClientRequest {
   status: 'pending' | 'accepted' | 'declined' | 'completed';
   formula_ready: boolean;
   formula_id?: string;
+  formula_title?: string;
+  creator_name?: string;
+  tier?: string;
+  per_use_cents?: number;
+  color_hex?: string;
+  required_products?: string[];
+  decline_reason?: string;
   created_at: string;
   updated_at: string;
 }

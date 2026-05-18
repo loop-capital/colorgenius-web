@@ -103,7 +103,7 @@ export async function exchangeAuthCode(code: string): Promise<{
   expires_at: string;
   merchant_id: string;
 }> {
-  const response = await fetch(SQUARE_TOKEN_URL, {
+  const response = await fetch(SQUARE_TOKEN_URL.value, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -130,7 +130,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<{
   refresh_token: string;
   expires_at: string;
 }> {
-  const response = await fetch(SQUARE_TOKEN_URL, {
+  const response = await fetch(SQUARE_TOKEN_URL.value, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

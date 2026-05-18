@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getTokenFromCookie } from '@/lib/auth';
+import { getTokenFromCookie, JWT_SECRET_KEY } from '@/lib/auth';
 import { jwtVerify } from 'jose';
-
-const JWT_SECRET = new TextEncoder().encode('colorgenius-prod-secret-2026');
 
 export async function GET() {
   const token = await getTokenFromCookie();
@@ -11,7 +9,7 @@ export async function GET() {
   }
 
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, JWT_SECRET_KEY);
     return NextResponse.json({
       user: {
         id: payload.userId,

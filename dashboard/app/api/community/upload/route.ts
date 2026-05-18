@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiResponse } from '@/lib/api/types';
 import { getCurrentUser } from '@/lib/api/auth';
+import { uploadToR2 } from '@/lib/r2';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,27 +43,14 @@ export async function POST(request: NextRequest) {
       }, { status: 413 });
     }
 
-    // Use the same R2 worker as photos upload
-    const workerUrl = 'https://colorgenius-r2-upload.shiny-sky-8891.workers.dev/upload';
-    const workerResponse = await fetch(workerUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: `community-${user.id}-${Date.now()}`,
-        angle: 'community',
-        contentType: file.type,
-      }),
-    });
-
-    if (!workerResponse.ok) {
-      throw new Error(`Worker responded with status: ${workerResponse.status}`);
-    }
-
-    const workerData = await workerResponse.json();
+    const ext = file.type.split('/')[1] || 'jpg';
+    const key = `community/${user.id}/${Date.now()}.${ext}`;
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const url = await uploadToR2(key, buffer, file.type);
 
     return NextResponse.json<ApiResponse<{ url: string; key: string }>>({
       success: true,
-      data: { url: workerData.publicUrl, key: workerData.key },
+      data: { url, key },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Upload failed';

@@ -431,7 +431,7 @@ export class AcaiaScale {
 
   private handleNotification(event: Event): void {
     const target = event.target as BluetoothRemoteGATTCharacteristic;
-    const result = decodeMessage(target.value!.buffer);
+    const result = decodeMessage(target.value!.buffer as ArrayBuffer);
 
     if (!result) return;
 

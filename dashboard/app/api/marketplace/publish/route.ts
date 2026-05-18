@@ -107,8 +107,10 @@ export async function POST(request: NextRequest) {
       tags: data.tags,
       score,
       tier,
+      price_cents: tierPricing[tier],
       per_use_cents: tierPricing[tier],
       usage_count: 0,
+      purchase_count: 0,
       share_code: '', // Will be generated below
       rating: 0,
       review_count: 0,
@@ -121,7 +123,7 @@ export async function POST(request: NextRequest) {
     newFormula.share_code = generateShareCode(newFormula.id);
 
     // Add to marketplace
-    formulas.push(newFormula);
+    formulas.push(newFormula as unknown as typeof formulas[0]);
 
     return NextResponse.json({
       success: true,
@@ -141,7 +143,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: error.errors[0].message },
+        error: { code: 'VALIDATION_ERROR', message: error.issues[0]?.message },
       }, { status: 400 });
     }
     const message = error instanceof Error ? error.message : 'Failed to publish formula';

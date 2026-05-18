@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Package, Plus, X, Search } from 'lucide-react';
-import { ALL_PRODUCTS, BRANDS } from '@/lib/products';
+import { ALL_PRODUCTS, BRANDS, HAIR_LEVELS } from '@/lib/products';
 import { useCanEdit } from '@/lib/user-context';
 
 interface InventoryItem {
@@ -182,7 +182,7 @@ export function AddInventoryItem({ onAdded }: { onAdded?: () => void }) {
             >
               <div
                 className="w-8 h-8 rounded-lg flex-shrink-0"
-                style={{ backgroundColor: p.hex || '#7D5038' }}
+                style={{ backgroundColor: HAIR_LEVELS[p.level]?.hex || '#7D5038' }}
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate" style={{ color: 'var(--cg-text-primary)' }}>

@@ -2,6 +2,8 @@
 // Rules-based algorithm for professional color formulation
 
 import { Product, ALL_PRODUCTS, HAIR_LEVELS, ToneFamily } from './products';
+import { getManufacturerConversion } from './conversion/manufacturer-conversions';
+import { getBrandDisplayName } from './conversion/data-loader';
 
 export interface HairCondition {
   type: 'virgin' | 'previously_colored' | 'damaged' | 'highly_damaged';
@@ -9,6 +11,16 @@ export interface HairCondition {
   grayPercent: number; // 0-100
   highlights: boolean;
   highlightedPercent?: number; // 0-100
+  // Problem indicators
+  banding?: boolean;
+  hotRoots?: boolean;
+  previousLightener?: boolean;
+  multipleColors?: boolean;
+  greenCast?: boolean;
+  muddyToner?: boolean;
+  overAshy?: boolean;
+  colorGrab?: boolean;
+  hollowEnds?: boolean;
 }
 
 export interface FormulationInput {
@@ -19,6 +31,27 @@ export interface FormulationInput {
   condition: HairCondition;
   brandPreference?: string;
   linePreference?: string;
+  // Extended form fields
+  texture?: string;
+  hairType?: string;
+  density?: string;
+  serviceType?: string;
+  chemicalHistory?: {
+    boxDye?: boolean;
+    metallicSalts?: boolean;
+    henna?: boolean;
+    keratinTreatment?: boolean;
+    relaxer?: boolean;
+    lastService?: string;
+    hardWater?: boolean;
+    medicationBuildup?: boolean;
+  } | null;
+  sensitivityFlags?: {
+    ppdAllergy?: boolean;
+    isPregnant?: boolean;
+    isBreastfeeding?: boolean;
+    activeChemo?: boolean;
+  } | null;
 }
 
 export interface FormulationStep {
@@ -47,7 +80,7 @@ export interface FormulationResult {
   brand: string;
   line: string;
   assessment?: string;
-  underlyingPigment?: { description: string };
+  underlyingPigment?: { description: string; exposed?: string };
   quantity?: { description: string };
   confidence?: number; // 0-100
   adjustedConfidence?: number; // 0-1, for UI
@@ -66,6 +99,55 @@ const LIFT_CHART: Record<number, number> = {
   30: 2,
   40: 3,
   50: 4,
+};
+
+// ─── Per-Shade Developer Constraint ──────────────────────────────────────────
+// Parse "10-20 vol" / "20-40 vol" / "30 vol" → allowed volume list
+function parseDevVolumes(developerRequired: string): number[] {
+  const nums = (developerRequired.match(/\d+/g) ?? []).map(Number);
+  if (nums.length >= 2) {
+    const lo = Math.min(...nums);
+    const hi = Math.max(...nums);
+    return [10, 20, 30, 40].filter(v => v >= lo && v <= hi);
+  }
+  if (nums.length === 1) return [nums[0]];
+  return [10, 20, 30, 40]; // unknown — allow all
+}
+
+// ─── Per-Line Processing Time ─────────────────────────────────────────────────
+function getLineProcessingTime(line: string): { base: number; min: number; max: number } {
+  const l = line.toLowerCase();
+  if (/high.?lift|high lift/.test(l)) return { base: 50, min: 40, max: 60 };
+  if (/color touch|colour touch|shades eq|majirel glow|dialight|shinefinity|super sync|socolor sync|vibrance|chromatics overlay/.test(l))
+    return { base: 25, min: 20, max: 30 }; // demi-permanent
+  if (/toner|semi.?perm|gloss|direct dye|pastel|neon|vivid|acidic/.test(l))
+    return { base: 15, min: 10, max: 20 }; // semi/toner
+  return { base: 35, min: 25, max: 45 }; // standard permanent
+}
+
+// ─── Brand Display Name → Conversion Slug ────────────────────────────────────
+// Maps Product.brand display names back to the keys used in the conversion engine
+const BRAND_TO_SLUG: Record<string, string> = {
+  'Schwarzkopf Professional': 'schwarzkopf',
+  'MoroccanOil': 'moroccanoil',
+  "L'ANZA": 'lanza',
+  'Davines': 'davines',
+  'Aveda': 'aveda',
+  'Oligo Calura': 'oligo',
+  "L'Oréal Professionnel": 'lorealpro',
+  'Kevin Murphy COLOR.ME': 'kevinmurphy',
+  'Wella Professionals': 'wella',
+  'Redken': 'redken',
+  'Joico': 'joico',
+  'Matrix': 'matrix',
+  'Pravana': 'pravana',
+  'Kenra Professional': 'kenra',
+  'Alfaparf': 'alfaparf',
+  'Paul Mitchell': 'paulmitchell',
+  'Pulp Riot': 'pulpriot',
+  'R+Color': 'rcolor',
+  'SOHO': 'soho',
+  'CHI': 'chi',
 };
 
 // Neutralizing color theory — ash contains green/blue base that counteracts red
@@ -89,12 +171,7 @@ const NEUTRALIZERS: Record<ToneFamily, ToneFamily> = {
 function determineDeveloperVolume(input: FormulationInput): { volume: number; lift: number } {
   const levelDiff = input.targetLevel - input.currentLevel;
   
-  // Gray coverage boost
-  if (input.condition.grayPercent > 25) {
-    return { volume: 20, lift: 1 };
-  }
-
-  // Lifting required
+  // Lifting required takes priority — gray coverage boost only when depositing
   if (levelDiff > 0) {
     // Need to lift
     const requiredLift = levelDiff;
@@ -108,7 +185,10 @@ function determineDeveloperVolume(input: FormulationInput): { volume: number; li
     return { volume: 40, lift: 3 };
   }
 
-  // Deposit only (same level or darker)
+  // Deposit only (same level or darker) — boost to 20vol for high gray coverage
+  if (input.condition.grayPercent > 25) {
+    return { volume: 20, lift: 0 };
+  }
   return { volume: 10, lift: 0 };
 }
 
@@ -154,25 +234,59 @@ function findPrimaryColor(
 }
 
 function findSecondaryColor(
-  targetLevel: number,
-  targetTone: ToneFamily,
-  primaryTone: ToneFamily,
-  brand: string,
-  line: string
-): Product | null {
-  // Find complementary or enhancing shade
-  // E.g., for golden at level 7, a secondary could be copper or a different golden
+  input: FormulationInput,
+  primary: Product
+): { product: Product; grams: number; reason: string } | null {
+  const { targetLevel, targetTone, condition } = input;
+  const { brand, line } = primary;
 
-  const neutralizer = NEUTRALIZERS[targetTone];
-  
-  // If primary is warm, secondary can add depth
-  if (targetTone === 'warm' || targetTone === 'golden') {
-    const copper = ALL_PRODUCTS.find(p => 
-      p.level === targetLevel && 
-      (p.tone === 'copper' || p.secondaryTone === 'copper') &&
-      (p.brand.toLowerCase() === brand.toLowerCase()) && p.line.toLowerCase() === line.toLowerCase()
+  const inLine = (p: Product) =>
+    p.brand === brand && p.line === line && p.id !== primary.id;
+
+  // 1. Problem-condition corrections take priority
+  if (condition.overAshy) {
+    const warm = ALL_PRODUCTS.find(p =>
+      p.level === targetLevel && inLine(p) &&
+      (p.tone === 'warm' || p.tone === 'golden')
     );
-    if (copper) return copper;
+    if (warm) return { product: warm, grams: 10, reason: 'Warm secondary to counteract over-ashy tendency' };
+  }
+
+  if (condition.greenCast) {
+    const red = ALL_PRODUCTS.find(p =>
+      p.level === targetLevel && inLine(p) &&
+      (p.tone === 'red' || p.tone === 'copper' || p.secondaryTone === 'red')
+    );
+    if (red) return { product: red, grams: 5, reason: 'Red/copper secondary to counteract green cast' };
+  }
+
+  // 2. High gray (≥50%): blend in neutral secondary for anchor base
+  if (condition.grayPercent >= 50 && targetTone !== 'neutral') {
+    const neutral = ALL_PRODUCTS.find(p =>
+      p.level === targetLevel && inLine(p) && p.tone === 'neutral'
+    );
+    if (neutral) {
+      const grams = Math.min(30, Math.max(10, Math.round(60 * (condition.grayPercent / 100) * 0.4)));
+      return { product: neutral, grams, reason: `Neutral anchor blend for ${condition.grayPercent}% gray coverage` };
+    }
+  }
+
+  // 3. Ash/cool on warm base (levels ≤6): small warm soften to prevent flat result
+  if ((targetTone === 'ash' || targetTone === 'cool') && input.currentLevel <= 6 && !condition.overAshy) {
+    const golden = ALL_PRODUCTS.find(p =>
+      p.level === targetLevel && inLine(p) &&
+      (p.tone === 'golden' || p.tone === 'warm')
+    );
+    if (golden) return { product: golden, grams: 5, reason: 'Small golden addition prevents flat/green ash on warm base' };
+  }
+
+  // 4. Warm/golden: copper depth boost
+  if (targetTone === 'warm' || targetTone === 'golden') {
+    const copper = ALL_PRODUCTS.find(p =>
+      p.level === targetLevel && inLine(p) &&
+      (p.tone === 'copper' || p.secondaryTone === 'copper')
+    );
+    if (copper) return { product: copper, grams: 10, reason: 'Copper secondary for warm depth' };
   }
 
   return null;
@@ -190,19 +304,31 @@ function addCorrectiveAdditives(
     // For now, note it as a recommendation
   }
 
-  // Gray coverage: add N+ (neutral) for natural coverage
+  // Gray coverage: UPT-aware neutral additive
   if (input.condition.grayPercent > 25) {
+    const primaryUPT = primary.upt ?? 100;
+    // Prefer a high-coverage neutral from the same brand
     const neutral = ALL_PRODUCTS.find(p =>
       p.level === input.targetLevel &&
       p.tone === 'neutral' &&
-      p.brand === primary.brand
+      p.brand === primary.brand &&
+      p.id !== primary.id &&
+      (p.upt ?? 100) >= 75
+    ) ?? ALL_PRODUCTS.find(p =>
+      p.level === input.targetLevel &&
+      p.tone === 'neutral' &&
+      p.brand === primary.brand &&
+      p.id !== primary.id
     );
-    if (neutral && neutral.id !== primary.id) {
-      // Add ~20% neutral for gray blending
+
+    if (neutral) {
+      // Scale neutral amount: at UPT 100 add a small boost; at UPT 50 (demi) double it
+      const uptFactor = Math.min(2.0, 100 / Math.max(primaryUPT, 50));
+      const neutralGrams = Math.max(5, Math.min(20, Math.round(10 * (input.condition.grayPercent / 100) * uptFactor)));
       additives.push({
         product: neutral,
-        grams: Math.round(10 * (input.condition.grayPercent / 100)),
-        reason: `Neutral base for gray coverage (${input.condition.grayPercent}% gray)`,
+        grams: neutralGrams,
+        reason: `Neutral base for ${input.condition.grayPercent}% gray (primary UPT ${primaryUPT})`,
       });
     }
   }
@@ -235,6 +361,50 @@ function addCorrectiveAdditives(
   return additives;
 }
 
+// ─── Hard Stop Rules ──────────────────────────────────────────────────────────
+
+function buildHardStops(
+  input: FormulationInput,
+  primary: Product
+): { type: string; message: string }[] {
+  const stops: { type: string; message: string }[] = [];
+
+  // Carmilane shades are oil-based and must not be mixed
+  if (primary.line.toLowerCase().includes('carmilane')) {
+    stops.push({
+      type: 'carmilane_no_mix',
+      message: 'Carmilane shades are oil-based intermediary pigments and cannot be mixed with other products. Use as a standalone treatment only.',
+    });
+  }
+
+  // Cannot lift more than 4 levels from very dark in one session
+  const levelDiff = input.targetLevel - input.currentLevel;
+  if (levelDiff > 4 && input.currentLevel <= 4) {
+    stops.push({
+      type: 'excessive_lift_dark_base',
+      message: `Lifting ${levelDiff} levels from a level ${input.currentLevel} base in one session risks severe damage and unpredictable results. A multi-session plan is required.`,
+    });
+  }
+
+  // Cannot go lighter than level 10
+  if (input.targetLevel > 10) {
+    stops.push({
+      type: 'level_out_of_range',
+      message: 'Target level exceeds the maximum achievable level (10). Adjust your target.',
+    });
+  }
+
+  // Highly damaged hair cannot safely undergo high-lift
+  if (input.condition.type === 'highly_damaged' && levelDiff > 2) {
+    stops.push({
+      type: 'damaged_hair_high_lift',
+      message: 'Highly damaged hair cannot safely undergo more than 2 levels of lift. A bond treatment and conditioning program must be completed first.',
+    });
+  }
+
+  return stops;
+}
+
 // ─── Main Formulation Function ─────────────────────────────────────────────────
 
 export function formulate(input: FormulationInput): FormulationResult {
@@ -253,8 +423,25 @@ export function formulate(input: FormulationInput): FormulationResult {
     );
   }
 
+  // Warn if primary shade's UPT can't cover the gray percentage
+  if (input.condition.grayPercent > 25) {
+    const primaryForUPTCheck = findPrimaryColor(
+      Math.min(input.targetLevel, 10),
+      input.targetTone,
+      input.brandPreference,
+      input.linePreference
+    );
+    const uptCapacity = primaryForUPTCheck?.upt ?? 100;
+    if (uptCapacity < input.condition.grayPercent) {
+      warnings.push(
+        `Selected color line has limited gray coverage capacity (${uptCapacity}% UPT). ` +
+        `For ${input.condition.grayPercent}% gray, consider switching to a permanent color line for full coverage.`
+      );
+    }
+  }
+
   // Find primary color
-  const primary = findPrimaryColor(
+  let primary = findPrimaryColor(
     Math.min(input.targetLevel, 10),
     input.targetTone,
     input.brandPreference,
@@ -273,26 +460,55 @@ export function formulate(input: FormulationInput): FormulationResult {
       coverage: 'full',
       notes: [],
       warnings: ['No matching color found. Try adjusting target level or tone.'],
-      brand: primary?.brand || input.brandPreference || 'Wella',
-      line: primary?.line || input.linePreference || 'Koleston Perfect ME+',
+      brand: input.brandPreference || 'Wella',
+      line: input.linePreference || 'Koleston Perfect ME+',
     };
   }
+
+  // ── Brand-to-brand conversion routing ──────────────────────────────────────
+  // If the user has a brand preference and the algorithmic match is a different
+  // brand, attempt a manufacturer-chart conversion to the preferred brand.
+  if (input.brandPreference) {
+    const preferredSlug = BRAND_TO_SLUG[input.brandPreference] ?? input.brandPreference.toLowerCase().replace(/\s+/g, '');
+    const primarySlug = BRAND_TO_SLUG[primary.brand] ?? primary.brand.toLowerCase().replace(/\s+/g, '');
+    if (primarySlug !== preferredSlug) {
+      const conv = getManufacturerConversion(primarySlug, preferredSlug, primary.shadeCode);
+      if (conv) {
+        const converted = ALL_PRODUCTS.find(p =>
+          p.shadeCode === conv.targetCode &&
+          (BRAND_TO_SLUG[p.brand] ?? p.brand.toLowerCase().replace(/\s+/g, '')) === preferredSlug
+        );
+        if (converted) {
+          notes.push(`Routed via manufacturer chart: ${primary.brand} ${primary.shadeCode} → ${converted.brand} ${converted.shadeCode} (confidence ${Math.round(conv.confidence * 100)}%)`);
+          primary = converted;
+        }
+      }
+    }
+  }
+
+  // ── Clamp developer volume to shade's allowed range ────────────────────────
+  const allowedVolumes = parseDevVolumes(primary.developerRequired);
+  let constrainedVolume = volume;
+  if (allowedVolumes.length > 0 && !allowedVolumes.includes(volume)) {
+    // Snap to nearest allowed volume
+    constrainedVolume = allowedVolumes.reduce((prev, curr) =>
+      Math.abs(curr - volume) < Math.abs(prev - volume) ? curr : prev
+    );
+    if (constrainedVolume !== volume) {
+      warnings.push(`${primary.line} requires ${primary.developerRequired} — adjusted from ${volume} vol to ${constrainedVolume} vol`);
+    }
+  }
+  const finalVolume = constrainedVolume;
 
   const steps: FormulationStep[] = [
     { product: primary, grams: 60, role: 'primary' },
   ];
 
   // Find secondary color
-  const secondary = findSecondaryColor(
-    input.targetLevel,
-    input.targetTone,
-    primary.tone,
-    primary.brand,
-    primary.line
-  );
+  const secondary = findSecondaryColor(input, primary);
   if (secondary) {
-    steps.push({ product: secondary, grams: 10, role: 'secondary' });
-    notes.push(`Secondary ${secondary.shadeName} added for depth`);
+    steps.push({ product: secondary.product, grams: secondary.grams, role: 'secondary', notes: secondary.reason });
+    notes.push(`Secondary ${secondary.product.shadeName}: ${secondary.reason}`);
   }
 
   // Add correctives/additives
@@ -304,16 +520,19 @@ export function formulate(input: FormulationInput): FormulationResult {
   // Calculate totals
   const totalColorGrams = steps.reduce((sum, s) => sum + s.grams, 0);
   const mixingRatio = primary.mixingRatio || '1:1';
-  const [colorPart] = mixingRatio.split(':').map(Number);
-  const [devPart] = mixingRatio.split(':').map(Number);
+  const [colorPart, devPart] = mixingRatio.split(':').map(Number);
   const totalMl = Math.round(totalColorGrams * (devPart / colorPart));
   const developerMl = totalMl;
 
-  // Processing time
-  let processingTime = 35;
-  if (volume >= 30) processingTime = 45;
-  if (volume <= 10) processingTime = 20;
-  if (input.condition.type === 'damaged') processingTime = Math.max(20, processingTime - 5);
+  // Processing time — line-aware base, then volume and condition adjustments
+  const lineTiming = getLineProcessingTime(primary.line);
+  let processingTime = lineTiming.base;
+  if (finalVolume >= 40) processingTime += 10;
+  else if (finalVolume >= 30) processingTime += 5;
+  else if (finalVolume <= 10) processingTime -= 10;
+  if (input.condition.type === 'damaged') processingTime -= 5;
+  if (input.condition.type === 'highly_damaged') processingTime -= 5;
+  processingTime = Math.max(lineTiming.min, Math.min(lineTiming.max, processingTime));
 
   // Application type
   let application: FormulationResult['application'] = 'all_over';
@@ -341,7 +560,7 @@ export function formulate(input: FormulationInput): FormulationResult {
   if (input.condition.porosity === 'high') {
     notes.push('High porosity: consider a bond builder additive and reduce processing time by 5 min');
   }
-  notes.push(`${primary.brand} ${primary.line}: mix ${primary.mixingRatio} with ${volume} vol developer`);
+  notes.push(`${primary.brand} ${primary.line}: mix ${primary.mixingRatio} with ${finalVolume} vol developer`);
   notes.push(`Processing time: ${processingTime} minutes at room temperature`);
 
   // Assessment
@@ -384,7 +603,7 @@ export function formulate(input: FormulationInput): FormulationResult {
   return {
     success: true,
     steps,
-    developerVolume: volume,
+    developerVolume: finalVolume,
     developerMl,
     totalMl,
     processingTime,
@@ -401,7 +620,7 @@ export function formulate(input: FormulationInput): FormulationResult {
     adjustedConfidence,
     confidenceAdjustments,
     strandTestRecommended: input.condition.porosity === 'high' || liftAmount > 3,
-    hardStops: [],
+    hardStops: buildHardStops(input, primary),
     alternatives: [],
     multiSessionPlan: multiSessionPlan.length > 0 ? multiSessionPlan : undefined,
   };

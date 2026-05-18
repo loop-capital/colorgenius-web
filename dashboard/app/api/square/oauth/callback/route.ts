@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     const merchantResponse = await client.merchants.list();
     const merchant = merchantResponse.merchants?.[0];
     const locations = await client.locations.list();
-    const locationIds = (locations.locations || []).map(l => l.id || '');
+    const locationIds = (locations.locations || []).map((l: { id?: string }) => l.id || '');
 
     // Store the connection
     saveConnection({

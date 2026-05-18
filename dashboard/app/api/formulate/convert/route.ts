@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { convertFormula, type ConversionRequest } from '@/lib/conversion/engine';
+import { convertFormula } from '@/lib/conversion/engine';
+import type { ConversionRequest } from '@/lib/conversion/types';
 
 /**
  * POST /api/formulate/convert

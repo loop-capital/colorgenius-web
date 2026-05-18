@@ -53,8 +53,8 @@ export async function POST(request: NextRequest) {
 
     // Get required products from client requests
     const relatedRequests = clientRequests.filter(r => r.formula_id === formula_id);
-    const allProducts = relatedRequests.flatMap(r => r.required_products);
-    const uniqueProductNames = [...new Set(allProducts.map(p => p.name))];
+    const allProducts = relatedRequests.flatMap(r => r.required_products ?? []);
+    const uniqueProductNames = [...new Set(allProducts)];
 
     // Try to check Square inventory
     const catalogIds = uniqueProductNames
@@ -80,9 +80,7 @@ export async function POST(request: NextRequest) {
         const qty = inventoryCounts.get(catalogId) || 0;
         return { name, in_stock: qty > 0, quantity: qty, square_catalog_id: catalogId };
       }
-      // Fallback to mock data from client requests
-      const mockProduct = allProducts.find(p => p.name === name);
-      return { name, in_stock: mockProduct?.in_stock ?? false };
+      return { name, in_stock: false };
     });
 
     const missingProducts = requiredProducts.filter(p => !p.in_stock).map(p => p.name);
