@@ -410,12 +410,12 @@ export function ScaleBowl({
             {/* Surface wave (when filling) */}
             {fillPercent > 0.03 && (
               <motion.path
-                d={getSurfacePath(fillTopY)}
+                d={getSurfacePath(fillTopY, fillPercent)}
                 fill="none"
                 stroke="rgba(255,255,255,0.15)"
                 strokeWidth="1.2"
                 strokeLinecap="round"
-                animate={{ d: getSurfacePath(fillTopY) }}
+                animate={{ d: getSurfacePath(fillTopY, fillPercent) }}
                 transition={{ duration: 0.3 }}
               />
             )}
