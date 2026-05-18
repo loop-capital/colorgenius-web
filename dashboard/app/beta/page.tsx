@@ -4,9 +4,6 @@ export default function BetaPage() {
   return (
     <main style={{ minHeight: '100vh', background: '#0A0A1A', color: '#F5F5F7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
       <div style={{ maxWidth: 460, width: '100%' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(147,51,234,0.3)', background: 'rgba(147,51,234,0.1)', color: '#9333EA', fontSize: 12, fontWeight: 600, padding: '4px 12px', borderRadius: 999, marginBottom: 20 }}>
-          🧬 ColorGenius Beta
-        </div>
         <h1 style={{ fontSize: 32, fontWeight: 900, marginBottom: 8 }}>Join the Beta</h1>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 15, marginBottom: 32, lineHeight: 1.5 }}>Sign up and we'll notify you as soon as spots open. Beta testers get a permanent discount on all plans.</p>
         <form action="https://formspree.io/f/xkoenolr" method="POST" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
