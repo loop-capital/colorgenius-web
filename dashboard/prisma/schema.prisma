@@ -789,6 +789,23 @@ model InventoryItem {
   @@index([salonId, brand], map: "idx_inventory_salon_brand")
 }
 
+model BowlRemainder {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salonId       String    @db.Uuid
+  shadeCode     String    @db.VarChar(50)
+  brand         String    @db.VarChar(100)
+  shadeName     String?   @db.VarChar(100)
+  remainingGrams Decimal   @db.Decimal(8, 2)
+  createdAt     DateTime? @default(now()) @db.Timestamp(6)
+  expiresAt     DateTime? @db.Timestamp(6)
+  sourceBowlId  String?   @db.VarChar(100)
+
+  @@unique([salonId, brand, shadeCode])
+  @@index([salonId], map: "idx_bowl_remainders_salon")
+  @@index([salonId, brand, shadeCode], map: "idx_bowl_remainders_salon_brand_shade")
+  @@index([expiresAt], map: "idx_bowl_remainders_expires")
+}
+
 model session_codes {
   id                   String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   salonId              String   @db.Uuid

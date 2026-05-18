@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, MoreHorizontal, ChevronRight, Clock, X, History, Heart, AlertTriangle, Trash2, ArrowRightLeft, Scale, FlaskConical, Check } from 'lucide-react';
 import { DropIndicator } from './scale-bowl';
+import { deductFormulaFromInventory } from './custom/inventory-dashboard';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -36,6 +37,7 @@ interface ServiceViewProps {
   clientId: string;
   clientName: string;
   services: SalonService[];
+  salonId?: string;
   onAddService: () => void;
   onAddBowl: (serviceId: string) => void;
   onOpenBowl: (serviceId: string, bowlId: string) => void;
@@ -46,7 +48,15 @@ interface ServiceViewProps {
   onMoveBowl: (serviceId: string, bowlId: string) => void;
   onReweigh: (serviceId: string, bowlId: string) => void;
   onContinueMixing: (serviceId: string, bowlId: string) => void;
+  onBowlComplete?: (serviceId: string, bowl: ServiceBowl) => void;
   className?: string;
+}
+
+interface RemainderItem {
+  brand: string;
+  shadeCode: string;
+  shadeName: string;
+  remainingGrams: number;
 }
 
 // ─── Bowl Status Badge ───────────────────────────────────────────────────────
@@ -66,6 +76,27 @@ function StatusBadge({ status }: { status: ServiceBowl['status'] }) {
   );
 }
 
+// ─── Carry-Forward Banner ───────────────────────────────────────────────────
+
+function CarryForwardBanner({ remainders }: { remainders: RemainderItem[] }) {
+  if (remainders.length === 0) return null;
+  return (
+    <div className="rounded-xl p-3 mb-3" style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>
+      <div className="flex items-center gap-2 mb-1">
+        <FlaskConical className="w-3.5 h-3.5 text-[#10B981]" />
+        <span className="text-xs font-medium text-[#10B981]">Remaining Formula Available</span>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {remainders.map((r, i) => (
+          <span key={i} className="text-[10px] px-2 py-1 rounded-full" style={{ background: 'rgba(16,185,129,0.1)', color: '#10B981' }}>
+            {r.shadeCode}: {r.remainingGrams}g
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Bowl Card ───────────────────────────────────────────────────────────────
 
 function BowlCard({
@@ -76,6 +107,7 @@ function BowlCard({
   onMove,
   onReweigh,
   onContinue,
+  onClose,
 }: {
   bowl: ServiceBowl;
   serviceId: string;
@@ -84,6 +116,7 @@ function BowlCard({
   onMove: () => void;
   onReweigh: () => void;
   onContinue: () => void;
+  onClose: () => void;
 }) {
   const [showMenu, setShowMenu] = useState(false);
   const isActive = bowl.status === 'active';
@@ -137,6 +170,12 @@ function BowlCard({
                       <Scale className="w-3.5 h-3.5" /> Continue Mixing
                     </button>
                   )}
+                  {isActive && bowl.totalWeighed > 0 && (
+                    <button type="button" onClick={() => { onClose(); setShowMenu(false); }}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-xs hover:bg-white/5" style={{ color: '#10B981' }}>
+                      <Check className="w-3.5 h-3.5" /> Close Bowl
+                    </button>
+                  )}
                   {bowl.status === 'closed' && (
                     <button type="button" onClick={() => { onReweigh(); setShowMenu(false); }}
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-xs hover:bg-white/5" style={{ color: '#F59E0B' }}>
@@ -187,6 +226,8 @@ function BowlCard({
 
 function ServiceSection({
   service,
+  salonId,
+  remainders,
   onAddBowl,
   onOpenBowl,
   onMixFromHistory,
@@ -196,8 +237,11 @@ function ServiceSection({
   onMoveBowl,
   onReweigh,
   onContinueMixing,
+  onCloseBowl,
 }: {
   service: SalonService;
+  salonId?: string;
+  remainders: RemainderItem[];
   onAddBowl: () => void;
   onOpenBowl: (bowlId: string) => void;
   onMixFromHistory: () => void;
@@ -207,11 +251,15 @@ function ServiceSection({
   onMoveBowl: (bowlId: string) => void;
   onReweigh: (bowlId: string) => void;
   onContinueMixing: (bowlId: string) => void;
+  onCloseBowl: (bowl: ServiceBowl) => void;
 }) {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
     <div className="mb-6">
+      {/* Carry-forward banner */}
+      <CarryForwardBanner remainders={remainders} />
+
       {/* Service header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>
@@ -256,6 +304,7 @@ function ServiceSection({
             onMove={() => onMoveBowl(bowl.id)}
             onReweigh={() => onReweigh(bowl.id)}
             onContinue={() => onContinueMixing(bowl.id)}
+            onClose={() => onCloseBowl(bowl)}
           />
         ))}
       </div>
@@ -297,6 +346,7 @@ export function ServiceView({
   clientId,
   clientName,
   services,
+  salonId,
   onAddService,
   onAddBowl,
   onOpenBowl,
@@ -307,8 +357,119 @@ export function ServiceView({
   onMoveBowl,
   onReweigh,
   onContinueMixing,
+  onBowlComplete,
   className = '',
 }: ServiceViewProps) {
+  const [localRemainders, setLocalRemainders] = useState<RemainderItem[]>([]);
+  const [lowStockAlert, setLowStockAlert] = useState<string[]>([]);
+
+  // Fetch remainders for this salon when component mounts
+  const fetchRemainders = useCallback(async () => {
+    if (!salonId) return;
+    try {
+      const res = await fetch(`/api/v1/bowls/remainder?salonId=${encodeURIComponent(salonId)}`);
+      if (res.ok) {
+        const data = await res.json();
+        const mapped: RemainderItem[] = (data.remainders || []).map((r: any) => ({
+          brand: r.brand,
+          shadeCode: r.shadeCode,
+          shadeName: r.shadeName || r.shadeCode,
+          remainingGrams: Number(r.remainingGrams),
+        }));
+        setLocalRemainders(mapped);
+      }
+    } catch (e) {
+      console.error('Failed to fetch remainders:', e);
+    }
+  }, [salonId]);
+
+  useEffect(() => {
+    fetchRemainders();
+  }, [fetchRemainders]);
+
+  // Handle bowl close: deduct inventory, store remainders, check reorder points
+  const handleCloseBowl = useCallback(
+    async (serviceId: string, bowl: ServiceBowl) => {
+      // 1. Deduct weighed ingredients from inventory
+      if (bowl.totalWeighed > 0 && bowl.ingredients.length > 0) {
+        const steps = bowl.ingredients
+          .filter((ing) => ing.weighedGrams > 0)
+          .map((ing) => ({
+            product: {
+              shadeCode: ing.shadeCode,
+              brand: '', // Brand not tracked per-ingredient in current schema
+            },
+            grams: ing.weighedGrams,
+          }));
+        if (steps.length > 0) {
+          const lowStockItems = await deductFormulaFromInventory(steps, salonId);
+          if (lowStockItems.length > 0) {
+            setLowStockAlert(lowStockItems.map((item) => item.shadeCode));
+          }
+        }
+      }
+
+      // 2. Calculate remainders and store them
+      const remainders: Array<{ brand: string; shadeCode: string; shadeName: string; remainingGrams: number }> = [];
+      for (const ing of bowl.ingredients) {
+        if (ing.weighedGrams > 0) {
+          const remaining = Math.max(0, ing.targetGrams - ing.weighedGrams);
+          if (remaining > 0) {
+            remainders.push({
+              brand: '',
+              shadeCode: ing.shadeCode,
+              shadeName: ing.name,
+              remainingGrams: remaining,
+            });
+          }
+        }
+      }
+
+      if (remainders.length > 0 && salonId) {
+        try {
+          await fetch('/api/v1/bowls/remainder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              salonId,
+              sourceBowlId: bowl.id,
+              items: remainders,
+            }),
+          });
+          // Refresh local remainders
+          await fetchRemainders();
+        } catch (e) {
+          console.error('Failed to store remainders:', e);
+        }
+      }
+
+      // 3. Check reorder points
+      if (salonId) {
+        try {
+          const res = await fetch(`/api/v1/inventory/reorder-check?salonId=${encodeURIComponent(salonId)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.items?.length > 0) {
+              setLowStockAlert(data.items.map((item: any) => item.shadeCode));
+            }
+          }
+        } catch (e) {
+          console.error('Reorder check failed:', e);
+        }
+      }
+
+      // 4. Notify parent
+      onBowlComplete?.(serviceId, bowl);
+    },
+    [salonId, onBowlComplete, fetchRemainders]
+  );
+
+  // Filter remainders for this client's services (match shadeCodes in any bowl)
+  const clientShadeCodes = new Set(
+    services.flatMap((s) => s.bowls.flatMap((b) => b.ingredients.map((i) => i.shadeCode)))
+  );
+  const relevantRemainders = localRemainders.filter((r) => clientShadeCodes.has(r.shadeCode));
+
   return (
     <div className={className}>
       {/* Header */}
@@ -319,11 +480,24 @@ export function ServiceView({
         </div>
       </div>
 
+      {/* Low stock alert banner */}
+      {lowStockAlert.length > 0 && (
+        <div
+          className="rounded-xl p-3 mb-4 flex items-center gap-2 text-xs"
+          style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B' }}
+        >
+          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+          <span>{lowStockAlert.length} shade{lowStockAlert.length !== 1 ? 's' : ''} below reorder point: {lowStockAlert.join(', ')}</span>
+        </div>
+      )}
+
       {/* Services */}
-      {services.map(service => (
+      {services.map((service) => (
         <ServiceSection
           key={service.id}
           service={service}
+          salonId={salonId}
+          remainders={relevantRemainders}
           onAddBowl={() => onAddBowl(service.id)}
           onOpenBowl={(bowlId) => onOpenBowl(service.id, bowlId)}
           onMixFromHistory={() => onMixFromHistory(service.id)}
@@ -333,6 +507,7 @@ export function ServiceView({
           onMoveBowl={(bowlId) => onMoveBowl(service.id, bowlId)}
           onReweigh={(bowlId) => onReweigh(service.id, bowlId)}
           onContinueMixing={(bowlId) => onContinueMixing(service.id, bowlId)}
+          onCloseBowl={(bowl) => handleCloseBowl(service.id, bowl)}
         />
       ))}
 
