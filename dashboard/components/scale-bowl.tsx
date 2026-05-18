@@ -34,63 +34,59 @@ interface ScaleBowlProps {
 }
 
 // ─── ROUND Bowl Geometry ───────────────────────────────────────────────────
-// Round salon mixing bowl viewed from slightly above
+// Round salon mixing bowl viewed from slightly above (true circular cross-section)
 // ViewBox: 260 x 240
 
 const BOWL_VIEW_W = 260;
 const BOWL_VIEW_H = 240;
 const CX = BOWL_VIEW_W / 2;  // 130 center X
-const CY = 125;               // center Y (slightly below midpoint for perspective)
-const BOWL_R_OUTER = 105;     // outer radius (width ~210)
-const BOWL_R_INNER = 98;      // inner radius
-const RIM_W = 6;              // rim thickness
+const CY = 125;               // center Y
+const BOWL_R = 105;           // outer radius (true circle → ~210px wide)
 
-// Top opening (ellipse for perspective)
-const RIM_RX = BOWL_R_OUTER;   // 105
-const RIM_RY = 28;             // flattened for above-view
-const RIM_TOP = 55;
-const RIM_CY = RIM_TOP + RIM_RY; // 83
+// Rim — circular ellipse viewed from above (slight perspective squish)
+const RIM_RX = BOWL_R;          // 105 (horizontal radius)
+const RIM_RY = 65;             // 65 (vertical radius — ~1.6:1 for above-view)
+const RIM_CY = 75;             // rim center Y (below top of ellipse)
 
-// Bowl depth
-const BOWL_DEPTH = 105;
-const BOWL_BOTTOM_Y = RIM_CY + BOWL_DEPTH; // 188
+// Bowl body/depth
+const BOWL_DEPTH = 108;
+const BOWL_BOTTOM_Y = RIM_CY + BOWL_DEPTH; // 183
 
-// Inner rim (where liquid surface sits)
-const INNER_RIM_RX = BOWL_R_INNER;  // 98
-const INNER_RIM_RY = 24;
-const INNER_RIM_CY = RIM_CY + 3;    // 86
+// Inner rim (slightly inset)
+const INNER_RIM_RX = RIM_RX - 6;   // 99
+const INNER_RIM_RY = RIM_RY - 4;   // 61
+const INNER_RIM_CY = RIM_CY + 3;   // 78
 
-// Bowl bottom (round)
-const BOWL_BOTTOM_RY = 20;
+// ─── Bowl Paths ───────────────────────────────────────────────────────────────
 
-// Outer bowl path: round top opening → round bottom
+// Outer bowl silhouette: circular rim opening → hemispherical bottom
 const BOWL_OUTER = `
   M ${CX - RIM_RX} ${RIM_CY}
-  C ${CX - RIM_RX} ${RIM_CY - RIM_RY*1.8}, ${CX + RIM_RX} ${RIM_CY - RIM_RY*1.8}, ${CX + RIM_RX} ${RIM_CY}
-  C ${CX + RIM_RX} ${RIM_CY + BOWL_DEPTH*0.4}, ${CX + BOWL_R_OUTER*0.7} ${BOWL_BOTTOM_Y - BOWL_BOTTOM_RY}, ${CX + BOWL_R_OUTER*0.5} ${BOWL_BOTTOM_Y}
-  C ${CX + BOWL_R_OUTER*0.2} ${BOWL_BOTTOM_Y + 8}, ${CX - BOWL_R_OUTER*0.2} ${BOWL_BOTTOM_Y + 8}, ${CX - BOWL_R_OUTER*0.5} ${BOWL_BOTTOM_Y}
-  C ${CX - BOWL_R_OUTER*0.7} ${BOWL_BOTTOM_Y - BOWL_BOTTOM_RY}, ${CX - RIM_RX} ${RIM_CY + BOWL_DEPTH*0.4}, ${CX - RIM_RX} ${RIM_CY}
+  C ${CX - RIM_RX} ${RIM_CY - RIM_RY * 1.5}, ${CX + RIM_RX} ${RIM_CY - RIM_RY * 1.5}, ${CX + RIM_RX} ${RIM_CY}
+  C ${CX + RIM_RX} ${RIM_CY + BOWL_DEPTH * 0.5}, ${CX + BOWL_R * 0.85} ${BOWL_BOTTOM_Y - 10}, ${CX + BOWL_R * 0.7} ${BOWL_BOTTOM_Y}
+  C ${CX + BOWL_R * 0.3} ${BOWL_BOTTOM_Y + 14}, ${CX - BOWL_R * 0.3} ${BOWL_BOTTOM_Y + 14}, ${CX - BOWL_R * 0.7} ${BOWL_BOTTOM_Y}
+  C ${CX - BOWL_R * 0.85} ${BOWL_BOTTOM_Y - 10}, ${CX - RIM_RX} ${RIM_CY + BOWL_DEPTH * 0.5}, ${CX - RIM_RX} ${RIM_CY}
   Z
 `;
 
-// Inner bowl (liquid container)
+// Inner liquid container: same shape, slightly inset
 const BOWL_INTERIOR = `
   M ${CX - INNER_RIM_RX} ${INNER_RIM_CY}
-  C ${CX - INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY*1.5}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY*1.5}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY}
-  C ${CX + INNER_RIM_RX} ${INNER_RIM_CY + BOWL_DEPTH*0.45}, ${CX + BOWL_R_INNER*0.75} ${BOWL_BOTTOM_Y - BOWL_BOTTOM_RY*0.8}, ${CX + BOWL_R_INNER*0.45} ${BOWL_BOTTOM_Y - 4}
-  C ${CX + BOWL_R_INNER*0.15} ${BOWL_BOTTOM_Y + 2}, ${CX - BOWL_R_INNER*0.15} ${BOWL_BOTTOM_Y + 2}, ${CX - BOWL_R_INNER*0.45} ${BOWL_BOTTOM_Y - 4}
-  C ${CX - BOWL_R_INNER*0.75} ${BOWL_BOTTOM_Y - BOWL_BOTTOM_RY*0.8}, ${CX - INNER_RIM_RX} ${INNER_RIM_CY + BOWL_DEPTH*0.45}, ${CX - INNER_RIM_RX} ${INNER_RIM_CY}
+  C ${CX - INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY * 1.5}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY * 1.5}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY}
+  C ${CX + INNER_RIM_RX} ${INNER_RIM_CY + BOWL_DEPTH * 0.5}, ${CX + (INNER_RIM_RX) * 0.85} ${BOWL_BOTTOM_Y - 10}, ${CX + (INNER_RIM_RX) * 0.7} ${BOWL_BOTTOM_Y}
+  C ${CX + (INNER_RIM_RX) * 0.3} ${BOWL_BOTTOM_Y + 14}, ${CX - (INNER_RIM_RX) * 0.3} ${BOWL_BOTTOM_Y + 14}, ${CX - (INNER_RIM_RX) * 0.7} ${BOWL_BOTTOM_Y}
+  C ${CX - (INNER_RIM_RX) * 0.85} ${BOWL_BOTTOM_Y - 10}, ${CX - INNER_RIM_RX} ${INNER_RIM_CY + BOWL_DEPTH * 0.5}, ${CX - INNER_RIM_RX} ${INNER_RIM_CY}
   Z
 `;
 
-// Rim ellipse (top ring)
+// Rim ellipse (top ring outline)
 const BOWL_RIM = `
   M ${CX - RIM_RX} ${RIM_CY}
   C ${CX - RIM_RX} ${RIM_CY - RIM_RY}, ${CX + RIM_RX} ${RIM_CY - RIM_RY}, ${CX + RIM_RX} ${RIM_CY}
   C ${CX + RIM_RX} ${RIM_CY + RIM_RY}, ${CX - RIM_RX} ${RIM_CY + RIM_RY}, ${CX - RIM_RX} ${RIM_CY}
 `;
 
-// Inner rim ellipse (liquid edge line)
+// Inner rim (liquid surface edge line)
 const BOWL_INNER_RIM = `
   M ${CX - INNER_RIM_RX} ${INNER_RIM_CY}
   C ${CX - INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY}
@@ -99,14 +95,14 @@ const BOWL_INNER_RIM = `
 
 // Shadow under bowl
 const BOWL_SHADOW = `
-  M ${CX - 70} ${BOWL_BOTTOM_Y + 10}
-  C ${CX - 70} ${BOWL_BOTTOM_Y + 22}, ${CX + 70} ${BOWL_BOTTOM_Y + 22}, ${CX + 70} ${BOWL_BOTTOM_Y + 10}
-  C ${CX + 70} ${BOWL_BOTTOM_Y + 4}, ${CX - 70} ${BOWL_BOTTOM_Y + 4}, ${CX - 70} ${BOWL_BOTTOM_Y + 10}
+  M ${CX - 72} ${BOWL_BOTTOM_Y + 12}
+  C ${CX - 72} ${BOWL_BOTTOM_Y + 24}, ${CX + 72} ${BOWL_BOTTOM_Y + 24}, ${CX + 72} ${BOWL_BOTTOM_Y + 12}
+  C ${CX + 72} ${BOWL_BOTTOM_Y + 4}, ${CX - 72} ${BOWL_BOTTOM_Y + 4}, ${CX - 72} ${BOWL_BOTTOM_Y + 12}
   Z
 `;
 
-// Liquid fill bottom (for masking)
-const LIQUID_BOTTOM_Y = BOWL_BOTTOM_Y - 8;
+// Liquid fill bottom Y
+const LIQUID_BOTTOM_Y = BOWL_BOTTOM_Y - 4;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -229,9 +225,9 @@ export function ScaleBowl({
 
   // ─── Round Bowl Layer Geometry ───────────────────────────────────────────
   // Round bowl interior: fills from INNER_RIM_CY (86) down to LIQUID_BOTTOM_Y (180)
-  const BOWL_TOP = INNER_RIM_CY;      // 86  (inner rim, where liquid surface sits)
-  const BOWL_BOTTOM = LIQUID_BOTTOM_Y;  // 180 (just above rounded bottom)
-  const BOWL_FILL_H = BOWL_BOTTOM - BOWL_TOP; // 94
+  const BOWL_TOP = INNER_RIM_CY;           // 78  (inner rim — liquid surface level)
+  const BOWL_BOTTOM = LIQUID_BOTTOM_Y;   // 179
+  const BOWL_FILL_H = BOWL_BOTTOM - BOWL_TOP; // 101
   const BOWL_CENTER_X = CX;             // 130
 
   // Build layer stack from bottom of liquid area
@@ -268,11 +264,11 @@ export function ScaleBowl({
 
   const fillTopY = layers.length > 0 ? layers[layers.length - 1].y : BOWL_BOTTOM;
 
-  // Width of liquid at a given Y (bowl narrows toward bottom)
+  // Width at a given Y — bowl narrows toward bottom in true circular cross-section
+  // Top (BOWL_TOP=78): ~198px  Bottom (BOWL_BOTTOM=179): ~143px
   const widthAtY = (y: number) => {
     const t = Math.max(0, Math.min(1, (y - BOWL_TOP) / (BOWL_BOTTOM - BOWL_TOP)));
-    // Bowl narrows as we go down: 196px at top → ~140px at bottom
-    return INNER_RIM_RX * 2 * (0.72 + 0.28 * t);
+    return INNER_RIM_RX * 2 * (1 - 0.28 * t);
   };
 
   return (
