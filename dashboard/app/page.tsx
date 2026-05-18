@@ -41,7 +41,7 @@ export default function LandingPage() {
             3,273 professional shades · 21 color brands · 90%+ formulation accuracy
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
-            <a href="https://formspree.io/f/xkoenolr" style={{ ...btnPrimary, padding: '16px 32px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
+            <a href="#beta-signup" style={{ ...btnPrimary, padding: '16px 32px', boxShadow: '0 0 40px rgba(147,51,234,0.2)', textDecoration: 'none' }}>Join the Beta <ArrowRight size={18} /></a>
             <a href="#how-it-works" style={{ ...btnPrimary, background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.8)', textDecoration: 'none' }}>See How It Works</a>
           </div>
         </div>
