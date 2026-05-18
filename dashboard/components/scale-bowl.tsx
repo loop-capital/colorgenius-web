@@ -33,43 +33,80 @@ interface ScaleBowlProps {
   className?: string;
 }
 
-// ─── Round Bowl Shape ─────────────────────────────────────────────────────────
+// ─── ROUND Bowl Geometry ───────────────────────────────────────────────────
+// Round salon mixing bowl viewed from slightly above
+// ViewBox: 260 x 240
 
-const BOWL_W = 240;
-const BOWL_H = 200;
+const BOWL_VIEW_W = 260;
+const BOWL_VIEW_H = 240;
+const CX = BOWL_VIEW_W / 2;  // 130 center X
+const CY = 125;               // center Y (slightly below midpoint for perspective)
+const BOWL_R_OUTER = 105;     // outer radius (width ~210)
+const BOWL_R_INNER = 98;      // inner radius
+const RIM_W = 6;              // rim thickness
 
-// Round mixing bowl viewed from front:
-// - Wide elliptical opening at top
-// - Rounded bottom (hemisphere-like)
-// - Center of bowl at roughly (120, 110)
-const BOWL_PATH = `
-  M 20 60
-  C 20 160, 60 190, 120 190
-  C 180 190, 220 160, 220 60
-  C 220 40, 200 30, 120 30
-  C 40 30, 20 40, 20 60
+// Top opening (ellipse for perspective)
+const RIM_RX = BOWL_R_OUTER;   // 105
+const RIM_RY = 28;             // flattened for above-view
+const RIM_TOP = 55;
+const RIM_CY = RIM_TOP + RIM_RY; // 83
+
+// Bowl depth
+const BOWL_DEPTH = 105;
+const BOWL_BOTTOM_Y = RIM_CY + BOWL_DEPTH; // 188
+
+// Inner rim (where liquid surface sits)
+const INNER_RIM_RX = BOWL_R_INNER;  // 98
+const INNER_RIM_RY = 24;
+const INNER_RIM_CY = RIM_CY + 3;    // 86
+
+// Bowl bottom (round)
+const BOWL_BOTTOM_RY = 20;
+
+// Outer bowl path: round top opening → round bottom
+const BOWL_OUTER = `
+  M ${CX - RIM_RX} ${RIM_CY}
+  C ${CX - RIM_RX} ${RIM_CY - RIM_RY*1.8}, ${CX + RIM_RX} ${RIM_CY - RIM_RY*1.8}, ${CX + RIM_RX} ${RIM_CY}
+  C ${CX + RIM_RX} ${RIM_CY + BOWL_DEPTH*0.4}, ${CX + BOWL_R_OUTER*0.7} ${BOWL_BOTTOM_Y - BOWL_BOTTOM_RY}, ${CX + BOWL_R_OUTER*0.5} ${BOWL_BOTTOM_Y}
+  C ${CX + BOWL_R_OUTER*0.2} ${BOWL_BOTTOM_Y + 8}, ${CX - BOWL_R_OUTER*0.2} ${BOWL_BOTTOM_Y + 8}, ${CX - BOWL_R_OUTER*0.5} ${BOWL_BOTTOM_Y}
+  C ${CX - BOWL_R_OUTER*0.7} ${BOWL_BOTTOM_Y - BOWL_BOTTOM_RY}, ${CX - RIM_RX} ${RIM_CY + BOWL_DEPTH*0.4}, ${CX - RIM_RX} ${RIM_CY}
   Z
 `;
 
-// Inner bowl path (slightly inset for depth)
-const BOWL_INNER_PATH = `
-  M 28 62
-  C 28 148, 64 178, 120 178
-  C 176 178, 212 148, 212 62
-  C 212 46, 194 38, 120 38
-  C 46 38, 28 46, 28 62
+// Inner bowl (liquid container)
+const BOWL_INTERIOR = `
+  M ${CX - INNER_RIM_RX} ${INNER_RIM_CY}
+  C ${CX - INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY*1.5}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY*1.5}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY}
+  C ${CX + INNER_RIM_RX} ${INNER_RIM_CY + BOWL_DEPTH*0.45}, ${CX + BOWL_R_INNER*0.75} ${BOWL_BOTTOM_Y - BOWL_BOTTOM_RY*0.8}, ${CX + BOWL_R_INNER*0.45} ${BOWL_BOTTOM_Y - 4}
+  C ${CX + BOWL_R_INNER*0.15} ${BOWL_BOTTOM_Y + 2}, ${CX - BOWL_R_INNER*0.15} ${BOWL_BOTTOM_Y + 2}, ${CX - BOWL_R_INNER*0.45} ${BOWL_BOTTOM_Y - 4}
+  C ${CX - BOWL_R_INNER*0.75} ${BOWL_BOTTOM_Y - BOWL_BOTTOM_RY*0.8}, ${CX - INNER_RIM_RX} ${INNER_RIM_CY + BOWL_DEPTH*0.45}, ${CX - INNER_RIM_RX} ${INNER_RIM_CY}
   Z
 `;
 
-// Rim ellipse
-const RIM_PATH = `
-  M 20 60
-  C 20 76, 60 86, 120 86
-  C 180 86, 220 76, 220 60
-  C 220 44, 180 34, 120 34
-  C 60 34, 20 44, 20 60
+// Rim ellipse (top ring)
+const BOWL_RIM = `
+  M ${CX - RIM_RX} ${RIM_CY}
+  C ${CX - RIM_RX} ${RIM_CY - RIM_RY}, ${CX + RIM_RX} ${RIM_CY - RIM_RY}, ${CX + RIM_RX} ${RIM_CY}
+  C ${CX + RIM_RX} ${RIM_CY + RIM_RY}, ${CX - RIM_RX} ${RIM_CY + RIM_RY}, ${CX - RIM_RX} ${RIM_CY}
+`;
+
+// Inner rim ellipse (liquid edge line)
+const BOWL_INNER_RIM = `
+  M ${CX - INNER_RIM_RX} ${INNER_RIM_CY}
+  C ${CX - INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY - INNER_RIM_RY}, ${CX + INNER_RIM_RX} ${INNER_RIM_CY}
+  C ${CX + INNER_RIM_RX} ${INNER_RIM_CY + INNER_RIM_RY}, ${CX - INNER_RIM_RX} ${INNER_RIM_CY + INNER_RIM_RY}, ${CX - INNER_RIM_RX} ${INNER_RIM_CY}
+`;
+
+// Shadow under bowl
+const BOWL_SHADOW = `
+  M ${CX - 70} ${BOWL_BOTTOM_Y + 10}
+  C ${CX - 70} ${BOWL_BOTTOM_Y + 22}, ${CX + 70} ${BOWL_BOTTOM_Y + 22}, ${CX + 70} ${BOWL_BOTTOM_Y + 10}
+  C ${CX + 70} ${BOWL_BOTTOM_Y + 4}, ${CX - 70} ${BOWL_BOTTOM_Y + 4}, ${CX - 70} ${BOWL_BOTTOM_Y + 10}
   Z
 `;
+
+// Liquid fill bottom (for masking)
+const LIQUID_BOTTOM_Y = BOWL_BOTTOM_Y - 8;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -92,7 +129,6 @@ export function ScaleBowl({
   const [unit, setUnit] = useState<'g' | 'oz'>('g');
   const [showMenu, setShowMenu] = useState(false);
   const [pouringIngredient, setPouringIngredient] = useState<string | null>(null);
-  const [pourComplete, setPourComplete] = useState(false);
 
   const currentIngredient = bowl.ingredients[bowl.currentIndex];
   const totalTarget = ingredients.reduce((sum, i) => sum + i.targetGrams, 0);
@@ -107,23 +143,19 @@ export function ScaleBowl({
   // ─── Pour Animation ──────────────────────────────────────────────────────
   const triggerPourAnimation = useCallback((ingredientId: string) => {
     setPouringIngredient(ingredientId);
-    setPourComplete(false);
-    setTimeout(() => setPourComplete(true), 1200);
-    setTimeout(() => setPouringIngredient(null), 1600);
+    setTimeout(() => setPouringIngredient(null), 1800);
   }, []);
 
   // ─── Inventory Deduction ───────────────────────────────────────────────────
   const handleInventoryDeduction = useCallback(
     async (weights: Record<string, number>) => {
       if (!salonId) return;
-
       const steps = bowl.ingredients
         .filter((ing) => weights[ing.id] && weights[ing.id] > 0)
         .map((ing) => ({
           product: { shadeCode: ing.shadeCode, brand: ing.brand },
           grams: weights[ing.id],
         }));
-
       if (steps.length > 0) {
         try {
           await deductFormulaFromInventory(steps, salonId);
@@ -131,10 +163,7 @@ export function ScaleBowl({
           console.error('Inventory deduction failed:', e);
         }
       }
-
-      // If there's leftover formula, record it as a bowl remainder
       if (totalTarget > totalCurrent) {
-        const remainderGrams = totalCurrent;
         try {
           await fetch('/api/v1/bowls/remainder', {
             method: 'POST',
@@ -142,7 +171,7 @@ export function ScaleBowl({
             body: JSON.stringify({
               salonId,
               formulaGrams: totalTarget,
-              remainderGrams,
+              remainderGrams: totalCurrent,
               ingredients: bowl.ingredients.map((ing) => ({
                 shadeCode: ing.shadeCode,
                 brand: ing.brand,
@@ -163,16 +192,12 @@ export function ScaleBowl({
   const captureWeight = useCallback(() => {
     if (!currentIngredient || !weight) return;
     const grams = Math.round(weight.value * 10) / 10;
-
-    // Trigger pour animation
     triggerPourAnimation(currentIngredient.id);
-
     setBowl((prev) => {
       const newWeights = { ...prev.weights, [currentIngredient.id]: grams };
       const nextIndex = prev.currentIndex + 1;
       const done = nextIndex >= prev.ingredients.length;
       if (done && onComplete) {
-        // Wait for pour animation then call onComplete + inventory deduction
         setTimeout(() => {
           onComplete(newWeights);
           handleInventoryDeduction(newWeights);
@@ -181,14 +206,7 @@ export function ScaleBowl({
       return { ...prev, weights: newWeights, currentIndex: done ? prev.currentIndex : nextIndex };
     });
     tare();
-  }, [
-    currentIngredient,
-    weight,
-    tare,
-    onComplete,
-    triggerPourAnimation,
-    handleInventoryDeduction,
-  ]);
+  }, [currentIngredient, weight, tare, onComplete, triggerPourAnimation, handleInventoryDeduction]);
 
   // ─── Reweigh ───────────────────────────────────────────────────────────────
   const reweigh = useCallback(() => {
@@ -209,71 +227,70 @@ export function ScaleBowl({
   const currentWeighed = currentIngredient ? bowl.weights[currentIngredient.id] || 0 : 0;
   const currentRemaining = Math.max(0, currentTarget - currentWeighed);
 
-  // ─── Bowl Geometry Helpers ───────────────────────────────────────────────
-  const bowlCenterX = BOWL_W / 2; // 120
-  const bowlBottomY = 178;
-  const bowlTopY = 62;
-  const bowlDepth = bowlBottomY - bowlTopY; // 116
-  const liquidMaxHeight = bowlDepth * 0.92; // leave some space at top
+  // ─── Round Bowl Layer Geometry ───────────────────────────────────────────
+  // Round bowl interior: fills from INNER_RIM_CY (86) down to LIQUID_BOTTOM_Y (180)
+  const BOWL_TOP = INNER_RIM_CY;      // 86  (inner rim, where liquid surface sits)
+  const BOWL_BOTTOM = LIQUID_BOTTOM_Y;  // 180 (just above rounded bottom)
+  const BOWL_FILL_H = BOWL_BOTTOM - BOWL_TOP; // 94
+  const BOWL_CENTER_X = CX;             // 130
 
-  // Calculate fill height based on total current vs total target
-  const currentFillHeight = totalTarget > 0
-    ? (totalCurrent / totalTarget) * liquidMaxHeight
-    : 0;
-  const liquidTopY = bowlBottomY - currentFillHeight;
-
-  // Meniscus (curved surface) path
-  const getMeniscusPath = (y: number, fillPct: number) => {
-    const widthAtY = 30 + (1 - (y - bowlTopY) / bowlDepth) * 160;
-    const leftX = bowlCenterX - widthAtY / 2;
-    const rightX = bowlCenterX + widthAtY / 2;
-    const curveY = y - 6 * Math.sin(fillPct * Math.PI); // subtle curve
-    return `M ${leftX} ${y} Q ${bowlCenterX} ${curveY} ${rightX} ${y}`;
-  };
-
-  // Get layer bounds for stacking
-  const getLayerBounds = () => {
+  // Build layer stack from bottom of liquid area
+  const getLayers = () => {
     const layers: Array<{
-      id: string;
+      ing: BowlIngredient;
       y: number;
       height: number;
-      color: string;
-      shadeCode: string;
-      isCurrent: boolean;
+      actual: number;
     }> = [];
 
-    let currentY = bowlBottomY;
-    for (let i = ingredients.length - 1; i >= 0; i--) {
-      const ing = ingredients[i];
-      const ingWeight = bowl.weights[ing.id] || 0;
-      if (ingWeight <= 0) continue;
-
-      const layerHeight = (ingWeight / totalTarget) * liquidMaxHeight;
-      const layerY = currentY - layerHeight;
-
-      layers.unshift({
-        id: ing.id,
-        y: layerY,
-        height: layerHeight,
-        color: ing.color,
-        shadeCode: ing.shadeCode,
-        isCurrent: ing.id === currentIngredient?.id,
-      });
-
-      currentY = layerY;
+    let cursorY = BOWL_BOTTOM;
+    for (const ing of bowl.ingredients) {
+      const actual = bowl.weights[ing.id] || 0;
+      if (actual <= 0) continue;
+      const layerH = (actual / totalTarget) * BOWL_FILL_H;
+      const layerY = cursorY - layerH;
+      layers.push({ ing, y: layerY, height: layerH, actual });
+      cursorY = layerY;
     }
-
-    return layers.reverse(); // bottom to top
+    return layers;
   };
 
-  const layerBounds = getLayerBounds();
+  const layers = getLayers();
+
+  // Meniscus (curved liquid surface) at fill top
+  const getSurfacePath = (topY: number, fillPct: number) => {
+    const halfW = INNER_RIM_RX * 0.92; // slightly narrower than rim
+    const leftX = BOWL_CENTER_X - halfW;
+    const rightX = BOWL_CENTER_X + halfW;
+    const curve = -5 * Math.sin(fillPercent * Math.PI); // meniscus dips in center
+    return `M ${leftX} ${topY} Q ${BOWL_CENTER_X} ${topY + curve} ${rightX} ${topY}`;
+  };
+
+  const fillTopY = layers.length > 0 ? layers[layers.length - 1].y : BOWL_BOTTOM;
+
+  // Width of liquid at a given Y (bowl narrows toward bottom)
+  const widthAtY = (y: number) => {
+    const t = Math.max(0, Math.min(1, (y - BOWL_TOP) / (BOWL_BOTTOM - BOWL_TOP)));
+    // Bowl narrows as we go down: 196px at top → ~140px at bottom
+    return INNER_RIM_RX * 2 * (0.72 + 0.28 * t);
+  };
 
   return (
     <div className={`flex flex-col items-center ${className}`}>
-      {/* Header: total weight */}
-      <div className="text-center mb-2">
+      {/* Title */}
+      {!isComplete && (
+        <p className="text-[11px] font-semibold tracking-wider mb-1" style={{ color: '#71717A' }}>
+          New Formula
+        </p>
+      )}
+
+      {/* Weight header — Vish style: black rounded rect */}
+      <div
+        className="rounded-xl px-5 py-2 mb-3 text-center"
+        style={{ background: '#18181B', border: '1px solid rgba(255,255,255,0.06)' }}
+      >
         <span
-          className="text-5xl font-bold font-mono tracking-tight"
+          className="text-3xl font-bold font-mono tracking-tight"
           style={{ color: '#F5F5F7' }}
         >
           {convertWeight(totalCurrent)}
@@ -289,208 +306,136 @@ export function ScaleBowl({
         <button
           type="button"
           onClick={() => setUnit((u) => (u === 'g' ? 'oz' : 'g'))}
-          className="text-[10px] mb-4 px-2 py-0.5 rounded-full"
-          style={{
-            background: 'rgba(255,255,255,0.05)',
-            color: '#71717A',
-          }}
+          className="text-[10px] mb-3 px-2 py-0.5 rounded-full"
+          style={{ background: 'rgba(255,255,255,0.05)', color: '#71717A' }}
         >
           {unit === 'g' ? 'Switch to oz' : 'Switch to g'}
         </button>
       )}
 
-      {/* Round Bowl Visualization */}
-      <div className="relative mb-4" style={{ width: BOWL_W, height: BOWL_H + 40 }}>
+      {/* ─── U-Shaped Bowl SVG ─────────────────────────────────────────────── */}
+      <div className="relative mb-3" style={{ width: BOWL_VIEW_W, height: BOWL_VIEW_H + 10 }}>
         <svg
-          width={BOWL_W}
-          height={BOWL_H + 40}
-          viewBox={`0 0 ${BOWL_W} ${BOWL_H + 40}`}
+          width={BOWL_VIEW_W}
+          height={BOWL_VIEW_H + 10}
+          viewBox={`0 0 ${BOWL_VIEW_W} ${BOWL_VIEW_H + 10}`}
           style={{ overflow: 'visible' }}
         >
           <defs>
-            {/* Bowl clip path (inner) */}
-            <clipPath id="bowlClip">
-              <path d={BOWL_INNER_PATH} />
+            <clipPath id="bowlInteriorClip">
+              <path d={BOWL_INTERIOR} />
             </clipPath>
 
-            {/* Glow filter */}
-            <filter id="bowlGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="4" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-
-            {/* Drop shadow */}
-            <filter id="bowlShadow" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="8" stdDeviation="6" floodColor="#000" floodOpacity="0.3" />
-            </filter>
-
-            {/* Liquid surface gradient */}
-            <linearGradient id="liquidSurfaceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.08)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            {/* Liquid layer gradient — darker at bottom, lighter at top */}
+            <linearGradient id="layerBase" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor="inherit" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="inherit" stopOpacity="0.5" />
             </linearGradient>
 
-            {/* Glass reflection gradient */}
-            <linearGradient id="glassReflection" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-              <stop offset="30%" stopColor="rgba(255,255,255,0.04)" />
-              <stop offset="50%" stopColor="rgba(255,255,255,0.08)" />
-              <stop offset="70%" stopColor="rgba(255,255,255,0.04)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-            </linearGradient>
+            {/* Bowl shadow */}
+            <filter id="bowlShadow" x="-20%" y="-10%" width="140%" height="130%">
+              <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#000" floodOpacity="0.4" />
+            </filter>
           </defs>
 
-          {/* Drop shadow ellipse under bowl */}
-          <ellipse
-            cx={bowlCenterX}
-            cy={BOWL_H + 15}
-            rx={80}
-            ry={12}
-            fill="rgba(0,0,0,0.25)"
-            filter="url(#bowlShadow)"
-          />
 
-          {/* Outer bowl body (glass/ceramic look) */}
+          {/* Bowl body shadow */}
+          <path d={BOWL_OUTER} fill="rgba(0,0,0,0.3)" filter="url(#bowlShadow)" />
+
+          {/* Bowl body (glass) */}
           <path
-            d={BOWL_PATH}
-            fill="rgba(255,255,255,0.03)"
-            stroke="rgba(255,255,255,0.06)"
+            d={BOWL_OUTER}
+            fill="rgba(24,24,27,0.95)"
+            stroke="rgba(255,255,255,0.08)"
             strokeWidth="1.5"
-            filter="url(#bowlGlow)"
           />
 
-          {/* ─── Liquid Fill Layers ───────────────────────────────────────── */}
-          <g clipPath="url(#bowlClip)">
-            {layerBounds.map((layer, idx) => {
-              // Build a path that fills from this layer's top to bottom of bowl
-              const prevLayersHeight = layerBounds
-                .slice(0, idx)
-                .reduce((sum, l) => sum + l.height, 0);
-              const layerBottomY = bowlBottomY - prevLayersHeight;
-              const layerTopY = layerBottomY - layer.height;
+          {/* Bowl interior fill area */}
+          <path
+            d={BOWL_INTERIOR}
+            fill="rgba(0,0,0,0.6)"
+            stroke="none"
+          />
 
-              // Simplified: draw rect within clip
+          {/* ─── Layer fills (clipped to interior) ───────────────────────── */}
+          <g clipPath="url(#bowlInteriorClip)">
+            {layers.map((layer, idx) => {
+              const isCurrent = layer.ing.id === currentIngredient?.id;
               return (
-                <g key={layer.id}>
-                  <defs>
-                    <linearGradient
-                      id={`layer-grad-${layer.id}`}
-                      x1="0%"
-                      y1="100%"
-                      x2="0%"
-                      y2="0%"
-                    >
-                      <stop
-                        offset="0%"
-                        stopColor={layer.color}
-                        stopOpacity={layer.isCurrent ? 0.95 : 0.65}
-                      />
-                      <stop
-                        offset="100%"
-                        stopColor={layer.color}
-                        stopOpacity={layer.isCurrent ? 0.75 : 0.45}
-                      />
-                    </linearGradient>
-                  </defs>
-
+                <g key={layer.ing.id}>
+                  {/* Layer fill rect */}
                   <motion.rect
-                    x={10}
-                    y={layerTopY}
-                    width={BOWL_W - 20}
-                    height={layerBottomY - layerTopY + 2}
-                    fill={`url(#layer-grad-${layer.id})`}
-                    initial={{ opacity: 0, scaleY: 0 }}
-                    animate={{ opacity: 1, scaleY: 1 }}
-                    transition={{ duration: 0.6, ease: 'easeOut' }}
-                    style={{ transformOrigin: 'center bottom' }}
+                    x={14}
+                    y={layer.y}
+                    width={BOWL_VIEW_W - 28}
+                    height={layer.height + 2}
+                    fill={layer.ing.color}
+                    opacity={isCurrent ? 0.9 : 0.65}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isCurrent ? 0.9 : 0.65 }}
+                    transition={{ duration: 0.4 }}
                   />
 
-                  {/* Shade code label on thick layers */}
-                  {layer.height > 28 && (
+                  {/* Layer separator line */}
+                  <line
+                    x1={16}
+                    y1={layer.y}
+                    x2={BOWL_VIEW_W - 16}
+                    y2={layer.y}
+                    stroke="rgba(255,255,255,0.1)"
+                    strokeWidth="0.8"
+                  />
+
+                  {/* Layer label: shadeCode actual/targetg */}
+                  {layer.height > 18 && (
                     <text
-                      x={bowlCenterX}
-                      y={layerTopY + layer.height / 2 + 5}
+                      x={BOWL_CENTER_X}
+                      y={layer.y + layer.height / 2 + 4}
                       textAnchor="middle"
                       fill="white"
-                      fontSize="12"
-                      fontWeight="700"
-                      fontFamily="system-ui"
-                      style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
+                      fontSize="10"
+                      fontWeight="600"
+                      fontFamily="system-ui, sans-serif"
+                      style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
                     >
-                      {layer.shadeCode}
+                      {layer.ing.shadeCode}{' '}
+                      {convertWeight(layer.actual)}/{convertWeight(layer.ing.targetGrams)}
+                      {unitLabel}
                     </text>
                   )}
                 </g>
               );
             })}
 
-            {/* Meniscus (curved surface line) at fill top */}
-            {fillPercent > 0.02 && layerBounds.length > 0 && (
+            {/* Surface wave (when filling) */}
+            {fillPercent > 0.03 && (
               <motion.path
-                d={getMeniscusPath(liquidTopY, fillPercent)}
+                d={getSurfacePath(fillTopY)}
                 fill="none"
-                stroke="rgba(255,255,255,0.12)"
-                strokeWidth="1"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.5 }}
+                stroke="rgba(255,255,255,0.15)"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                animate={{ d: getSurfacePath(fillTopY) }}
+                transition={{ duration: 0.3 }}
               />
             )}
-
-            {/* Liquid surface wave animation */}
-            {fillPercent > 0.02 && layerBounds.length > 0 && (
-              <motion.ellipse
-                cx={bowlCenterX}
-                cy={liquidTopY}
-                rx={60}
-                ry={3}
-                fill="rgba(255,255,255,0.05)"
-                animate={{
-                  rx: [55, 65, 55],
-                  ry: [2, 4, 2],
-                  cy: [liquidTopY - 0.5, liquidTopY + 0.5, liquidTopY - 0.5],
-                }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            )}
-
-            {/* Glass reflection overlay */}
-            <rect
-              x={30}
-              y={40}
-              width={40}
-              height={120}
-              rx={20}
-              fill="url(#glassReflection)"
-              opacity="0.3"
-            />
           </g>
 
-          {/* Rim highlight */}
+          {/* Rim line (top flat edge) */}
           <path
-            d={RIM_PATH}
+            d={BOWL_RIM}
             fill="none"
-            stroke="rgba(147,51,234,0.25)"
+            stroke="rgba(255,255,255,0.15)"
             strokeWidth="2"
-            filter="url(#bowlGlow)"
-          />
-          <path
-            d={RIM_PATH}
-            fill="none"
-            stroke="rgba(147,51,234,0.12)"
-            strokeWidth="0.5"
+            strokeLinecap="round"
           />
 
-          {/* Top rim highlight arc */}
+          {/* Rim highlight arc */}
           <path
-            d={`M 40 58 Q 120 50 200 58`}
+            d={`M 14 36 Q ${BOWL_CENTER_X} 34 ${BOWL_VIEW_W - 14} 36`}
             fill="none"
-            stroke="rgba(255,255,255,0.08)"
-            strokeWidth="1.5"
-            strokeLinecap="round"
+            stroke="rgba(255,255,255,0.06)"
+            strokeWidth="1"
           />
         </svg>
 
@@ -499,27 +444,21 @@ export function ScaleBowl({
           {pouringIngredient && currentIngredient && (
             <motion.div
               className="absolute pointer-events-none"
-              style={{
-                left: bowlCenterX - 4,
-                top: -20,
-                width: 8,
-                height: bowlTopY + 20,
-              }}
+              style={{ left: BOWL_CENTER_X - 3, top: -10, width: 6 }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
             >
               {/* Stream */}
               <motion.div
                 className="absolute left-1/2 -translate-x-1/2 rounded-full"
                 style={{
-                  width: 6,
-                  background: `linear-gradient(to bottom, ${currentIngredient.color}, ${currentIngredient.color}88)`,
+                  width: 5,
+                  background: `linear-gradient(to bottom, ${currentIngredient.color}cc, ${currentIngredient.color}44)`,
                 }}
-                initial={{ height: 0, top: 0 }}
-                animate={{ height: '100%', top: 0 }}
-                transition={{ duration: 0.4, ease: 'easeIn' }}
+                initial={{ height: 0 }}
+                animate={{ height: 55 }}
+                transition={{ duration: 0.5, ease: 'easeIn' }}
               />
               {/* Droplets */}
               {[0, 1, 2].map((i) => (
@@ -533,135 +472,94 @@ export function ScaleBowl({
                     marginLeft: -(2 + i),
                     background: currentIngredient.color,
                   }}
-                  initial={{ top: 0, opacity: 1, scale: 1 }}
+                  initial={{ top: 0, opacity: 1 }}
                   animate={{
-                    top: bowlTopY + 30 + i * 20,
+                    top: 40 + i * 18,
                     opacity: [1, 1, 0],
-                    scale: [1, 1.2, 0.5],
+                    scale: [1, 1.1, 0.5],
                   }}
-                  transition={{
-                    duration: 0.5 + i * 0.15,
-                    delay: 0.3 + i * 0.1,
-                    ease: 'easeIn',
-                  }}
+                  transition={{ duration: 0.45, delay: 0.35 + i * 0.1 }}
                 />
               ))}
-              {/* Splash at bottom */}
+              {/* Splash */}
               <motion.div
                 className="absolute rounded-full"
                 style={{
                   left: '50%',
-                  bottom: -10,
-                  width: 20,
-                  height: 10,
-                  marginLeft: -10,
-                  background: `radial-gradient(ellipse, ${currentIngredient.color}66, transparent)`,
+                  bottom: -8,
+                  width: 18,
+                  height: 8,
+                  marginLeft: -9,
+                  background: `radial-gradient(ellipse, ${currentIngredient.color}55, transparent)`,
                 }}
                 initial={{ scale: 0, opacity: 1 }}
-                animate={{ scale: [0, 1.5, 0], opacity: [1, 0.6, 0] }}
-                transition={{ duration: 0.5, delay: 0.6 }}
+                animate={{ scale: [0, 1.4, 0], opacity: [1, 0.5, 0] }}
+                transition={{ duration: 0.45, delay: 0.7 }}
               />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Current product card */}
-      {!isComplete && currentIngredient && (
-        <motion.div
-          key={currentIngredient.id}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full rounded-2xl p-4 mb-3"
-          style={{
-            background: 'rgba(22,22,32,0.8)',
-            border: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ background: currentIngredient.color }}
-              />
-              <span className="text-sm font-semibold" style={{ color: '#F5F5F7' }}>
-                {currentIngredient.shadeCode}
-              </span>
-              <span className="text-xs" style={{ color: '#71717A' }}>
-                {currentIngredient.brand}
-              </span>
-            </div>
-            <span className="text-lg font-bold font-mono" style={{ color: '#F5F5F7' }}>
-              {convertWeight(currentWeighed)}
-              <span className="text-xs ml-0.5" style={{ color: '#71717A' }}>
-                / {convertWeight(currentTarget)}
-                {unitLabel}
-              </span>
-            </span>
-          </div>
-
-          {/* Remaining indicator */}
-          <div className="flex items-center justify-between">
-            <div className="flex-1 mr-4">
-              <div
-                className="w-full h-1.5 rounded-full overflow-hidden"
-                style={{ background: 'rgba(255,255,255,0.05)' }}
-              >
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: currentIngredient.color }}
-                  animate={{
-                    width: `${Math.min((currentWeighed / currentTarget) * 100, 100)}%`,
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
-            </div>
-            <span
-              className="text-xs font-medium whitespace-nowrap"
-              style={{
-                color: currentRemaining <= 0 ? '#10B981' : '#F59E0B',
-              }}
-            >
-              {currentRemaining <= 0
-                ? '✓ Complete'
-                : `${convertWeight(currentRemaining)}${unitLabel} remaining`}
-            </span>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Up Next queue */}
-      {!isComplete && bowl.currentIndex < bowl.ingredients.length - 1 && (
+      {/* ─── Ingredient cards (matching Vish below-bowl style) ─────────────── */}
+      {!isComplete && (
         <div className="w-full mb-3">
-          {bowl.ingredients
-            .slice(bowl.currentIndex + 1, bowl.currentIndex + 3)
-            .map((ing) => (
+          {bowl.ingredients.map((ing) => {
+            const weighed = bowl.weights[ing.id] || 0;
+            const isActive = ing.id === currentIngredient?.id;
+            const done = weighed > 0;
+
+            return (
               <div
                 key={ing.id}
-                className="flex items-center justify-between py-2 px-3 rounded-lg mb-1"
-                style={{ background: 'rgba(255,255,255,0.02)' }}
+                className="flex items-center gap-2 py-2 px-3 rounded-xl mb-1.5 transition-all"
+                style={{
+                  background: isActive
+                    ? 'rgba(147,51,234,0.08)'
+                    : done
+                      ? 'rgba(255,255,255,0.02)'
+                      : 'transparent',
+                  border: isActive
+                    ? '1px solid rgba(147,51,234,0.2)'
+                    : done
+                      ? '1px solid rgba(255,255,255,0.04)'
+                      : '1px solid transparent',
+                }}
               >
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-2 h-2 rounded-full"
-                    style={{ background: ing.color, opacity: 0.4 }}
-                  />
-                  <span className="text-[11px]" style={{ color: '#71717A' }}>
+                {/* Color dot */}
+                <div
+                  className="w-4 h-4 rounded-full flex-shrink-0"
+                  style={{
+                    background: ing.color,
+                    opacity: done ? 1 : 0.4,
+                    boxShadow: isActive ? `0 0 8px ${ing.color}66` : 'none',
+                  }}
+                />
+
+                {/* Shade + brand */}
+                <div className="flex-1 min-w-0">
+                  <span
+                    className="text-[11px] font-semibold"
+                    style={{ color: done ? '#F5F5F7' : '#71717A' }}
+                  >
                     {ing.shadeCode}
                   </span>
+                  <span className="text-[10px] ml-1" style={{ color: '#52525B' }}>
+                    {ing.brand}
+                  </span>
                 </div>
-                <span className="text-[11px] font-mono" style={{ color: '#71717A' }}>
-                  {convertWeight(ing.targetGrams)}
+
+                {/* Weight */}
+                <span
+                  className="text-[11px] font-mono font-semibold"
+                  style={{ color: isActive ? '#A855F7' : done ? '#F5F5F7' : '#52525B' }}
+                >
+                  {done ? convertWeight(weighed) : '—'} / {convertWeight(ing.targetGrams)}
                   {unitLabel}
                 </span>
               </div>
-            ))}
-          {bowl.ingredients.length > bowl.currentIndex + 3 && (
-            <p className="text-[10px] text-center mt-1" style={{ color: '#71717A' }}>
-              +{bowl.ingredients.length - bowl.currentIndex - 3} more
-            </p>
-          )}
+            );
+          })}
         </div>
       )}
 
@@ -670,15 +568,15 @@ export function ScaleBowl({
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full rounded-2xl p-5 mb-3 text-center"
+          className="w-full rounded-2xl p-4 mb-3 text-center"
           style={{
             background: 'rgba(16,185,129,0.06)',
             border: '1px solid rgba(16,185,129,0.15)',
           }}
         >
-          <Check className="w-8 h-8 mx-auto mb-2 text-[#10B981]" />
-          <p className="text-sm font-semibold text-[#10B981]">All components weighed</p>
-          <p className="text-xs mt-1" style={{ color: '#71717A' }}>
+          <Check className="w-7 h-7 mx-auto mb-1.5 text-[#10B981]" />
+          <p className="text-sm font-semibold text-[#10B981]">Formula complete</p>
+          <p className="text-xs mt-0.5" style={{ color: '#71717A' }}>
             {convertWeight(totalCurrent)}
             {unitLabel} / {convertWeight(totalTarget)}
             {unitLabel}
@@ -686,7 +584,7 @@ export function ScaleBowl({
         </motion.div>
       )}
 
-      {/* Error display */}
+      {/* Error */}
       {error && (
         <div
           className="w-full mb-3 p-3 rounded-xl text-xs"
@@ -701,13 +599,13 @@ export function ScaleBowl({
       )}
 
       {/* Action bar */}
-      <div className="w-full flex gap-3">
+      <div className="w-full flex gap-2">
         {!connected ? (
           <button
             type="button"
             onClick={connect}
             disabled={connecting || !isSupported}
-            className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
+            className="flex-1 py-3 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
             style={{
               background: 'linear-gradient(135deg, #9333EA, #EC4899)',
               color: '#FFF',
@@ -721,10 +619,10 @@ export function ScaleBowl({
             <button
               type="button"
               onClick={tare}
-              className="py-3.5 px-5 rounded-2xl text-sm font-medium flex items-center justify-center gap-2"
-              style={{ background: 'rgba(147,51,234,0.12)', color: '#A855F7' }}
+              className="py-3 px-4 rounded-2xl text-sm font-medium flex items-center justify-center gap-1.5"
+              style={{ background: 'rgba(255,255,255,0.06)', color: '#A1A1AA' }}
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-3.5 h-3.5" />
               Tare
             </button>
 
@@ -733,52 +631,56 @@ export function ScaleBowl({
                 type="button"
                 onClick={captureWeight}
                 disabled={!weight || weight.value <= 0}
-                className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
+                className="flex-1 py-3 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-40"
                 style={{
-                  background: 'linear-gradient(135deg, #9333EA, #EC4899)',
-                  color: '#FFF',
+                  background:
+                    !weight || weight.value <= 0
+                      ? 'rgba(255,255,255,0.04)'
+                      : 'linear-gradient(135deg, #9333EA, #EC4899)',
+                  color: !weight || weight.value <= 0 ? '#52525B' : '#FFF',
                 }}
               >
                 <Check className="w-4 h-4" />
-                Capture{' '}
-                {weight?.value ? `${convertWeight(weight.value)}${unitLabel}` : ''}
+                {weight?.value
+                  ? `Capture ${convertWeight(weight.value)}${unitLabel}`
+                  : 'Waiting for weight...'}
               </button>
             )}
 
             {isComplete && (
-              <button
-                type="button"
-                onClick={() => {
-                  onComplete?.(bowl.weights);
-                  handleInventoryDeduction(bowl.weights);
-                }}
-                className="flex-1 py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2"
-                style={{
-                  background: 'linear-gradient(135deg, #10B981, #059669)',
-                  color: '#FFF',
-                }}
-              >
-                <Check className="w-4 h-4" />
-                Done
-              </button>
-            )}
-
-            {onReweigh && isComplete && (
-              <button
-                type="button"
-                onClick={onReweigh}
-                className="py-3.5 px-5 rounded-2xl text-sm font-medium flex items-center justify-center gap-2"
-                style={{ background: 'rgba(245,158,11,0.12)', color: '#F59E0B' }}
-              >
-                <Scale className="w-4 h-4" />
-                Reweigh
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onComplete?.(bowl.weights);
+                    handleInventoryDeduction(bowl.weights);
+                  }}
+                  className="flex-1 py-3 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2"
+                  style={{
+                    background: 'linear-gradient(135deg, #EC4899, #DB2777)',
+                    color: '#FFF',
+                  }}
+                >
+                  <Check className="w-4 h-4" />
+                  Done
+                </button>
+                {onReweigh && (
+                  <button
+                    type="button"
+                    onClick={onReweigh}
+                    className="py-3 px-4 rounded-2xl text-sm font-medium flex items-center justify-center gap-1.5"
+                    style={{ background: 'rgba(245,158,11,0.1)', color: '#F59E0B' }}
+                  >
+                    <Scale className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </>
             )}
           </>
         )}
       </div>
 
-      {/* Scale connection indicator */}
+      {/* Scale indicator */}
       {connected && (
         <div className="flex items-center gap-1.5 mt-3">
           <BluetoothConnected className="w-3 h-3 text-[#10B981]" />
@@ -791,7 +693,7 @@ export function ScaleBowl({
   );
 }
 
-// ─── Mini drop indicator (for formula cards / service view) ──────────────────
+// ─── Mini indicator (round bowl, for formula cards) ────────────────────────────
 
 interface DropIndicatorProps {
   ingredients: { name: string; shadeCode: string; color: string; targetGrams: number }[];
@@ -806,82 +708,45 @@ export function DropIndicator({
   totalTarget,
   size = 'sm',
 }: DropIndicatorProps) {
-  const dims = size === 'sm' ? { w: 36, h: 48 } : { w: 50, h: 68 };
-
-  // Mini bowl path scaled
-  const miniBowlPath = `
-    M 4 12
-    C 4 36, 16 46, 28 46
-    C 40 46, 52 36, 52 12
-    C 52 6, 46 4, 28 4
-    C 10 4, 4 6, 4 12
-    Z
-  `;
-
-  const miniBowlInner = `
-    M 6 13
-    C 6 34, 16 42, 28 42
-    C 40 42, 50 34, 50 13
-    C 50 8, 44 6, 28 6
-    C 12 6, 6 8, 6 13
-    Z
-  `;
+  const dims = size === 'sm' ? { w: 40, h: 56 } : { w: 54, h: 76 };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       <div className="relative" style={{ width: dims.w, height: dims.h }}>
         <svg
           width={dims.w}
           height={dims.h}
-          viewBox="0 0 56 52"
+          viewBox="0 0 220 250"
           className="absolute inset-0"
         >
-          <defs>
-            <clipPath id="miniBowlClip">
-              <path d={miniBowlInner} />
-            </clipPath>
-          </defs>
-
-          {/* Bowl outline */}
+          {/* Mini U-bowl */}
           <path
-            d={miniBowlPath}
+            d="M 10 30 L 210 30 C 215 30 220 35 220 45 L 218 200 C 218 215 205 225 170 225 L 50 225 C 15 225 2 215 2 200 L 0 45 C 0 35 5 30 10 30 Z"
             fill="rgba(255,255,255,0.04)"
             stroke="rgba(255,255,255,0.08)"
             strokeWidth="1"
           />
-
-          {/* Layer fills */}
-          <g clipPath="url(#miniBowlClip)">
-            {ingredients.map((ing, i) => {
-              if (ing.targetGrams <= 0) return null;
-              const layerH = (ing.targetGrams / Math.max(totalTarget, 1)) * 38;
-              const prevH = ingredients
-                .slice(0, i)
-                .reduce((s, p) => s + (p.targetGrams / Math.max(totalTarget, 1)) * 38, 0);
-              return (
-                <rect
-                  key={ing.name}
-                  x={2}
-                  y={44 - prevH - layerH}
-                  width={52}
-                  height={layerH + 2}
-                  fill={ing.color}
-                  opacity={0.6}
-                />
-              );
-            })}
-          </g>
-
+          {/* Layers */}
+          {ingredients.map((ing, i) => {
+            if (ing.targetGrams <= 0) return null;
+            const layerH = (ing.targetGrams / Math.max(totalTarget, 1)) * 184;
+            const prevH = ingredients
+              .slice(0, i)
+              .reduce((s, p) => s + (p.targetGrams / Math.max(totalTarget, 1)) * 184, 0);
+            return (
+              <rect
+                key={ing.name}
+                x={14}
+                y={220 - prevH - layerH}
+                width={192}
+                height={layerH}
+                fill={ing.color}
+                opacity={0.6}
+              />
+            );
+          })}
           {/* Rim */}
-          <ellipse
-            cx={28}
-            cy={12}
-            rx={24}
-            ry={5}
-            fill="none"
-            stroke="rgba(147,51,234,0.2)"
-            strokeWidth="0.5"
-          />
+          <line x1={10} y1={30} x2={210} y2={30} stroke="rgba(255,255,255,0.12)" strokeWidth="1.5" />
         </svg>
       </div>
       <div>
