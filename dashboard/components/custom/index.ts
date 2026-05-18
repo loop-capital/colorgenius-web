@@ -10,7 +10,7 @@ export {
   FormulaHistoryTimeline,
   type FormulaHistoryItem,
 } from './formula-history-timeline'
-export { InventoryDashboard, getInventory, saveInventory, deductFromInventory, deductFormulaFromInventory } from './inventory-dashboard'
+export { InventoryDashboard, deductFromInventory, deductFormulaFromInventory } from './inventory-dashboard'
 export { AddInventoryItem } from './add-inventory-item'
 export { CostCalculator } from './cost-calculator'
 export { FormulaRating } from './formula-rating'
