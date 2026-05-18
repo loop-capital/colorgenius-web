@@ -89,12 +89,6 @@ export default function LandingPage() {
               onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
               onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
             />
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 0', cursor: 'pointer' }}>
-              <input type="checkbox" name="interest_color_mgmt" value="yes"
-                style={{ width: 18, height: 18, accentColor: '#9333EA', cursor: 'pointer' }}
-              />
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>Also interested in color management & waste reduction</span>
-            </label>
             <input type="hidden" name="source" value="beta-landing-page" />
             <button type="submit" style={{ ...btnPrimary, padding: '14px 24px', width: '100%', fontSize: 15, justifyContent: 'center' }}>
               Join the Beta
