@@ -57,7 +57,7 @@ export default function LandingPage() {
           <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 36px)', fontWeight: 900, marginBottom: 12 }}>Be first in line for the beta.</h2>
           <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 15, marginBottom: 32, lineHeight: 1.5 }}>Sign up and we'll notify you as soon as spots open. Beta testers get a permanent discount on all plans.</p>
           <form action="https://formspree.io/f/xkoenolr" method="POST" style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 460, margin: '0 auto', textAlign: 'left' }}>
-            <div style={{ display: 'grid', gridTemplateTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <input type="text" name="name" placeholder="Your name" required
                 style={{ width: '100%', padding: '14px 18px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 15, outline: 'none' }}
                 onFocus={e => e.currentTarget.style.borderColor = 'rgba(147,51,234,0.5)'}
