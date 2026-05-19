@@ -34,6 +34,29 @@ interface SettingRowProps {
 }
 
 function SettingRow({ icon, title, subtitle, onPress, right, danger }: SettingRowProps) {
+  // If the row has interactive controls on the right (e.g. a Switch), don't wrap
+  // the entire row in a TouchableOpacity — it blocks child pointer events.
+  const hasInteractiveRight = !!right;
+
+  const content = (
+    <>
+      <View style={styles.settingIcon}>{icon}</View>
+      <View style={styles.settingContent}>
+        <Text style={[styles.settingTitle, danger && styles.dangerText]}>{title}</Text>
+        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+      </View>
+      {right || (onPress && <ChevronRight size={18} color="#D1D5DB" />)}
+    </>
+  );
+
+  if (hasInteractiveRight) {
+    return (
+      <View style={styles.settingRow} pointerEvents="box-none">
+        {content}
+      </View>
+    );
+  }
+
   return (
     <TouchableOpacity
       style={styles.settingRow}
@@ -41,12 +64,7 @@ function SettingRow({ icon, title, subtitle, onPress, right, danger }: SettingRo
       disabled={!onPress}
       activeOpacity={onPress ? 0.7 : 1}
     >
-      <View style={styles.settingIcon}>{icon}</View>
-      <View style={styles.settingContent}>
-        <Text style={[styles.settingTitle, danger && styles.dangerText]}>{title}</Text>
-        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
-      </View>
-      {right || (onPress && <ChevronRight size={18} color="#D1D5DB" />)}
+      {content}
     </TouchableOpacity>
   );
 }

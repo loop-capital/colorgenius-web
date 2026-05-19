@@ -73,11 +73,12 @@ The mobile app has 6 screens already built. It just needs to be built with EAS a
 - **Previous submission:** Already submitted to App Store Connect once before
 - **This is a RESUBMISSION** — update version to 1.0.1 or bump build number
 
-### Current mobile/app.json Issues
-The app.json currently has:
-- slug: "mobile" ❌ (should be "colorgenius")
-- No bundleIdentifier ❌ (should be "co.colorgenius.mobile")
-- Wrong projectId ❌ (should be "b079806d-5b5b-4c83-ab89-63ea74de66da")
+### mobile/app.json — Correct Values (FIXED 2026-05-18)
+- slug: "colorgenius" ✅
+- bundleIdentifier: "com.colorgenius.app" ✅ (must match App Store Connect — do NOT change to co.colorgenius.mobile)
+- projectId: "b079806d-5b5b-4c83-ab89-63ea74de66da" ✅
+- owner: "jasonopland" ✅
+- version: "1.0.1" ✅
 
 ### Bluetooth Dependency Issue
 - `react-native-ble-plx` may conflict with React Native 0.79
@@ -171,3 +172,8 @@ colorgenius/
 - Expo project slug must match what's on the server
 - PTY terminals on this server corrupt input (appends "78") — use non-interactive flags
 - Never modify existing working code without understanding it first
+- bundleIdentifier MUST be "com.colorgenius.app" — that is what App Store Connect (app ID 6768502681) is registered with. Do not change it.
+- ASC App ID is 6768502681 — already in eas.json submit profile
+- EAS credentials for com.colorgenius.app provisioning profile already exist (set up May 12, valid until May 2027) — non-interactive builds work without any Apple login
+- Interactive EAS sessions must be run from Windows Terminal → wsl, NOT from this server (PTY issue)
+- Status: v1.0.1 build 1.0.3 submitted to Apple on 2026-05-18, processing at Apple

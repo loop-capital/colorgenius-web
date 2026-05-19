@@ -1,4 +1,5 @@
 import React from 'react';
+import { Pressable } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
@@ -43,6 +44,13 @@ export default function App() {
             paddingVertical: 8,
             minHeight: 60,
           },
+          tabBarButton: (props: any) => (
+            <Pressable
+              {...props}
+              hitSlop={{ top: 10, bottom: 20, left: 10, right: 10 }}
+              android_ripple={{ borderless: true, radius: 40 }}
+            />
+          ),
         }}
       >
         <Tab.Screen
