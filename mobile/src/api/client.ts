@@ -1,3 +1,7 @@
+import {
+  TONE_VALUE_MAP,
+} from '../types';
+
 // COLORgenius API Client
 // Connects to the existing web API at colorgenius.co
 
@@ -29,32 +33,67 @@ export async function clearAuthToken(): Promise<void> {
 }
 
 export async function getSettings() {
-  const [notifications, darkMode, autoSync] = await Promise.all([
-    AsyncStorage.getItem(SETTINGS_NOTIFICATIONS_KEY).then(v => v !== null ? v === 'true' : true),
-    AsyncStorage.getItem(SETTINGS_DARK_MODE_KEY).then(v => v !== null ? v === 'true' : false),
-    AsyncStorage.getItem(SETTINGS_AUTO_SYNC_KEY).then(v => v !== null ? v === 'true' : true),
-  ]);
-  return { notifications, darkMode, autoSync };
+  try {
+    const [notifications, darkMode, autoSync] = await Promise.all([
+      AsyncStorage.getItem(SETTINGS_NOTIFICATIONS_KEY),
+      AsyncStorage.getItem(SETTINGS_DARK_MODE_KEY),
+      AsyncStorage.getItem(SETTINGS_AUTO_SYNC_KEY),
+    ]);
+    return {
+      notifications: notifications !== null ? notifications === 'true' : true,
+      darkMode: darkMode !== null ? darkMode === 'true' : false,
+      autoSync: autoSync !== null ? autoSync === 'true' : true,
+    };
+  } catch (error) {
+    console.error('[Settings] Failed to load settings:', error);
+    // Return defaults on error
+    return { notifications: true, darkMode: false, autoSync: true };
+  }
 }
 
 export async function saveNotifications(value: boolean) {
-  await AsyncStorage.setItem(SETTINGS_NOTIFICATIONS_KEY, String(value));
+  try {
+    await AsyncStorage.setItem(SETTINGS_NOTIFICATIONS_KEY, String(value));
+  } catch (error) {
+    console.error('[Settings] Failed to save notifications:', error);
+    throw error;
+  }
 }
 
 export async function saveDarkMode(value: boolean) {
-  await AsyncStorage.setItem(SETTINGS_DARK_MODE_KEY, String(value));
+  try {
+    await AsyncStorage.setItem(SETTINGS_DARK_MODE_KEY, String(value));
+  } catch (error) {
+    console.error('[Settings] Failed to save dark mode:', error);
+    throw error;
+  }
 }
 
 export async function saveAutoSync(value: boolean) {
-  await AsyncStorage.setItem(SETTINGS_AUTO_SYNC_KEY, String(value));
+  try {
+    await AsyncStorage.setItem(SETTINGS_AUTO_SYNC_KEY, String(value));
+  } catch (error) {
+    console.error('[Settings] Failed to save auto sync:', error);
+    throw error;
+  }
 }
 
 export async function saveDefaultBrand(brand: string) {
-  await AsyncStorage.setItem(SETTINGS_DEFAULT_BRAND_KEY, brand);
+  try {
+    await AsyncStorage.setItem(SETTINGS_DEFAULT_BRAND_KEY, brand);
+  } catch (error) {
+    console.error('[Settings] Failed to save default brand:', error);
+    throw error;
+  }
 }
 
 export async function getDefaultBrand(): Promise<string | null> {
-  return AsyncStorage.getItem(SETTINGS_DEFAULT_BRAND_KEY);
+  try {
+    return await AsyncStorage.getItem(SETTINGS_DEFAULT_BRAND_KEY);
+  } catch (error) {
+    console.error('[Settings] Failed to load default brand:', error);
+    return null;
+  }
 }
 
 // ─── Core API Helper ─────────────────────────────────────────────
@@ -138,12 +177,16 @@ export interface FormulationInput {
 }
 
 export async function submitFormulation(input: FormulationInput) {
+  // Convert single-letter tone codes to full tone names for the web API
+  const currentToneName = TONE_VALUE_MAP[input.currentTone] || input.currentTone;
+  const targetToneName = TONE_VALUE_MAP[input.targetTone] || input.targetTone;
+
   // Match web API field names exactly (camelCase)
   const body = {
     currentLevel: input.currentLevel,
-    currentTone: input.currentTone,
+    currentTone: currentToneName,
     targetLevel: input.targetLevel,
-    targetTone: input.targetTone,
+    targetTone: targetToneName,
     brandPreference: input.brandPreference,
     linePreference: input.linePreference,
     condition: input.condition,
@@ -210,13 +253,14 @@ export async function uploadPhotoMultipart(
   // Build multipart form data
   const formData = new FormData();
 
-  // React Native can use the file URI directly in FormData
-  // @ts-ignore — React Native FormData accepts file objects
+  // React Native FormData file upload
+  // Use a proper File-like object for React Native
+  const fileName = `photo-${Date.now()}.${ext || 'jpg'}`;
   formData.append('file', {
     uri: imageUri,
-    name: `photo.${ext || 'jpg'}`,
+    name: fileName,
     type: mimeType,
-  });
+  } as any);
   formData.append('sessionId', sessionId);
   formData.append('angle', angle);
 

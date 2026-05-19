@@ -756,7 +756,7 @@ function ResultCard({ result }: { result: FormulationResult }) {
         {result.confidence && (
           <View style={resultStyles.metaRow}>
             <Text style={resultStyles.metaLabel}>Confidence</Text>
-            <Text style={resultStyles.metaValue}>{Math.round(result.confidence * 100)}%</Text>
+            <Text style={resultStyles.metaValue}>{result.confidence}%</Text>
           </View>
         )}
       </View>
@@ -1367,24 +1367,6 @@ export default function FormulateScreen({ navigation }: any) {
               </View>
             </View>
 
-            {/* Generate Button */}
-            {result && (
-              <TouchableOpacity
-                style={stepStyles.generateBtn}
-                onPress={handleGenerate}
-                disabled={loading}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#FFF" size="small" />
-                ) : (
-                  <>
-                    <Sparkles size={20} color="#FFF" />
-                    <Text style={stepStyles.generateBtnText}>Generate Formula</Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            )}
-
             {/* Error */}
             {error && (
               <View style={stepStyles.errorBox}>
@@ -1393,7 +1375,7 @@ export default function FormulateScreen({ navigation }: any) {
               </View>
             )}
 
-            {/* Result only shown after bottom-nav generate */}
+            {/* Result shown after generation */}
             {result && <ResultCard result={result} />}
 
             {/* Reset */}

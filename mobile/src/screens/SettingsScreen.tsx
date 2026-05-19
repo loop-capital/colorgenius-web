@@ -61,6 +61,7 @@ export default function SettingsScreen() {
   const [autoSync, setAutoSync] = useState(true);
   const [defaultBrand, setDefaultBrand] = useState('Wella');
   const [loadingSettings, setLoadingSettings] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -72,7 +73,8 @@ export default function SettingsScreen() {
         const brand = await getDefaultBrand();
         if (brand) setDefaultBrand(brand);
       } catch (e) {
-        // Fallback to defaults
+        console.error('Failed to load settings:', e);
+        Alert.alert('Error', 'Failed to load settings');
       } finally {
         setLoadingSettings(false);
       }
@@ -81,17 +83,47 @@ export default function SettingsScreen() {
 
   const handleNotificationsToggle = async (value: boolean) => {
     setNotifications(value);
-    try { await saveNotifications(value); } catch (e) { console.error('Failed to save notifications', e); }
+    setSaving(true);
+    try {
+      await saveNotifications(value);
+    } catch (e) {
+      console.error('Failed to save notifications', e);
+      Alert.alert('Error', 'Failed to save notification setting');
+      // Revert on failure
+      setNotifications(!value);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDarkModeToggle = async (value: boolean) => {
     setDarkMode(value);
-    try { await saveDarkMode(value); } catch (e) { console.error('Failed to save dark mode', e); }
+    setSaving(true);
+    try {
+      await saveDarkMode(value);
+    } catch (e) {
+      console.error('Failed to save dark mode', e);
+      Alert.alert('Error', 'Failed to save dark mode setting');
+      // Revert on failure
+      setDarkMode(!value);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleAutoSyncToggle = async (value: boolean) => {
     setAutoSync(value);
-    try { await saveAutoSync(value); } catch (e) { console.error('Failed to save auto sync', e); }
+    setSaving(true);
+    try {
+      await saveAutoSync(value);
+    } catch (e) {
+      console.error('Failed to save auto sync', e);
+      Alert.alert('Error', 'Failed to save auto sync setting');
+      // Revert on failure
+      setAutoSync(!value);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleLogout = () => {
