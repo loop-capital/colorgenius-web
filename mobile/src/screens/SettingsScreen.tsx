@@ -81,17 +81,17 @@ export default function SettingsScreen() {
 
   const handleNotificationsToggle = async (value: boolean) => {
     setNotifications(value);
-    try { await saveNotifications(value); } catch {}
+    try { await saveNotifications(value); } catch (e) { console.error('Failed to save notifications', e); }
   };
 
   const handleDarkModeToggle = async (value: boolean) => {
     setDarkMode(value);
-    try { await saveDarkMode(value); } catch {}
+    try { await saveDarkMode(value); } catch (e) { console.error('Failed to save dark mode', e); }
   };
 
   const handleAutoSyncToggle = async (value: boolean) => {
     setAutoSync(value);
-    try { await saveAutoSync(value); } catch {}
+    try { await saveAutoSync(value); } catch (e) { console.error('Failed to save auto sync', e); }
   };
 
   const handleLogout = () => {

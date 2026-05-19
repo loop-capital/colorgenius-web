@@ -138,14 +138,15 @@ export interface FormulationInput {
 }
 
 export async function submitFormulation(input: FormulationInput) {
-  // Map from mobile nested format to web flat format if needed
+  // Match web API field names exactly (camelCase)
   const body = {
-    ...input,
-    // Web API expects flat arrays for some fields
-    chemical_history: input.chemicalHistory || [],
-    sensitivity_flags: input.sensitivities || [],
-    service_type: input.serviceType,
-    last_chemical_service: input.lastChemicalService,
+    currentLevel: input.currentLevel,
+    currentTone: input.currentTone,
+    targetLevel: input.targetLevel,
+    targetTone: input.targetTone,
+    brandPreference: input.brandPreference,
+    linePreference: input.linePreference,
+    condition: input.condition,
   };
 
   return apiRequest<{
@@ -186,81 +187,8 @@ export async function uploadPhoto(
   sessionId: string,
   angle: 'roots' | 'mid' | 'ends'
 ): Promise<PhotoUploadResponse> {
-  // Fallback to multipart if expo-file-system is not available
-  try {
-    // @ts-ignore — dynamic require
-    const FileSystem = require('expo-file-system');
-    if (!FileSystem) {
-      return uploadPhotoMultipart(imageUri, sessionId, angle);
-    }
-
-    const uriPath = imageUri.split('?')[0];
-    const ext = uriPath.split('.').pop()?.toLowerCase() ?? '';
-    const contentType = ext === 'png' ? 'image/png'
-      : ext === 'webp' ? 'image/webp'
-      : 'image/jpeg';
-
-    const token = await getAuthToken();
-    const authHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (token) {
-      authHeaders['Authorization'] = `Bearer ${token}`;
-    }
-
-    let contentLength: number | undefined;
-    try {
-      const fileInfo = await FileSystem.getInfoAsync(imageUri);
-      if (fileInfo.exists) {
-        contentLength = fileInfo.size;
-      }
-    } catch {
-      // Ignore
-    }
-
-    const presignBody: Record<string, string | number | undefined> = {
-      sessionId,
-      angle,
-      contentType,
-    };
-    if (contentLength !== undefined) {
-      presignBody.contentLength = contentLength;
-    }
-
-    const presignResponse = await fetch(`${API_BASE}/photos/upload`, {
-      method: 'POST',
-      headers: authHeaders,
-      body: JSON.stringify(presignBody),
-    });
-
-    if (!presignResponse.ok) {
-      const err = await presignResponse.json().catch(() => ({ error: 'Upload failed' }));
-      throw new Error(err.error || `Upload failed: HTTP ${presignResponse.status}`);
-    }
-
-    const presignData: PhotoUploadResponse = await presignResponse.json();
-    const { uploadUrl } = presignData.data;
-
-    if (!uploadUrl) {
-      throw new Error('Server did not return an upload URL');
-    }
-
-    const uploadResult = await FileSystem.uploadAsync(uploadUrl, imageUri, {
-      httpMethod: 'PUT',
-      headers: {
-        'Content-Type': contentType,
-      },
-    });
-
-    if (uploadResult.status < 200 || uploadResult.status >= 300) {
-      throw new Error(`Storage upload failed: HTTP ${uploadResult.status}`);
-    }
-
-    return presignData;
-  } catch {
-    // Fallback to multipart on any error
-    return uploadPhotoMultipart(imageUri, sessionId, angle);
-  }
+  // Always use multipart upload (no expo-file-system dependency)
+  return uploadPhotoMultipart(imageUri, sessionId, angle);
 }
 
 /**
