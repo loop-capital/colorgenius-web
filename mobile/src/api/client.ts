@@ -5,6 +5,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_BASE = 'https://colorgenius.co/api';
 
+// ─── Settings Keys ───────────────────────────────────────────────
+
+const SETTINGS_NOTIFICATIONS_KEY = 'cg_settings_notifications';
+const SETTINGS_DARK_MODE_KEY     = 'cg_settings_dark_mode';
+const SETTINGS_AUTO_SYNC_KEY     = 'cg_settings_auto_sync';
+const SETTINGS_DEFAULT_BRAND_KEY = 'cg_settings_default_brand';
+
 // ─── Auth Token Management ───────────────────────────────────────
 
 const TOKEN_KEY = 'cg_auth_token';
@@ -19,6 +26,35 @@ export async function setAuthToken(token: string): Promise<void> {
 
 export async function clearAuthToken(): Promise<void> {
   await AsyncStorage.removeItem(TOKEN_KEY);
+}
+
+export async function getSettings() {
+  const [notifications, darkMode, autoSync] = await Promise.all([
+    AsyncStorage.getItem(SETTINGS_NOTIFICATIONS_KEY).then(v => v !== null ? v === 'true' : true),
+    AsyncStorage.getItem(SETTINGS_DARK_MODE_KEY).then(v => v !== null ? v === 'true' : false),
+    AsyncStorage.getItem(SETTINGS_AUTO_SYNC_KEY).then(v => v !== null ? v === 'true' : true),
+  ]);
+  return { notifications, darkMode, autoSync };
+}
+
+export async function saveNotifications(value: boolean) {
+  await AsyncStorage.setItem(SETTINGS_NOTIFICATIONS_KEY, String(value));
+}
+
+export async function saveDarkMode(value: boolean) {
+  await AsyncStorage.setItem(SETTINGS_DARK_MODE_KEY, String(value));
+}
+
+export async function saveAutoSync(value: boolean) {
+  await AsyncStorage.setItem(SETTINGS_AUTO_SYNC_KEY, String(value));
+}
+
+export async function saveDefaultBrand(brand: string) {
+  await AsyncStorage.setItem(SETTINGS_DEFAULT_BRAND_KEY, brand);
+}
+
+export async function getDefaultBrand(): Promise<string | null> {
+  return AsyncStorage.getItem(SETTINGS_DEFAULT_BRAND_KEY);
 }
 
 // ─── Core API Helper ─────────────────────────────────────────────
@@ -71,12 +107,29 @@ export interface FormulationInput {
   currentTone: string;
   targetLevel: number;
   targetTone: string;
+  hairType?: 'virgin' | 'previously_colored' | 'damaged' | 'highly_damaged' | 'unknown';
+  texture?: 'fine' | 'medium' | 'coarse';
+  hairPattern?: 'straight' | 'wavy' | 'curly' | 'coily';
+  density?: 'thin' | 'medium' | 'thick';
+  serviceType?: 'full_head' | 'retouch' | 'balayage' | 'foils' | 'corrective' | 'gloss_toner';
+  chemicalHistory?: string[];
+  sensitivities?: string[];
+  lastChemicalService?: string;
   condition?: {
     type?: 'virgin' | 'previously_colored' | 'damaged' | 'highly_damaged' | 'unknown';
     porosity?: 'low' | 'normal' | 'high';
     grayPercent?: number;
     highlights?: boolean;
     highlightedPercent?: number;
+    banding?: boolean;
+    hotRoots?: boolean;
+    previousLightener?: boolean;
+    multipleColors?: boolean;
+    greenCast?: boolean;
+    muddyToner?: boolean;
+    overAshy?: boolean;
+    colorGrab?: boolean;
+    hollowEnds?: boolean;
   };
   brandPreference?: string;
   linePreference?: string;

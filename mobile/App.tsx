@@ -29,15 +29,19 @@ export default function App() {
             backgroundColor: BG,
             borderTopColor: BORDER,
             borderTopWidth: 1,
-            paddingBottom: 6,
-            paddingTop: 6,
-            height: 60,
+            paddingBottom: 8,
+            paddingTop: 8,
+            height: 72,
           },
           tabBarActiveTintColor: ACTIVE,
           tabBarInactiveTintColor: INACTIVE,
           tabBarLabelStyle: {
             fontSize: 10,
             fontWeight: '600',
+          },
+          tabBarItemStyle: {
+            paddingVertical: 4,
+            minHeight: 56,
           },
         }}
       >

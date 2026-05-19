@@ -19,6 +19,10 @@ import { submitFormulation, FormulationInput } from '../api/client';
 // ─── Inline types ────────────────────────────────────────────────────────────
 type HairConditionType = 'virgin' | 'previously_colored' | 'damaged' | 'highly_damaged';
 type Porosity = 'low' | 'normal' | 'high';
+type Texture = 'fine' | 'medium' | 'coarse';
+type HairPattern = 'straight' | 'wavy' | 'curly' | 'coily';
+type Density = 'thin' | 'medium' | 'thick';
+type ServiceType = 'full_head' | 'retouch' | 'balayage' | 'foils' | 'corrective' | 'gloss_toner';
 type Tone = 'neutral' | 'warm' | 'cool' | 'ash' | 'golden' | 'copper' |
   'red' | 'violet' | 'pearl' | 'beige' | 'mahogany' | 'chocolate';
 
@@ -45,6 +49,73 @@ const HAIR_TYPES: { value: HairConditionType; label: string }[] = [
   { value: 'previously_colored', label: 'Previously Colored' },
   { value: 'damaged', label: 'Damaged' },
   { value: 'highly_damaged', label: 'Highly Damaged' },
+];
+
+const TEXTURES: { value: Texture; label: string }[] = [
+  { value: 'fine', label: 'Fine' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'coarse', label: 'Coarse' },
+];
+
+const HAIR_PATTERNS: { value: HairPattern; label: string }[] = [
+  { value: 'straight', label: 'Straight' },
+  { value: 'wavy', label: 'Wavy' },
+  { value: 'curly', label: 'Curly' },
+  { value: 'coily', label: 'Coily' },
+];
+
+const DENSITIES: { value: Density; label: string }[] = [
+  { value: 'thin', label: 'Thin' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'thick', label: 'Thick' },
+];
+
+const SERVICE_TYPES: { value: ServiceType; label: string }[] = [
+  { value: 'full_head', label: 'Full Head' },
+  { value: 'retouch', label: 'Retouch' },
+  { value: 'balayage', label: 'Balayage' },
+  { value: 'foils', label: 'Foils' },
+  { value: 'corrective', label: 'Corrective' },
+  { value: 'gloss_toner', label: 'Gloss/Toner' },
+];
+
+const CHEMICAL_HISTORY_ITEMS: { value: string; label: string }[] = [
+  { value: 'box_dye', label: 'Box Dye' },
+  { value: 'metallic_salts', label: 'Metallic Salts' },
+  { value: 'henna', label: 'Henna' },
+  { value: 'keratin', label: 'Keratin Treatment' },
+  { value: 'relaxer', label: 'Relaxer / Straightening' },
+  { value: 'hard_water', label: 'Hard Water' },
+  { value: 'medication', label: 'Medication/Mineral Buildup' },
+];
+
+const SENSITIVITIES: { value: string; label: string }[] = [
+  { value: 'ppd_allergy', label: 'PPD Allergy' },
+  { value: 'pregnancy', label: 'Pregnancy' },
+  { value: 'breastfeeding', label: 'Breastfeeding' },
+  { value: 'chemotherapy', label: 'Active Chemotherapy' },
+];
+
+const LAST_CHEMICAL_TIMES: { value: string; label: string }[] = [
+  { value: 'never', label: 'Never' },
+  { value: '6_plus_months', label: '6+ months ago' },
+  { value: '3_to_6_months', label: '3-6 months ago' },
+  { value: '1_to_3_months', label: '1-3 months ago' },
+  { value: '3_to_4_weeks', label: '3-4 weeks ago' },
+  { value: '1_to_2_weeks', label: '1-2 weeks ago' },
+  { value: 'this_week', label: 'This week' },
+];
+
+const CONDITION_FLAGS: { value: string; label: string }[] = [
+  { value: 'banding', label: 'Banding' },
+  { value: 'previousLightener', label: 'Previous Lightener' },
+  { value: 'greenCast', label: 'Green Cast' },
+  { value: 'overAshy', label: 'Over-Ashy' },
+  { value: 'hollowEnds', label: 'Hollow Ends' },
+  { value: 'hotRoots', label: 'Hot Roots' },
+  { value: 'multipleColors', label: 'Multiple Colors' },
+  { value: 'muddyToner', label: 'Muddy Toner' },
+  { value: 'colorGrab', label: 'Color Grab' },
 ];
 
 const POROSITY: { value: Porosity; label: string }[] = [
@@ -173,6 +244,38 @@ const chipStyles = StyleSheet.create({
   chipTextActive: { color: '#FFFFFF', fontWeight: '700' },
 });
 
+// ─── MultiSelectChipSelector ─────────────────────────────────────────────────
+interface MultiChipSelectorProps {
+  label: string;
+  options: { value: string; label: string }[];
+  selected: string[];
+  onToggle: (value: string) => void;
+}
+
+function MultiChipSelector({ label, options, selected, onToggle }: MultiChipSelectorProps) {
+  return (
+    <View style={chipStyles.container}>
+      <Text style={chipStyles.label}>{label}</Text>
+      <View style={chipStyles.row}>
+        {options.map((opt) => {
+          const isSelected = selected.includes(opt.value);
+          return (
+            <TouchableOpacity
+              key={opt.value}
+              style={[chipStyles.chip, isSelected && chipStyles.chipActive]}
+              onPress={() => onToggle(opt.value)}
+            >
+              <Text style={[chipStyles.chipText, isSelected && chipStyles.chipTextActive]}>
+                {opt.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 export default function FormulateScreen({ navigation }: any) {
   const [currentLevel, setCurrentLevel] = useState(5);
@@ -183,8 +286,32 @@ export default function FormulateScreen({ navigation }: any) {
   const [porosity, setPorosity] = useState<Porosity>('normal');
   const [grayPercent, setGrayPercent] = useState('0');
   const [brandPref, setBrandPref] = useState('');
+  const [texture, setTexture] = useState<Texture>('medium');
+  const [hairPattern, setHairPattern] = useState<HairPattern>('straight');
+  const [density, setDensity] = useState<Density>('medium');
+  const [serviceType, setServiceType] = useState<ServiceType>('full_head');
+  const [chemicalHistory, setChemicalHistory] = useState<string[]>([]);
+  const [sensitivities, setSensitivities] = useState<string[]>([]);
+  const [lastChemicalService, setLastChemicalService] = useState('never');
+  const [conditionFlags, setConditionFlags] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+
+  const toggleChemicalHistory = (value: string) => {
+    setChemicalHistory(prev =>
+      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+    );
+  };
+
+  const toggleSensitivity = (value: string) => {
+    setSensitivities(prev =>
+      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+    );
+  };
+
+  const toggleConditionFlag = (value: string) => {
+    setConditionFlags(prev => ({ ...prev, [value]: !prev[value] }));
+  };
 
   const handleFormulate = async () => {
     setLoading(true);
@@ -195,7 +322,28 @@ export default function FormulateScreen({ navigation }: any) {
         currentTone,
         targetLevel,
         targetTone,
-        condition: { type: hairType, porosity, grayPercent: Number(grayPercent) || 0 },
+        hairType,
+        texture,
+        hairPattern,
+        density,
+        serviceType,
+        chemicalHistory,
+        sensitivities,
+        lastChemicalService,
+        condition: {
+          type: hairType,
+          porosity,
+          grayPercent: Number(grayPercent) || 0,
+          banding: conditionFlags.banding || false,
+          hotRoots: conditionFlags.hotRoots || false,
+          previousLightener: conditionFlags.previousLightener || false,
+          multipleColors: conditionFlags.multipleColors || false,
+          greenCast: conditionFlags.greenCast || false,
+          muddyToner: conditionFlags.muddyToner || false,
+          overAshy: conditionFlags.overAshy || false,
+          colorGrab: conditionFlags.colorGrab || false,
+          hollowEnds: conditionFlags.hollowEnds || false,
+        },
         brandPreference: brandPref || undefined,
       };
       const response = await submitFormulation(input);
@@ -216,6 +364,14 @@ export default function FormulateScreen({ navigation }: any) {
     setPorosity('normal');
     setGrayPercent('0');
     setBrandPref('');
+    setTexture('medium');
+    setHairPattern('straight');
+    setDensity('medium');
+    setServiceType('full_head');
+    setChemicalHistory([]);
+    setSensitivities([]);
+    setLastChemicalService('never');
+    setConditionFlags({});
     setResult(null);
   };
 
@@ -280,6 +436,40 @@ export default function FormulateScreen({ navigation }: any) {
               </View>
             </ScrollView>
           </View>
+
+          <Text style={styles.sectionHeader}>Hair Assessment</Text>
+          <ChipSelector label="Texture" options={TEXTURES} selected={texture} onSelect={(v) => setTexture(v as Texture)} />
+          <ChipSelector label="Pattern" options={HAIR_PATTERNS} selected={hairPattern} onSelect={(v) => setHairPattern(v as HairPattern)} />
+          <ChipSelector label="Density" options={DENSITIES} selected={density} onSelect={(v) => setDensity(v as Density)} />
+
+          <Text style={styles.sectionHeader}>Service & History</Text>
+          <ChipSelector label="Service Type" options={SERVICE_TYPES} selected={serviceType} onSelect={(v) => setServiceType(v as ServiceType)} />
+          <MultiChipSelector
+            label="Chemical History"
+            options={CHEMICAL_HISTORY_ITEMS}
+            selected={chemicalHistory}
+            onToggle={toggleChemicalHistory}
+          />
+          <MultiChipSelector
+            label="Sensitivities & Contraindications"
+            options={SENSITIVITIES}
+            selected={sensitivities}
+            onToggle={toggleSensitivity}
+          />
+          <ChipSelector
+            label="Last Chemical Service"
+            options={LAST_CHEMICAL_TIMES}
+            selected={lastChemicalService}
+            onSelect={setLastChemicalService}
+          />
+
+          <Text style={styles.sectionHeader}>Problem Indicators</Text>
+          <MultiChipSelector
+            label="Condition Flags"
+            options={CONDITION_FLAGS}
+            selected={Object.entries(conditionFlags).filter(([_, v]) => v).map(([k]) => k)}
+            onToggle={toggleConditionFlag}
+          />
 
           <View style={styles.actions}>
             <TouchableOpacity style={styles.resetBtn} onPress={handleReset}>

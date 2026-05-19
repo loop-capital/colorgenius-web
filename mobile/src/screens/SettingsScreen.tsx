@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ import {
   Wifi,
   Smartphone,
 } from 'lucide-react-native';
-import { clearAuthToken } from '../api/client';
+import { clearAuthToken, getSettings, saveNotifications, saveDarkMode, saveAutoSync, saveDefaultBrand, getDefaultBrand } from '../api/client';
 
 interface SettingRowProps {
   icon: React.ReactNode;
@@ -59,6 +59,40 @@ export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [autoSync, setAutoSync] = useState(true);
+  const [defaultBrand, setDefaultBrand] = useState('Wella');
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const settings = await getSettings();
+        setNotifications(settings.notifications);
+        setDarkMode(settings.darkMode);
+        setAutoSync(settings.autoSync);
+        const brand = await getDefaultBrand();
+        if (brand) setDefaultBrand(brand);
+      } catch (e) {
+        // Fallback to defaults
+      } finally {
+        setLoadingSettings(false);
+      }
+    })();
+  }, []);
+
+  const handleNotificationsToggle = async (value: boolean) => {
+    setNotifications(value);
+    try { await saveNotifications(value); } catch {}
+  };
+
+  const handleDarkModeToggle = async (value: boolean) => {
+    setDarkMode(value);
+    try { await saveDarkMode(value); } catch {}
+  };
+
+  const handleAutoSyncToggle = async (value: boolean) => {
+    setAutoSync(value);
+    try { await saveAutoSync(value); } catch {}
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -112,7 +146,7 @@ export default function SettingsScreen() {
             right={
               <Switch
                 value={notifications}
-                onValueChange={setNotifications}
+                onValueChange={handleNotificationsToggle}
                 trackColor={{ false: '#E5E7EB', true: '#C4B5FD' }}
                 thumbColor={notifications ? '#7C3AED' : '#FFF'}
               />
@@ -124,7 +158,7 @@ export default function SettingsScreen() {
             right={
               <Switch
                 value={darkMode}
-                onValueChange={setDarkMode}
+                onValueChange={handleDarkModeToggle}
                 trackColor={{ false: '#E5E7EB', true: '#C4B5FD' }}
                 thumbColor={darkMode ? '#7C3AED' : '#FFF'}
               />
@@ -152,7 +186,7 @@ export default function SettingsScreen() {
             right={
               <Switch
                 value={autoSync}
-                onValueChange={setAutoSync}
+                onValueChange={handleAutoSyncToggle}
                 trackColor={{ false: '#E5E7EB', true: '#C4B5FD' }}
                 thumbColor={autoSync ? '#7C3AED' : '#FFF'}
               />
