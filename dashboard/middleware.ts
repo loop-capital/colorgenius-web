@@ -11,6 +11,7 @@ const PUBLIC_PATHS = [
   '/login',
   '/register',
   '/privacy',
+  '/api',           // All API routes are public (handle own auth via Bearer token)
   '/api/auth/register',
   '/api/auth/login',
   '/api/auth/logout',
@@ -28,12 +29,18 @@ export async function middleware(request: NextRequest) {
   const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'));
 
   if (!isPublic) {
+    // Check for cookie-based auth (web dashboard)
     const token = request.cookies.get('colorgenius_token')?.value;
-    if (!token) {
+    // Check for Bearer token auth (mobile app)
+    const authHeader = request.headers.get('authorization')?.replace('Bearer ', '');
+    
+    const authToken = token || authHeader;
+    
+    if (!authToken) {
       return redirectToLogin(request);
     }
     try {
-      await jwtVerify(token, JWT_SECRET);
+      await jwtVerify(authToken, JWT_SECRET);
     } catch {
       return redirectToLogin(request);
     }
