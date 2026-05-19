@@ -21,7 +21,11 @@ const SETTINGS_DEFAULT_BRAND_KEY = 'cg_settings_default_brand';
 const TOKEN_KEY = 'cg_auth_token';
 
 export async function getAuthToken(): Promise<string | null> {
-  return AsyncStorage.getItem(TOKEN_KEY);
+  const raw = await AsyncStorage.getItem(TOKEN_KEY);
+  if (!raw) return null;
+  // Strip whitespace, newlines, and null bytes that corrupt HTTP headers
+  const cleaned = raw.replace(/[\x00-\x1F\x7F\s]/g, '');
+  return cleaned.length > 0 ? cleaned : null;
 }
 
 export async function setAuthToken(token: string): Promise<void> {
@@ -116,7 +120,8 @@ async function apiRequest<T>(
   };
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    const cleanToken = token.replace(/[^A-Za-z0-9._~+/=-]/g, '');
+    if (cleanToken) headers['Authorization'] = 'Bearer ' + cleanToken;
   }
 
   const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -269,7 +274,7 @@ export async function uploadPhotoMultipart(
   const response = await fetch(`${API_BASE}/photos/upload`, {
     method: 'POST',
     headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(token ? { 'Authorization': 'Bearer ' + token.replace(/[^A-Za-z0-9._~+/=-]/g, '') } : {}),
     },
     body: formData,
   });
