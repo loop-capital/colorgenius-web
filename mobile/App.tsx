@@ -40,8 +40,8 @@ export default function App() {
             fontWeight: '600',
           },
           tabBarItemStyle: {
-            paddingVertical: 4,
-            minHeight: 56,
+            paddingVertical: 8,
+            minHeight: 60,
           },
         }}
       >
