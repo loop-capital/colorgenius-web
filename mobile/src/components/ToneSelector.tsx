@@ -4,29 +4,13 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { TONES, type Tone } from '../types';
+import { TONES, type ToneValue } from '../types';
 
 interface ToneSelectorProps {
-  value: Tone;
-  onChange: (tone: Tone) => void;
+  value: ToneValue;
+  onChange: (tone: ToneValue) => void;
   label?: string;
 }
-
-// Subtle per-tone accent colours
-const TONE_COLORS: Record<string, string> = {
-  neutral: '#B0A090',
-  warm: '#D4A574',
-  cool: '#7BA7C9',
-  ash: '#8FA39A',
-  golden: '#C9A84C',
-  copper: '#B87333',
-  red: '#C94C4C',
-  violet: '#9B59B6',
-  pearl: '#D5C8E0',
-  beige: '#C9B99A',
-  mahogany: '#6E3B3B',
-  chocolate: '#5C3317',
-};
 
 export default function ToneSelector({ value, onChange, label }: ToneSelectorProps) {
   return (
@@ -34,24 +18,30 @@ export default function ToneSelector({ value, onChange, label }: ToneSelectorPro
       {label && <Text style={styles.label}>{label}</Text>}
       <View style={styles.grid}>
         {TONES.map((tone) => {
-          const selected = tone === value;
-          const accent = TONE_COLORS[tone] ?? '#D4A574';
+          const selected = tone.value === value;
           return (
             <Pressable
-              key={tone}
-              onPress={() => onChange(tone)}
+              key={tone.value}
+              onPress={() => onChange(tone.value)}
               style={[
                 styles.chip,
-                selected && { backgroundColor: accent, borderColor: accent },
+                selected && { backgroundColor: tone.color + '40', borderColor: tone.color },
               ]}
             >
+              <View
+                style={[
+                  styles.colorDot,
+                  { backgroundColor: tone.color },
+                  selected && styles.colorDotActive,
+                ]}
+              />
               <Text
                 style={[
                   styles.chipText,
                   selected && styles.chipTextSelected,
                 ]}
               >
-                {capitalize(tone)}
+                {tone.label}
               </Text>
             </Pressable>
           );
@@ -59,10 +49,6 @@ export default function ToneSelector({ value, onChange, label }: ToneSelectorPro
       </View>
     </View>
   );
-}
-
-function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 const styles = StyleSheet.create({
@@ -81,12 +67,29 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#333355',
     backgroundColor: '#1A1A2E',
+  },
+  colorDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  colorDotActive: {
+    borderColor: '#FFF',
+    shadowColor: '#FFF',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
   },
   chipText: {
     color: '#AAAACC',
