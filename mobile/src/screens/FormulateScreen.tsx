@@ -1368,20 +1368,22 @@ export default function FormulateScreen({ navigation }: any) {
             </View>
 
             {/* Generate Button */}
-            <TouchableOpacity
-              style={stepStyles.generateBtn}
-              onPress={handleGenerate}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator color="#FFF" size="small" />
-              ) : (
-                <>
-                  <Sparkles size={20} color="#FFF" />
-                  <Text style={stepStyles.generateBtnText}>Generate Formula</Text>
-                </>
-              )}
-            </TouchableOpacity>
+            {result && (
+              <TouchableOpacity
+                style={stepStyles.generateBtn}
+                onPress={handleGenerate}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFF" size="small" />
+                ) : (
+                  <>
+                    <Sparkles size={20} color="#FFF" />
+                    <Text style={stepStyles.generateBtnText}>Generate Formula</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            )}
 
             {/* Error */}
             {error && (
@@ -1391,7 +1393,7 @@ export default function FormulateScreen({ navigation }: any) {
               </View>
             )}
 
-            {/* Result */}
+            {/* Result only shown after bottom-nav generate */}
             {result && <ResultCard result={result} />}
 
             {/* Reset */}
