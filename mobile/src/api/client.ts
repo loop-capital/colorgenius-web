@@ -102,6 +102,8 @@ export async function healthCheck() {
 
 // ─── Formulation ─────────────────────────────────────────────────
 
+export type { FormulationResult } from '../types';
+
 export interface FormulationInput {
   currentLevel: number;
   currentTone: string;
@@ -116,7 +118,7 @@ export interface FormulationInput {
   sensitivities?: string[];
   lastChemicalService?: string;
   condition?: {
-    type?: 'virgin' | 'previously_colored' | 'damaged' | 'highly_damaged' | 'unknown';
+    type?: 'virgin' | 'previously_colored' | 'damaged' | 'highly_damaged' | 'bleached' | 'gray_coverage' | 'oily_scalp' | 'dry_brittle' | 'unknown';
     porosity?: 'low' | 'normal' | 'high';
     grayPercent?: number;
     highlights?: boolean;
@@ -136,13 +138,23 @@ export interface FormulationInput {
 }
 
 export async function submitFormulation(input: FormulationInput) {
+  // Map from mobile nested format to web flat format if needed
+  const body = {
+    ...input,
+    // Web API expects flat arrays for some fields
+    chemical_history: input.chemicalHistory || [],
+    sensitivity_flags: input.sensitivities || [],
+    service_type: input.serviceType,
+    last_chemical_service: input.lastChemicalService,
+  };
+
   return apiRequest<{
     success: boolean;
     data: any;
     meta: { formulatedAt: string };
   }>('/formulate', {
     method: 'POST',
-    body: input,
+    body,
   });
 }
 
@@ -161,56 +173,141 @@ export interface PhotoUploadResponse {
   };
 }
 
+/**
+ * Upload a photo using the presigned URL flow.
+ *
+ * Step 1: POST /api/photos/upload with JSON to get a presigned R2 URL
+ * Step 2: PUT the file bytes directly to the presigned URL
+ *
+ * NOTE: This requires expo-file-system. If not available, use uploadPhotoMultipart.
+ */
 export async function uploadPhoto(
   imageUri: string,
   sessionId: string,
   angle: 'roots' | 'mid' | 'ends'
 ): Promise<PhotoUploadResponse> {
-  // Determine content type from URI extension
+  // Fallback to multipart if expo-file-system is not available
+  try {
+    // @ts-ignore — dynamic require
+    const FileSystem = require('expo-file-system');
+    if (!FileSystem) {
+      return uploadPhotoMultipart(imageUri, sessionId, angle);
+    }
+
+    const uriPath = imageUri.split('?')[0];
+    const ext = uriPath.split('.').pop()?.toLowerCase() ?? '';
+    const contentType = ext === 'png' ? 'image/png'
+      : ext === 'webp' ? 'image/webp'
+      : 'image/jpeg';
+
+    const token = await getAuthToken();
+    const authHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      authHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    let contentLength: number | undefined;
+    try {
+      const fileInfo = await FileSystem.getInfoAsync(imageUri);
+      if (fileInfo.exists) {
+        contentLength = fileInfo.size;
+      }
+    } catch {
+      // Ignore
+    }
+
+    const presignBody: Record<string, string | number | undefined> = {
+      sessionId,
+      angle,
+      contentType,
+    };
+    if (contentLength !== undefined) {
+      presignBody.contentLength = contentLength;
+    }
+
+    const presignResponse = await fetch(`${API_BASE}/photos/upload`, {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify(presignBody),
+    });
+
+    if (!presignResponse.ok) {
+      const err = await presignResponse.json().catch(() => ({ error: 'Upload failed' }));
+      throw new Error(err.error || `Upload failed: HTTP ${presignResponse.status}`);
+    }
+
+    const presignData: PhotoUploadResponse = await presignResponse.json();
+    const { uploadUrl } = presignData.data;
+
+    if (!uploadUrl) {
+      throw new Error('Server did not return an upload URL');
+    }
+
+    const uploadResult = await FileSystem.uploadAsync(uploadUrl, imageUri, {
+      httpMethod: 'PUT',
+      headers: {
+        'Content-Type': contentType,
+      },
+    });
+
+    if (uploadResult.status < 200 || uploadResult.status >= 300) {
+      throw new Error(`Storage upload failed: HTTP ${uploadResult.status}`);
+    }
+
+    return presignData;
+  } catch {
+    // Fallback to multipart on any error
+    return uploadPhotoMultipart(imageUri, sessionId, angle);
+  }
+}
+
+/**
+ * Alternative upload using multipart/form-data (direct upload mode).
+ * Use this if presigned URL flow has issues with R2.
+ */
+export async function uploadPhotoMultipart(
+  imageUri: string,
+  sessionId: string,
+  angle: 'roots' | 'mid' | 'ends'
+): Promise<PhotoUploadResponse> {
+  // Determine content type
   const uriPath = imageUri.split('?')[0];
   const ext = uriPath.split('.').pop()?.toLowerCase() ?? '';
-  const contentType = ext === 'png' ? 'image/png'
+  const mimeType = ext === 'png' ? 'image/png'
     : ext === 'webp' ? 'image/webp'
     : 'image/jpeg';
 
-  // Step 1: Request a presigned URL from the server (small JSON payload, no body limit issues)
+  // Build multipart form data
+  const formData = new FormData();
+
+  // React Native can use the file URI directly in FormData
+  // @ts-ignore — React Native FormData accepts file objects
+  formData.append('file', {
+    uri: imageUri,
+    name: `photo.${ext || 'jpg'}`,
+    type: mimeType,
+  });
+  formData.append('sessionId', sessionId);
+  formData.append('angle', angle);
+
   const token = await getAuthToken();
-  const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (token) authHeaders['Authorization'] = `Bearer ${token}`;
 
-  const presignResponse = await fetch(`${API_BASE}/photos/upload`, {
+  const response = await fetch(`${API_BASE}/photos/upload`, {
     method: 'POST',
-    headers: authHeaders,
-    body: JSON.stringify({ sessionId, angle, contentType }),
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
   });
 
-  if (!presignResponse.ok) {
-    const err = await presignResponse.json().catch(() => ({ error: 'Upload failed' }));
-    throw new Error(err.error || `Upload failed: HTTP ${presignResponse.status}`);
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ error: 'Upload failed' }));
+    throw new Error(err.error || `Upload failed: HTTP ${response.status}`);
   }
 
-  const presignData: PhotoUploadResponse = await presignResponse.json();
-  const { uploadUrl } = presignData.data;
-
-  if (!uploadUrl) {
-    throw new Error('Server did not return an upload URL');
-  }
-
-  // Step 2: Read the local file and PUT it directly to R2 (bypasses Next.js body limit)
-  const fileResponse = await fetch(imageUri);
-  const blob = await fileResponse.blob();
-
-  const r2Response = await fetch(uploadUrl, {
-    method: 'PUT',
-    headers: { 'Content-Type': contentType },
-    body: blob,
-  });
-
-  if (!r2Response.ok) {
-    throw new Error(`Storage upload failed: HTTP ${r2Response.status}`);
-  }
-
-  return presignData;
+  return response.json();
 }
 
 export async function analyzePhoto(photoId: string) {
