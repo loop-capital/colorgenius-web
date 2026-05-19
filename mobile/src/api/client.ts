@@ -23,8 +23,9 @@ const TOKEN_KEY = 'cg_auth_token';
 export async function getAuthToken(): Promise<string | null> {
   const raw = await AsyncStorage.getItem(TOKEN_KEY);
   if (!raw) return null;
-  // Strip whitespace, newlines, and null bytes that corrupt HTTP headers
-  const cleaned = raw.replace(/[\x00-\x1F\x7F\s]/g, '');
+  // Aggressively strip all non-visible ASCII and control characters that corrupt HTTP headers.
+  // Token must be non-empty after stripping.
+  const cleaned = raw.replace(/[^\x20-\x7E]/g, '').trim();
   return cleaned.length > 0 ? cleaned : null;
 }
 
@@ -271,11 +272,18 @@ export async function uploadPhotoMultipart(
 
   const token = await getAuthToken();
 
+  // Build headers carefully — never send an Authorization header with an invalid/null token
+  const headers: Record<string, string> = {};
+  if (token) {
+    const cleanToken = token.replace(/[^A-Za-z0-9._~+/=-]/g, '');
+    if (cleanToken) {
+      headers['Authorization'] = 'Bearer ' + cleanToken;
+    }
+  }
+
   const response = await fetch(`${API_BASE}/photos/upload`, {
     method: 'POST',
-    headers: {
-      ...(token ? { 'Authorization': 'Bearer ' + token.replace(/[^A-Za-z0-9._~+/=-]/g, '') } : {}),
-    },
+    headers,
     body: formData,
   });
 
