@@ -73,13 +73,32 @@ Spawned an agent to build something that already existed. **Fix:** `ls` the targ
 
 ## Project-Specific Lessons
 
-_COLORgenius failures and discoveries go here._
+### PL-001: Build from the RIGHT Directory
+**May 19, 2026:** Builds 8-14 were all compiled from `ios-app/` (old code) instead of `mobile/` (fixed code). Every build appeared to succeed but TestFlight had the old broken code. **Fix:** Always `cd mobile/` before running `eas build`. The EAS project root is `mobile/`, not the repo root. **Also:** commit changes before building — EAS uses git commits, not working tree.
 
-<!-- Examples:
-- "Always back up COLORgenius workspace before letting ColorGenius-CEO write to it"
-- "iOS app is at ios-app/ — Expo project"
-- "Dashboard is at dashboard/ — Next.js + Prisma"
--->
+### PL-002: EXPO_TOKEN Has Double-Dashes
+The EXPO_TOKEN contains `--` which breaks shell argument parsing. `EXPO_TOKEN="$(cat /tmp/expo_token.txt)"` — read from file, never inline.
+
+### PL-003: Vercel Project Can Be Stale
+Multiple Vercel projects can exist for the same repo. The `colorgenius` project (root dir `.`, no domains) was created alongside `dashboard` (root dir `dashboard/`, serves colorgenius.co). The stale project failed on every push. **Fix:** Deleted the stale project. Always verify which Vercel project actually serves the live domain.
+
+### PL-004: API Routes Need Middleware Exemption
+The middleware was redirecting ALL unauthenticated requests (including `/api/*`) to `/login`. Mobile app uses `Authorization: Bearer` headers, not cookies. **Fix:** Added `/api` to `PUBLIC_PATHS`. API routes should handle their own auth.
+
+### PL-005: Auth Token Can Contain Invalid Characters
+AsyncStorage tokens can have whitespace, newlines, or control characters that break HTTP headers in React Native's `fetch()`. **Fix:** Aggressively sanitize tokens: `raw.replace(/[^\x20-\x7E]/g, '').trim()` on read, and `token.replace(/[^A-Za-z0-9._~+/=-]/g, '')` before setting header. Only set header if sanitized token is non-empty.
+
+### PL-006: TouchableOpacity Blocks Child Switch Components
+In React Native, wrapping a `Switch` inside a `TouchableOpacity` blocks the Switch's taps. **Fix:** Use `pointerEvents="box-none"` on the parent View when it contains interactive children (Switch, Slider, etc.).
+
+### PL-007: Tab Bar Touch Targets Too Small
+React Navigation's default tab bar touch targets are too small on iOS. `tabBarItemStyle.paddingVertical` alone doesn't expand the pressable area. **Fix:** Use a custom `tabBarButton` component wrapping `Pressable` with `hitSlop={{ top: 10, bottom: 20, left: 10, right: 10 }}`.
+
+### PL-008: Always Check Which Vercel Project Serves the Domain
+Before assuming a failed deployment affects the live site, run `npx vercel project ls` and check which project actually has the domain. Don't trust notification emails blindly.
+
+### PL-009: Run EXPO_TOKEN From File
+Shell truncates tokens with `--` (double-dash). Always use `EXPO_TOKEN="$(cat /tmp/expo_token.txt)"` when running EAS commands.
 
 ---
 
