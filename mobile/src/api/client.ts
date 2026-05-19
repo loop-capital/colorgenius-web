@@ -153,6 +153,7 @@ export interface PhotoUploadResponse {
   data: {
     id: string;
     url: string;
+    uploadUrl?: string;
     sessionId: string;
     angle: string;
     analysisStatus: string;
@@ -165,38 +166,51 @@ export async function uploadPhoto(
   sessionId: string,
   angle: 'roots' | 'mid' | 'ends'
 ): Promise<PhotoUploadResponse> {
-  const formData = new FormData();
+  // Determine content type from URI extension
+  const uriPath = imageUri.split('?')[0];
+  const ext = uriPath.split('.').pop()?.toLowerCase() ?? '';
+  const contentType = ext === 'png' ? 'image/png'
+    : ext === 'webp' ? 'image/webp'
+    : 'image/jpeg';
 
-  const filename = imageUri.split('/').pop() || 'photo.jpg';
-  const type = filename.endsWith('.png') ? 'image/png' : 'image/jpeg';
-
-  formData.append('file', {
-    uri: imageUri,
-    name: filename,
-    type,
-  } as any);
-
-  formData.append('sessionId', sessionId);
-  formData.append('angle', angle);
-
+  // Step 1: Request a presigned URL from the server (small JSON payload, no body limit issues)
   const token = await getAuthToken();
-  const headers: Record<string, string> = {};
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+  const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) authHeaders['Authorization'] = `Bearer ${token}`;
 
-  const response = await fetch(`${API_BASE}/photos/upload`, {
+  const presignResponse = await fetch(`${API_BASE}/photos/upload`, {
     method: 'POST',
-    headers,
-    body: formData,
+    headers: authHeaders,
+    body: JSON.stringify({ sessionId, angle, contentType }),
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Upload failed' }));
-    throw new Error(error.error || `Upload failed: HTTP ${response.status}`);
+  if (!presignResponse.ok) {
+    const err = await presignResponse.json().catch(() => ({ error: 'Upload failed' }));
+    throw new Error(err.error || `Upload failed: HTTP ${presignResponse.status}`);
   }
 
-  return response.json();
+  const presignData: PhotoUploadResponse = await presignResponse.json();
+  const { uploadUrl } = presignData.data;
+
+  if (!uploadUrl) {
+    throw new Error('Server did not return an upload URL');
+  }
+
+  // Step 2: Read the local file and PUT it directly to R2 (bypasses Next.js body limit)
+  const fileResponse = await fetch(imageUri);
+  const blob = await fileResponse.blob();
+
+  const r2Response = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': contentType },
+    body: blob,
+  });
+
+  if (!r2Response.ok) {
+    throw new Error(`Storage upload failed: HTTP ${r2Response.status}`);
+  }
+
+  return presignData;
 }
 
 export async function analyzePhoto(photoId: string) {
