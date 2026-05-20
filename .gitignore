@@ -54,3 +54,6 @@ coverage/
 # Archive directory
 .archive/
 .vercel
+
+# Archives (local only, not committed)
+archives/
