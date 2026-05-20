@@ -51,8 +51,13 @@ function SettingRow({ icon, title, subtitle, onPress, right, danger }: SettingRo
 
   if (hasInteractiveRight) {
     return (
-      <View style={styles.settingRow} pointerEvents="box-none">
-        {content}
+      <View style={styles.settingRow}>
+        <View style={styles.settingIcon}>{icon}</View>
+        <View style={styles.settingContent}>
+          <Text style={[styles.settingTitle, danger && styles.dangerText]}>{title}</Text>
+          {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+        </View>
+        {right}
       </View>
     );
   }
