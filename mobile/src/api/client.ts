@@ -270,20 +270,10 @@ export async function uploadPhotoMultipart(
   formData.append('sessionId', sessionId);
   formData.append('angle', angle);
 
-  const token = await getAuthToken();
-
-  // Build headers carefully — never send an Authorization header with an invalid/null token
-  const headers: Record<string, string> = {};
-  if (token) {
-    const cleanToken = token.replace(/[^A-Za-z0-9._~+/=-]/g, '');
-    if (cleanToken) {
-      headers['Authorization'] = 'Bearer ' + cleanToken;
-    }
-  }
-
+  // /api/photos/upload has no auth check — omit Authorization header entirely
+  // to avoid iOS fetch rejecting invalid/control characters in the token.
   const response = await fetch(`${API_BASE}/photos/upload`, {
     method: 'POST',
-    headers,
     body: formData,
   });
 
