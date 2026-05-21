@@ -27,7 +27,7 @@ function QuickAction({ icon, title, subtitle, onPress }: QuickActionProps) {
         <Text style={styles.quickActionTitle}>{title}</Text>
         <Text style={styles.quickActionSubtitle}>{subtitle}</Text>
       </View>
-      <ChevronRight size={20} color="#9CA3AF" />
+      <ChevronRight size={20} color="#71717A" />
     </TouchableOpacity>
   );
 }
@@ -84,7 +84,7 @@ export default function HomeScreen({ navigation }: any) {
         {/* Hero Card */}
         <TouchableOpacity style={styles.heroCard} onPress={() => navigation.navigate('Formulate')}>
           <View style={styles.heroGradient}>
-            <Sparkles size={32} color="#FFFFFF" />
+            <Sparkles size={32} color="#F5F5F7" />
             <Text style={styles.heroTitle}>New Formulation</Text>
             <Text style={styles.heroSubtitle}>
               Capture photos, analyze hair, and generate professional color formulations
@@ -119,7 +119,7 @@ export default function HomeScreen({ navigation }: any) {
           icon={<Camera size={24} color="#7C3AED" />}
           title="Take Photo"
           subtitle="Capture hair for analysis"
-          onPress={() => navigation.navigate('Formulate', { screen: 'Camera' })}
+          onPress={() => navigation.navigate('Camera')}
         />
         <QuickAction
           icon={<Palette size={24} color="#EC4899" />}
@@ -145,7 +145,7 @@ export default function HomeScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  container: { flex: 1, backgroundColor: '#0F0F1A' },
   scroll: { padding: 16, paddingBottom: 32 },
 
   header: {
@@ -154,8 +154,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 20,
   },
-  greeting: { fontSize: 14, color: '#6B7280' },
-  title: { fontSize: 28, fontWeight: '800', color: '#111827', marginTop: 2 },
+  greeting: { fontSize: 14, color: '#A1A1AA' },
+  title: { fontSize: 28, fontWeight: '800', color: '#F5F5F7', marginTop: 2 },
 
   statusBadge: {
     flexDirection: 'row',
@@ -164,44 +164,44 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 20,
   },
-  statusOnline: { backgroundColor: '#ECFDF5' },
-  statusOffline: { backgroundColor: '#FEF2F2' },
+  statusOnline: { backgroundColor: 'rgba(16,185,129,0.15)' },
+  statusOffline: { backgroundColor: 'rgba(239,68,68,0.15)' },
   statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
   dotOnline: { backgroundColor: '#10B981' },
   dotOffline: { backgroundColor: '#EF4444' },
-  statusText: { fontSize: 12, fontWeight: '600', color: '#374151' },
+  statusText: { fontSize: 12, fontWeight: '600', color: '#F5F5F7' },
 
   heroCard: {
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 20,
-    shadowColor: '#7C3AED',
+    shadowColor: '#9333EA',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 6,
   },
   heroGradient: {
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#9333EA',
     padding: 24,
     alignItems: 'flex-start',
   },
   heroTitle: {
     fontSize: 22,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#F5F5F7',
     marginTop: 12,
   },
   heroSubtitle: {
     fontSize: 14,
-    color: '#DDD6FE',
+    color: 'rgba(255,255,255,0.7)',
     marginTop: 8,
     lineHeight: 20,
   },
   heroButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#161620',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 24,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   heroButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#7C3AED',
+    color: '#9333EA',
     marginRight: 4,
   },
 
@@ -221,49 +221,43 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#161620',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
-  statNumber: { fontSize: 20, fontWeight: '800', color: '#7C3AED' },
-  statLabel: { fontSize: 12, color: '#6B7280', marginTop: 4 },
+  statNumber: { fontSize: 20, fontWeight: '800', color: '#9333EA' },
+  statLabel: { fontSize: 12, color: '#A1A1AA', marginTop: 4 },
 
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: '#F5F5F7',
     marginBottom: 12,
   },
 
   quickAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#161620',
     borderRadius: 12,
     padding: 16,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   quickActionIcon: {
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   quickActionContent: { flex: 1 },
-  quickActionTitle: { fontSize: 15, fontWeight: '600', color: '#111827' },
-  quickActionSubtitle: { fontSize: 12, color: '#6B7280', marginTop: 2 },
+  quickActionTitle: { fontSize: 15, fontWeight: '600', color: '#F5F5F7' },
+  quickActionSubtitle: { fontSize: 12, color: '#A1A1AA', marginTop: 2 },
 });
