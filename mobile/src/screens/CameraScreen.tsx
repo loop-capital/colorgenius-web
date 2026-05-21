@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -237,19 +237,19 @@ const styles = StyleSheet.create({
   permissionTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#111827',
+    color: '#F5F5F7',
     marginTop: 16,
     textAlign: 'center',
   },
   permissionText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#A1A1AA',
     textAlign: 'center',
     marginTop: 8,
     lineHeight: 20,
   },
   permissionBtn: {
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#9333EA',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   },
   permissionBtnText: { color: '#FFF', fontWeight: '700', fontSize: 15 },
   backBtn: { marginTop: 12 },
-  backBtnText: { color: '#7C3AED', fontWeight: '600', fontSize: 14 },
+  backBtnText: { color: '#9333EA', fontWeight: '600', fontSize: 14 },
 
   // Camera
   topBar: {
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F5F5F7',
   },
 
   angleBtn: {
