@@ -18,11 +18,10 @@ import {
   CircleQuestionMark,
   LogOut,
   ChevronRight,
-  Moon,
   Wifi,
   Smartphone,
 } from 'lucide-react-native';
-import { clearAuthToken, getSettings, saveNotifications, saveDarkMode, saveAutoSync, saveDefaultBrand, getDefaultBrand } from '../api/client';
+import { clearAuthToken, getSettings, saveNotifications, saveAutoSync, getDefaultBrand } from '../api/client';
 
 interface SettingRowProps {
   icon: React.ReactNode;
@@ -45,7 +44,7 @@ function SettingRow({ icon, title, subtitle, onPress, right, danger }: SettingRo
         <Text style={[styles.settingTitle, danger && styles.dangerText]}>{title}</Text>
         {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
       </View>
-      {right || (onPress && <ChevronRight size={18} color="#D1D5DB" />)}
+      {right || (onPress && <ChevronRight size={18} color="#71717A" />)}
     </>
   );
 
@@ -80,7 +79,6 @@ function SectionHeader({ title }: { title: string }) {
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
   const [autoSync, setAutoSync] = useState(true);
   const [defaultBrand, setDefaultBrand] = useState('Wella');
   const [loadingSettings, setLoadingSettings] = useState(true);
@@ -91,7 +89,6 @@ export default function SettingsScreen() {
       try {
         const settings = await getSettings();
         setNotifications(settings.notifications);
-        setDarkMode(settings.darkMode);
         setAutoSync(settings.autoSync);
         const brand = await getDefaultBrand();
         if (brand) setDefaultBrand(brand);
@@ -114,21 +111,6 @@ export default function SettingsScreen() {
       Alert.alert('Error', 'Failed to save notification setting');
       // Revert on failure
       setNotifications(!value);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDarkModeToggle = async (value: boolean) => {
-    setDarkMode(value);
-    setSaving(true);
-    try {
-      await saveDarkMode(value);
-    } catch (e) {
-      console.error('Failed to save dark mode', e);
-      Alert.alert('Error', 'Failed to save dark mode setting');
-      // Revert on failure
-      setDarkMode(!value);
     } finally {
       setSaving(false);
     }
@@ -183,14 +165,14 @@ export default function SettingsScreen() {
             <Text style={styles.profileName}>Stylist</Text>
             <Text style={styles.profileEmail}>colorgenius.co</Text>
           </View>
-          <ChevronRight size={20} color="#D1D5DB" />
+          <ChevronRight size={20} color="#71717A" />
         </TouchableOpacity>
 
         {/* General */}
         <SectionHeader title="General" />
         <View style={styles.section}>
           <SettingRow
-            icon={<User size={20} color="#7C3AED" />}
+            icon={<User size={20} color="#9333EA" />}
             title="Account"
             subtitle="Profile, email, password"
           />
@@ -202,20 +184,8 @@ export default function SettingsScreen() {
               <Switch
                 value={notifications}
                 onValueChange={handleNotificationsToggle}
-                trackColor={{ false: '#E5E7EB', true: '#C4B5FD' }}
-                thumbColor={notifications ? '#7C3AED' : '#FFF'}
-              />
-            }
-          />
-          <SettingRow
-            icon={<Moon size={20} color="#6366F1" />}
-            title="Dark Mode"
-            right={
-              <Switch
-                value={darkMode}
-                onValueChange={handleDarkModeToggle}
-                trackColor={{ false: '#E5E7EB', true: '#C4B5FD' }}
-                thumbColor={darkMode ? '#7C3AED' : '#FFF'}
+                trackColor={{ false: 'rgba(255,255,255,0.1)', true: 'rgba(147,51,234,0.3)' }}
+                thumbColor={notifications ? '#9333EA' : '#71717A'}
               />
             }
           />
@@ -230,7 +200,7 @@ export default function SettingsScreen() {
             subtitle="Acaia scales, sensors"
           />
           <SettingRow
-            icon={<Smartphone size={20} color="#8B5CF6" />}
+            icon={<Smartphone size={20} color="#EC4899" />}
             title="Connected Devices"
             subtitle="Manage paired devices"
           />
@@ -242,8 +212,8 @@ export default function SettingsScreen() {
               <Switch
                 value={autoSync}
                 onValueChange={handleAutoSyncToggle}
-                trackColor={{ false: '#E5E7EB', true: '#C4B5FD' }}
-                thumbColor={autoSync ? '#7C3AED' : '#FFF'}
+                trackColor={{ false: 'rgba(255,255,255,0.1)', true: 'rgba(147,51,234,0.3)' }}
+                thumbColor={autoSync ? '#9333EA' : '#71717A'}
               />
             }
           />
@@ -281,7 +251,7 @@ export default function SettingsScreen() {
         <SectionHeader title="Support" />
         <View style={styles.section}>
           <SettingRow
-            icon={<CircleQuestionMark size={20} color="#6B7280" />}
+            icon={<CircleQuestionMark size={20} color="#71717A" />}
             title="Help Center"
             subtitle="colorgenius.co/help"
           />
@@ -305,43 +275,40 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F3F4F6' },
-  header: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#F9FAFB' },
-  headerTitle: { fontSize: 24, fontWeight: '800', color: '#111827' },
+  container: { flex: 1, backgroundColor: '#0F0F1A' },
+  header: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#161620' },
+  headerTitle: { fontSize: 24, fontWeight: '800', color: '#F5F5F7' },
   scroll: { paddingTop: 12 },
 
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#161620',
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 16,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   profileAvatar: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#9333EA',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
   },
   profileAvatarText: { fontSize: 18, fontWeight: '800', color: '#FFF' },
   profileInfo: { flex: 1 },
-  profileName: { fontSize: 17, fontWeight: '700', color: '#111827' },
-  profileEmail: { fontSize: 13, color: '#6B7280', marginTop: 2 },
+  profileName: { fontSize: 17, fontWeight: '700', color: '#F5F5F7' },
+  profileEmail: { fontSize: 13, color: '#A1A1AA', marginTop: 2 },
 
   sectionHeader: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#6B7280',
+    color: '#71717A',
     textTransform: 'uppercase',
     letterSpacing: 1,
     paddingHorizontal: 20,
@@ -350,11 +317,13 @@ const styles = StyleSheet.create({
   },
 
   section: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#161620',
     marginHorizontal: 16,
     borderRadius: 14,
     overflow: 'hidden',
     marginBottom: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
 
   settingRow: {
@@ -363,26 +332,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: 'rgba(255,255,255,0.06)',
   },
   settingIcon: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   settingContent: { flex: 1 },
-  settingTitle: { fontSize: 15, fontWeight: '600', color: '#111827' },
-  settingSubtitle: { fontSize: 12, color: '#6B7280', marginTop: 1 },
+  settingTitle: { fontSize: 15, fontWeight: '600', color: '#F5F5F7' },
+  settingSubtitle: { fontSize: 12, color: '#A1A1AA', marginTop: 1 },
   dangerText: { color: '#EF4444' },
 
   version: {
     textAlign: 'center',
     fontSize: 12,
-    color: '#9CA3AF',
+    color: '#71717A',
     marginTop: 24,
   },
 });
