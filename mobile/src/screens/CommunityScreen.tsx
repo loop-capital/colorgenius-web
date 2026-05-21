@@ -36,7 +36,7 @@ function PhotoCard({ item, index }: { item: any; index: number }) {
   return (
     <View style={styles.photoCard}>
       <View style={styles.photoPlaceholder}>
-        <Sparkles size={32} color="#DDD6FE" />
+        <Sparkles size={32} color="#9333EA" />
       </View>
       <View style={styles.photoInfo}>
         <Text style={styles.photoTitle} numberOfLines={1}>
@@ -51,7 +51,7 @@ function PhotoCard({ item, index }: { item: any; index: number }) {
             <Text style={styles.photoStatText}>{item.likes || Math.floor(Math.random() * 50) + 10}</Text>
           </View>
           <View style={styles.photoStat}>
-            <Eye size={14} color="#6B7280" />
+            <Eye size={14} color="#A1A1AA" />
             <Text style={styles.photoStatText}>{item.views || Math.floor(Math.random() * 200) + 50}</Text>
           </View>
         </View>
@@ -152,25 +152,25 @@ export default function CommunityScreen() {
           label="Trending"
           active={activeTab === 'trending'}
           onPress={() => setActiveTab('trending')}
-          icon={<TrendingUp size={16} color={activeTab === 'trending' ? '#7C3AED' : '#6B7280'} />}
+          icon={<TrendingUp size={16} color={activeTab === 'trending' ? '#9333EA' : '#A1A1AA'} />}
         />
         <TabButton
           label="Gallery"
           active={activeTab === 'gallery'}
           onPress={() => setActiveTab('gallery')}
-          icon={<Star size={16} color={activeTab === 'gallery' ? '#7C3AED' : '#6B7280'} />}
+          icon={<Star size={16} color={activeTab === 'gallery' ? '#9333EA' : '#A1A1AA'} />}
         />
         <TabButton
           label="Marketplace"
           active={activeTab === 'marketplace'}
           onPress={() => setActiveTab('marketplace')}
-          icon={<Sparkles size={16} color={activeTab === 'marketplace' ? '#7C3AED' : '#6B7280'} />}
+          icon={<Sparkles size={16} color={activeTab === 'marketplace' ? '#9333EA' : '#A1A1AA'} />}
         />
       </View>
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#7C3AED" />
+          <ActivityIndicator size="large" color="#9333EA" />
         </View>
       ) : (
         <ScrollView
@@ -191,7 +191,7 @@ export default function CommunityScreen() {
 
           {data.length === 0 && activeTab === 'gallery' && (
             <View style={styles.empty}>
-              <Sparkles size={48} color="#DDD6FE" />
+              <Sparkles size={48} color="#9333EA" />
               <Text style={styles.emptyTitle}>No photos yet</Text>
               <Text style={styles.emptyText}>
                 Share your formulations to the gallery and inspire the community
@@ -207,9 +207,9 @@ export default function CommunityScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  container: { flex: 1, backgroundColor: '#0F0F1A' },
   header: { paddingHorizontal: 16, paddingVertical: 12 },
-  headerTitle: { fontSize: 24, fontWeight: '800', color: '#111827' },
+  headerTitle: { fontSize: 24, fontWeight: '800', color: '#F5F5F7' },
 
   tabs: {
     flexDirection: 'row',
@@ -225,20 +225,20 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 12,
-    backgroundColor: '#FFF',
+    backgroundColor: '#161620',
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
-  tabActive: { backgroundColor: '#EDE9FE', borderColor: '#7C3AED' },
-  tabText: { fontSize: 13, fontWeight: '600', color: '#6B7280' },
-  tabTextActive: { color: '#7C3AED' },
+  tabActive: { backgroundColor: 'rgba(147,51,234,0.15)', borderColor: '#9333EA' },
+  tabText: { fontSize: 13, fontWeight: '600', color: '#A1A1AA' },
+  tabTextActive: { color: '#9333EA' },
 
   content: { padding: 16 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
   photoCard: {
     flexDirection: 'row',
-    backgroundColor: '#FFF',
+    backgroundColor: '#161620',
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 10,
@@ -251,16 +251,16 @@ const styles = StyleSheet.create({
   photoPlaceholder: {
     width: 90,
     height: 90,
-    backgroundColor: '#EDE9FE',
+    backgroundColor: 'rgba(147,51,234,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   photoInfo: { flex: 1, padding: 12, justifyContent: 'center' },
-  photoTitle: { fontSize: 15, fontWeight: '700', color: '#111827' },
-  photoMeta: { fontSize: 12, color: '#6B7280', marginTop: 2 },
+  photoTitle: { fontSize: 15, fontWeight: '700', color: '#F5F5F7' },
+  photoMeta: { fontSize: 12, color: '#A1A1AA', marginTop: 2 },
   photoStats: { flexDirection: 'row', gap: 12, marginTop: 6 },
   photoStat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  photoStatText: { fontSize: 12, color: '#6B7280' },
+  photoStatText: { fontSize: 12, color: '#A1A1AA' },
 
   marketGrid: {
     flexDirection: 'row',
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   },
   marketCard: {
     width: '48%',
-    backgroundColor: '#FFF',
+    backgroundColor: '#161620',
     borderRadius: 12,
     padding: 14,
     shadowColor: '#000',
@@ -279,16 +279,16 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   marketBadge: {
-    backgroundColor: '#EDE9FE',
+    backgroundColor: 'rgba(147,51,234,0.15)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
     alignSelf: 'flex-start',
     marginBottom: 8,
   },
-  marketBadgeText: { fontSize: 10, fontWeight: '700', color: '#7C3AED', textTransform: 'uppercase' },
-  marketTitle: { fontSize: 14, fontWeight: '700', color: '#111827' },
-  marketCreator: { fontSize: 11, color: '#6B7280', marginTop: 4 },
+  marketBadgeText: { fontSize: 10, fontWeight: '700', color: '#9333EA', textTransform: 'uppercase' },
+  marketTitle: { fontSize: 14, fontWeight: '700', color: '#F5F5F7' },
+  marketCreator: { fontSize: 11, color: '#A1A1AA', marginTop: 4 },
   marketFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -297,14 +297,14 @@ const styles = StyleSheet.create({
   },
   marketPrice: { fontSize: 16, fontWeight: '800', color: '#10B981' },
   marketBtn: {
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#9333EA',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
   },
-  marketBtnText: { color: '#FFF', fontSize: 11, fontWeight: '700' },
+  marketBtnText: { color: '#161620', fontSize: 11, fontWeight: '700' },
 
   empty: { alignItems: 'center', paddingTop: 60 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#374151', marginTop: 12 },
-  emptyText: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginTop: 6, paddingHorizontal: 40 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#A1A1AA', marginTop: 12 },
+  emptyText: { fontSize: 14, color: '#A1A1AA', textAlign: 'center', marginTop: 6, paddingHorizontal: 40 },
 });

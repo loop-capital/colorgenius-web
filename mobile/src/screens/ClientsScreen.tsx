@@ -50,7 +50,7 @@ function AddClientModal({ visible, onClose, onAdded }: {
       <SafeAreaView style={modalStyles.container} edges={['top']}>
         <View style={modalStyles.header}>
           <TouchableOpacity onPress={onClose}>
-            <X size={24} color="#6B7280" />
+            <X size={24} color="#A1A1AA" />
           </TouchableOpacity>
           <Text style={modalStyles.title}>New Client</Text>
           <TouchableOpacity onPress={handleSave} disabled={saving}>
@@ -62,7 +62,7 @@ function AddClientModal({ visible, onClose, onAdded }: {
 
         <View style={modalStyles.form}>
           <View style={modalStyles.field}>
-            <User size={18} color="#9CA3AF" />
+            <User size={18} color="#71717A" />
             <TextInput
               style={modalStyles.input}
               placeholder="Full name"
@@ -73,7 +73,7 @@ function AddClientModal({ visible, onClose, onAdded }: {
           </View>
 
           <View style={modalStyles.field}>
-            <Mail size={18} color="#9CA3AF" />
+            <Mail size={18} color="#71717A" />
             <TextInput
               style={modalStyles.input}
               placeholder="Email (optional)"
@@ -85,7 +85,7 @@ function AddClientModal({ visible, onClose, onAdded }: {
           </View>
 
           <View style={modalStyles.field}>
-            <Phone size={18} color="#9CA3AF" />
+            <Phone size={18} color="#71717A" />
             <TextInput
               style={modalStyles.input}
               placeholder="Phone (optional)"
@@ -101,7 +101,7 @@ function AddClientModal({ visible, onClose, onAdded }: {
 }
 
 const modalStyles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  container: { flex: 1, backgroundColor: '#0F0F1A' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -109,23 +109,23 @@ const modalStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-    backgroundColor: '#FFF',
+    borderBottomColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: '#161620',
   },
-  title: { fontSize: 17, fontWeight: '700', color: '#111827' },
-  save: { fontSize: 16, fontWeight: '700', color: '#7C3AED' },
+  title: { fontSize: 17, fontWeight: '700', color: '#F5F5F7' },
+  save: { fontSize: 16, fontWeight: '700', color: '#9333EA' },
   form: { padding: 16, gap: 12 },
   field: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#161620',
     borderRadius: 12,
     paddingHorizontal: 14,
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(255,255,255,0.06)',
     gap: 10,
   },
-  input: { flex: 1, paddingVertical: 14, fontSize: 16, color: '#111827' },
+  input: { flex: 1, paddingVertical: 14, fontSize: 16, color: '#F5F5F7' },
 });
 
 export default function ClientsScreen() {
@@ -172,14 +172,14 @@ export default function ClientsScreen() {
         </Text>
         {item.lastVisit && (
           <View style={styles.visitRow}>
-            <Calendar size={12} color="#6B7280" />
+            <Calendar size={12} color="#A1A1AA" />
             <Text style={styles.visitText}>
               Last visit: {new Date(item.lastVisit).toLocaleDateString()}
             </Text>
           </View>
         )}
       </View>
-      <ChevronRight size={20} color="#D1D5DB" />
+      <ChevronRight size={20} color="#71717A" />
     </TouchableOpacity>
   );
 
@@ -195,7 +195,7 @@ export default function ClientsScreen() {
 
       {/* Search */}
       <View style={styles.searchRow}>
-        <Search size={18} color="#9CA3AF" />
+        <Search size={18} color="#71717A" />
         <TextInput
           style={styles.searchInput}
           placeholder="Search clients..."
@@ -211,7 +211,7 @@ export default function ClientsScreen() {
         </View>
       ) : clients.length === 0 ? (
         <View style={styles.center}>
-          <User size={48} color="#DDD6FE" />
+          <User size={48} color="#9333EA" />
           <Text style={styles.emptyTitle}>
             {search ? 'No results' : 'No clients yet'}
           </Text>
@@ -245,7 +245,7 @@ export default function ClientsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  container: { flex: 1, backgroundColor: '#0F0F1A' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -253,12 +253,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
-  headerTitle: { fontSize: 24, fontWeight: '800', color: '#111827' },
+  headerTitle: { fontSize: 24, fontWeight: '800', color: '#F5F5F7' },
   addBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#9333EA',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
@@ -268,16 +268,16 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#161620',
     marginHorizontal: 16,
     marginBottom: 12,
     borderRadius: 12,
     paddingHorizontal: 14,
     gap: 8,
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
-  searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: '#111827' },
+  searchInput: { flex: 1, paddingVertical: 12, fontSize: 15, color: '#F5F5F7' },
 
   list: { paddingHorizontal: 16, paddingBottom: 20 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
@@ -285,39 +285,36 @@ const styles = StyleSheet.create({
   clientCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#161620',
     borderRadius: 12,
     padding: 14,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   avatar: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#EDE9FE',
+    backgroundColor: 'rgba(147,51,234,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
-  avatarText: { fontSize: 15, fontWeight: '700', color: '#7C3AED' },
+  avatarText: { fontSize: 15, fontWeight: '700', color: '#9333EA' },
   clientInfo: { flex: 1 },
-  clientName: { fontSize: 15, fontWeight: '600', color: '#111827' },
-  clientMeta: { fontSize: 12, color: '#6B7280', marginTop: 2 },
+  clientName: { fontSize: 15, fontWeight: '600', color: '#F5F5F7' },
+  clientMeta: { fontSize: 12, color: '#A1A1AA', marginTop: 2 },
   visitRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
-  visitText: { fontSize: 11, color: '#6B7280' },
+  visitText: { fontSize: 11, color: '#A1A1AA' },
 
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#374151', marginTop: 12 },
-  emptyText: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginTop: 6 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#F5F5F7', marginTop: 12 },
+  emptyText: { fontSize: 14, color: '#A1A1AA', textAlign: 'center', marginTop: 6 },
   emptyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#9333EA',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 24,

@@ -28,7 +28,7 @@ research/
 prisma/
 shared/
 color-lines/
-components/
+/components/
 blog/
 temp/
 second-brain/
