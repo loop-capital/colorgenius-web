@@ -1,76 +1,66 @@
 # COLORgenius — Project Status
 
-> **Last updated:** 2026-05-17 23:20 EDT
-> **Deployed:** colorgenius.co (Vercel)
-> **Current focus:** Expo mobile app
+> **Last Updated:** 2026-05-22
+> **Deployed:** colorgenius.co on Vercel
+> **Repo:** /home/jason/.openclaw/workspaces/colorgenius/
 
 ---
 
-## ✅ COMPLETE
+## ⚠️ CRITICAL ARCHITECTURE DECISIONS
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Shade database | ✅ | 21 brands, 3,454+ shades, verified on live API |
-| Google Sign In | ✅ | OAuth + Supabase, deployed |
-| Apple Sign In | ✅ | Cookie bug fixed, deployed |
-| Cost-plus pricing | ✅ | 2× default, slider + presets, API |
-| Photo analysis | ✅ | Kimi K2.6 vision primary, Claude Haiku fallback |
-| Square POS | ✅ | OAuth, multi-tenant, catalog sync, webhooks |
-| Acaia scale | ✅ | BLE protocol built, needs react-native-ble-plx for iOS |
-| Claude review | ✅ | 17 build fixes + 7 improvements shipped |
-| Icon updates | ✅ | All purple Lucide icons deployed |
+### Photo Analysis — DO NOT CHANGE
+- **PRIMARY:** Gemma E4B on user's iPhone (on-device via LiteRT-LM)
+  - Web: `@litert-lm/core` npm package
+  - iOS: LiteRT-LM Swift API with Metal GPU
+  - Model: `gemma-4-E4B-it-web.litertlm` from Hugging Face
+- **FALLBACK:** Kimi K2.6 vision via Ollama (server-side, burns tokens)
+- **Goal:** Zero vision API costs — all analysis on-device
+- **Reference:** https://github.com/google-ai-edge/LiteRT-LM
+- **Status:** Vision API endpoint created at `/api/vision-analyze`. Kimi fallback works. On-device Gemma integration NOT YET BUILT — needs LiteRT-LM JS integration.
 
-## 🔨 IN PROGRESS
-
-| Item | Owner | Status |
-|------|-------|--------|
-| Expo mobile app | Che + Claude | Scaffolded, building core screens |
-| **Bowl weighing → inventory pipeline** | **COLORgenius-dev** | ✅ API routes + schema + frontend wiring DONE; 🔄 Bowl viz upgrade + scale-bowl wiring in progress |
+### Payment — Square Only (NO Stripe)
+- Square API in sandbox mode
+- Need to swap for production creds
 
 ---
 
-## Salon POS/Software Integrations
+## What's Built
 
-**GetVish (competitor) integrates with:**
-Meevo (Millennium), Boulevard, Phorest, Square, Shortcuts (Fusion), Zenoti, Rosy, Booker (Mindbody), Envision, SalonIQ, MyTime
+### Web Dashboard (Next.js)
+- Formulate page: 6-step flow (Photo → Hair Assessment → Chemical History → Target → Condition → Results)
+- Photo upload works (file picker, stores base64)
+- Vision analysis wired: Step 1 "Next" calls `/api/vision-analyze` → auto-fills level/tone/gray/porosity
+- Formulation engine: generates formulas from hair state input
+- Scale bowl widget, product search, corrective color, visual outcome simulator
+- Contextual education component
+- Client management, history, subscription, marketplace
 
-**Our integration roadmap:**
-1. **Square** ✅ Done
-2. **Vagaro** — next (Vish doesn't integrate — differentiation opportunity)
-3. **Meevo/Millennium** — enterprise salons (mirror Vish)
-4. **Boulevard** — upscale, growing fast (mirror Vish)
-5. **Booker** — mid-market (mirror Vish)
-6. **Phorest, Shortcuts, Zenoti, Rosy** — mirror Vish's proven demand
-
-**Strategy:** Steal Vish's integrations. They proved the market. Vagaro first as a differentiator, then work through their list.
+### Native App (React Native / Expo)
+- Submitted to App Store Connect
+- Status: Processing at Apple
 
 ---
 
-## Vagaro Integration — Task Brief
+## Blockers / TODO
 
-**What is Vagaro?**
-- Salon/spa/fitness management platform
-- ~100K+ salons, independent stylists, small chains
-- Features: booking, POS, inventory, marketing, payroll
+- [ ] Gemma E4B on-device vision integration (LiteRT-LM JS)
+- [ ] Square production mode (swap sandbox creds)
+- [ ] App Store review (after TestFlight testing)
+- [ ] Google Sign In implementation
+- [ ] Vagaro integration testing
 
-**Why integrate?**
-- Largest independent salon install base after Square
-- If they use Vagaro for booking + POS, we can pull catalog/inventory
-- Stylists don't want to manage inventory in two places
-- Vish doesn't integrate with Vagaro — we own this space
+---
 
-**What to research:**
-1. Vagaro API docs (developer.vagaro.com)
-2. OAuth flow (connect COLORgenius to salon's Vagaro account)
-3. Catalog/inventory sync (pull product data)
-4. Booking sync (client appointment → formulate session)
-5. API rate limits, pricing for API access
-6. Webhook support for real-time inventory updates
+## Deployment
 
-**Deliverables:**
-- API documentation summary
-- OAuth flow design (same pattern as Square)
-- Catalog sync architecture
-- Estimation: hours to build
+```bash
+cd /home/jason/.openclaw/workspaces/colorgenius/dashboard
+npx vercel --prod --yes
+```
 
-**Timeline:** Research now (while Expo app is being built), implementation after app ships.
+Vercel project: `dashboard`
+Production URL: colorgenius.co
+
+### Backup Tags
+- `backup/working-formulation-fix-may16-2300` (latest)
+

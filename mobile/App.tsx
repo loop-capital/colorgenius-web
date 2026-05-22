@@ -60,13 +60,15 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 // ─── Custom Header ────────────────────────────────────────────────────────────
 function CustomHeader({ onOpenDrawer }: { onOpenDrawer: () => void }) {
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
       <View style={styles.headerLeft}>
         <TouchableOpacity
           style={styles.hamburgerBtn}
           onPress={onOpenDrawer}
           activeOpacity={0.7}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
           <Menu size={22} color={THEME.textSecondary} />
         </TouchableOpacity>

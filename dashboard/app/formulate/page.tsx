@@ -152,6 +152,46 @@ export default function FormulatePage() {
   const { toast } = useToast()
   const [step, setStep] = useState(1)
   const [photo, setPhoto] = useState<string | null>(null)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<any>(null)
+
+  // Vision analysis - calls /api/vision-analyze with the photo base64
+  const analyzePhoto = async () => {
+    if (!photo) return
+    setAnalyzing(true)
+    try {
+      const res = await fetch('/api/vision-analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: photo }),
+      })
+      const data = await res.json()
+      if (data.success && data.analysis) {
+        setAnalysisResult(data.analysis)
+        const toneMap: Record<string, string> = {
+          neutral: 'N', ash: 'A', golden: 'G', copper: 'C', red: 'R',
+          violet: 'V', pearl: 'P', beige: 'B', mahogany: 'M', chocolate: 'CH',
+          warm: 'W', cool: 'CO',
+        }
+        setFd(prev => ({
+          ...prev,
+          currentLevel: data.analysis.currentLevel,
+          currentTone: toneMap[data.analysis.currentTone] || 'N',
+          condition: {
+            ...prev.condition,
+            grayPercent: data.analysis.grayPercent,
+            porosity: data.analysis.damageIndicators?.porosityEstimate || prev.condition.porosity,
+          },
+        }))
+        setStep(2)
+      }
+    } catch (e) {
+      console.error('[Vision analysis error]', e)
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
   const [fd, setFd] = useState({
     currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N',
     hairType: 'normal',
@@ -503,7 +543,7 @@ export default function FormulatePage() {
                 </div>
               )}
               {photo && <p style={{ fontSize: 12, color: '#71717A' }}>Photo captured ✓</p>}
-              <button type="button" onClick={() => setStep(2)} style={btnPrimary}>{photo ? 'Next: Hair Assessment' : 'Next: Hair Assessment'} <ChevronRight size={16} /></button>
+              <button type="button" onClick={photo ? analyzePhoto : () => setStep(2)} style={btnPrimary}>{analyzing ? 'Analyzing photo...' : photo ? 'Analyze & Continue' : 'Next: Hair Assessment'} <ChevronRight size={16} /></button>
             </div>
           </div>
         )}
