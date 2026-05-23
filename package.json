@@ -2,13 +2,21 @@
   "scripts": {
     "build": "cd dashboard && npm run build",
     "dev": "cd dashboard && npm run dev",
-    "start": "cd dashboard && npm run start"
+    "start": "cd dashboard && npm run start",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@jest/globals": "^30.4.1",
     "@types/jest": "^30.0.0",
+    "husky": "^9.1.7",
     "jest": "^30.4.2",
+    "lint-staged": "^17.0.5",
+    "prettier": "^3.8.3",
     "ts-jest": "^29.4.9",
     "typescript": "^6.0.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,css,md,json}": "prettier --write",
+    "*.{ts,tsx}": "eslint --quiet --cache --fix"
   }
 }
