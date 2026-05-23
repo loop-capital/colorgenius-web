@@ -18,7 +18,11 @@
       "bundleIdentifier": "com.colorgenius.app",
       "buildNumber": "4",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "COLORgenius uses your camera to capture hair photos for AI color analysis."
+      },
+      "config": {
+        "usesNonExemptEncryption": false
       }
     },
     "android": {
@@ -36,6 +40,14 @@
       "eas": {
         "projectId": "b079806d-5b5b-4c83-ab89-63ea74de66da"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow COLORgenius to access your camera to capture hair photos for analysis."
+        }
+      ]
+    ]
   }
 }

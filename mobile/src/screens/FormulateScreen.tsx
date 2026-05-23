@@ -1144,7 +1144,7 @@ export default function FormulateScreen({ navigation }: any) {
 
             <TouchableOpacity
               style={stepStyles.photoCard}
-              onPress={() => setCurrentStep(2)}
+              onPress={() => setStep(2)}
             >
               <View style={stepStyles.photoIconBg}>
                 <Palette size={32} color={COLORS.pink} />
