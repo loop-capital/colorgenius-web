@@ -1,7 +1,7 @@
-# COLORgenius Mobile — Claude Review Document v3
+# COLORgenius Mobile — Claude Review & Submit Document v3
 
 > **Date:** 2026-05-23, 7:30 PM
-> **Purpose:** Pre-submission review. All 3 previous bugs (upload auth, settings switches, tab bar) are FIXED. This is a final review before we submit to Apple.
+> **Purpose:** Pre-submission review + build + submit to Apple. All 3 previous bugs are FIXED. Verify everything, fix anything broken, then build and submit.
 > **Branch:** `main`, latest commit: `d5040c0`
 > **Directory:** `/home/jason/.openclaw/workspaces/colorgenius/mobile/`
 
@@ -9,7 +9,11 @@
 
 ## Your Job
 
-Run the checks below. Fix anything broken. Commit the fixes. DO NOT build or submit — we handle that.
+1. Run all 8 checks below
+2. Fix anything broken
+3. Commit the fixes
+4. Build with EAS
+5. Submit to Apple
 
 ---
 
@@ -103,18 +107,30 @@ Verify the settings screen works:
 
 ---
 
-## What NOT to Do
+## After Review: Build & Submit
 
-- ❌ Do NOT run `npm run build` (this is Expo, not a standard build)
-- ❌ Do NOT run EAS build or submit commands
-- ❌ Do NOT modify `app.json` version/build numbers
-- ❌ Do NOT create new branches — fix on `main` and commit
+After fixing any issues, commit, then build:
+
+```bash
+cd /home/jason/.openclaw/workspaces/colorgenius/mobile
+EXPO_TOKEN="Qe7Nuio-DEpkKeJa-VTqGmX4JLvv--lpvsZULah7" npx eas-cli@latest build --platform ios --profile production --non-interactive
+```
+
+Wait for the build to finish (check with `eas build:list`), then submit:
+
+```bash
+EXPO_TOKEN="Qe7Nuio-DEpkKeJa-VTqGmX4JLvv--lpvsZULah7" npx eas-cli@latest submit --platform ios --non-interactive
+```
+
+Report the build ID and submission ID when done.
 
 ---
 
-## After Review
+## What NOT to Do
 
-If all 8 checks pass, commit any fixes and tell me "ready to submit." I'll handle the EAS build and submission.
+- ❌ Do NOT run `npm run build` (this is Expo, not a standard build)
+- ❌ Do NOT modify `app.json` version/build numbers — EAS auto-increments
+- ❌ Do NOT create new branches — fix on `main` and commit
 
 ---
 
@@ -157,4 +173,4 @@ mobile/
 
 ---
 
-*Good luck. Ship it clean.*
+*Ship it clean.*
