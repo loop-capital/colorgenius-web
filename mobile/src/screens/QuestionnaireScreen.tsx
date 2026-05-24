@@ -29,25 +29,25 @@ export default function QuestionnaireScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Complete the client intake questionnaire</Text>
         </View>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Hair History questionnaire - coming in next update!')}>
           <Text style={styles.cardTitle}>Hair History</Text>
           <Text style={styles.cardDesc}>Previous color services and chemical history</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Desired Result questionnaire - coming in next update!')}>
           <Text style={styles.cardTitle}>Desired Result</Text>
           <Text style={styles.cardDesc}>Target color, tone, and service goals</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Hair Condition questionnaire - coming in next update!')}>
           <Text style={styles.cardTitle}>Hair Condition</Text>
           <Text style={styles.cardDesc}>Current porosity, texture, and health</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Scalp Assessment questionnaire - coming in next update!')}>
           <Text style={styles.cardTitle}>Scalp Assessment</Text>
           <Text style={styles.cardDesc}>Sensitivity and scalp condition</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />

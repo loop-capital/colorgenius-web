@@ -66,6 +66,13 @@ export default function CameraScreen({ navigation }: any) {
   };
 
   const pickFromGallery = async () => {
+    // Request media library permissions first
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Needed', 'COLORgenius needs access to your photos to upload hair analysis images.');
+      return;
+    }
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       quality: 0.85,

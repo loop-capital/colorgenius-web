@@ -29,25 +29,25 @@ export default function LibraryScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Browse shade libraries and formulas</Text>
         </View>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Wella Professionals shade library - coming in next update!')}>
           <Text style={styles.cardTitle}>Wella Professionals</Text>
           <Text style={styles.cardDesc}>1,245 shades</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Schwarzkopf shade library - coming in next update!')}>
           <Text style={styles.cardTitle}>Schwarzkopf</Text>
           <Text style={styles.cardDesc}>892 shades</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('L\'Oréal Professionnel shade library - coming in next update!')}>
           <Text style={styles.cardTitle}>L'Oréal Professionnel</Text>
           <Text style={styles.cardDesc}>756 shades</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Matrix shade library - coming in next update!')}>
           <Text style={styles.cardTitle}>Matrix</Text>
           <Text style={styles.cardDesc}>634 shades</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />

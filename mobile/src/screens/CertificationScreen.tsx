@@ -29,19 +29,19 @@ export default function CertificationScreen({ navigation }: any) {
           <Text style={styles.subtitle}>ColorGenius certification program</Text>
         </View>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Level 1 Foundations - coming in next update!')}>
           <Text style={styles.cardTitle}>Level 1: Foundations</Text>
           <Text style={styles.cardDesc}>Color theory basics</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Level 2 Formulation - coming in next update!')}>
           <Text style={styles.cardTitle}>Level 2: Formulation</Text>
           <Text style={styles.cardDesc}>Advanced color formulation</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Level 3 Mastery - coming in next update!')}>
           <Text style={styles.cardTitle}>Level 3: Mastery</Text>
           <Text style={styles.cardDesc}>Expert-level certification</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />

@@ -41,7 +41,7 @@ export default function ServiceScreen({ navigation }: any) {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('Questionnaire')}
+          onPress={() => navigation.navigate('Consultation')}
         >
           <View style={styles.iconBg}>
             <CirclePlus size={28} color={COLORS.purple} />
