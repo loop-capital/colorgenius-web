@@ -29,19 +29,19 @@ export default function HistoryScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Past services and formulations</Text>
         </View>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Today\'s services detail - coming in next update!')}>
           <Text style={styles.cardTitle}>Today</Text>
           <Text style={styles.cardDesc}>3 services completed</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('This Week\'s services detail - coming in next update!')}>
           <Text style={styles.cardTitle}>This Week</Text>
           <Text style={styles.cardDesc}>12 services completed</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('This Month\'s services detail - coming in next update!')}>
           <Text style={styles.cardTitle}>This Month</Text>
           <Text style={styles.cardDesc}>48 services completed</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />

@@ -159,7 +159,7 @@ export default function ClientsScreen() {
   };
 
   const renderClient = ({ item }: { item: Client }) => (
-    <TouchableOpacity style={styles.clientCard}>
+    <TouchableOpacity style={styles.clientCard} onPress={() => alert(`Client ${item.name} detail - coming in next update!`)}>
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>
           {item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}

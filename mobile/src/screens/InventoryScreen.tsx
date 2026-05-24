@@ -29,19 +29,19 @@ export default function InventoryScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Manage your salon stock</Text>
         </View>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Color Products inventory - coming in next update!')}>
           <Text style={styles.cardTitle}>Color Products</Text>
           <Text style={styles.cardDesc}>124 items in stock</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Developers inventory - coming in next update!')}>
           <Text style={styles.cardTitle}>Developers</Text>
           <Text style={styles.cardDesc}>32 items in stock</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Treatments inventory - coming in next update!')}>
           <Text style={styles.cardTitle}>Treatments</Text>
           <Text style={styles.cardDesc}>18 items in stock</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />

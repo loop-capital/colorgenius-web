@@ -29,19 +29,19 @@ export default function GalleryScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Your photo collection</Text>
         </View>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Before & After gallery - coming in next update!')}>
           <Text style={styles.cardTitle}>Before & After</Text>
           <Text style={styles.cardDesc}>24 photos</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Analysis Photos gallery - coming in next update!')}>
           <Text style={styles.cardTitle}>Analysis Photos</Text>
           <Text style={styles.cardDesc}>18 photos</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => alert('Color Swatches gallery - coming in next update!')}>
           <Text style={styles.cardTitle}>Color Swatches</Text>
           <Text style={styles.cardDesc}>12 photos</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
