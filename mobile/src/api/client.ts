@@ -109,7 +109,7 @@ interface RequestOptions {
   headers?: Record<string, string>;
 }
 
-async function apiRequest<T>(
+export async function apiRequest<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
