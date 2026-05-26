@@ -8,7 +8,7 @@ import { getCurrentUser, requireAuth } from '@/lib/api/auth';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUser(req);
