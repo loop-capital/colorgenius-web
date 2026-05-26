@@ -888,7 +888,8 @@ function SummarySection({
     { label: 'Current Tone', value: TONES.find((t) => t.value === formData.currentTone)?.label || formData.currentTone },
     { label: 'Target Level', value: `${formData.targetLevel} — ${HAIR_LEVEL_NAMES[formData.targetLevel]}` },
     { label: 'Target Tone', value: TONES.find((t) => t.value === formData.targetTone)?.label || formData.targetTone },
-    { label: 'Service Type', value: SERVICE_TYPES.find((s) => s.value === formData.serviceType)?.label || formData.serviceType },
+    { label: 'Last Color Service', value: SERVICE_TYPES.find((s) => s.value === formData.lastServiceType)?.label || formData.lastServiceType },
+    { label: 'Service Type (Today)', value: SERVICE_TYPES.find((s) => s.value === formData.serviceType)?.label || formData.serviceType },
     { label: 'Condition', value: CONDITION_TYPES.find((c) => c.value === formData.conditionType)?.label || formData.conditionType },
     { label: 'Porosity', value: capitalize(formData.porosity) },
     { label: 'Gray %', value: `${formData.grayPercent}%` },
@@ -991,6 +992,7 @@ interface FormState {
   hairPattern: HairPatternType;
   density: DensityType;
   serviceType: ServiceType;
+  lastServiceType: ServiceType;
   chemicalHistory: string[];
   sensitivities: string[];
   lastChemicalService: string;
@@ -1011,6 +1013,7 @@ const INITIAL_STATE: FormState = {
   hairPattern: 'straight',
   density: 'medium',
   serviceType: 'full_head',
+  lastServiceType: 'full_head',
   chemicalHistory: [],
   sensitivities: [],
   lastChemicalService: 'never',
@@ -1026,8 +1029,14 @@ const INITIAL_STATE: FormState = {
 
 export default function FormulateScreen({ navigation, route }: any) {
   const initialStep = route?.params?.initialStep;
+  const autoPopulateData = route?.params?.autoPopulateData;
   const [step, setStep] = useState(typeof initialStep === 'number' && initialStep >= 1 && initialStep <= 6 ? initialStep : 1);
-  const [formData, setFormData] = useState<FormState>(INITIAL_STATE);
+  const [formData, setFormData] = useState<FormState>(() => {
+    if (autoPopulateData) {
+      return { ...INITIAL_STATE, ...autoPopulateData };
+    }
+    return INITIAL_STATE;
+  });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FormulationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -1209,10 +1218,10 @@ export default function FormulateScreen({ navigation, route }: any) {
             <Text style={stepStyles.stepTitle}>Chemical History</Text>
 
             <ChipSelector
-              label="Service Type"
+              label="What was your last color service?"
               options={SERVICE_TYPES}
-              selected={formData.serviceType}
-              onSelect={(v) => updateField('serviceType', v)}
+              selected={formData.lastServiceType}
+              onSelect={(v) => updateField('lastServiceType', v)}
             />
 
             <MultiChipSelector
@@ -1243,6 +1252,13 @@ export default function FormulateScreen({ navigation, route }: any) {
         return (
           <View style={stepStyles.container}>
             <Text style={stepStyles.stepTitle}>Target Look</Text>
+
+            <ChipSelector
+              label="What service are we doing today?"
+              options={SERVICE_TYPES}
+              selected={formData.serviceType}
+              onSelect={(v) => updateField('serviceType', v)}
+            />
 
             <LevelSlider
               label="Target Level"

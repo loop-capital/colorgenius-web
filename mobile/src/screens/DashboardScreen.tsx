@@ -63,7 +63,7 @@ export default function DashboardScreen({ navigation }: any) {
         </View>
 
         {/* Hero Card */}
-        <TouchableOpacity style={styles.heroCard} onPress={() => navigation.navigate('Formulate')}>
+        <TouchableOpacity style={styles.heroCard} onPress={() => navigation.navigate('NewServiceSelect')}>
           <View style={styles.heroGradient}>
             <Sparkles size={32} color="#F5F5F7" />
             <Text style={styles.heroTitle}>New Formulation</Text>

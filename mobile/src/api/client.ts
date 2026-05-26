@@ -415,7 +415,37 @@ export async function getProducts() {
   return apiRequest<{ products: any[] }>('/products');
 }
 
-// ─── Formulation Saves ───────────────────────────────────────────
+// ─── Last Consultation ───────────────────────────────────────────
+
+export interface LastConsultationData {
+  // Step 2 (Hair Assessment)
+  texture: 'fine' | 'medium' | 'coarse';
+  hairPattern: 'straight' | 'wavy' | 'curly' | 'coily';
+  density: 'thin' | 'medium' | 'thick';
+  currentLevel: number;
+  currentTone: string;
+  
+  // Step 3 (Chemical History)
+  lastServiceType: string;
+  chemicalHistory: string[];
+  sensitivities: string[];
+  lastChemicalService: string;
+  
+  // Step 4 (Desired Result)
+  serviceType: string;
+  targetLevel: number;
+  targetTone: string;
+  
+  // Step 5 (Condition)
+  conditionType: 'virgin' | 'previously_colored' | 'damaged' | 'highly_damaged' | 'bleached' | 'gray_coverage' | 'oily_scalp' | 'dry_brittle';
+  porosity: 'low' | 'normal' | 'high';
+  grayPercent: number;
+  problemIndicators: string[];
+}
+
+export async function getClientLastConsultation(clientId: string) {
+  return apiRequest<{ consultation: LastConsultationData | null }>(`/clients/${clientId}/last-consultation`);
+}
 
 export async function saveFormulation(data: any) {
   return apiRequest<{ success: boolean; id: string }>('/formulations/save', {

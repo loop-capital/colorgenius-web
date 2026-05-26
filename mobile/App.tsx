@@ -9,6 +9,7 @@ import { Menu } from 'lucide-react-native';
 import DashboardScreen from './src/screens/DashboardScreen';
 import ServiceScreen from './src/screens/ServiceScreen';
 import FormulateScreen from './src/screens/FormulateScreen';
+import NewServiceScreen from './src/screens/NewServiceScreen';
 import ClientsScreen from './src/screens/ClientsScreen';
 import QuestionnaireScreen from './src/screens/QuestionnaireScreen';
 import LibraryScreen from './src/screens/LibraryScreen';
@@ -39,7 +40,8 @@ const THEME = {
 export type RootStackParamList = {
   Dashboard: undefined;
   NewService: undefined;
-  Formulate: { initialStep?: number } | undefined;
+  NewServiceSelect: undefined;
+  Formulate: { initialStep?: number; autoPopulateData?: Record<string, any>; clientId?: string; clientName?: string } | undefined;
   Consultation: undefined;
   Clients: undefined;
   Library: undefined;
@@ -130,6 +132,7 @@ function AppContent() {
       <Stack.Navigator screenOptions={screenOptions}>
         <Stack.Screen name="Dashboard" component={wrapScreen(DashboardScreen)} />
         <Stack.Screen name="NewService" component={wrapScreen(ServiceScreen)} />
+        <Stack.Screen name="NewServiceSelect" component={wrapScreen(NewServiceScreen)} />
         <Stack.Screen name="Formulate" component={wrapScreen(FormulateScreen)} />
         <Stack.Screen name="Consultation" component={wrapScreen(QuestionnaireScreen)} />
         <Stack.Screen name="Clients" component={wrapScreen(ClientsScreen)} />
