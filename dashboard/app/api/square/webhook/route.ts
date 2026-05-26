@@ -36,12 +36,12 @@ export async function POST(request: NextRequest) {
         // TODO: Trigger re-sync of catalog
         break;
 
-      case 'payment.completed':
+      case 'payment.created':
         // Payment completed (could be a formula license payment)
         console.log('Payment completed:', event.data?.object);
         break;
 
-      case 'payment.failed':
+      case 'payment.updated':
         // Payment failed
         console.log('Payment failed:', event.data?.object);
         break;
