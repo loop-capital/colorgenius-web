@@ -1,13 +1,14 @@
 /**
  * POST /api/square/sync
- * Sync a salon's Square product catalog into COLORgenius
- * 
+ * Sync a salon's Square product catalog into COLORgenius inventory_items table
+ *
  * Pulls all catalog items from the salon's Square account
- * and creates a product mapping for inventory checks
+ * and upserts them into inventory_items with source="square"
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createSalonClient, getConnection, saveConnection } from '@/lib/square-multi';
+import { prisma } from '@/lib/prisma';
 
 interface SyncedProduct {
   square_catalog_id: string;
@@ -18,15 +19,41 @@ interface SyncedProduct {
   quantity?: number;
 }
 
-// In-memory product store — in production this would be a database table
-const salonProducts = new Map<string, SyncedProduct[]>();
+/**
+ * Map Square catalog category names to our internal category codes
+ */
+function mapCategory(squareCategory?: string): string {
+  if (!squareCategory) return 'other';
+  const lower = squareCategory.toLowerCase();
+  if (lower.includes('hair color') || lower.includes('haircolor') || lower.includes('colour')) return 'color';
+  if (lower.includes('developer') || lower.includes('oxidant') || lower.includes('peroxide')) return 'developer';
+  if (lower.includes('treatment') || lower.includes('conditioner') || lower.includes('mask')) return 'treatment';
+  return 'other';
+}
 
 export async function POST(request: NextRequest) {
   try {
     const auth = request.headers.get('authorization');
     const salonId = auth?.startsWith('Bearer ') ? auth.slice(7).split(':')[0] : 'default';
 
-    const client = createSalonClient(salonId);
+    // Check that the salon has inventory_management enabled
+    const salon = await prisma.salons.findUnique({ where: { id: salonId } });
+    if (!salon) {
+      return NextResponse.json({
+        success: false,
+        error: { code: 'SALON_NOT_FOUND', message: 'Salon not found.' },
+      }, { status: 404 });
+    }
+
+    const features = salon.features_enabled as Record<string, unknown> | null;
+    if (!features || features.inventory_management !== true) {
+      return NextResponse.json({
+        success: false,
+        error: { code: 'INVENTORY_DISABLED', message: 'Inventory management is not enabled for this salon. Enable it in salon settings first.' },
+      }, { status: 403 });
+    }
+
+    const client = await createSalonClient(salonId);
     if (!client) {
       return NextResponse.json({
         success: false,
@@ -34,10 +61,10 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const connection = getConnection(salonId);
+    const connection = await getConnection(salonId);
     const locationId = connection?.location_ids[0] || '';
 
-    // Fetch all catalog items
+    // Fetch all catalog items from Square
     const products: SyncedProduct[] = [];
     let cursor: string | undefined;
 
@@ -79,13 +106,64 @@ export async function POST(request: NextRequest) {
       cursor = response.cursor;
     } while (cursor);
 
-    // Store synced products
-    salonProducts.set(salonId, products);
+    // Upsert each product into inventory_items
+    const upsertResults = await Promise.all(
+      products.map(async (product) => {
+        const category = mapCategory(product.category);
+        const shadeCode = product.sku || product.square_catalog_id;
+        const brand = product.name.split(' ')[0] || 'Unknown';
+        const productLine = product.name;
+        const retailPrice = product.price_cents ? product.price_cents / 100 : null;
+
+        return prisma.inventory_items.upsert({
+          where: {
+            salon_id_brand_shade_code: {
+              salon_id: salonId,
+              brand: brand,
+              shade_code: shadeCode,
+            },
+          },
+          update: {
+            source: 'square',
+            square_catalog_object_id: product.square_catalog_id,
+            square_variation_id: product.sku || null,
+            shade_name: product.name,
+            category: category,
+            quantity_on_hand: product.quantity || 0,
+            unit_of_measure: 'grams',
+            low_stock_threshold: 50,
+            retail_price: retailPrice,
+            reorder_point: 25,
+            reorder_quantity: 100,
+            last_synced_at: new Date(),
+            updated_at: new Date(),
+          },
+          create: {
+            salon_id: salonId,
+            source: 'square',
+            square_catalog_object_id: product.square_catalog_id,
+            square_variation_id: product.sku || null,
+            brand: brand,
+            product_line: productLine,
+            shade_code: shadeCode,
+            shade_name: product.name,
+            category: category,
+            quantity_on_hand: product.quantity || 0,
+            unit_of_measure: 'grams',
+            low_stock_threshold: 50,
+            retail_price: retailPrice,
+            reorder_point: 25,
+            reorder_quantity: 100,
+            last_synced_at: new Date(),
+          },
+        });
+      })
+    );
 
     // Update connection sync timestamp
     if (connection) {
       connection.catalog_synced_at = new Date().toISOString();
-      saveConnection(connection);
+      await saveConnection(connection);
     }
 
     return NextResponse.json({
@@ -107,25 +185,38 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/square/sync
- * Get synced products for a salon
+ * Get synced products for a salon from the database
  */
 export async function GET(request: NextRequest) {
   const auth = request.headers.get('authorization');
   const salonId = auth?.startsWith('Bearer ') ? auth.slice(7).split(':')[0] : 'default';
 
-  const products = salonProducts.get(salonId) || [];
-  const connection = getConnection(salonId);
+  const items = await prisma.inventory_items.findMany({
+    where: {
+      salon_id: salonId,
+      source: 'square',
+    },
+    orderBy: { updated_at: 'desc' },
+  });
+
+  const connection = await getConnection(salonId);
 
   return NextResponse.json({
     success: true,
     data: {
-      products,
-      total: products.length,
+      products: items.map((item) => ({
+        id: item.id,
+        square_catalog_id: item.square_catalog_object_id,
+        name: item.shade_name || item.shade_code || '',
+        category: item.category,
+        sku: item.square_variation_id || undefined,
+        price_cents: item.retail_price ? Number(item.retail_price) * 100 : undefined,
+        quantity: item.quantity_on_hand,
+        brand: item.brand,
+        product_line: item.product_line,
+      })),
+      total: items.length,
       last_synced: connection?.catalog_synced_at || null,
     },
   });
-}
-
-function getSyncedProducts(salonId: string): SyncedProduct[] {
-  return salonProducts.get(salonId) || [];
 }

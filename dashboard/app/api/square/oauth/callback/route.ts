@@ -1,17 +1,18 @@
 /**
  * GET /api/square/oauth/callback
  * Square OAuth callback — exchanges auth code for access token
- * 
+ *
  * Flow:
  * 1. User clicks "Connect Square" in settings
  * 2. Redirected to Square authorization page
  * 3. User approves access
  * 4. Square redirects here with ?code=xxx&state=salon_id
- * 5. We exchange code for token and store connection
+ * 5. We exchange code for token and store connection in square_connections table
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeAuthCode, saveConnection } from '@/lib/square-multi';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,6 +34,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Check that the salon exists and has inventory_management enabled
+    const salon = await prisma.salons.findUnique({ where: { id: state } });
+    if (!salon) {
+      return NextResponse.redirect(
+        new URL('/settings?square_error=salon_not_found', request.url)
+      );
+    }
+
+    const features = salon.features_enabled as Record<string, unknown> | null;
+    if (!features || features.inventory_management !== true) {
+      return NextResponse.redirect(
+        new URL('/settings?square_error=inventory_not_enabled', request.url)
+      );
+    }
+
     // Exchange code for tokens
     const tokenData = await exchangeAuthCode(code);
 
@@ -50,8 +66,8 @@ export async function GET(request: NextRequest) {
     const locations = await client.locations.list();
     const locationIds = (locations.locations || []).map((l: { id?: string }) => l.id || '');
 
-    // Store the connection
-    saveConnection({
+    // Store the connection in the database
+    await saveConnection({
       salon_id: state,
       access_token: tokenData.access_token,
       refresh_token: tokenData.refresh_token,
