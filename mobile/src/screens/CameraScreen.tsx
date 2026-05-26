@@ -12,24 +12,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { X, RotateCcw, Image as ImageIcon, Zap, Camera } from 'lucide-react-native';
-import { uploadPhoto, analyzePhoto, getAuthToken, loginBeta } from '../api/client';
+import { uploadPhoto, analyzePhoto, waitForAnalysis, ensureAuth } from '../api/client';
 
 export default function CameraScreen({ navigation }: any) {
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>('back');
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [angle, setAngle] = useState<'roots' | 'mid' | 'ends'>('roots');
   const [authReady, setAuthReady] = useState(false);
   const cameraRef = useRef<CameraView>(null);
 
-  // Ensure auth token is present before allowing uploads
+  // Pre-authenticate on mount
   useEffect(() => {
     (async () => {
-      let token = await getAuthToken();
-      if (!token) {
-        token = await loginBeta();
-      }
+      const token = await ensureAuth();
       setAuthReady(!!token);
     })();
   }, []);
@@ -78,7 +76,6 @@ export default function CameraScreen({ navigation }: any) {
   };
 
   const pickFromGallery = async () => {
-    // Request media library permissions first
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert('Permission Needed', 'COLORgenius needs access to your photos to upload hair analysis images.');
@@ -100,14 +97,14 @@ export default function CameraScreen({ navigation }: any) {
   const handleUpload = async () => {
     if (!capturedUri) return;
 
-    // Ensure auth token exists before uploading
-    let token = await getAuthToken();
-    if (!token) {
-      token = await loginBeta();
-    }
-    if (!token) {
-      Alert.alert('Authentication Required', 'Unable to log in. Please check your internet connection and try again.');
-      return;
+    // Gate on auth — fail fast if not ready
+    if (!authReady) {
+      const token = await ensureAuth();
+      if (!token) {
+        Alert.alert('Authentication Required', 'Unable to log in. Check your internet connection and try again.');
+        return;
+      }
+      setAuthReady(true);
     }
 
     setUploading(true);
@@ -115,32 +112,36 @@ export default function CameraScreen({ navigation }: any) {
       const sessionId = `mobile-${Date.now()}`;
       const uploadResult = await uploadPhoto(capturedUri, sessionId, angle);
 
-      // Trigger analysis
+      // Trigger analysis and poll for completion
       if (uploadResult.data?.id) {
+        setAnalyzing(true);
         try {
           await analyzePhoto(uploadResult.data.id);
-        } catch {}
+          // Poll for analysis completion
+          const analysis = await waitForAnalysis(uploadResult.data.id, 60000, 3000);
+          if (analysis) {
+            navigation.navigate('Formulate', {
+              photoId: uploadResult.data.id,
+              analysis,
+            });
+          } else {
+            // Timed out — still navigate with raw data
+            navigation.navigate('Formulate', {
+              photoId: uploadResult.data.id,
+              analysis: uploadResult.data,
+            });
+          }
+        } catch (analysisErr: any) {
+          console.error('[Camera] Analysis failed:', analysisErr.message);
+          // Still navigate — user can retry analysis from Formulate screen
+          navigation.navigate('Formulate', {
+            photoId: uploadResult.data.id,
+            analysis: uploadResult.data,
+          });
+        } finally {
+          setAnalyzing(false);
+        }
       }
-
-      Alert.alert(
-        'Photo Uploaded',
-        `${angle} photo uploaded successfully! Analysis will be available shortly.`,
-        [
-          {
-            text: 'Take Another',
-            onPress: () => setCapturedUri(null),
-          },
-          {
-            text: 'View Results',
-            onPress: () => {
-              navigation.navigate('Formulate', {
-                photoId: uploadResult.data?.id,
-                analysis: uploadResult.data,
-              });
-            },
-          },
-        ]
-      );
     } catch (err: any) {
       Alert.alert('Upload Failed', err.message || 'Please try again');
     } finally {
@@ -175,18 +176,24 @@ export default function CameraScreen({ navigation }: any) {
             <TouchableOpacity
               style={styles.retakeBtn}
               onPress={() => setCapturedUri(null)}
+              disabled={uploading || analyzing}
             >
               <RotateCcw size={20} color="#FFF" />
               <Text style={styles.retakeText}>Retake</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.uploadBtn, uploading && styles.uploadBtnDisabled]}
+              style={[styles.uploadBtn, (uploading || analyzing) && styles.uploadBtnDisabled]}
               onPress={handleUpload}
-              disabled={uploading}
+              disabled={uploading || analyzing}
             >
-              {uploading ? (
-                <ActivityIndicator color="#FFF" size="small" />
+              {(uploading || analyzing) ? (
+                <View style={{ alignItems: 'center' }}>
+                  <ActivityIndicator color="#FFF" size="small" />
+                  <Text style={styles.uploadText}>
+                    {analyzing ? 'Analyzing...' : uploading ? 'Uploading...' : ''}
+                  </Text>
+                </View>
               ) : (
                 <>
                   <Zap size={20} color="#FFF" />
@@ -262,174 +269,37 @@ export default function CameraScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-
-  permissionTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#F5F5F7',
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  permissionText: {
-    fontSize: 14,
-    color: '#A1A1AA',
-    textAlign: 'center',
-    marginTop: 8,
-    lineHeight: 20,
-  },
-  permissionBtn: {
-    backgroundColor: '#9333EA',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-    marginTop: 20,
-  },
+  permissionTitle: { fontSize: 22, fontWeight: '700', color: '#F5F5F7', marginTop: 16, textAlign: 'center' },
+  permissionText: { fontSize: 14, color: '#A1A1AA', textAlign: 'center', marginTop: 8, lineHeight: 20 },
+  permissionBtn: { backgroundColor: '#9333EA', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 24, marginTop: 20 },
   permissionBtnText: { color: '#FFF', fontWeight: '700', fontSize: 15 },
   backBtn: { marginTop: 12 },
   backBtnText: { color: '#9333EA', fontWeight: '600', fontSize: 14 },
-
-  // Camera
-  topBar: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-  closeBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  topBar: { position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 8 },
+  closeBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
   topTitle: { fontSize: 16, fontWeight: '700', color: '#FFF' },
-  flipBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  angleGuide: {
-    position: 'absolute',
-    top: '35%',
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  angleGuideText: {
-    color: '#FFF',
-    fontSize: 15,
-    fontWeight: '600',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 12,
-  },
+  flipBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
+  angleGuide: { position: 'absolute', top: '35%', left: 0, right: 0, alignItems: 'center' },
+  angleGuideText: { color: '#FFF', fontSize: 15, fontWeight: '600', backgroundColor: 'rgba(0,0,0,0.5)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, overflow: 'hidden', marginBottom: 12 },
   angleRow: { flexDirection: 'row', gap: 8 },
-  angleBtnCamera: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    borderWidth: 1.5,
-    borderColor: 'transparent',
-  },
-  angleBtnCameraActive: {
-    borderColor: '#7C3AED',
-    backgroundColor: 'rgba(124, 58, 237, 0.6)',
-  },
+  angleBtnCamera: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.4)', borderWidth: 1.5, borderColor: 'transparent' },
+  angleBtnCameraActive: { borderColor: '#7C3AED', backgroundColor: 'rgba(124, 58, 237, 0.6)' },
   angleTextCamera: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: '600' },
   angleTextCameraActive: { color: '#FFF' },
-
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingBottom: 40,
-    paddingTop: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
-  galleryBtn: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  shutterBtn: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 4,
-    borderColor: '#FFF',
-  },
-  shutterInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#F5F5F7',
-  },
-
-  angleBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderWidth: 1.5,
-    borderColor: 'transparent',
-  },
+  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingBottom: 40, paddingTop: 20, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.3)' },
+  galleryBtn: { width: 50, height: 50, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
+  shutterBtn: { width: 76, height: 76, borderRadius: 38, backgroundColor: 'rgba(255,255,255,0.3)', justifyContent: 'center', alignItems: 'center', borderWidth: 4, borderColor: '#FFF' },
+  shutterInner: { width: 60, height: 60, borderRadius: 30, backgroundColor: '#F5F5F7' },
+  angleBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.15)', borderWidth: 1.5, borderColor: 'transparent' },
   angleBtnActive: { borderColor: '#7C3AED', backgroundColor: 'rgba(124, 58, 237, 0.4)' },
   angleText: { color: 'rgba(255,255,255,0.6)', fontSize: 13, fontWeight: '600' },
   angleTextActive: { color: '#FFF' },
-
-  // Preview
   previewContainer: { flex: 1, backgroundColor: '#000' },
   previewImage: { flex: 1, resizeMode: 'contain' },
-  previewActions: {
-    flexDirection: 'row',
-    gap: 12,
-    padding: 16,
-    paddingBottom: 40,
-  },
-  retakeBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
+  previewActions: { flexDirection: 'row', gap: 12, padding: 16, paddingBottom: 40 },
+  retakeBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 20, paddingVertical: 14, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)' },
   retakeText: { color: '#FFF', fontWeight: '600', fontSize: 14 },
-  uploadBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#7C3AED',
-    borderRadius: 12,
-    paddingVertical: 14,
-  },
+  uploadBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#7C3AED', borderRadius: 12, paddingVertical: 14 },
   uploadBtnDisabled: { opacity: 0.6 },
   uploadText: { color: '#FFF', fontWeight: '700', fontSize: 15 },
 });

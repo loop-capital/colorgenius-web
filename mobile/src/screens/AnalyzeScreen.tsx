@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera, ChevronRight, Image as ImageIcon } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { uploadPhoto, analyzePhoto } from '../api/client';
+import { uploadPhoto, analyzePhoto, waitForAnalysis, ensureAuth } from '../api/client';
 
 const COLORS = {
   bg: '#0F0F1A',
@@ -25,6 +25,46 @@ const COLORS = {
 
 export default function AnalyzeScreen({ navigation }: any) {
   const [uploading, setUploading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+
+  const handleUpload = async (uri: string) => {
+    // Auth check first
+    const token = await ensureAuth();
+    if (!token) {
+      Alert.alert('Authentication Required', 'Please log in first.');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const sessionId = `mobile-${Date.now()}`;
+      const uploadResult = await uploadPhoto(uri, sessionId, 'roots');
+
+      if (uploadResult.data?.id) {
+        setAnalyzing(true);
+        try {
+          await analyzePhoto(uploadResult.data.id);
+          const analysis = await waitForAnalysis(uploadResult.data.id, 60000, 3000);
+          navigation.navigate('Formulate', {
+            photoId: uploadResult.data.id,
+            analysis: analysis || uploadResult.data,
+          });
+        } catch (analysisErr: any) {
+          console.error('[Analyze] Analysis failed:', analysisErr.message);
+          navigation.navigate('Formulate', {
+            photoId: uploadResult.data.id,
+            analysis: uploadResult.data,
+          });
+        } finally {
+          setAnalyzing(false);
+        }
+      }
+    } catch (err: any) {
+      Alert.alert('Upload Failed', err.message || 'Please try again');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const pickFromGallery = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -41,27 +81,7 @@ export default function AnalyzeScreen({ navigation }: any) {
     });
 
     if (!result.canceled && result.assets[0]) {
-      const uri = result.assets[0].uri;
-      setUploading(true);
-      try {
-        const sessionId = `mobile-${Date.now()}`;
-        const uploadResult = await uploadPhoto(uri, sessionId, 'roots');
-        if (uploadResult.data?.id) {
-          try { await analyzePhoto(uploadResult.data.id); } catch {}
-        }
-        Alert.alert(
-          'Photo Uploaded',
-          'Photo uploaded successfully! Analysis will be available shortly.',
-          [
-            { text: 'Take Another', onPress: () => {} },
-            { text: 'View Results', onPress: () => navigation.navigate('Formulate', { photoId: uploadResult.data?.id, analysis: uploadResult.data }) },
-          ]
-        );
-      } catch (err: any) {
-        Alert.alert('Upload Failed', err.message || 'Please try again');
-      } finally {
-        setUploading(false);
-      }
+      await handleUpload(result.assets[0].uri);
     }
   };
 
@@ -74,38 +94,52 @@ export default function AnalyzeScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Take or upload a photo for AI assessment</Text>
         </View>
 
+        {(uploading || analyzing) && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={COLORS.purple} />
+            <Text style={styles.loadingText}>
+              {analyzing ? 'Analyzing hair color...' : 'Uploading photo...'}
+            </Text>
+          </View>
+        )}
+
         <TouchableOpacity
           style={styles.card}
           onPress={() => navigation.navigate('Camera')}
+          disabled={uploading || analyzing}
         >
-          <View style={styles.iconBg}>
-            <Camera size={28} color={COLORS.purple} />
+          <View style={styles.cardIcon}>
+            <Camera size={24} color={COLORS.purple} />
           </View>
-          <View style={styles.textBlock}>
+          <View style={styles.cardContent}>
             <Text style={styles.cardTitle}>Take Photo</Text>
-            <Text style={styles.cardDesc}>Capture hair for AI analysis</Text>
+            <Text style={styles.cardDesc}>Capture hair for color analysis</Text>
           </View>
           <ChevronRight size={20} color={COLORS.textMuted} />
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.card, uploading && styles.cardDisabled]}
+          style={styles.card}
           onPress={pickFromGallery}
-          disabled={uploading}
+          disabled={uploading || analyzing}
         >
-          <View style={styles.iconBg}>
-            {uploading ? (
-              <ActivityIndicator size="small" color={COLORS.purple} />
-            ) : (
-              <ImageIcon size={28} color={COLORS.purple} />
-            )}
+          <View style={styles.cardIcon}>
+            <ImageIcon size={24} color={COLORS.purple} />
           </View>
-          <View style={styles.textBlock}>
-            <Text style={styles.cardTitle}>{uploading ? 'Uploading...' : 'Upload from Gallery'}</Text>
-            <Text style={styles.cardDesc}>Select existing photo</Text>
+          <View style={styles.cardContent}>
+            <Text style={styles.cardTitle}>Upload from Gallery</Text>
+            <Text style={styles.cardDesc}>Select existing hair photo</Text>
           </View>
-          {!uploading && <ChevronRight size={20} color={COLORS.textMuted} />}
+          <ChevronRight size={20} color={COLORS.textMuted} />
         </TouchableOpacity>
+
+        <View style={styles.tips}>
+          <Text style={styles.tipsTitle}>Photo Tips</Text>
+          <Text style={styles.tip}>• Use natural lighting when possible</Text>
+          <Text style={styles.tip}>• Show the roots, mid-lengths, and ends separately</Text>
+          <Text style={styles.tip}>• Avoid flash — it changes the perceived color</Text>
+          <Text style={styles.tip}>• Hold the camera 6-8 inches from the hair</Text>
+        </View>
 
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -116,34 +150,31 @@ export default function AnalyzeScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
   scroll: { padding: 20 },
-  header: {
-    alignItems: 'center',
-    marginBottom: 28,
-    marginTop: 8,
-  },
+  header: { alignItems: 'center', marginBottom: 28, marginTop: 8 },
   title: { fontSize: 24, fontWeight: '800', color: COLORS.textPrimary, marginTop: 12 },
   subtitle: { fontSize: 14, color: COLORS.textSecondary, marginTop: 6, textAlign: 'center' },
+  loadingOverlay: {
+    alignItems: 'center', paddingVertical: 24, marginBottom: 16,
+    backgroundColor: 'rgba(147,51,234,0.06)', borderRadius: 16,
+    borderWidth: 1, borderColor: 'rgba(147,51,234,0.15)',
+  },
+  loadingText: { color: COLORS.textSecondary, fontSize: 14, marginTop: 12 },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    backgroundColor: COLORS.card, borderRadius: 16, padding: 16,
+    marginBottom: 12, borderWidth: 1, borderColor: COLORS.cardBorder,
   },
-  iconBg: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: 'rgba(147,51,234,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
+  cardIcon: {
+    width: 48, height: 48, borderRadius: 14,
+    backgroundColor: 'rgba(147,51,234,0.1)', justifyContent: 'center', alignItems: 'center',
   },
-  textBlock: { flex: 1 },
-  cardDisabled: { opacity: 0.5 },
+  cardContent: { flex: 1 },
   cardTitle: { fontSize: 15, fontWeight: '700', color: COLORS.textPrimary },
   cardDesc: { fontSize: 13, color: COLORS.textSecondary, marginTop: 2 },
+  tips: {
+    backgroundColor: 'rgba(147,51,234,0.06)', borderRadius: 16, padding: 16,
+    marginTop: 8, borderWidth: 1, borderColor: 'rgba(147,51,234,0.15)',
+  },
+  tipsTitle: { fontSize: 14, fontWeight: '700', color: '#A855F7', marginBottom: 8 },
+  tip: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 20 },
 });
