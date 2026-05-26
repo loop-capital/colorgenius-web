@@ -695,6 +695,7 @@ model texture_analyses {
 model users {
   id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email         String     @unique @db.VarChar(255)
+  apple_id      String?    @unique
   password_hash String     @db.VarChar(255)
   first_name    String?    @db.VarChar(100)
   last_name     String?    @db.VarChar(100)
