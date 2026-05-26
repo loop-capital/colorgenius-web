@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CirclePlus, ChevronRight } from 'lucide-react-native';
+import { CirclePlus, ChevronRight, ClipboardList } from 'lucide-react-native';
 
 const COLORS = {
   bg: '#0F0F1A',
@@ -27,14 +27,14 @@ export default function ServiceScreen({ navigation }: any) {
 
         <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('Formulate')}
+          onPress={() => navigation.navigate('NewServiceSelect')}
         >
           <View style={styles.iconBg}>
             <CirclePlus size={28} color={COLORS.purple} />
           </View>
           <View style={styles.textBlock}>
             <Text style={styles.cardTitle}>New Color Service</Text>
-            <Text style={styles.cardDesc}>Create a custom color formulation</Text>
+            <Text style={styles.cardDesc}>Select a client and create a custom formulation</Text>
           </View>
           <ChevronRight size={20} color={COLORS.textMuted} />
         </TouchableOpacity>
@@ -44,7 +44,7 @@ export default function ServiceScreen({ navigation }: any) {
           onPress={() => navigation.navigate('Consultation')}
         >
           <View style={styles.iconBg}>
-            <CirclePlus size={28} color={COLORS.purple} />
+            <ClipboardList size={28} color={COLORS.purple} />
           </View>
           <View style={styles.textBlock}>
             <Text style={styles.cardTitle}>Consultation</Text>
