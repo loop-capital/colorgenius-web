@@ -700,6 +700,7 @@ model users {
   created_at    DateTime?  @default(now()) @db.Timestamp(6)
   updated_at    DateTime?  @default(now()) @db.Timestamp(6)
   formulas      formulas[]
+  photo_collections client_photo_collections[]
 
   @@index([email], map: "idx_users_email")
 }
@@ -872,6 +873,7 @@ model formula_photos {
   photo_comments  formula_photo_comments[]
   photo_tags      formula_photo_tags[]
   photo_votes     formula_photo_votes[]
+  client_collections client_photo_collections[]
   clients         clients?                 @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   formulas        formulas                 @relation(fields: [formula_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   stylists        stylists                 @relation(fields: [stylist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -906,6 +908,25 @@ model formula_photo_tags {
   @@unique([photo_id, tag], map: "uniq_photo_tag")
   @@index([photo_id], map: "idx_photo_tags_photo")
   @@index([tag], map: "idx_photo_tags_tag")
+}
+
+model client_photo_collections {
+  id                     String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  client_id              String         @db.Uuid
+  photo_id               String         @db.Uuid
+  notes                  String?        @db.VarChar(500)
+  shared_with_stylist_id String?        @db.Uuid
+  shared_at              DateTime?      @db.Timestamp(6)
+  status                 String         @default("saved") @db.VarChar(20)
+  created_at             DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at             DateTime?      @default(now()) @db.Timestamp(6)
+
+  client users         @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  photo  formula_photos @relation(fields: [photo_id], references: [id], onDelete: Cascade)
+
+  @@unique([client_id, photo_id], map: "uniq_client_photo")
+  @@index([client_id], map: "idx_collections_client")
+  @@index([photo_id], map: "idx_collections_photo")
 }
 
 model formula_photo_comments {
