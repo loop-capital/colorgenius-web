@@ -39,7 +39,7 @@ const THEME = {
 export type RootStackParamList = {
   Dashboard: undefined;
   NewService: undefined;
-  Formulate: undefined;
+  Formulate: { initialStep?: number } | undefined;
   Consultation: undefined;
   Clients: undefined;
   Library: undefined;
