@@ -11,20 +11,18 @@ const API_BASE = 'https://colorgenius.co/api';
 
 // ─── Settings Keys ───────────────────────────────────────────────
 
-const SETTINGS_NOTIFICATIONS_KEY = 'cg_settings_notifications';
-const SETTINGS_DARK_MODE_KEY     = 'cg_settings_dark_mode';
-const SETTINGS_AUTO_SYNC_KEY     = 'cg_settings_auto_sync';
-const SETTINGS_DEFAULT_BRAND_KEY = 'cg_settings_default_brand';
+const SETTINGS_NOTIFICATIONS_KEY = 'cg_set_notif';
+const SETTINGS_DARK_MODE_KEY     = 'cg_set_mode';
+const SETTINGS_AUTO_SYNC_KEY     = 'cg_set_sync';
+const SETTINGS_DEFAULT_BRAND_KEY = 'cg_set_brand';
 
 // ─── Auth Token Management ───────────────────────────────────────
 
-const TOKEN_KEY = 'cg_auth_token';
+const TOKEN_KEY = 'cg_token';
 
 export async function getAuthToken(): Promise<string | null> {
   const raw = await AsyncStorage.getItem(TOKEN_KEY);
   if (!raw) return null;
-  // Aggressively strip all non-visible ASCII and control characters that corrupt HTTP headers.
-  // Token must be non-empty after stripping.
   const cleaned = raw.replace(/[^\x20-\x7E]/g, '').trim();
   return cleaned.length > 0 ? cleaned : null;
 }
@@ -51,54 +49,57 @@ export async function getSettings() {
     };
   } catch (error) {
     console.error('[Settings] Failed to load settings:', error);
-    // Return defaults on error
     return { notifications: true, darkMode: false, autoSync: true };
   }
 }
 
 export async function saveNotifications(value: boolean) {
-  try {
-    await AsyncStorage.setItem(SETTINGS_NOTIFICATIONS_KEY, String(value));
-  } catch (error) {
-    console.error('[Settings] Failed to save notifications:', error);
-    throw error;
-  }
+  await AsyncStorage.setItem(SETTINGS_NOTIFICATIONS_KEY, String(value));
 }
 
 export async function saveDarkMode(value: boolean) {
-  try {
-    await AsyncStorage.setItem(SETTINGS_DARK_MODE_KEY, String(value));
-  } catch (error) {
-    console.error('[Settings] Failed to save dark mode:', error);
-    throw error;
-  }
+  await AsyncStorage.setItem(SETTINGS_DARK_MODE_KEY, String(value));
 }
 
 export async function saveAutoSync(value: boolean) {
-  try {
-    await AsyncStorage.setItem(SETTINGS_AUTO_SYNC_KEY, String(value));
-  } catch (error) {
-    console.error('[Settings] Failed to save auto sync:', error);
-    throw error;
-  }
+  await AsyncStorage.setItem(SETTINGS_AUTO_SYNC_KEY, String(value));
 }
 
 export async function saveDefaultBrand(brand: string) {
-  try {
-    await AsyncStorage.setItem(SETTINGS_DEFAULT_BRAND_KEY, brand);
-  } catch (error) {
-    console.error('[Settings] Failed to save default brand:', error);
-    throw error;
-  }
+  await AsyncStorage.setItem(SETTINGS_DEFAULT_BRAND_KEY, brand);
 }
 
 export async function getDefaultBrand(): Promise<string | null> {
-  try {
-    return await AsyncStorage.getItem(SETTINGS_DEFAULT_BRAND_KEY);
-  } catch (error) {
-    console.error('[Settings] Failed to load default brand:', error);
-    return null;
+  return AsyncStorage.getItem(SETTINGS_DEFAULT_BRAND_KEY);
+}
+
+// ─── Retry Helper ────────────────────────────────────────────────
+
+async function retry<T>(
+  fn: () => Promise<T>,
+  maxAttempts = 3,
+  baseDelayMs = 1000
+): Promise<T> {
+  let lastError: Error | null = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      lastError = err;
+      // Don't retry permanent failures
+      if (err.message?.includes('HTTP 401') || err.message?.includes('HTTP 403') ||
+          err.message?.includes('HTTP 404') || err.message?.includes('HTTP 413') ||
+          err.message?.includes('HTTP 415')) {
+        throw err;
+      }
+      if (attempt < maxAttempts) {
+        const delay = baseDelayMs * Math.pow(2, attempt - 1);
+        console.log(`[Retry] Attempt ${attempt}/${maxAttempts} failed, retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
   }
+  throw lastError || new Error('Retry failed');
 }
 
 // ─── Core API Helper ─────────────────────────────────────────────
@@ -183,11 +184,9 @@ export interface FormulationInput {
 }
 
 export async function submitFormulation(input: FormulationInput) {
-  // Convert single-letter tone codes to full tone names for the web API
   const currentToneName = TONE_VALUE_MAP[input.currentTone] || input.currentTone;
   const targetToneName = TONE_VALUE_MAP[input.targetTone] || input.targetTone;
 
-  // Match web API field names exactly (camelCase)
   const body = {
     currentLevel: input.currentLevel,
     currentTone: currentToneName,
@@ -211,12 +210,15 @@ export async function submitFormulation(input: FormulationInput) {
 // ─── Auth / Login ──────────────────────────────────────────────
 
 const BETA_EMAIL = 'beta@colorgenius.co';
-const BETA_PASSWORD = 'colorgenius';
+const BETA_PASSWORD = 'beta2026colorgenius';
 
-/**
- * Log in with the shared beta account and store the token.
- * Returns the token string on success, null on failure.
- */
+export async function ensureAuth(): Promise<string | null> {
+  let token = await getAuthToken();
+  if (token) return token;
+  token = await loginBeta();
+  return token;
+}
+
 export async function loginBeta(): Promise<string | null> {
   try {
     const response = await fetch(`${API_BASE}/auth/login`, {
@@ -243,9 +245,6 @@ export async function loginBeta(): Promise<string | null> {
   }
 }
 
-/**
- * Log in with email/password, store token, and return it.
- */
 export async function loginWithCredentials(email: string, password: string): Promise<string | null> {
   try {
     const response = await fetch(`${API_BASE}/auth/login`, {
@@ -287,44 +286,26 @@ export interface PhotoUploadResponse {
   };
 }
 
-/**
- * Upload a photo using the presigned URL flow.
- *
- * Step 1: POST /api/photos/upload with JSON to get a presigned R2 URL
- * Step 2: PUT the file bytes directly to the presigned URL
- *
- * NOTE: This requires expo-file-system. If not available, use uploadPhotoMultipart.
- */
 export async function uploadPhoto(
   imageUri: string,
   sessionId: string,
   angle: 'roots' | 'mid' | 'ends'
 ): Promise<PhotoUploadResponse> {
-  // Always use multipart upload (no expo-file-system dependency)
-  return uploadPhotoMultipart(imageUri, sessionId, angle);
+  return retry(() => uploadPhotoMultipart(imageUri, sessionId, angle), 3, 1000);
 }
 
-/**
- * Upload a photo using multipart/form-data (direct upload mode).
- * Includes Authorization header from auth store.
- * Falls back to beta account login if no token is present.
- */
 export async function uploadPhotoMultipart(
   imageUri: string,
   sessionId: string,
   angle: 'roots' | 'mid' | 'ends'
 ): Promise<PhotoUploadResponse> {
-  // Determine content type
   const uriPath = imageUri.split('?')[0];
   const ext = uriPath.split('.').pop()?.toLowerCase() ?? '';
   const mimeType = ext === 'png' ? 'image/png'
     : ext === 'webp' ? 'image/webp'
     : 'image/jpeg';
 
-  // Build multipart form data
   const formData = new FormData();
-
-  // React Native FormData file upload
   const fileName = `photo-${Date.now()}.${ext || 'jpg'}`;
   formData.append('file', {
     uri: imageUri,
@@ -334,17 +315,15 @@ export async function uploadPhotoMultipart(
   formData.append('sessionId', sessionId);
   formData.append('angle', angle);
 
-  // Get auth token (falls back to beta login if none stored)
-  let token = await getAuthToken();
+  const token = await ensureAuth();
   if (!token) {
-    token = await loginBeta();
+    throw new Error('Not authenticated. Please log in and try again.');
   }
 
-  const headers: Record<string, string> = {};
-  if (token) {
-    const cleanToken = token.replace(/[^A-Za-z0-9._~+/=-]/g, '');
-    if (cleanToken) headers['Authorization'] = 'Bearer ' + cleanToken;
-  }
+  const cleanToken = token.replace(/[^A-Za-z0-9._~+/=-]/g, '');
+  const headers: Record<string, string> = {
+    'Authorization': 'Bearer ' + cleanToken,
+  };
 
   const response = await fetch(`${API_BASE}/photos/upload`, {
     method: 'POST',
@@ -361,16 +340,42 @@ export async function uploadPhotoMultipart(
 }
 
 export async function analyzePhoto(photoId: string) {
-  return apiRequest<{ success: boolean; data: any }>(
+  return retry(() => apiRequest<{ success: boolean; data: any }>(
     `/photos/${photoId}/analyze`,
     { method: 'POST' }
-  );
+  ), 3, 1000);
 }
 
 export async function getPhotoAnalysis(photoId: string) {
   return apiRequest<{ success: boolean; data: any }>(
     `/photos/${photoId}/analysis`
   );
+}
+
+export async function waitForAnalysis(
+  photoId: string,
+  timeoutMs = 60000,
+  intervalMs = 3000
+): Promise<any | null> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const result = await getPhotoAnalysis(photoId);
+      if (result.success && result.data) {
+        const status = result.data.processing_status || result.data.status;
+        if (status === 'completed' || status === 'success') {
+          return result.data;
+        }
+        if (status === 'failed' || status === 'error') {
+          throw new Error('Analysis failed');
+        }
+      }
+    } catch (err: any) {
+      if (err.message?.includes('Analysis failed')) throw err;
+    }
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+  return null;
 }
 
 // ─── Clients ─────────────────────────────────────────────────────
@@ -418,25 +423,18 @@ export async function getProducts() {
 // ─── Last Consultation ───────────────────────────────────────────
 
 export interface LastConsultationData {
-  // Step 2 (Hair Assessment)
   texture: 'fine' | 'medium' | 'coarse';
   hairPattern: 'straight' | 'wavy' | 'curly' | 'coily';
   density: 'thin' | 'medium' | 'thick';
   currentLevel: number;
   currentTone: string;
-  
-  // Step 3 (Chemical History)
   lastServiceType: string;
   chemicalHistory: string[];
   sensitivities: string[];
   lastChemicalService: string;
-  
-  // Step 4 (Desired Result)
   serviceType: string;
   targetLevel: number;
   targetTone: string;
-  
-  // Step 5 (Condition)
   conditionType: 'virgin' | 'previously_colored' | 'damaged' | 'highly_damaged' | 'bleached' | 'gray_coverage' | 'oily_scalp' | 'dry_brittle';
   porosity: 'low' | 'normal' | 'high';
   grayPercent: number;
@@ -500,4 +498,63 @@ export async function registerDevice(data: {
 
 export async function getDevices() {
   return apiRequest<{ devices: any[] }>('/salon/devices');
+}
+
+// ─── Pricing Config ──────────────────────────────────────────────
+
+export interface PricingConfig {
+  costPlusMode: boolean;
+  markupPercent: number;
+  applyToColor: boolean;
+  applyToDeveloper: boolean;
+}
+
+export async function getPricingConfig(): Promise<PricingConfig | null> {
+  try {
+    const data = await apiRequest<{ config: PricingConfig }>('/v1/pricing/config');
+    return data.config;
+  } catch {
+    return null;
+  }
+}
+
+export async function savePricingConfig(config: { markupPercent: number; applyToColor: boolean; applyToDeveloper: boolean }): Promise<boolean> {
+  try {
+    await apiRequest('/v1/pricing/config', {
+      method: 'PUT',
+      body: JSON.stringify(config),
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ─── History ─────────────────────────────────────────────────────
+
+export interface HistoryEntry {
+  id: string;
+  type: string;
+  clientName: string;
+  brand: string;
+  serviceType: string;
+  targetLevel: number;
+  targetTone: string;
+  satisfaction: number | null;
+  createdAt: string;
+}
+
+export async function getHistory(params?: { search?: string; type?: string; from?: string; to?: string }): Promise<HistoryEntry[]> {
+  try {
+    const query = new URLSearchParams();
+    if (params?.search) query.set('search', params.search);
+    if (params?.type) query.set('type', params.type);
+    if (params?.from) query.set('from', params.from);
+    if (params?.to) query.set('to', params.to);
+    const qs = query.toString();
+    const data = await apiRequest<{ history: HistoryEntry[] }>(`/history${qs ? `?${qs}` : ''}`);
+    return data.history || [];
+  } catch {
+    return [];
+  }
 }
