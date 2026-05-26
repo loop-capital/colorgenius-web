@@ -64,7 +64,7 @@ interface SidebarDrawerProps {
 // Exact order from web app nav-sidebar.tsx
 const navItems: NavItem[] = [
   { label: 'Dashboard', icon: <LayoutDashboard size={18} color={COLORS.textSecondary} />, route: 'Dashboard', group: 'WORKFLOW' },
-  { label: 'New Service', icon: <CirclePlus size={18} color={COLORS.textSecondary} />, route: 'NewServiceSelect', group: 'WORKFLOW' },
+  { label: 'New Service', icon: <CirclePlus size={18} color={COLORS.textSecondary} />, route: 'NewService', group: 'WORKFLOW' },
   { label: 'Formulate', icon: <FlaskConical size={18} color={COLORS.textSecondary} />, route: 'Formulate', group: 'WORKFLOW' },
   { label: 'Consultation', icon: <ClipboardList size={18} color={COLORS.textSecondary} />, route: 'Consultation', group: 'WORKFLOW' },
   { label: 'Clients', icon: <Users size={18} color={COLORS.textSecondary} />, route: 'Clients', group: 'CLIENTS' },
