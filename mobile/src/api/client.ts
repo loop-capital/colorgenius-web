@@ -208,6 +208,70 @@ export async function submitFormulation(input: FormulationInput) {
   });
 }
 
+// ─── Auth / Login ──────────────────────────────────────────────
+
+const BETA_EMAIL = 'beta@colorgenius.co';
+const BETA_PASSWORD = 'colorgenius';
+
+/**
+ * Log in with the shared beta account and store the token.
+ * Returns the token string on success, null on failure.
+ */
+export async function loginBeta(): Promise<string | null> {
+  try {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: BETA_EMAIL, password: BETA_PASSWORD }),
+    });
+
+    if (!response.ok) {
+      console.error('[Auth] Beta login failed:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const token: string | undefined = data.token || data.sessionToken;
+    if (token) {
+      await setAuthToken(token);
+      return token;
+    }
+    return null;
+  } catch (err) {
+    console.error('[Auth] Beta login error:', err);
+    return null;
+  }
+}
+
+/**
+ * Log in with email/password, store token, and return it.
+ */
+export async function loginWithCredentials(email: string, password: string): Promise<string | null> {
+  try {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      console.error('[Auth] Login failed:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const token: string | undefined = data.token || data.sessionToken;
+    if (token) {
+      await setAuthToken(token);
+      return token;
+    }
+    return null;
+  } catch (err) {
+    console.error('[Auth] Login error:', err);
+    return null;
+  }
+}
+
 // ─── Photos ──────────────────────────────────────────────────────
 
 export interface PhotoUploadResponse {
@@ -241,8 +305,9 @@ export async function uploadPhoto(
 }
 
 /**
- * Alternative upload using multipart/form-data (direct upload mode).
- * Use this if presigned URL flow has issues with R2.
+ * Upload a photo using multipart/form-data (direct upload mode).
+ * Includes Authorization header from auth store.
+ * Falls back to beta account login if no token is present.
  */
 export async function uploadPhotoMultipart(
   imageUri: string,
@@ -260,7 +325,6 @@ export async function uploadPhotoMultipart(
   const formData = new FormData();
 
   // React Native FormData file upload
-  // Use a proper File-like object for React Native
   const fileName = `photo-${Date.now()}.${ext || 'jpg'}`;
   formData.append('file', {
     uri: imageUri,
@@ -270,11 +334,22 @@ export async function uploadPhotoMultipart(
   formData.append('sessionId', sessionId);
   formData.append('angle', angle);
 
-  // /api/photos/upload has no auth check — omit Authorization header entirely
-  // to avoid iOS fetch rejecting invalid/control characters in the token.
+  // Get auth token (falls back to beta login if none stored)
+  let token = await getAuthToken();
+  if (!token) {
+    token = await loginBeta();
+  }
+
+  const headers: Record<string, string> = {};
+  if (token) {
+    const cleanToken = token.replace(/[^A-Za-z0-9._~+/=-]/g, '');
+    if (cleanToken) headers['Authorization'] = 'Bearer ' + cleanToken;
+  }
+
   const response = await fetch(`${API_BASE}/photos/upload`, {
     method: 'POST',
-    body: formData,
+    headers,
+    body: formData as any,
   });
 
   if (!response.ok) {

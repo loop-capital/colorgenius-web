@@ -1024,8 +1024,9 @@ const INITIAL_STATE: FormState = {
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
-export default function FormulateScreen({ navigation }: any) {
-  const [step, setStep] = useState(1);
+export default function FormulateScreen({ navigation, route }: any) {
+  const initialStep = route?.params?.initialStep;
+  const [step, setStep] = useState(typeof initialStep === 'number' && initialStep >= 1 && initialStep <= 6 ? initialStep : 1);
   const [formData, setFormData] = useState<FormState>(INITIAL_STATE);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<FormulationResult | null>(null);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 /**
  * GET /api/photos/[id]
@@ -17,39 +17,43 @@ export async function GET(
   try {
     const { id } = await params;
 
-    // TODO: Replace with actual Prisma call
-    // const photo = await prisma.photo.findUnique({
-    //   where: { id },
-    //   include: {
-    //     session: true,
-    //     analysisResult: true,
-    //   },
-    // });
-    //
-    // if (!photo) {
-    //   return NextResponse.json(
-    //     { error: 'Photo not found' },
-    //     { status: 404 }
-    //   );
-    // }
+    const photo = await prisma.photo_analyses.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        photo_type: true,
+        photo_label: true,
+        original_url: true,
+        file_size_bytes: true,
+        format: true,
+        processing_status: true,
+        results: true,
+        created_at: true,
+      },
+    });
 
-    // Stub response — aligned with dashboard/types/camera.ts
-    const photo = {
-      id,
-      sessionId: null,
-      angle: 'roots',
-      url: `https://storage.example.com/photos/${id}.jpg`,
-      storageKey: `photos/${id}.jpg`,
-      sizeBytes: 2048000,
-      mimeType: 'image/jpeg',
-      analysisStatus: 'pending',
-      colorProfile: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      analysisResult: null,
-    };
+    if (!photo) {
+      return NextResponse.json(
+        { error: 'Photo not found' },
+        { status: 404 }
+      );
+    }
 
-    return NextResponse.json({ success: true, data: photo });
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: photo.id,
+        sessionId: photo.photo_label, // stored here from upload
+        angle: photo.photo_type,
+        url: photo.original_url,
+        storageKey: null, // not stored separately; derivable from original_url if needed
+        sizeBytes: photo.file_size_bytes,
+        mimeType: photo.format ? `image/${photo.format}` : null,
+        analysisStatus: photo.processing_status,
+        colorProfile: photo.results ? (photo.results as any).colorProfile ?? null : null,
+        createdAt: photo.created_at?.toISOString() ?? null,
+      },
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch photo';
     return NextResponse.json({ error: message }, { status: 500 });

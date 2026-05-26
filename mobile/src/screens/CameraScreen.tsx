@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { X, RotateCcw, Image as ImageIcon, Zap, Camera } from 'lucide-react-native';
-import { uploadPhoto, analyzePhoto } from '../api/client';
+import { uploadPhoto, analyzePhoto, getAuthToken, loginBeta } from '../api/client';
 
 export default function CameraScreen({ navigation }: any) {
   const [permission, requestPermission] = useCameraPermissions();
@@ -20,7 +20,19 @@ export default function CameraScreen({ navigation }: any) {
   const [capturedUri, setCapturedUri] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [angle, setAngle] = useState<'roots' | 'mid' | 'ends'>('roots');
+  const [authReady, setAuthReady] = useState(false);
   const cameraRef = useRef<CameraView>(null);
+
+  // Ensure auth token is present before allowing uploads
+  useEffect(() => {
+    (async () => {
+      let token = await getAuthToken();
+      if (!token) {
+        token = await loginBeta();
+      }
+      setAuthReady(!!token);
+    })();
+  }, []);
 
   if (!permission) {
     return (
@@ -87,6 +99,16 @@ export default function CameraScreen({ navigation }: any) {
 
   const handleUpload = async () => {
     if (!capturedUri) return;
+
+    // Ensure auth token exists before uploading
+    let token = await getAuthToken();
+    if (!token) {
+      token = await loginBeta();
+    }
+    if (!token) {
+      Alert.alert('Authentication Required', 'Unable to log in. Please check your internet connection and try again.');
+      return;
+    }
 
     setUploading(true);
     try {

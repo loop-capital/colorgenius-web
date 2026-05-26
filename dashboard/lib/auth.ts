@@ -1,4 +1,4 @@
-import { SignJWT } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 
 if (!process.env.JWT_SECRET) {
@@ -55,4 +55,32 @@ export async function clearAuthCookie(): Promise<void> {
     maxAge: 0,
     path: '/',
   });
+}
+
+/**
+ * Verify a JWT token from Authorization: Bearer <token> header.
+ * Returns the decoded payload or null if invalid.
+ */
+export async function verifyBearerToken(
+  request: Request
+): Promise<{ userId: string; username: string; email: string } | null> {
+  const auth = request.headers.get('authorization');
+  if (!auth?.startsWith('Bearer ')) return null;
+
+  const token = auth.slice(7).trim();
+  if (!token) return null;
+
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET_KEY, {
+      clockTolerance: 60,
+    });
+    const userId = payload.userId as string | undefined;
+    const username = payload.username as string | undefined;
+    const email = payload.email as string | undefined;
+
+    if (!userId) return null;
+    return { userId, username: username || '', email: email || '' };
+  } catch {
+    return null;
+  }
 }

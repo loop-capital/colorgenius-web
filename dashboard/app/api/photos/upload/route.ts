@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadToR2, getPresignedUploadUrl, R2_PUBLIC_URL } from '@/lib/r2';
+import { prisma } from '@/lib/prisma';
+import { verifyBearerToken } from '@/lib/auth';
 
 /**
  * POST /api/photos/upload
@@ -28,6 +30,20 @@ import { uploadToR2, getPresignedUploadUrl, R2_PUBLIC_URL } from '@/lib/r2';
  */
 export async function POST(request: NextRequest) {
   try {
+    // ─── Auth check ──────────────────────────────────────────────
+    const authPayload = await verifyBearerToken(request);
+    if (!authPayload) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Valid Bearer token required.' },
+        { status: 401 }
+      );
+    }
+
+    // Look up user to get stylist_id (users.id === stylists.id in this schema)
+    // The JWT payload userId maps to the users.id column; photo_analyses.stylist_id
+    // references stylists.id, but in practice user.id == stylist.id.
+    const stylistId = authPayload.userId;
+
     const contentType = request.headers.get('content-type') || '';
 
     // Presigned URL mode (JSON request)
@@ -64,8 +80,25 @@ export async function POST(request: NextRequest) {
       const uploadUrl = await getPresignedUploadUrl(key, mimeType);
       const publicUrl = `${R2_PUBLIC_URL}/${key}`;
 
+      const photoId = crypto.randomUUID();
+
+      // Save record to Prisma so /api/photos/[id]/analyze can find it
+      await prisma.photo_analyses.create({
+        data: {
+          id: photoId,
+          stylist_id: stylistId,
+          photo_type: angle,
+          photo_label: sessionId, // store sessionId here since schema has no session_id column
+          original_url: publicUrl,
+          file_size_bytes: contentLength ?? null,
+          format: ext,
+          processing_status: 'pending',
+          created_at: new Date(),
+        },
+      });
+
       const photo = {
-        id: crypto.randomUUID(),
+        id: photoId,
         sessionId,
         angle,
         uploadUrl,
@@ -124,8 +157,25 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const publicUrl = await uploadToR2(key, buffer, file.type);
 
+    const photoId = crypto.randomUUID();
+
+    // Save record to Prisma so /api/photos/[id]/analyze can find it
+    await prisma.photo_analyses.create({
+      data: {
+        id: photoId,
+        stylist_id: stylistId,
+        photo_type: angle,
+        photo_label: sessionId, // store sessionId here since schema has no session_id column
+        original_url: publicUrl,
+        file_size_bytes: file.size,
+        format: ext,
+        processing_status: 'pending',
+        created_at: new Date(),
+      },
+    });
+
     const photo = {
-      id: crypto.randomUUID(),
+      id: photoId,
       sessionId,
       angle,
       url: publicUrl,
