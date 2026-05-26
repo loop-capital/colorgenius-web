@@ -1,8 +1,10 @@
 /**
  * Multi-tenant Square client manager
- * Each salon stores their own Square access token
- * This module creates per-salon Square clients on demand
+ * Each salon stores their own Square access token in the database
+ * Uses Prisma square_connections table for persistence
  */
+
+import { prisma } from './prisma';
 
 const SQUARE_APP_ID = process.env.SQUARE_APP_ID || '';
 const SQUARE_APP_SECRET = process.env.SQUARE_APP_SECRET || '';
@@ -33,7 +35,7 @@ export const SQUARE_TOKEN_URL = { get value() {
     : 'https://connect.squareupsandbox.com/oauth2/token';
 } };
 
-// ── Salon Square Connections (in-memory for now, database in production) ──
+// ── Salon Square Connections (persisted in database) ──
 
 export interface SalonSquareConnection {
   salon_id: string;
@@ -47,44 +49,87 @@ export interface SalonSquareConnection {
   catalog_synced_at?: string;
 }
 
-// In-memory store — in production this would be a database table
-const salonConnections = new Map<string, SalonSquareConnection>();
-
 /**
- * Store a salon's Square connection
+ * Store a salon's Square connection in the database
  */
-export function saveConnection(connection: SalonSquareConnection) {
-  salonConnections.set(connection.salon_id, connection);
+export async function saveConnection(connection: SalonSquareConnection): Promise<void> {
+  await prisma.square_connections.upsert({
+    where: { salon_id: connection.salon_id },
+    update: {
+      square_merchant_id: connection.merchant_id,
+      access_token_encrypted: connection.access_token,
+      refresh_token_encrypted: connection.refresh_token,
+      token_expires_at: new Date(connection.expires_at),
+      status: 'connected',
+      square_location_id: connection.location_ids[0] || null,
+      square_location_name: connection.business_name,
+      last_sync_at: connection.catalog_synced_at ? new Date(connection.catalog_synced_at) : null,
+      updated_at: new Date(),
+    },
+    create: {
+      salon_id: connection.salon_id,
+      square_merchant_id: connection.merchant_id,
+      access_token_encrypted: connection.access_token,
+      refresh_token_encrypted: connection.refresh_token,
+      token_expires_at: new Date(connection.expires_at),
+      status: 'connected',
+      square_location_id: connection.location_ids[0] || null,
+      square_location_name: connection.business_name,
+      created_at: new Date(connection.connected_at),
+      updated_at: new Date(),
+    },
+  });
 }
 
 /**
- * Get a salon's Square connection
+ * Get a salon's Square connection from the database
  */
-export function getConnection(salonId: string): SalonSquareConnection | undefined {
-  return salonConnections.get(salonId);
+export async function getConnection(salonId: string): Promise<SalonSquareConnection | undefined> {
+  const row = await prisma.square_connections.findUnique({
+    where: { salon_id: salonId },
+  });
+  if (!row) return undefined;
+
+  return {
+    salon_id: row.salon_id,
+    access_token: row.access_token_encrypted || '',
+    refresh_token: row.refresh_token_encrypted || '',
+    expires_at: row.token_expires_at?.toISOString() || '',
+    merchant_id: row.square_merchant_id || '',
+    location_ids: row.square_location_id ? [row.square_location_id] : [],
+    business_name: row.square_location_name || '',
+    connected_at: row.created_at?.toISOString() || '',
+    catalog_synced_at: row.last_sync_at?.toISOString() || undefined,
+  };
 }
 
 /**
- * Remove a salon's Square connection
+ * Remove a salon's Square connection from the database
  */
-export function removeConnection(salonId: string) {
-  salonConnections.delete(salonId);
+export async function removeConnection(salonId: string): Promise<void> {
+  await prisma.square_connections.deleteMany({
+    where: { salon_id: salonId },
+  });
 }
 
 /**
  * Check if a salon has an active Square connection
  */
-export function isConnected(salonId: string): boolean {
-  const conn = salonConnections.get(salonId);
-  if (!conn) return false;
-  return new Date(conn.expires_at) > new Date();
+export async function isConnected(salonId: string): Promise<boolean> {
+  const row = await prisma.square_connections.findUnique({
+    where: { salon_id: salonId },
+  });
+  if (!row) return false;
+  if (row.status !== 'connected') return false;
+  if (!row.token_expires_at) return false;
+  return new Date(row.token_expires_at) > new Date();
 }
 
 /**
  * Create a Square client for a specific salon
  */
-export function createSalonClient(salonId: string): any | null {
-  const conn = salonConnections.get(salonId);
+export async function createSalonClient(salonId: string): Promise<any | null> {
+  const conn = await getConnection(salonId);
   if (!conn) return null;
 
   const { SquareClient } = require('square');
@@ -164,8 +209,21 @@ export function getAuthUrl(salonId: string, redirectUri: string): string {
 /**
  * List all connected salons (admin use)
  */
-export function listConnections(): SalonSquareConnection[] {
-  return Array.from(salonConnections.values());
+export async function listConnections(): Promise<SalonSquareConnection[]> {
+  const rows = await prisma.square_connections.findMany({
+    where: { status: 'connected' },
+  });
+  return rows.map((row) => ({
+    salon_id: row.salon_id,
+    access_token: row.access_token_encrypted || '',
+    refresh_token: row.refresh_token_encrypted || '',
+    expires_at: row.token_expires_at?.toISOString() || '',
+    merchant_id: row.square_merchant_id || '',
+    location_ids: row.square_location_id ? [row.square_location_id] : [],
+    business_name: row.square_location_name || '',
+    connected_at: row.created_at?.toISOString() || '',
+    catalog_synced_at: row.last_sync_at?.toISOString() || undefined,
+  }));
 }
 
 // App credentials

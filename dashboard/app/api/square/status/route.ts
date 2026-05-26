@@ -1,7 +1,7 @@
 /**
  * GET /api/square/status
  * Check if a salon has Square connected
- * 
+ *
  * DELETE /api/square/status
  * Disconnect Square from a salon
  */
@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
   const user = getUserFromAuth(request);
   const salonId = user?.id || 'default';
 
-  const connected = isConnected(salonId);
-  const connection = getConnection(salonId);
+  const connected = await isConnected(salonId);
+  const connection = await getConnection(salonId);
 
   if (connected && connection) {
     return NextResponse.json({
@@ -56,7 +56,7 @@ export async function DELETE(request: NextRequest) {
   const user = getUserFromAuth(request);
   const salonId = user?.id || 'default';
 
-  removeConnection(salonId);
+  await removeConnection(salonId);
 
   return NextResponse.json({
     success: true,
