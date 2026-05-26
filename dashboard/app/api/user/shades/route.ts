@@ -12,18 +12,19 @@ export async function GET(req: NextRequest) {
     }
 
     // Get inventory items for this brand/salon
-    const inventoryItems = await prisma.inventoryItem.findMany({
+    const inventoryItems = await prisma.inventory_items.findMany({
       where: {
         brand,
-        ...(salonId ? { salonId } : {}),
+        ...(salonId ? { salon_id: salonId } : {}),
+        is_active: true,
       },
       select: {
-        shadeCode: true,
-        shadeName: true,
-        quantity: true,
+        shade_code: true,
+        shade_name: true,
+        quantity_on_hand: true,
         brand: true,
       },
-      orderBy: { shadeCode: "asc" },
+      orderBy: { shade_code: "asc" },
     });
 
     if (inventoryItems.length === 0) {
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
     // Try to resolve line names (graceful fallback if tables don't exist or no match)
     let lineMap: Record<string, string> = {};
     try {
-      const shadeCodes = inventoryItems.map((i) => i.shadeCode);
+      const shadeCodes = inventoryItems.map((i) => i.shade_code);
 
       const brandRecord = await prisma.brands.findFirst({
         where: { name: brand },
@@ -65,7 +66,7 @@ export async function GET(req: NextRequest) {
     // Enrich inventory items with line info
     const enriched = inventoryItems.map((item) => ({
       ...item,
-      line: lineMap[item.shadeCode] || null,
+      line: lineMap[item.shade_code] || null,
     }));
 
     return NextResponse.json({

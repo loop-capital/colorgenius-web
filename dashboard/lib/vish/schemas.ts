@@ -26,19 +26,27 @@ export const formulaListQuerySchema = z.object({
 });
 
 export const inventoryItemSchema = z.object({
-  salonId: z.string().min(1),
+  salon_id: z.string().min(1),
   brand: z.string().min(1).max(100),
-  shadeCode: z.string().min(1).max(50),
-  shadeName: z.string().min(1).max(100),
-  quantity: z.number().positive(),
-  unit: z.string().min(1).max(10),
-  lowStockThreshold: z.number().positive().optional(),
+  product_line: z.string().max(100).optional(),
+  shade_code: z.string().min(1).max(50),
+  shade_name: z.string().min(1).max(100),
+  category: z.enum(["color", "developer", "treatment", "other"]).default("color"),
+  quantity_on_hand: z.number().int().min(0).default(0),
+  unit_of_measure: z.string().min(1).max(20).default("units"),
+  low_stock_threshold: z.number().int().min(0).default(3),
+  cost_per_unit: z.number().min(0).optional(),
+  retail_price: z.number().min(0).optional(),
+  reorder_point: z.number().int().min(0).optional(),
+  reorder_quantity: z.number().int().min(0).optional(),
 });
 
 export const inventoryListQuerySchema = z.object({
-  salonId: z.string().min(1),
+  salon_id: z.string().min(1),
   brand: z.string().optional(),
+  category: z.enum(["color", "developer", "treatment", "other"]).optional(),
   lowStock: z.coerce.boolean().optional(),
+  source: z.enum(["square", "manual"]).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
