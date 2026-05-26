@@ -3,13 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const deductSchema = z.object({
-  salonId: z.string().min(1),
+  salon_id: z.string().min(1),
   items: z.array(
     z.object({
-      shadeCode: z.string().min(1),
-      brand: z.string().min(1),
-      shadeName: z.string().optional(),
-      grams: z.number().positive(),
+      item_id: z.string().min(1),
+      quantity_deducted: z.number().int().positive(),
+      reason: z.enum(["formula_mix", "adjustment", "waste"]).default("formula_mix"),
+      notes: z.string().optional(),
+      formula_id: z.string().optional(),
     })
   ).min(1),
 });
@@ -21,71 +22,88 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid input", issues: parsed.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { salonId, items } = parsed.data;
+    const { salon_id, items } = parsed.data;
     const results: Array<{
-      shadeCode: string;
-      brand: string;
+      item_id: string;
+      brand: string | null;
+      shade_code: string | null;
+      shade_name: string | null;
       deducted: number;
       remaining: number;
       lowStock: boolean;
     }> = [];
 
-    for (const item of items) {
-      const existing = await prisma.inventoryItem.findUnique({
-        where: {
-          salonId_brand_shadeCode: {
-            salonId,
-            brand: item.brand,
-            shadeCode: item.shadeCode,
-          },
-        },
+    for (const deduction of items) {
+      const existing = await prisma.inventory_items.findUnique({
+        where: { id: deduction.item_id },
       });
 
       if (!existing) {
-        // Create a new inventory item at 0 (negative not allowed)
-        await prisma.inventoryItem.create({
-          data: {
-            salonId,
-            brand: item.brand,
-            shadeCode: item.shadeCode,
-            shadeName: item.shadeName || item.shadeCode,
-            quantity: 0,
-            unit: "g",
-          },
-        });
-        results.push({
-          shadeCode: item.shadeCode,
-          brand: item.brand,
-          deducted: 0,
-          remaining: 0,
-          lowStock: true,
-        });
-        continue;
+        return NextResponse.json(
+          { error: `Inventory item ${deduction.item_id} not found` },
+          { status: 404 },
+        );
       }
 
-      const newQty = Math.max(0, existing.quantity - Math.round(item.grams));
-      const deducted = existing.quantity - newQty;
-      const lowStock =
-        existing.lowStockThreshold !== null &&
-        existing.lowStockThreshold !== undefined &&
-        newQty <= existing.lowStockThreshold;
+      if (existing.salon_id !== salon_id) {
+        return NextResponse.json(
+          { error: `Inventory item ${deduction.item_id} does not belong to salon ${salon_id}` },
+          { status: 403 },
+        );
+      }
 
-      await prisma.inventoryItem.update({
+      const newQty = existing.quantity_on_hand - deduction.quantity_deducted;
+      if (newQty < 0) {
+        return NextResponse.json(
+          {
+            error: `Insufficient stock for ${existing.shade_name || existing.shade_code}`,
+            item_id: existing.id,
+            available: existing.quantity_on_hand,
+            requested: deduction.quantity_deducted,
+          },
+          { status: 409 },
+        );
+      }
+
+      const lowStock =
+        existing.low_stock_threshold !== null &&
+        existing.low_stock_threshold !== undefined &&
+        newQty <= existing.low_stock_threshold;
+
+      // Update inventory item
+      const updated = await prisma.inventory_items.update({
         where: { id: existing.id },
         data: {
-          quantity: newQty,
-          lastUpdated: new Date(),
+          quantity_on_hand: newQty,
+          updated_at: new Date(),
+        },
+      });
+
+      // Create inventory transaction record
+      await prisma.inventory_transactions.create({
+        data: {
+          salon_id,
+          item_id: existing.id,
+          transaction_type: "deduct",
+          quantity_change: deduction.quantity_deducted,
+          quantity_before: existing.quantity_on_hand,
+          quantity_after: newQty,
+          reason: deduction.reason,
+          notes: deduction.notes,
+          formula_id: deduction.formula_id,
         },
       });
 
       results.push({
-        shadeCode: item.shadeCode,
-        brand: item.brand,
-        deducted,
+        item_id: existing.id,
+        brand: existing.brand,
+        shade_code: existing.shade_code,
+        shade_name: existing.shade_name,
+        deducted: deduction.quantity_deducted,
         remaining: newQty,
         lowStock,
       });
@@ -93,13 +111,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { success: true, results, lowStockItems: results.filter((r) => r.lowStock) },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (e) {
     console.error("POST /api/v1/inventory/deduct error:", e);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

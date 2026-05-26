@@ -43,8 +43,8 @@ export async function GET(req: NextRequest) {
     const usedBrands = preferredBrands.length;
 
     // Step 1: Try to get distinct brands from inventory
-    const inventoryBrands = await prisma.inventoryItem.findMany({
-      where: { salonId },
+    const inventoryBrands = await prisma.inventory_items.findMany({
+      where: { salon_id: salonId, is_active: true },
       select: { brand: true },
       distinct: ["brand"],
     });
