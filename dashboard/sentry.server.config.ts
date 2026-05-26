@@ -1,0 +1,2 @@
+// Sentry server config stub — no-op, prevents import crashes
+export {};
