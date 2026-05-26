@@ -1,6 +1,6 @@
 # MEMORY-COLORGENIUS.md — COLORgenius Team Memory
 
-> **Last updated:** 2026-05-25
+> **Last updated:** 2026-05-26 (11:30 PM)
 > **Identity:** I am COLORgenius 🎨 — AI Hair Color Formulation Platform
 > **Workspace:** `/home/jason/.openclaw/workspaces/colorgenius/`
 
@@ -156,12 +156,67 @@ client_photo_collections:
 
 ---
 
+## ✅ Gallery Upload + Client Collection — COMPLETED (May 26, 2026)
+**Commit:** `6a271de` — `"feat(mobile): gallery upload + client collection"` pushed to `main`
+
+### What Was Built
+1. **GalleryUploadScreen.tsx** (~1,000 lines) — Full Before/After capture flow:
+   - Step 1: Select formula from library dropdown
+   - Step 2: Capture Before + After photos with camera preview
+   - Step 3: Add caption, tags, hair condition
+   - Step 4: Review + submit via multipart FormData to `/api/v1/gallery/photos/upload`
+   - Progress bar upload, success/error handling
+
+2. **ClientCollectionScreen.tsx** (~920 lines) — Consumer "My Collection":
+   - Grid view of saved photos (2-column layout)
+   - Status filter tabs: All | Saved | Booked | Completed
+   - Color-coded status badges
+   - Unsave (remove) functionality
+   - Notes modal (500 char limit)
+   - "Share with Stylist" modal
+   - Status changer (saved → booked → completed)
+   - Detail modal with full before/after images
+   - Mock fallback data for offline testing
+
+3. **InventoryScreen.tsx** (~350 lines) — Rebuilt from placeholder:
+   - Real data from `/api/v1/inventory`
+   - Stats cards: Total Items | Low Stock | Inventory Value
+   - Filter tabs: All | Low | Out of Stock
+   - Visual status bars (purple/good, yellow/low, red/out)
+   - `+`/`-` buttons for 10g adjustments
+   - AsyncStorage caching
+   - Low stock alert banner
+
+4. **API Endpoints** — New dashboard routes:
+   - `POST /api/v1/gallery/photos/[id]/save` — save to collection
+   - `DELETE /api/v1/gallery/photos/[id]/save` — remove from collection
+   - `POST /api/v1/gallery/photos/[id]/share` — share with stylist
+   - `GET /api/v1/clients/[id]/collection` — get saved photos
+
+5. **Prisma Migration** — `client_photo_collections` model added with:
+   - `client_id` + `photo_id` composite unique constraint
+   - `notes`, `status` (saved/booked/completed/archived)
+   - `shared_with_stylist_id`, `shared_at`
+   - Relations to `users` and `formula_photos`
+
+### Verification
+- ✅ Mobile `npx tsc --noEmit` — passes cleanly (zero errors)
+- ✅ Dashboard `npx tsc --noEmit` — no NEW errors (9 pre-existing: globals.css + Bluetooth types)
+- ✅ `npx prisma generate` — schema validates, client generates
+- ✅ All 5 files committed and pushed to `main`
+
+### Still Needed
+- [ ] Run `npx prisma migrate dev --name add_client_photo_collections` to apply schema to DB
+- [ ] Deploy dashboard to Vercel: `cd dashboard && npx vercel --prod`
+- [ ] Update GetUpLook web app to consume gallery photos from API (feed public gallery)
+
+---
+
 ## Next Actions
-1. **Deploy dashboard** — `cd dashboard && npx vercel --prod` to push auth-guarded upload endpoint
-2. Monitor TestFlight for Build 10
-3. Implement Google Sign In (after Apple approval)
-4. Vagaro integration testing
-5. Video training series (after app ships)
+1. **Deploy dashboard** — `cd dashboard && npx vercel --prod` to push new API endpoints live
+2. **Run Prisma migration** — `npx prisma migrate dev --name add_client_photo_collections`
+3. **Update GetUpLook** — wire gallery photos to feed public consumer gallery
+4. **Monitor TestFlight** for Build 10
 
 ## ⏰ URGENT TODO (14-Day Deadline: June 8, 2026)
 **Camera Upload Auth Integration**

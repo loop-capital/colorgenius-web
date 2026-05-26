@@ -469,6 +469,9 @@ model salons {
   learning_events         learning_events[]
   salon_devices           salon_devices[]
   session_codes           session_codes[]
+  square_connections       square_connections[]
+  inventory_items          inventory_items[]
+  inventory_transactions   inventory_transactions[]
   stylists                stylists[]
 
   @@index([slug], map: "idx_salons_slug")
@@ -1096,4 +1099,89 @@ model client_visits {
   created_at   DateTime? @default(now()) @db.Timestamptz(6)
   clients      clients   @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   formulas     formulas? @relation(fields: [formula_id], references: [id], onUpdate: NoAction)
+}
+
+model inventory_items {
+  id                  String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id            String                  @db.Uuid
+  source              String                  @default("manual") @db.VarChar(20)
+  square_catalog_object_id String?           @db.VarChar(255)
+  square_variation_id String?                 @db.VarChar(255)
+  brand               String?                 @db.VarChar(100)
+  product_line        String?                 @db.VarChar(100)
+  shade_code          String?                 @db.VarChar(50)
+  shade_name          String?                 @db.VarChar(100)
+  category            String?                 @db.VarChar(50)
+  quantity_on_hand    Int                     @default(0)
+  quantity_committed  Int                     @default(0)
+  unit_of_measure     String?                 @default("units") @db.VarChar(20)
+  low_stock_threshold Int                     @default(3)
+  cost_per_unit       Decimal?                @db.Decimal(10, 2)
+  retail_price        Decimal?                @db.Decimal(10, 2)
+  reorder_point       Int?
+  reorder_quantity    Int?
+  is_active           Boolean                 @default(true)
+  last_synced_at      DateTime?               @db.Timestamp(6)
+  created_at          DateTime?               @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?               @default(now()) @db.Timestamp(6)
+  salon               salons                  @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  transactions        inventory_transactions[]
+
+  @@unique([salon_id, brand, shade_code], map: "uniq_inventory_item_salon_brand_shade")
+  @@index([salon_id], map: "idx_inventory_items_salon")
+  @@index([salon_id, brand], map: "idx_inventory_items_salon_brand")
+  @@index([salon_id, category], map: "idx_inventory_items_salon_category")
+  @@index([low_stock_threshold], map: "idx_inventory_items_low_stock")
+  @@index([source], map: "idx_inventory_items_source")
+}
+
+model inventory_transactions {
+  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id            String          @db.Uuid
+  item_id             String          @db.Uuid
+  transaction_type    String          @db.VarChar(20)
+  quantity_change     Int
+  quantity_before     Int
+  quantity_after      Int
+  unit_cost           Decimal?        @db.Decimal(10, 2)
+  total_cost          Decimal?        @db.Decimal(10, 2)
+  reason              String?         @db.VarChar(100)
+  notes               String?
+  reference_type      String?         @db.VarChar(50)
+  reference_id        String?         @db.Uuid
+  performed_by        String?         @db.Uuid
+  square_sync_id      String?         @db.VarChar(255)
+  created_at          DateTime?       @default(now()) @db.Timestamp(6)
+  salon               salons          @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  item                inventory_items @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([salon_id], map: "idx_inventory_transactions_salon")
+  @@index([item_id], map: "idx_inventory_transactions_item")
+  @@index([transaction_type], map: "idx_inventory_transactions_type")
+  @@index([created_at(sort: Desc)], map: "idx_inventory_transactions_date")
+  @@index([salon_id, created_at(sort: Desc)], map: "idx_inventory_transactions_salon_date")
+}
+
+model square_connections {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id              String    @unique @db.Uuid
+  square_merchant_id    String?   @db.VarChar(255)
+  access_token_encrypted String?  @db.Text
+  refresh_token_encrypted String? @db.Text
+  token_expires_at      DateTime? @db.Timestamp(6)
+  scopes                String[]
+  status                String    @default("disconnected") @db.VarChar(20)
+  last_sync_at          DateTime? @db.Timestamp(6)
+  sync_error            String?
+  sync_error_at         DateTime? @db.Timestamp(6)
+  square_location_id    String?   @db.VarChar(255)
+  square_location_name  String?   @db.VarChar(255)
+  auto_sync_enabled     Boolean   @default(false)
+  sync_interval_minutes Int?      @default(60)
+  created_at            DateTime? @default(now()) @db.Timestamp(6)
+  updated_at            DateTime? @default(now()) @db.Timestamp(6)
+  salon                 salons    @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([square_merchant_id], map: "idx_square_connections_merchant")
+  @@index([status], map: "idx_square_connections_status")
 }
