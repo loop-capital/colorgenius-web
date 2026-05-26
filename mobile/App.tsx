@@ -15,6 +15,8 @@ import LibraryScreen from './src/screens/LibraryScreen';
 import AnalyzeScreen from './src/screens/AnalyzeScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import GalleryScreen from './src/screens/GalleryScreen';
+import GalleryUploadScreen from './src/screens/GalleryUploadScreen';
+import ClientCollectionScreen from './src/screens/ClientCollectionScreen';
 import CommunityScreen from './src/screens/CommunityScreen';
 import InventoryScreen from './src/screens/InventoryScreen';
 import PricingScreen from './src/screens/PricingScreen';
@@ -46,6 +48,8 @@ export type RootStackParamList = {
   Analyze: undefined;
   History: undefined;
   Gallery: undefined;
+  GalleryUpload: undefined;
+  ClientCollection: undefined;
   Community: undefined;
   Inventory: undefined;
   Pricing: undefined;
@@ -137,6 +141,8 @@ function AppContent() {
         <Stack.Screen name="Analyze" component={wrapScreen(AnalyzeScreen)} />
         <Stack.Screen name="History" component={wrapScreen(HistoryScreen)} />
         <Stack.Screen name="Gallery" component={wrapScreen(GalleryScreen)} />
+        <Stack.Screen name="GalleryUpload" component={wrapScreen(GalleryUploadScreen)} />
+        <Stack.Screen name="ClientCollection" component={wrapScreen(ClientCollectionScreen)} />
         <Stack.Screen name="Community" component={wrapScreen(CommunityScreen)} />
         <Stack.Screen name="Inventory" component={wrapScreen(InventoryScreen)} />
         <Stack.Screen name="Pricing" component={wrapScreen(PricingScreen)} />

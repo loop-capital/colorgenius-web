@@ -170,7 +170,9 @@ Remaining: Analyze, Library, History, Questionnaire
 - Manufacturer-verified conversions: SOHO (14 brand pairs) + CHI (11 brand pairs) = 1,000+ mappings
 - All 21 brands integrated into conversion engine (data-loader, tone mappings, engine.ts, ConversionPanel, API endpoint)
 
-## Promoted From Short-Term Memory (2026-05-21)
+## Promoted From Short-Term Memory (2026-05-25)
 
-<!-- openclaw-memory-promotion:memory:memory/2026-05-16.md:4:4 -->
-- Iris ran beta sprint verification cycle. All 3 workstreams confirmed complete: [score=0.856 recalls=0 avg=0.620 source=memory/2026-05-16.md:4-4]
+<!-- openclaw-memory-promotion:memory:memory/2026-05-17.md:28:29 -->
+- Test Suites: 2 passed, 2 total Tests: 34 passed, 34 total [score=0.887 recalls=0 avg=0.620 source=memory/2026-05-17.md:28-29]
+<!-- openclaw-memory-promotion:memory:memory/2026-05-17.md:34:35 -->
+- ✓ All 20 routes compiled successfully ✓ Middleware: 40.7 kB [score=0.887 recalls=0 avg=0.620 source=memory/2026-05-17.md:34-35]
