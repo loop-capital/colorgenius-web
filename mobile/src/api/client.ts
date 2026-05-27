@@ -7,7 +7,7 @@ import {
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_BASE = 'https://colorgenius.co/api';
+export const API_BASE = 'https://colorgenius.co/api';
 
 // ─── Settings Keys ───────────────────────────────────────────────
 
@@ -105,7 +105,7 @@ async function retry<T>(
 // ─── Core API Helper ─────────────────────────────────────────────
 
 interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
   headers?: Record<string, string>;
 }
@@ -134,7 +134,7 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Request failed' }));
-    throw new Error(error.error || `HTTP ${response.status}`);
+    throw new Error(`HTTP ${response.status}: ${error.error || 'Request failed'}`);
   }
 
   return response.json();
@@ -333,7 +333,7 @@ export async function uploadPhotoMultipart(
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({ error: 'Upload failed' }));
-    throw new Error(err.error || `Upload failed: HTTP ${response.status}`);
+    throw new Error(`HTTP ${response.status}: ${err.error || 'Upload failed'}`);
   }
 
   return response.json();
@@ -375,7 +375,7 @@ export async function waitForAnalysis(
     }
     await new Promise(resolve => setTimeout(resolve, intervalMs));
   }
-  return null;
+  throw new Error('Analysis timed out. Please try again.');
 }
 
 // ─── Clients ─────────────────────────────────────────────────────
@@ -522,7 +522,7 @@ export async function savePricingConfig(config: { markupPercent: number; applyTo
   try {
     await apiRequest('/v1/pricing/config', {
       method: 'PUT',
-      body: JSON.stringify(config),
+      body: config,
     });
     return true;
   } catch {
@@ -534,6 +534,7 @@ export async function savePricingConfig(config: { markupPercent: number; applyTo
 
 export interface HistoryEntry {
   id: string;
+  clientId?: string;
   type: string;
   clientName: string;
   brand: string;

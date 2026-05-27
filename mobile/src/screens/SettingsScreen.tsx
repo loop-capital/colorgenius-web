@@ -15,7 +15,7 @@ import {
   Bluetooth,
   Palette,
   Shield,
-  CircleQuestionMark,
+  CircleHelp,
   LogOut,
   ChevronRight,
   Wifi,
@@ -157,7 +157,7 @@ export default function SettingsScreen() {
 
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Profile */}
-        <TouchableOpacity style={styles.profileCard} onPress={() => alert('Profile detail - coming in next update!')}>
+        <TouchableOpacity style={styles.profileCard} onPress={() => Alert.alert('Coming Soon', 'Profile detail — coming in next update!')}>
           <View style={styles.profileAvatar}>
             <Text style={styles.profileAvatarText}>CG</Text>
           </View>
@@ -175,7 +175,7 @@ export default function SettingsScreen() {
             icon={<User size={20} color="#9333EA" />}
             title="Account"
             subtitle="Profile, email, password"
-            onPress={() => alert('Account detail - coming in next update!')}
+            onPress={() => Alert.alert('Coming Soon', 'Account detail — coming in next update!')}
           />
           <SettingRow
             icon={<Bell size={20} color="#F59E0B" />}
@@ -199,13 +199,13 @@ export default function SettingsScreen() {
             icon={<Bluetooth size={20} color="#3B82F6" />}
             title="Bluetooth Devices"
             subtitle="Acaia scales, sensors"
-            onPress={() => alert('Bluetooth devices - coming in next update!')}
+            onPress={() => Alert.alert('Coming Soon', 'Bluetooth devices — coming in next update!')}
           />
           <SettingRow
             icon={<Smartphone size={20} color="#EC4899" />}
             title="Connected Devices"
             subtitle="Manage paired devices"
-            onPress={() => alert('Connected devices - coming in next update!')}
+            onPress={() => Alert.alert('Coming Soon', 'Connected devices — coming in next update!')}
           />
           <SettingRow
             icon={<Wifi size={20} color="#10B981" />}
@@ -229,13 +229,13 @@ export default function SettingsScreen() {
             icon={<Palette size={20} color="#EC4899" />}
             title="Default Brand"
             subtitle="Wella"
-            onPress={() => alert('Default brand picker - coming in next update!')}
+            onPress={() => Alert.alert('Coming Soon', 'Default brand picker — coming in next update!')}
           />
           <SettingRow
             icon={<Palette size={20} color="#F97316" />}
             title="Shade Database"
             subtitle="3,454 shades - 21 brands"
-            onPress={() => alert('Shade database browser - coming in next update!')}
+            onPress={() => Alert.alert('Coming Soon', 'Shade database browser — coming in next update!')}
           />
         </View>
 
@@ -245,12 +245,12 @@ export default function SettingsScreen() {
           <SettingRow
             icon={<Shield size={20} color="#14B8A6" />}
             title="Privacy & Data"
-            onPress={() => alert('Privacy settings - coming in next update!')}
+            onPress={() => Alert.alert('Coming Soon', 'Privacy settings — coming in next update!')}
           />
           <SettingRow
             icon={<Shield size={20} color="#06B6D4" />}
             title="App Permissions"
-            onPress={() => alert('App permissions - coming in next update!')}
+            onPress={() => Alert.alert('Coming Soon', 'App permissions — coming in next update!')}
           />
         </View>
 
@@ -258,10 +258,10 @@ export default function SettingsScreen() {
         <SectionHeader title="Support" />
         <View style={styles.section}>
           <SettingRow
-            icon={<CircleQuestionMark size={20} color="#71717A" />}
+            icon={<CircleHelp size={20} color="#71717A" />}
             title="Help Center"
             subtitle="colorgenius.co/help"
-            onPress={() => alert('Help center - coming in next update!')}
+            onPress={() => Alert.alert('Coming Soon', 'Help center — coming in next update!')}
           />
         </View>
 
@@ -275,7 +275,7 @@ export default function SettingsScreen() {
           />
         </View>
 
-        <Text style={styles.version}>COLORgenius Mobile v1.0.0</Text>
+        <Text style={styles.version}>COLORgenius Mobile v1.0.1</Text>
         <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>

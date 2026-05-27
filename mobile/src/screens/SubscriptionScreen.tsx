@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CreditCard, ChevronRight } from 'lucide-react-native';
@@ -36,19 +37,19 @@ export default function SubscriptionScreen({ navigation }: any) {
           <Text style={styles.planPrice}>$49/month</Text>
         </View>
 
-        <TouchableOpacity style={styles.card} onPress={() => alert('Upgrade Plan - coming in next update!')}>
+        <TouchableOpacity style={styles.card} onPress={() => Alert.alert('Coming Soon', 'Upgrade Plan - coming in next update!')}>
           <Text style={styles.cardTitle}>Upgrade Plan</Text>
           <Text style={styles.cardDesc}>View all available plans</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} onPress={() => alert('Billing History - coming in next update!')}>
+        <TouchableOpacity style={styles.card} onPress={() => Alert.alert('Coming Soon', 'Billing History - coming in next update!')}>
           <Text style={styles.cardTitle}>Billing History</Text>
           <Text style={styles.cardDesc}>View past invoices</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} onPress={() => alert('Payment Methods - coming in next update!')}>
+        <TouchableOpacity style={styles.card} onPress={() => Alert.alert('Coming Soon', 'Payment Methods - coming in next update!')}>
           <Text style={styles.cardTitle}>Payment Methods</Text>
           <Text style={styles.cardDesc}>Manage cards and payment</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />

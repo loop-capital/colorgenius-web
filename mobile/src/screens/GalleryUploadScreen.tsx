@@ -18,7 +18,7 @@ import {
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import {
   X,
   RotateCcw,
@@ -30,7 +30,7 @@ import {
   Image as ImageIcon,
   Check,
 } from 'lucide-react-native';
-import { apiRequest, getAuthToken, loginBeta, uploadPhotoMultipart } from '../api/client';
+import { apiRequest, getAuthToken, loginBeta, uploadPhotoMultipart, API_BASE } from '../api/client';
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
 
@@ -77,7 +77,7 @@ export default function GalleryUploadScreen({ navigation }: any) {
   const [formulaLoading, setFormulaLoading] = useState(false);
 
   const [permission, requestPermission] = useCameraPermissions();
-  const [facing, setFacing] = useState<CameraType>('back');
+  const [facing, setFacing] = useState<'back' | 'front'>('back');
   const [capturedPhotos, setCapturedPhotos] = useState<PhotoFile[]>([]);
   const [capturingType, setCapturingType] = useState<'before' | 'after'>('before');
   const [showCamera, setShowCamera] = useState(false);
@@ -273,7 +273,7 @@ export default function GalleryUploadScreen({ navigation }: any) {
       const cleanToken = token.replace(/[^A-Za-z0-9._~+/=-]/g, '');
       if (cleanToken) headers['Authorization'] = 'Bearer ' + cleanToken;
 
-      const response = await fetch('https://colorgenius.co/api/v1/gallery/photos/upload', {
+      const response = await fetch(`${API_BASE}/v1/gallery/photos/upload`, {
         method: 'POST',
         headers,
         body: formData as any,
@@ -319,6 +319,7 @@ export default function GalleryUploadScreen({ navigation }: any) {
     setDeveloperVol('');
     setProcessingTime('');
     setTags([]);
+    setTagInput('');
   };
 
   // ─── Auto-populate from formula ────────────────────────────────────────────

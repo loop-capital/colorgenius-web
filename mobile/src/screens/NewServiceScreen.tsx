@@ -224,7 +224,9 @@ export default function NewServiceScreen({ navigation }: any) {
     try {
       const result = await getClients(search || undefined);
       setClients(result.clients || []);
-    } catch {}
+    } catch (e: any) {
+      console.warn('[NewServiceScreen] loadClients failed:', e?.message);
+    }
     setLoading(false);
   }, [search]);
 
@@ -297,7 +299,7 @@ export default function NewServiceScreen({ navigation }: any) {
       >
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>
-            {item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+            {(item.name || '').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
           </Text>
         </View>
         <View style={styles.clientInfo}>
@@ -356,7 +358,7 @@ export default function NewServiceScreen({ navigation }: any) {
           <View style={styles.selectedClientCard}>
             <View style={styles.avatarLarge}>
               <Text style={styles.avatarLargeText}>
-                {selectedClient.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                {(selectedClient.name || '').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
               </Text>
             </View>
             <View style={styles.selectedClientInfo}>

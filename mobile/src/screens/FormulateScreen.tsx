@@ -1106,7 +1106,7 @@ export default function FormulateScreen({ navigation, route }: any) {
       };
 
       const response = await submitFormulation(input);
-      setResult(response.data);
+      setResult((response.data ?? response) as any);
     } catch (err: any) {
       setError(err.message || 'Failed to generate formula');
       Alert.alert('Formulation Failed', err.message || 'Please try again');

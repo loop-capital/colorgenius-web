@@ -8,6 +8,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   FlatList,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrendingUp, Star, Sparkles, Heart, Eye } from 'lucide-react-native';
@@ -62,7 +63,7 @@ function PhotoCard({ item, index }: { item: any; index: number }) {
 
 function MarketplaceItem({ item }: { item: any }) {
   return (
-    <TouchableOpacity style={styles.marketCard} onPress={() => alert('Marketplace item detail - coming in next update!')}>
+    <TouchableOpacity style={styles.marketCard} onPress={() => Alert.alert('Coming Soon', 'Marketplace item detail - coming in next update!')}>
       <View style={styles.marketBadge}>
         <Text style={styles.marketBadgeText}>{item.category || 'Formula'}</Text>
       </View>
@@ -76,7 +77,7 @@ function MarketplaceItem({ item }: { item: any }) {
         <Text style={styles.marketPrice}>
           {item.price ? `$${item.price}` : 'Free'}
         </Text>
-        <TouchableOpacity style={styles.marketBtn} onPress={() => alert('View marketplace item - coming in next update!')}>
+        <TouchableOpacity style={styles.marketBtn} onPress={() => Alert.alert('Coming Soon', 'View marketplace item - coming in next update!')}>
           <Text style={styles.marketBtnText}>View</Text>
         </TouchableOpacity>
       </View>
@@ -110,7 +111,9 @@ export default function CommunityScreen() {
         setMarketplace(results[2].value.items || []);
       }
     } catch {}
-    setLoading(false);
+    finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { loadData(); }, []);
