@@ -9,7 +9,7 @@ import { ColorWheel3D } from '@/components/custom'
 import { HairSwatch } from '@/components/ui/hair-swatch'
 import {
   Search, Save, Edit3, Trash2, X, FlaskConical, Filter,
-  Grid3X3, LayoutList, ChevronRight,
+  Grid3X3, LayoutList, ChevronRight, Plus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { classifyFormula } from '@/lib/formula-classifier'
@@ -338,6 +338,15 @@ export default function LibraryPage() {
   const [marketplaceLoading, setMarketplaceLoading] = useState(false)
   const [desiredResultQuery, setDesiredResultQuery] = useState('')
   const [dynamicTrends, setDynamicTrends] = useState<string[]>([])
+
+  // Manual formula entry
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [manualName, setManualName] = useState('')
+  const [manualProducts, setManualProducts] = useState([{ brand: '', shadeCode: '', grams: 0 }])
+  const [manualDev, setManualDev] = useState('20vol')
+  const [manualProcessingTime, setManualProcessingTime] = useState('')
+  const [manualNotes, setManualNotes] = useState('')
+  const [savingManual, setSavingManual] = useState(false)
 
   // Log a search event for trend analytics
   const logTrendSearch = (query: string, category: 'trend' | 'finish' | 'free-text') => {
@@ -1127,6 +1136,127 @@ export default function LibraryPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Add Formula Modal */}
+      {showAddModal && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: 'rgba(0,0,0,0.7)', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', padding: 24,
+        }} onClick={() => setShowAddModal(false)}>
+          <div style={{
+            background: '#12121F', borderRadius: 16, padding: 32,
+            maxWidth: 600, width: '100%', maxHeight: '80vh', overflow: 'auto',
+            border: '1px solid rgba(255,255,255,0.08)',
+          }} onClick={e => e.stopPropagation()}>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#F5F5F7', marginBottom: 24 }}>Add Formula</h2>
+            
+            {/* Formula Name */}
+            <input
+              placeholder="Formula Name"
+              value={manualName}
+              onChange={e => setManualName(e.target.value)}
+              style={{ width: '100%', padding: '12px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: '#F5F5F7', fontSize: 14, marginBottom: 16 }}
+            />
+
+            {/* Products */}
+            {manualProducts.map((f, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 8, marginBottom: 8 }}>
+                <input placeholder="Brand" value={f.brand} onChange={e => {
+                  const next = [...manualProducts]; next[i] = { ...next[i], brand: e.target.value }; setManualProducts(next);
+                }} style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: '#F5F5F7', fontSize: 13 }} />
+                <input placeholder="Shade Code" value={f.shadeCode} onChange={e => {
+                  const next = [...manualProducts]; next[i] = { ...next[i], shadeCode: e.target.value }; setManualProducts(next);
+                }} style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: '#F5F5F7', fontSize: 13 }} />
+                <input placeholder="Grams" type="number" value={f.grams || ''} onChange={e => {
+                  const next = [...manualProducts]; next[i] = { ...next[i], grams: Number(e.target.value) }; setManualProducts(next);
+                }} style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: '#F5F5F7', fontSize: 13 }} />
+                {manualProducts.length > 1 && (
+                  <button onClick={() => setManualProducts(prev => prev.filter((_, j) => j !== i))} style={{ padding: '10px 12px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', cursor: 'pointer', fontSize: 13 }}>✕</button>
+                )}
+              </div>
+            ))}
+            <button onClick={() => setManualProducts(prev => [...prev, { brand: '', shadeCode: '', grams: 0 }])} style={{ color: '#9333EA', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, marginBottom: 16, textDecoration: 'underline' }}>+ Add Another Product</button>
+
+            {/* Developer + Processing Time */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={{ fontSize: 12, color: '#71717A', display: 'block', marginBottom: 6 }}>Developer</label>
+                <select value={manualDev} onChange={e => setManualDev(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: '#F5F5F7', fontSize: 13 }}>
+                  {['10vol','20vol','30vol','40vol'].map(v => <option key={v} value={v}>{v}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: 12, color: '#71717A', display: 'block', marginBottom: 6 }}>Processing Time</label>
+                <input placeholder="e.g. 30 minutes" value={manualProcessingTime} onChange={e => setManualProcessingTime(e.target.value)} style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: '#F5F5F7', fontSize: 13 }} />
+              </div>
+            </div>
+
+            {/* Notes */}
+            <textarea placeholder="Application notes..." value={manualNotes} onChange={e => setManualNotes(e.target.value)} rows={3} style={{ width: '100%', padding: '12px 16px', borderRadius: 10, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', color: '#F5F5F7', fontSize: 13, marginBottom: 24, resize: 'vertical' }} />
+
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button onClick={() => setShowAddModal(false)} style={{ flex: 1, padding: 14, borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', background: 'transparent', color: '#A1A1AA', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+              <button onClick={async () => {
+                if (!manualName.trim()) { alert('Please enter a formula name'); return; }
+                setSavingManual(true);
+                try {
+                  const res = await fetch('/api/v1/formulas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      name: manualName,
+                      brand: manualProducts[0]?.brand || '',
+                      shades: manualProducts.filter(f => f.brand || f.shadeCode).map(f => ({ brand: f.brand, shadeCode: f.shadeCode, grams: f.grams })),
+                      developer: manualDev,
+                      processingTime: manualProcessingTime,
+                      notes: manualNotes,
+                      isManual: true,
+                    }),
+                  });
+                  if (res.ok) {
+                    setShowAddModal(false);
+                    setManualName(''); setManualProducts([{ brand: '', shadeCode: '', grams: 0 }]); setManualDev('20vol'); setManualProcessingTime(''); setManualNotes('');
+                    // Refresh list
+                    window.location.reload();
+                  } else {
+                    alert('Failed to save formula');
+                  }
+                } catch (e) { alert('Error saving formula'); }
+                finally { setSavingManual(false); }
+              }} disabled={savingManual} style={{ flex: 1, padding: 14, borderRadius: 12, background: 'linear-gradient(135deg, #9333EA, #EC4899)', border: 'none', color: 'white', fontSize: 14, fontWeight: 700, cursor: 'pointer', opacity: savingManual ? 0.6 : 1 }}>
+                {savingManual ? 'Saving...' : 'Save Formula'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Formula FAB */}
+      <button
+        onClick={() => setShowAddModal(true)}
+        style={{
+          position: 'fixed',
+          bottom: 32,
+          right: 32,
+          zIndex: 50,
+          background: 'linear-gradient(135deg, #9333EA, #EC4899)',
+          color: 'white',
+          border: 'none',
+          borderRadius: 999,
+          padding: '14px 24px',
+          fontSize: 14,
+          fontWeight: 700,
+          cursor: 'pointer',
+          boxShadow: '0 4px 20px rgba(147,51,234,0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+        }}
+      >
+        <Plus size={18} /> Add Formula
+      </button>
     </div>
   )
 }
