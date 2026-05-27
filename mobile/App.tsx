@@ -1,9 +1,10 @@
-import React, { useState, useCallback, createContext, useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useCallback, useEffect, createContext, useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getAuthToken } from './src/api/client';
 import { Menu } from 'lucide-react-native';
 
 import DashboardScreen from './src/screens/DashboardScreen';
@@ -26,6 +27,7 @@ import SubscriptionScreen from './src/screens/SubscriptionScreen';
 import CameraScreen from './src/screens/CameraScreen';
 
 import SidebarDrawer from './src/components/SidebarDrawer';
+import LoginScreen from './src/screens/LoginScreen';
 
 // ─── Theme Tokens ─────────────────────────────────────────────────────────────
 const THEME = {
@@ -124,7 +126,22 @@ function WrappedCamera(props: any) { return <ScreenWithHeader><CameraScreen {...
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function AppContent() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
+
+  // Check auth on mount
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  async function checkAuth() {
+    try {
+      const token = await getAuthToken();
+      setIsAuthenticated(!!token);
+    } catch {
+      setIsAuthenticated(false);
+    }
+  }
 
   const openDrawer = useCallback(() => setDrawerVisible(true), []);
 
@@ -137,6 +154,30 @@ function AppContent() {
     }, 100);
   }, []);
 
+  // Re-check auth whenever any screen gains focus (catches logout)
+  useEffect(() => {
+    if (!navigationRef.isReady()) return;
+    const unsub = navigationRef.addListener('focus', () => {
+      checkAuth();
+    });
+    return unsub;
+  }, []);
+
+  // Loading while checking auth
+  if (isAuthenticated === null) {
+    return (
+      <View style={[styles.screenContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color={THEME.accent} />
+      </View>
+    );
+  }
+
+  // Not authenticated — show login screen
+  if (!isAuthenticated) {
+    return <LoginScreen onLoginSuccess={() => setIsAuthenticated(true)} />;
+  }
+
+  // Authenticated — show app
   return (
     <DrawerContext.Provider value={openDrawer}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
