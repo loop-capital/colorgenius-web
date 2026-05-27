@@ -16,12 +16,12 @@ interface FormData {
   phone: string
   email: string
   salonNotes: string
-  hairCondition: string[]
   texture: string
   hairPattern: string
   density: string
   porosity: string
   grayPercent: number
+  scalpType: string
   chemicalHistory: string[]
   sensitivities: string[]
   lastChemicalService: string
@@ -59,16 +59,11 @@ const POROSITY = [
   { value: 'high', label: 'High' },
 ]
 
-const HAIR_CONDITIONS = [
-  { id: 'virgin', label: 'Virgin Hair' },
-  { id: 'previously_colored', label: 'Previously Colored' },
-  { id: 'bleached', label: 'Bleached / Lightened' },
-  { id: 'damaged', label: 'Damaged' },
-  { id: 'gray', label: 'Gray Coverage Needed' },
-  { id: 'dry', label: 'Dry / Brittle' },
-  { id: 'oily', label: 'Oily Scalp' },
-  { id: 'fine', label: 'Fine / Thin' },
-  { id: 'thick', label: 'Thick / Coarse' },
+const SCALP_TYPES = [
+  { value: 'normal', label: 'Normal' },
+  { value: 'oily_scalp', label: 'Oily Scalp' },
+  { value: 'dry_scalp', label: 'Dry Scalp' },
+  { value: 'psoriasis_eczema', label: 'Psoriasis / Eczema' },
 ]
 
 const CHEMICAL_HISTORY = [
@@ -83,9 +78,8 @@ const CHEMICAL_HISTORY = [
 
 const SENSITIVITIES = [
   { value: 'ppd_allergy', label: 'PPD Allergy', desc: 'Allergic to PPD — use PPD-free alternatives', warning: true },
-  { value: 'pregnancy', label: 'Pregnancy', desc: 'Client is pregnant' },
-  { value: 'breastfeeding', label: 'Breastfeeding', desc: 'Client is breastfeeding' },
-  { value: 'chemotherapy', label: 'Active Chemotherapy', desc: 'Currently receiving chemo' },
+  { value: 'ammonia_sensitivity', label: 'Ammonia Sensitivity', desc: 'Sensitive to ammonia-based products', warning: true },
+  { value: 'scalp_sensitivity', label: 'Scalp Sensitivity', desc: 'Sensitive scalp, prone to irritation', warning: false },
 ]
 
 const LAST_CHEMICAL_TIMES = [
@@ -151,12 +145,12 @@ export default function QuestionnairePage() {
     phone: '',
     email: '',
     salonNotes: '',
-    hairCondition: [],
     texture: '',
     hairPattern: '',
     density: '',
     porosity: '',
     grayPercent: 0,
+    scalpType: '',
     chemicalHistory: [],
     sensitivities: [],
     lastChemicalService: '',
@@ -164,18 +158,6 @@ export default function QuestionnairePage() {
 
   const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const toggleCondition = (condition: string) => {
-    setFormData((prev) => {
-      const has = prev.hairCondition.includes(condition)
-      return {
-        ...prev,
-        hairCondition: has
-          ? prev.hairCondition.filter((c) => c !== condition)
-          : [...prev.hairCondition, condition],
-      }
-    })
   }
 
   const toggleChemicalHistory = (value: string) => {
@@ -230,7 +212,7 @@ export default function QuestionnairePage() {
         phone: formData.phone || undefined,
         email: formData.email || undefined,
         notes: formData.salonNotes || undefined,
-        hairCondition: formData.hairCondition,
+        scalpType: formData.scalpType || undefined,
         texture: formData.texture || undefined,
         hairPattern: formData.hairPattern || undefined,
         density: formData.density || undefined,
@@ -281,7 +263,7 @@ export default function QuestionnairePage() {
       if (formData.density) params.set('density', formData.density)
       if (formData.porosity) params.set('porosity', formData.porosity)
       params.set('grayPercent', String(formData.grayPercent))
-      if (formData.hairCondition.length > 0) params.set('conditions', formData.hairCondition.join(','))
+      if (formData.scalpType) params.set('scalpType', formData.scalpType)
       if (formData.chemicalHistory.length > 0) params.set('chemicalHistory', formData.chemicalHistory.join(','))
       if (formData.sensitivities.length > 0) params.set('sensitivities', formData.sensitivities.join(','))
       if (formData.lastChemicalService) params.set('lastChemicalService', formData.lastChemicalService)
@@ -472,30 +454,25 @@ export default function QuestionnairePage() {
               </div>
             </div>
 
-            {/* Hair Condition */}
+            {/* Scalp Type */}
             <div>
-              <Label className="mb-3 block text-[#F5F5F7]">Hair Condition</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {HAIR_CONDITIONS.map((c) => (
-                  <motion.label
-                    key={c.id}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
-                      formData.hairCondition.includes(c.id)
-                        ? 'border-[#9333EA]/50 bg-[#9333EA]/10'
-                        : 'border-white/10 bg-white/5 hover:bg-white/[0.07]'
-                    }`}
+              <Label className="mb-3 block text-[#F5F5F7]">Scalp Type</Label>
+              <div className="grid grid-cols-4 gap-3">
+                {SCALP_TYPES.map((t) => (
+                  <motion.button
+                    type="button"
+                    key={t.value}
+                    onClick={() => updateField('scalpType', t.value)}
+                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    style={{
+                      borderColor: formData.scalpType === t.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                      background: formData.scalpType === t.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
+                    }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <input
-                      type="checkbox"
-                      id={`cond-${c.id}`}
-                      checked={formData.hairCondition.includes(c.id)}
-                      onChange={() => toggleCondition(c.id)}
-                      className="h-4 w-4 rounded border-white/20 bg-white/5 text-[#9333EA] accent-[#9333EA] focus:ring-[#9333EA] focus:ring-offset-[#0F0F0F]"
-                    />
-                    <span className="text-sm text-[#F5F5F7]/80">{c.label}</span>
-                  </motion.label>
+                    <span className="text-sm font-semibold" style={{ color: formData.scalpType === t.value ? '#9333EA' : '#F5F5F7' }}>{t.label}</span>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -663,19 +640,10 @@ export default function QuestionnairePage() {
                   <span className="text-[#F5F5F7] font-medium">{LAST_CHEMICAL_TIMES.find(t => t.value === formData.lastChemicalService)?.label || '—'}</span>
                 </div>
               </div>
-              {formData.hairCondition.length > 0 && (
+              {formData.scalpType && (
                 <div className="text-sm">
-                  <span className="text-white/40">Conditions:</span>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {formData.hairCondition.map((c) => (
-                      <span
-                        key={c}
-                        className="px-2 py-1 rounded-full text-xs bg-[#9333EA]/15 text-[#9333EA] border border-[#9333EA]/20"
-                      >
-                        {HAIR_CONDITIONS.find((h) => h.id === c)?.label}
-                      </span>
-                    ))}
-                  </div>
+                  <span className="text-white/40">Scalp:</span>{' '}
+                  <span className="text-[#F5F5F7] font-medium">{SCALP_TYPES.find(t => t.value === formData.scalpType)?.label}</span>
                 </div>
               )}
               {formData.chemicalHistory.length > 0 && (
