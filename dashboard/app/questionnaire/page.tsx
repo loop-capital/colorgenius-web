@@ -23,6 +23,7 @@ interface FormData {
   targetTone: string
   brandPreference: string
   linePreference: string
+  serviceType: string
   specialRequests: string
 }
 
@@ -51,6 +52,15 @@ const HAIR_CONDITIONS = [
   { id: 'oily', label: 'Oily Scalp' },
   { id: 'fine', label: 'Fine / Thin' },
   { id: 'thick', label: 'Thick / Coarse' },
+]
+
+const SERVICE_TYPES = [
+  { value: 'full_head', label: 'Full Head', desc: 'All-over application' },
+  { value: 'retouch', label: 'Retouch', desc: 'Root regrowth only' },
+  { value: 'balayage', label: 'Balayage', desc: 'Hand-painted highlights' },
+  { value: 'foils', label: 'Foils', desc: 'Foil highlights/lowlights' },
+  { value: 'corrective', label: 'Corrective', desc: 'Color correction' },
+  { value: 'gloss_toner', label: 'Gloss/Toner', desc: 'Tone refresh or gloss' },
 ]
 
 const STEP_TITLES = ['Client Profile', 'Current Hair State', 'Desired Result', 'Review & Submit']
@@ -119,6 +129,7 @@ export default function QuestionnairePage() {
     targetTone: 'N',
     brandPreference: '',
     linePreference: '',
+    serviceType: '',
     specialRequests: '',
   })
 
@@ -167,6 +178,7 @@ export default function QuestionnairePage() {
     params.set('targetTone', formData.targetTone)
     if (formData.brandPreference) params.set('brand', formData.brandPreference)
     if (formData.linePreference) params.set('line', formData.linePreference)
+    if (formData.serviceType) params.set('serviceType', formData.serviceType)
     if (formData.specialRequests) params.set('notes', formData.specialRequests)
     if (formData.clientName) params.set('client', formData.clientName)
     params.set('conditions', formData.hairCondition.join(','))
@@ -314,6 +326,30 @@ export default function QuestionnairePage() {
       case 3:
         return (
           <div className="space-y-6">
+            <div>
+              <Label className="text-[#F5F5F7] mb-3 block">Service Type</Label>
+              <p className="text-white/40 text-xs mb-3">What service are we doing today?</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {SERVICE_TYPES.map((s) => (
+                  <motion.button
+                    type="button"
+                    key={s.value}
+                    onClick={() => updateField('serviceType', s.value)}
+                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    style={{
+                      borderColor: formData.serviceType === s.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                      background: formData.serviceType === s.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="text-sm font-semibold" style={{ color: formData.serviceType === s.value ? '#9333EA' : '#F5F5F7' }}>{s.label}</span>
+                    <span className="text-xs text-white/40">{s.desc}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
             <div>
               <div className="flex items-center justify-between mb-3">
                 <Label className="text-[#F5F5F7]">Target Level</Label>
@@ -485,6 +521,10 @@ export default function QuestionnairePage() {
             <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4 space-y-4">
               <h3 className="text-lg font-semibold text-[#F5F5F7]">Desired Result</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                <div>
+                  <span className="text-white/40">Service:</span>{' '}
+                  <span className="text-[#F5F5F7] font-medium">{SERVICE_TYPES.find(s => s.value === formData.serviceType)?.label || '—'}</span>
+                </div>
                 <div>
                   <span className="text-white/40">Target Level:</span>{' '}
                   <span className="text-[#F5F5F7] font-medium">{formData.targetLevel}</span>
