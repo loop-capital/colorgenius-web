@@ -210,7 +210,7 @@ export async function submitFormulation(input: FormulationInput) {
 // ─── Auth / Login ──────────────────────────────────────────────
 
 const BETA_EMAIL = 'beta@colorgenius.co';
-const BETA_PASSWORD = 'beta2026colorgenius';
+const BETA_PASSWORD = 'betagenius';
 
 export async function ensureAuth(): Promise<string | null> {
   let token = await getAuthToken();
