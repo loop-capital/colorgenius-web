@@ -28,15 +28,12 @@ import {
   HAIR_PATTERNS,
   DENSITIES,
   POROSITY,
-  SENSITIVITIES,
   CHEMICAL_HISTORY_ITEMS,
   LAST_SERVICE_OPTIONS,
-  CONDITION_TYPES,
   type TextureType,
   type HairPatternType,
   type DensityType,
   type Porosity,
-  type ConditionType,
   type LastServiceType,
 } from '../types';
 
@@ -70,6 +67,21 @@ const STEPS = [
   { id: 3, title: 'Review', label: 'Review' },
 ] as const;
 
+// Permanent sensitivities (client-level, not per-visit)
+const PERMANENT_SENSITIVITIES: { value: string; label: string; desc?: string; danger?: boolean; icon?: string }[] = [
+  { value: 'ppd_allergy', label: 'PPD Allergy', desc: 'Allergic to PPD — use PPD-free alternatives' },
+  { value: 'ammonia_sensitivity', label: 'Ammonia Sensitivity', desc: 'Sensitive to ammonia in color products' },
+  { value: 'scalp_sensitivity', label: 'Scalp Sensitivity', desc: 'Easily irritated or reactive scalp' },
+];
+
+// Scalp types (permanent)
+const SCALP_TYPES: { value: string; label: string; desc?: string; danger?: boolean }[] = [
+  { value: 'normal', label: 'Normal', desc: 'Balanced, no issues' },
+  { value: 'oily_scalp', label: 'Oily Scalp', desc: 'Excess sebum production' },
+  { value: 'dry_scalp', label: 'Dry Scalp', desc: 'Dry, flaky, or tight scalp' },
+  { value: 'psoriasis_eczema', label: 'Psoriasis / Eczema', desc: 'Chronic scalp condition', danger: true },
+];
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface FormData {
@@ -77,15 +89,15 @@ interface FormData {
   phone: string;
   email: string;
   salonNotes: string;
-  // Hair characteristics (client-level, relatively permanent)
-  hairCondition: string[];  // keep existing
+  // Permanent hair characteristics
   texture: TextureType | '';
   hairPattern: HairPatternType | '';
   density: DensityType | '';
   porosity: Porosity | '';
   grayPercent: number;
+  sensitivities: string[];  // ppd_allergy, ammonia_sensitivity, scalp_sensitivity
+  scalpType: string;  // normal, oily_scalp, dry_scalp, psoriasis_eczema
   chemicalHistory: string[];
-  sensitivities: string[];
   lastChemicalService: string;
 }
 
@@ -94,14 +106,14 @@ const INITIAL_DATA: FormData = {
   phone: '',
   email: '',
   salonNotes: '',
-  hairCondition: [],
   texture: '',
   hairPattern: '',
   density: '',
   porosity: '',
   grayPercent: 0,
-  chemicalHistory: [],
   sensitivities: [],
+  scalpType: '',
+  chemicalHistory: [],
   lastChemicalService: '',
 };
 
@@ -285,55 +297,6 @@ function SingleChipSelector<T extends string>({
   );
 }
 
-// ─── Condition Selector (existing multi-select, adapted) ──────────────────────
-
-function ConditionSelector({
-  value,
-  onChange,
-}: {
-  value: string[];
-  onChange: (v: string[]) => void;
-}) {
-  const toggle = (id: string) => {
-    if (value.includes(id)) {
-      onChange(value.filter((c) => c !== id));
-    } else {
-      onChange([...value, id]);
-    }
-  };
-
-  return (
-    <View style={styles.chipSection}>
-      <Text style={styles.chipLabel}>Hair Condition (select all that apply)</Text>
-      <View style={styles.chipGrid}>
-        {CONDITION_TYPES.map((cond) => {
-          const isSelected = value.includes(cond.value);
-          return (
-            <TouchableOpacity
-              key={cond.value}
-              style={[
-                styles.chip,
-                isSelected && styles.chipActive,
-              ]}
-              onPress={() => toggle(cond.value)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
-                {cond.label}
-              </Text>
-              {cond.desc && (
-                <Text style={styles.chipDesc} numberOfLines={1}>
-                  {cond.desc}
-                </Text>
-              )}
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    </View>
-  );
-}
-
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function QuestionnaireScreen({ navigation }: any) {
@@ -350,7 +313,7 @@ export default function QuestionnaireScreen({ navigation }: any) {
   );
 
   const toggleArray = useCallback(
-    (field: 'hairCondition' | 'chemicalHistory' | 'sensitivities', value: string) => {
+    (field: 'chemicalHistory' | 'sensitivities', value: string) => {
       setFormData((prev) => {
         const current = prev[field];
         const updated = current.includes(value)
@@ -410,8 +373,8 @@ export default function QuestionnaireScreen({ navigation }: any) {
         ...(formData.density ? [`Density: ${formData.density}`] : []),
         ...(formData.porosity ? [`Porosity: ${formData.porosity}`] : []),
         ...(formData.grayPercent > 0 ? [`Gray: ${formData.grayPercent}%`] : []),
+        ...(formData.scalpType ? [`Scalp: ${formData.scalpType}`] : []),
         ...(formData.lastChemicalService ? [`Last Service: ${formData.lastChemicalService}`] : []),
-        ...formData.hairCondition,
         ...formData.chemicalHistory,
         ...formData.sensitivities,
       ],
@@ -464,12 +427,12 @@ export default function QuestionnaireScreen({ navigation }: any) {
             texture: formData.texture,
             hairPattern: formData.hairPattern,
             density: formData.density,
-            conditionType: formData.hairCondition[0] || 'previously_colored',
-            porosity: formData.porosity,
-            grayPercent: formData.grayPercent,
+            condition: {
+              porosity: formData.porosity,
+              grayPercent: formData.grayPercent,
+            },
             chemicalHistory: formData.chemicalHistory,
             sensitivities: formData.sensitivities,
-            lastChemicalService: formData.lastChemicalService,
           },
         });
       } else {
@@ -585,26 +548,28 @@ export default function QuestionnaireScreen({ navigation }: any) {
         onChange={(v) => updateField('grayPercent', v)}
       />
 
-      {/* Condition Types (existing multi-select) */}
-      <ConditionSelector
-        value={formData.hairCondition}
-        onChange={(v) => updateField('hairCondition', v)}
+      {/* Sensitivities — permanent only */}
+      <MultiChipSelector
+        label="Sensitivities"
+        options={PERMANENT_SENSITIVITIES}
+        selected={formData.sensitivities}
+        onToggle={(v) => toggleArray('sensitivities', v)}
       />
 
-      {/* Chemical History */}
+      {/* Scalp Type */}
+      <SingleChipSelector
+        label="Scalp Type"
+        options={SCALP_TYPES}
+        selected={formData.scalpType}
+        onSelect={(v) => updateField('scalpType', v)}
+      />
+
+      {/* Chemical History — accumulated over time */}
       <MultiChipSelector
         label="Chemical History"
         options={CHEMICAL_HISTORY_ITEMS}
         selected={formData.chemicalHistory}
         onToggle={(v) => toggleArray('chemicalHistory', v)}
-      />
-
-      {/* Sensitivities */}
-      <MultiChipSelector
-        label="Sensitivities"
-        options={SENSITIVITIES}
-        selected={formData.sensitivities}
-        onToggle={(v) => toggleArray('sensitivities', v)}
       />
 
       {/* Last Chemical Service */}
@@ -647,19 +612,19 @@ export default function QuestionnaireScreen({ navigation }: any) {
           <Text style={styles.reviewText}>Porosity: {POROSITY.find((p) => p.value === formData.porosity)?.label}</Text>
         ) : null}
         <Text style={styles.reviewText}>Gray: {formData.grayPercent}%</Text>
-        {formData.hairCondition.length > 0 && (
+        {formData.sensitivities.length > 0 && (
           <Text style={styles.reviewSubtext}>
-            Conditions: {formData.hairCondition.map((c) => CONDITION_TYPES.find((ct) => ct.value === c)?.label).filter(Boolean).join(', ')}
+            Sensitivities: {formData.sensitivities.map((s) => PERMANENT_SENSITIVITIES.find((sen) => sen.value === s)?.label).filter(Boolean).join(', ')}
+          </Text>
+        )}
+        {formData.scalpType && (
+          <Text style={styles.reviewSubtext}>
+            Scalp: {SCALP_TYPES.find((s) => s.value === formData.scalpType)?.label}
           </Text>
         )}
         {formData.chemicalHistory.length > 0 && (
           <Text style={styles.reviewSubtext}>
             Chemical History: {formData.chemicalHistory.map((c) => CHEMICAL_HISTORY_ITEMS.find((ch) => ch.value === c)?.label).filter(Boolean).join(', ')}
-          </Text>
-        )}
-        {formData.sensitivities.length > 0 && (
-          <Text style={styles.reviewSubtext}>
-            Sensitivities: {formData.sensitivities.map((s) => SENSITIVITIES.find((sen) => sen.value === s)?.label).filter(Boolean).join(', ')}
           </Text>
         )}
         {formData.lastChemicalService ? (
