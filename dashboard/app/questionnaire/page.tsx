@@ -1,45 +1,62 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { GlassCard } from '@/components/custom/glass-card'
 import { StepTransition } from '@/components/custom/step-transition'
-import { BRANDS, LINES_BY_BRAND } from '@/lib/products'
+import { AlertTriangle, Loader2 } from 'lucide-react'
+import { useToast } from '@/components/ui/use-toast'
 
 interface FormData {
   clientName: string
   phone: string
   email: string
   salonNotes: string
-  currentLevel: number
-  currentTone: string
   hairCondition: string[]
-  targetLevel: number
-  targetTone: string
-  brandPreference: string
-  linePreference: string
-  serviceType: string
-  specialRequests: string
+  texture: string
+  hairPattern: string
+  density: string
+  porosity: string
+  grayPercent: number
+  chemicalHistory: string[]
+  sensitivities: string[]
+  lastChemicalService: string
 }
 
-const TONES = [
-  { value: 'N', label: 'Natural', color: '#9C8B7A' },
-  { value: 'A', label: 'Ash', color: '#8A7D6E' },
-  { value: 'G', label: 'Gold', color: '#C4A35A' },
-  { value: 'K', label: 'Copper', color: '#B87333' },
-  { value: 'R', label: 'Red', color: '#A03030' },
-  { value: 'V', label: 'Violet', color: '#7B68A6' },
-  { value: 'P', label: 'Pearl', color: '#B8B0C4' },
-  { value: 'B', label: 'Beige', color: '#C4B5A0' },
-  { value: 'M', label: 'Mahogany', color: '#6B3A3A' },
-  { value: 'Ch', label: 'Chocolate', color: '#4A2C2A' },
-  { value: 'W', label: 'Warm', color: '#D4A574' },
-  { value: 'C', label: 'Cool', color: '#7D8B9A' },
+const STEP_TITLES = ['Client Profile', 'Hair Characteristics', 'Review']
+const STEP_DESCRIPTIONS = [
+  "Enter your client's basic information",
+  'Document permanent hair characteristics',
+  'Review and save client profile',
+]
+
+const TEXTURES = [
+  { value: 'fine', label: 'Fine', desc: 'Thin strands, processes faster' },
+  { value: 'medium', label: 'Medium', desc: 'Average strand diameter' },
+  { value: 'coarse', label: 'Coarse', desc: 'Thick strands, takes longer' },
+]
+
+const HAIR_PATTERNS = [
+  { value: 'straight', label: 'Straight', desc: 'Type 1' },
+  { value: 'wavy', label: 'Wavy', desc: 'Type 2' },
+  { value: 'curly', label: 'Curly', desc: 'Type 3' },
+  { value: 'coily', label: 'Coily', desc: 'Type 4' },
+]
+
+const DENSITIES = [
+  { value: 'thin', label: 'Thin', desc: 'Low density' },
+  { value: 'medium', label: 'Medium', desc: 'Average density' },
+  { value: 'thick', label: 'Thick', desc: 'High density' },
+]
+
+const POROSITY = [
+  { value: 'low', label: 'Low' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'high', label: 'High' },
 ]
 
 const HAIR_CONDITIONS = [
@@ -54,21 +71,31 @@ const HAIR_CONDITIONS = [
   { id: 'thick', label: 'Thick / Coarse' },
 ]
 
-const SERVICE_TYPES = [
-  { value: 'full_head', label: 'Full Head', desc: 'All-over application' },
-  { value: 'retouch', label: 'Retouch', desc: 'Root regrowth only' },
-  { value: 'balayage', label: 'Balayage', desc: 'Hand-painted highlights' },
-  { value: 'foils', label: 'Foils', desc: 'Foil highlights/lowlights' },
-  { value: 'corrective', label: 'Corrective', desc: 'Color correction' },
-  { value: 'gloss_toner', label: 'Gloss/Toner', desc: 'Tone refresh or gloss' },
+const CHEMICAL_HISTORY = [
+  { value: 'box_dye', label: 'Box Dye', desc: 'Drugstore/home color kit — MAJOR HAZARD', warning: true },
+  { value: 'metallic_salts', label: 'Metallic Salts', desc: 'Metallic dye or mineral buildup', warning: true },
+  { value: 'henna', label: 'Henna', desc: 'Henna color — lightener = green disaster', warning: true },
+  { value: 'keratin', label: 'Keratin Treatment', desc: 'Keratin smoothing in last 6 months' },
+  { value: 'relaxer', label: 'Relaxer / Straightening', desc: 'Chemical relaxer or Japanese straightening' },
+  { value: 'hard_water', label: 'Hard Water', desc: 'Hard water or well water at home' },
+  { value: 'medication', label: 'Medication/Mineral Buildup', desc: 'Thyroid meds, iron, copper, etc.' },
 ]
 
-const STEP_TITLES = ['Client Profile', 'Current Hair State', 'Desired Result', 'Review & Submit']
-const STEP_DESCRIPTIONS = [
-  "Enter your client's basic information",
-  'Document the current hair condition',
-  'Define the target color and preferences',
-  'Review all details before creating the formula',
+const SENSITIVITIES = [
+  { value: 'ppd_allergy', label: 'PPD Allergy', desc: 'Allergic to PPD — use PPD-free alternatives', warning: true },
+  { value: 'pregnancy', label: 'Pregnancy', desc: 'Client is pregnant' },
+  { value: 'breastfeeding', label: 'Breastfeeding', desc: 'Client is breastfeeding' },
+  { value: 'chemotherapy', label: 'Active Chemotherapy', desc: 'Currently receiving chemo' },
+]
+
+const LAST_CHEMICAL_TIMES = [
+  { value: 'never', label: 'Never' },
+  { value: '6_plus_months', label: '6+ months ago' },
+  { value: '3_to_6_months', label: '3-6 months ago' },
+  { value: '1_to_3_months', label: '1-3 months ago' },
+  { value: '3_to_4_weeks', label: '3-4 weeks ago' },
+  { value: '1_to_2_weeks', label: '1-2 weeks ago' },
+  { value: 'this_week', label: 'This week' },
 ]
 
 function StepIndicator({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
@@ -113,24 +140,26 @@ function StepIndicator({ currentStep, totalSteps }: { currentStep: number; total
 
 export default function QuestionnairePage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [step, setStep] = useState(1)
   const [direction, setDirection] = useState<'forward' | 'back'>('forward')
-  const totalSteps = 4
+  const [saving, setSaving] = useState(false)
+  const totalSteps = 3
 
   const [formData, setFormData] = useState<FormData>({
     clientName: '',
     phone: '',
     email: '',
     salonNotes: '',
-    currentLevel: 5,
-    currentTone: 'N',
     hairCondition: [],
-    targetLevel: 7,
-    targetTone: 'N',
-    brandPreference: '',
-    linePreference: '',
-    serviceType: '',
-    specialRequests: '',
+    texture: '',
+    hairPattern: '',
+    density: '',
+    porosity: '',
+    grayPercent: 0,
+    chemicalHistory: [],
+    sensitivities: [],
+    lastChemicalService: '',
   })
 
   const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
@@ -145,6 +174,30 @@ export default function QuestionnairePage() {
         hairCondition: has
           ? prev.hairCondition.filter((c) => c !== condition)
           : [...prev.hairCondition, condition],
+      }
+    })
+  }
+
+  const toggleChemicalHistory = (value: string) => {
+    setFormData((prev) => {
+      const has = prev.chemicalHistory.includes(value)
+      return {
+        ...prev,
+        chemicalHistory: has
+          ? prev.chemicalHistory.filter((c) => c !== value)
+          : [...prev.chemicalHistory, value],
+      }
+    })
+  }
+
+  const toggleSensitivity = (value: string) => {
+    setFormData((prev) => {
+      const has = prev.sensitivities.includes(value)
+      return {
+        ...prev,
+        sensitivities: has
+          ? prev.sensitivities.filter((c) => c !== value)
+          : [...prev.sensitivities, value],
       }
     })
   }
@@ -170,20 +223,71 @@ export default function QuestionnairePage() {
     }
   }
 
-  const handleSubmit = () => {
-    const params = new URLSearchParams()
-    params.set('currentLevel', String(formData.currentLevel))
-    params.set('currentTone', formData.currentTone)
-    params.set('targetLevel', String(formData.targetLevel))
-    params.set('targetTone', formData.targetTone)
-    if (formData.brandPreference) params.set('brand', formData.brandPreference)
-    if (formData.linePreference) params.set('line', formData.linePreference)
-    if (formData.serviceType) params.set('serviceType', formData.serviceType)
-    if (formData.specialRequests) params.set('notes', formData.specialRequests)
-    if (formData.clientName) params.set('client', formData.clientName)
-    params.set('conditions', formData.hairCondition.join(','))
+  const saveClient = async (): Promise<{ id: string; name: string } | null> => {
+    try {
+      const payload = {
+        name: formData.clientName,
+        phone: formData.phone || undefined,
+        email: formData.email || undefined,
+        notes: formData.salonNotes || undefined,
+        hairCondition: formData.hairCondition,
+        texture: formData.texture || undefined,
+        hairPattern: formData.hairPattern || undefined,
+        density: formData.density || undefined,
+        porosity: formData.porosity || undefined,
+        grayPercent: formData.grayPercent,
+        chemicalHistory: formData.chemicalHistory,
+        sensitivities: formData.sensitivities,
+        lastChemicalService: formData.lastChemicalService || undefined,
+      }
+      const res = await fetch('/api/v1/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (data.success || data.client) {
+        return { id: data.client?.id || data.id, name: formData.clientName }
+      }
+      toast({ title: 'Error', description: data.error || 'Failed to save client', variant: 'destructive' })
+      return null
+    } catch (e: any) {
+      toast({ title: 'Error', description: e.message, variant: 'destructive' })
+      return null
+    }
+  }
 
-    router.push(`/formulate?${params.toString()}`)
+  const handleSaveClient = async () => {
+    setSaving(true)
+    const saved = await saveClient()
+    setSaving(false)
+    if (saved) {
+      toast({ title: 'Saved', description: `Client "${saved.name}" saved successfully.` })
+      router.push('/dashboard')
+    }
+  }
+
+  const handleSaveAndFormulate = async () => {
+    setSaving(true)
+    const saved = await saveClient()
+    setSaving(false)
+    if (saved) {
+      const params = new URLSearchParams()
+      params.set('clientId', saved.id)
+      params.set('clientName', saved.name)
+      params.set('autoPopulate', 'true')
+      if (formData.texture) params.set('texture', formData.texture)
+      if (formData.hairPattern) params.set('hairPattern', formData.hairPattern)
+      if (formData.density) params.set('density', formData.density)
+      if (formData.porosity) params.set('porosity', formData.porosity)
+      params.set('grayPercent', String(formData.grayPercent))
+      if (formData.hairCondition.length > 0) params.set('conditions', formData.hairCondition.join(','))
+      if (formData.chemicalHistory.length > 0) params.set('chemicalHistory', formData.chemicalHistory.join(','))
+      if (formData.sensitivities.length > 0) params.set('sensitivities', formData.sensitivities.join(','))
+      if (formData.lastChemicalService) params.set('lastChemicalService', formData.lastChemicalService)
+
+      router.push(`/formulate?${params.toString()}`)
+    }
   }
 
   const renderStep = () => {
@@ -241,59 +345,134 @@ export default function QuestionnairePage() {
       case 2:
         return (
           <div className="space-y-6">
+            {/* Texture */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label className="text-[#F5F5F7]">Current Level</Label>
-                <motion.span
-                  key={formData.currentLevel}
-                  initial={{ scale: 1.3, color: '#9333EA' }}
-                  animate={{ scale: 1, color: '#9333EA' }}
-                  className="font-bold text-lg text-[#9333EA]"
-                >
-                  {formData.currentLevel}
-                </motion.span>
-              </div>
-              <input
-                type="range"
-                min={1}
-                max={10}
-                value={formData.currentLevel}
-                onChange={(e) => updateField('currentLevel', Number(e.target.value))}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10"
-                style={{
-                  background: `linear-gradient(to right, #9333EA 0%, #9333EA ${(formData.currentLevel - 1) * 11.11}%, rgba(255,255,255,0.1) ${(formData.currentLevel - 1) * 11.11}%, rgba(255,255,255,0.1) 100%)`,
-                }}
-              />
-              <div className="flex justify-between text-xs text-white/40 mt-2">
-                <span>1 (Black)</span>
-                <span>10 (Lightest Blonde)</span>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-[#F5F5F7] mb-3 block">Current Tone</Label>
-              <div className="grid grid-cols-6 gap-3">
-                {TONES.map((t) => (
-                  <button
+              <Label className="text-[#F5F5F7] mb-3 block">Texture</Label>
+              <div className="grid grid-cols-3 gap-3">
+                {TEXTURES.map((t) => (
+                  <motion.button
                     type="button"
                     key={t.value}
-                    onClick={() => updateField('currentTone', t.value)}
-                    className="flex flex-col items-center gap-1.5 cursor-pointer"
+                    onClick={() => updateField('texture', t.value)}
+                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    style={{
+                      borderColor: formData.texture === t.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                      background: formData.texture === t.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <div
-                      className="w-10 h-10 rounded-full transition-all"
-                      style={{
-                        backgroundColor: t.color,
-                        border: formData.currentTone === t.value ? '3px solid #9333EA' : '2px solid rgba(255,255,255,0.1)',
-                        boxShadow: formData.currentTone === t.value ? '0 0 12px rgba(147,51,234,0.4)' : 'none',
-                      }}
-                    />
-                    <span className="text-xs" style={{ color: formData.currentTone === t.value ? '#9333EA' : '#A1A1AA' }}>{t.label}</span>
-                  </button>
+                    <span className="text-sm font-semibold" style={{ color: formData.texture === t.value ? '#9333EA' : '#F5F5F7' }}>{t.label}</span>
+                    <span className="text-xs text-white/40">{t.desc}</span>
+                  </motion.button>
                 ))}
               </div>
             </div>
 
+            {/* Hair Pattern */}
+            <div>
+              <Label className="text-[#F5F5F7] mb-3 block">Hair Pattern</Label>
+              <div className="grid grid-cols-4 gap-3">
+                {HAIR_PATTERNS.map((t) => (
+                  <motion.button
+                    type="button"
+                    key={t.value}
+                    onClick={() => updateField('hairPattern', t.value)}
+                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    style={{
+                      borderColor: formData.hairPattern === t.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                      background: formData.hairPattern === t.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="text-sm font-semibold" style={{ color: formData.hairPattern === t.value ? '#9333EA' : '#F5F5F7' }}>{t.label}</span>
+                    <span className="text-xs text-white/40">{t.desc}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Density */}
+            <div>
+              <Label className="text-[#F5F5F7] mb-3 block">Density</Label>
+              <div className="grid grid-cols-3 gap-3">
+                {DENSITIES.map((t) => (
+                  <motion.button
+                    type="button"
+                    key={t.value}
+                    onClick={() => updateField('density', t.value)}
+                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    style={{
+                      borderColor: formData.density === t.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                      background: formData.density === t.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="text-sm font-semibold" style={{ color: formData.density === t.value ? '#9333EA' : '#F5F5F7' }}>{t.label}</span>
+                    <span className="text-xs text-white/40">{t.desc}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Porosity */}
+            <div>
+              <Label className="text-[#F5F5F7] mb-3 block">Porosity</Label>
+              <div className="grid grid-cols-3 gap-3">
+                {POROSITY.map((t) => (
+                  <motion.button
+                    type="button"
+                    key={t.value}
+                    onClick={() => updateField('porosity', t.value)}
+                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    style={{
+                      borderColor: formData.porosity === t.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                      background: formData.porosity === t.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="text-sm font-semibold" style={{ color: formData.porosity === t.value ? '#9333EA' : '#F5F5F7' }}>{t.label}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Gray Percentage */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <Label className="text-[#F5F5F7]">Gray Percentage</Label>
+                <motion.span
+                  key={formData.grayPercent}
+                  initial={{ scale: 1.3, color: '#9333EA' }}
+                  animate={{ scale: 1, color: '#9333EA' }}
+                  className="font-bold text-lg text-[#9333EA]"
+                >
+                  {formData.grayPercent}%
+                </motion.span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={formData.grayPercent}
+                onChange={(e) => updateField('grayPercent', Number(e.target.value))}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10"
+                style={{
+                  background: `linear-gradient(to right, #9333EA 0%, #9333EA ${formData.grayPercent}%, rgba(255,255,255,0.1) ${formData.grayPercent}%, rgba(255,255,255,0.1) 100%)`,
+                }}
+              />
+              <div className="flex justify-between text-xs text-white/40 mt-2">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+            </div>
+
+            {/* Hair Condition */}
             <div>
               <Label className="mb-3 block text-[#F5F5F7]">Hair Condition</Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -320,149 +499,117 @@ export default function QuestionnairePage() {
                 ))}
               </div>
             </div>
-          </div>
-        )
 
-      case 3:
-        return (
-          <div className="space-y-6">
+            {/* Chemical History */}
             <div>
-              <Label className="text-[#F5F5F7] mb-3 block">Service Type</Label>
-              <p className="text-white/40 text-xs mb-3">What service are we doing today?</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {SERVICE_TYPES.map((s) => (
+              <Label className="mb-3 block text-[#F5F5F7]">Chemical History</Label>
+              <p className="text-white/40 text-xs mb-3">Past treatments that affect formulation</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {CHEMICAL_HISTORY.map((c) => (
                   <motion.button
                     type="button"
-                    key={s.value}
-                    onClick={() => updateField('serviceType', s.value)}
-                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    key={c.value}
+                    onClick={() => toggleChemicalHistory(c.value)}
+                    className="flex items-start gap-3 px-4 py-3 rounded-lg border cursor-pointer text-left"
                     style={{
-                      borderColor: formData.serviceType === s.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
-                      background: formData.serviceType === s.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
+                      borderColor: formData.chemicalHistory.includes(c.value) ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                      background: formData.chemicalHistory.includes(c.value) ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
                     }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <span className="text-sm font-semibold" style={{ color: formData.serviceType === s.value ? '#9333EA' : '#F5F5F7' }}>{s.label}</span>
-                    <span className="text-xs text-white/40">{s.desc}</span>
+                    <div
+                      className="h-4 w-4 rounded border flex-shrink-0 mt-0.5 flex items-center justify-center"
+                      style={{
+                        borderColor: formData.chemicalHistory.includes(c.value) ? '#9333EA' : 'rgba(255,255,255,0.2)',
+                        background: formData.chemicalHistory.includes(c.value) ? '#9333EA' : 'transparent',
+                      }}
+                    >
+                      {formData.chemicalHistory.includes(c.value) && <span className="text-white text-[10px]">✓</span>}
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-[#F5F5F7] flex items-center gap-1.5">
+                        {c.warning && <AlertTriangle size={12} className="text-yellow-400" />}
+                        {c.label}
+                      </span>
+                      <span className="text-xs text-white/40 block mt-0.5">{c.desc}</span>
+                    </div>
                   </motion.button>
                 ))}
               </div>
             </div>
 
+            {/* Sensitivities */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label className="text-[#F5F5F7]">Target Level</Label>
-                <motion.span
-                  key={formData.targetLevel}
-                  initial={{ scale: 1.3, color: '#9333EA' }}
-                  animate={{ scale: 1, color: '#9333EA' }}
-                  className="font-bold text-lg text-[#9333EA]"
-                >
-                  {formData.targetLevel}
-                </motion.span>
-              </div>
-              <input
-                type="range"
-                min={1}
-                max={10}
-                value={formData.targetLevel}
-                onChange={(e) => updateField('targetLevel', Number(e.target.value))}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white/10"
-                style={{
-                  background: `linear-gradient(to right, #9333EA 0%, #9333EA ${(formData.targetLevel - 1) * 11.11}%, rgba(255,255,255,0.1) ${(formData.targetLevel - 1) * 11.11}%, rgba(255,255,255,0.1) 100%)`,
-                }}
-              />
-              <div className="flex justify-between text-xs text-white/40 mt-2">
-                <span>1 (Black)</span>
-                <span>10 (Lightest Blonde)</span>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-[#F5F5F7] mb-3 block">Target Tone</Label>
-              <div className="grid grid-cols-6 gap-3">
-                {TONES.map((t) => (
-                  <button
+              <Label className="mb-3 block text-[#F5F5F7]">Sensitivities & Contraindications</Label>
+              <p className="text-white/40 text-xs mb-3">Safety-critical information</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {SENSITIVITIES.map((c) => (
+                  <motion.button
                     type="button"
-                    key={t.value}
-                    onClick={() => updateField('targetTone', t.value)}
-                    className="flex flex-col items-center gap-1.5 cursor-pointer"
+                    key={c.value}
+                    onClick={() => toggleSensitivity(c.value)}
+                    className="flex items-start gap-3 px-4 py-3 rounded-lg border cursor-pointer text-left"
+                    style={{
+                      borderColor: formData.sensitivities.includes(c.value) ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
+                      background: formData.sensitivities.includes(c.value) ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <div
-                      className="w-10 h-10 rounded-full transition-all"
+                      className="h-4 w-4 rounded border flex-shrink-0 mt-0.5 flex items-center justify-center"
                       style={{
-                        backgroundColor: t.color,
-                        border: formData.targetTone === t.value ? '3px solid #9333EA' : '2px solid rgba(255,255,255,0.1)',
-                        boxShadow: formData.targetTone === t.value ? '0 0 12px rgba(147,51,234,0.4)' : 'none',
+                        borderColor: formData.sensitivities.includes(c.value) ? '#9333EA' : 'rgba(255,255,255,0.2)',
+                        background: formData.sensitivities.includes(c.value) ? '#9333EA' : 'transparent',
                       }}
-                    />
-                    <span className="text-xs" style={{ color: formData.targetTone === t.value ? '#9333EA' : '#A1A1AA' }}>{t.label}</span>
-                  </button>
+                    >
+                      {formData.sensitivities.includes(c.value) && <span className="text-white text-[10px]">✓</span>}
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-[#F5F5F7] flex items-center gap-1.5">
+                        {c.warning && <AlertTriangle size={12} className="text-yellow-400" />}
+                        {c.label}
+                      </span>
+                      <span className="text-xs text-white/40 block mt-0.5">{c.desc}</span>
+                    </div>
+                  </motion.button>
                 ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <Label className="text-[#F5F5F7]">Brand Preference</Label>
-                <Select
-                  value={formData.brandPreference}
-                  onValueChange={(v) => {
-                    updateField('brandPreference', v)
-                    updateField('linePreference', '')
-                  }}
-                >
-                  <SelectTrigger className="mt-1.5 w-full bg-white/5 border-white/10 text-[#F5F5F7]">
-                    <SelectValue placeholder="Select brand" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0F0F0F] border-white/10">
-                    {BRANDS.map((b) => (
-                      <SelectItem key={b} value={b} className="text-[#F5F5F7] focus:bg-[#9333EA]/20 focus:text-[#F5F5F7]">
-                        {b}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-[#F5F5F7]">Line Preference</Label>
-                <Select
-                  value={formData.linePreference}
-                  onValueChange={(v) => updateField('linePreference', v)}
-                  disabled={!formData.brandPreference}
-                >
-                  <SelectTrigger className="mt-1.5 w-full bg-white/5 border-white/10 text-[#F5F5F7]">
-                    <SelectValue placeholder={formData.brandPreference ? "Select line" : "Select brand first"} />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#0F0F0F] border-white/10">
-                    {(LINES_BY_BRAND[formData.brandPreference] || []).map((l) => (
-                      <SelectItem key={l} value={l} className="text-[#F5F5F7] focus:bg-[#9333EA]/20 focus:text-[#F5F5F7]">
-                        {l}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
+            {/* Last Chemical Service */}
             <div>
-              <Label htmlFor="specialRequests" className="text-[#F5F5F7]">Special Requests / Notes</Label>
-              <textarea
-                id="specialRequests"
-                rows={3}
-                placeholder="Any additional details, preferences, or concerns..."
-                value={formData.specialRequests}
-                onChange={(e) => updateField('specialRequests', e.target.value)}
-                className="mt-1.5 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#F5F5F7] placeholder:text-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9333EA] focus-visible:ring-offset-2 ring-offset-[#0F0F0F]"
-              />
+              <Label className="text-[#F5F5F7] mb-3 block">Last Chemical Service</Label>
+              <p className="text-white/40 text-xs mb-3">How recently was the last treatment?</p>
+              <div className="flex flex-wrap gap-2">
+                {LAST_CHEMICAL_TIMES.map((o) => (
+                  <motion.button
+                    type="button"
+                    key={o.value}
+                    onClick={() => updateField('lastChemicalService', o.value)}
+                    className="px-4 py-2 rounded-full border cursor-pointer text-sm"
+                    style={{
+                      borderColor: formData.lastChemicalService === o.value ? 'rgba(147,51,234,0.6)' : 'rgba(255,255,255,0.12)',
+                      background: formData.lastChemicalService === o.value ? 'rgba(147,51,234,0.15)' : 'rgba(255,255,255,0.02)',
+                      color: formData.lastChemicalService === o.value ? '#9333EA' : '#A1A1AA',
+                      fontWeight: formData.lastChemicalService === o.value ? 600 : 400,
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {o.label}
+                  </motion.button>
+                ))}
+              </div>
             </div>
           </div>
         )
 
-      case 4:
+      case 3:
         return (
           <div className="space-y-5">
+            {/* Client Profile Summary */}
             <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4 space-y-4">
               <h3 className="text-lg font-semibold text-[#F5F5F7]">Client Profile</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
@@ -487,18 +634,33 @@ export default function QuestionnairePage() {
               )}
             </div>
 
+            {/* Hair Characteristics Summary */}
             <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4 space-y-4">
-              <h3 className="text-lg font-semibold text-[#F5F5F7]">Current Hair State</h3>
+              <h3 className="text-lg font-semibold text-[#F5F5F7]">Hair Characteristics</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <div>
-                  <span className="text-white/40">Level:</span>{' '}
-                  <span className="text-[#F5F5F7] font-medium">{formData.currentLevel}</span>
+                  <span className="text-white/40">Texture:</span>{' '}
+                  <span className="text-[#F5F5F7] font-medium">{TEXTURES.find(t => t.value === formData.texture)?.label || '—'}</span>
                 </div>
                 <div>
-                  <span className="text-white/40">Tone:</span>{' '}
-                  <span className="text-[#F5F5F7] font-medium">
-                    {TONES.find((t) => t.value === formData.currentTone)?.label || formData.currentTone}
-                  </span>
+                  <span className="text-white/40">Pattern:</span>{' '}
+                  <span className="text-[#F5F5F7] font-medium">{HAIR_PATTERNS.find(t => t.value === formData.hairPattern)?.label || '—'}</span>
+                </div>
+                <div>
+                  <span className="text-white/40">Density:</span>{' '}
+                  <span className="text-[#F5F5F7] font-medium">{DENSITIES.find(t => t.value === formData.density)?.label || '—'}</span>
+                </div>
+                <div>
+                  <span className="text-white/40">Porosity:</span>{' '}
+                  <span className="text-[#F5F5F7] font-medium">{POROSITY.find(t => t.value === formData.porosity)?.label || '—'}</span>
+                </div>
+                <div>
+                  <span className="text-white/40">Gray:</span>{' '}
+                  <span className="text-[#F5F5F7] font-medium">{formData.grayPercent}%</span>
+                </div>
+                <div>
+                  <span className="text-white/40">Last Chemical Service:</span>{' '}
+                  <span className="text-[#F5F5F7] font-medium">{LAST_CHEMICAL_TIMES.find(t => t.value === formData.lastChemicalService)?.label || '—'}</span>
                 </div>
               </div>
               {formData.hairCondition.length > 0 && (
@@ -516,38 +678,34 @@ export default function QuestionnairePage() {
                   </div>
                 </div>
               )}
-            </div>
-
-            <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4 space-y-4">
-              <h3 className="text-lg font-semibold text-[#F5F5F7]">Desired Result</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
-                <div>
-                  <span className="text-white/40">Service:</span>{' '}
-                  <span className="text-[#F5F5F7] font-medium">{SERVICE_TYPES.find(s => s.value === formData.serviceType)?.label || '—'}</span>
-                </div>
-                <div>
-                  <span className="text-white/40">Target Level:</span>{' '}
-                  <span className="text-[#F5F5F7] font-medium">{formData.targetLevel}</span>
-                </div>
-                <div>
-                  <span className="text-white/40">Target Tone:</span>{' '}
-                  <span className="text-[#F5F5F7] font-medium">
-                    {TONES.find((t) => t.value === formData.targetTone)?.label || formData.targetTone}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-white/40">Brand:</span>{' '}
-                  <span className="text-[#F5F5F7] font-medium">{formData.brandPreference || 'Any'}</span>
-                </div>
-                <div>
-                  <span className="text-white/40">Line:</span>{' '}
-                  <span className="text-[#F5F5F7] font-medium">{formData.linePreference || 'Any'}</span>
-                </div>
-              </div>
-              {formData.specialRequests && (
+              {formData.chemicalHistory.length > 0 && (
                 <div className="text-sm">
-                  <span className="text-white/40">Special Requests:</span>
-                  <p className="text-[#F5F5F7]/70 mt-1">{formData.specialRequests}</p>
+                  <span className="text-white/40">Chemical History:</span>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.chemicalHistory.map((c) => (
+                      <span
+                        key={c}
+                        className="px-2 py-1 rounded-full text-xs bg-red-500/15 text-red-400 border border-red-500/20"
+                      >
+                        {CHEMICAL_HISTORY.find((h) => h.value === c)?.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {formData.sensitivities.length > 0 && (
+                <div className="text-sm">
+                  <span className="text-white/40">Sensitivities:</span>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.sensitivities.map((c) => (
+                      <span
+                        key={c}
+                        className="px-2 py-1 rounded-full text-xs bg-yellow-500/15 text-yellow-400 border border-yellow-500/20"
+                      >
+                        {SENSITIVITIES.find((h) => h.value === c)?.label}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -622,12 +780,25 @@ export default function QuestionnairePage() {
               Next →
             </Button>
           ) : (
-            <Button
-              onClick={handleSubmit}
-              className="bg-gradient-to-r from-[#9333EA] to-[#0D9488] hover:opacity-90 text-white font-semibold"
-            >
-              Create Formula →
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleSaveClient}
+                disabled={saving}
+                variant="outline"
+                className="border-white/10 text-[#F5F5F7] hover:bg-white/5 hover:text-[#F5F5F7]"
+              >
+                {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+                Save Client
+              </Button>
+              <Button
+                onClick={handleSaveAndFormulate}
+                disabled={saving}
+                className="bg-gradient-to-r from-[#9333EA] to-[#0D9488] hover:opacity-90 text-white font-semibold"
+              >
+                {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+                Save & Formulate →
+              </Button>
+            </div>
           )}
         </motion.div>
       </div>

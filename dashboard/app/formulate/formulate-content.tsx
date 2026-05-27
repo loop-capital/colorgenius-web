@@ -144,6 +144,7 @@ const card = { background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255
 export { blendColor } from '@/lib/color-utils'
 const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 const btnOutline = { padding: '12px 24px', border: '1px solid rgba(255,255,255,0.12)', color: '#A1A1AA', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
+const btnPinkOutline = { padding: '12px 24px', border: '1px solid rgba(236,72,153,0.4)', color: '#EC4899', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 600 }
 
 export default function FormulatePage() {
   const { toast } = useToast()
@@ -177,6 +178,11 @@ export default function FormulatePage() {
   const [showClientSearch, setShowClientSearch] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [listed, setListed] = useState(false)
+  const [manualEntry, setManualEntry] = useState(false)
+  const [manualProducts, setManualProducts] = useState<Array<{ brand: string; shadeCode: string; shadeName: string; grams: number; developerVol: number; processingTime: string; notes: string }>>([{
+    brand: '', shadeCode: '', shadeName: '', grams: 20, developerVol: 20, processingTime: '30 min', notes: ''
+  }])
 
   // Fetch salon context and available brands on mount
   useEffect(() => {
@@ -258,6 +264,42 @@ export default function FormulatePage() {
         toast({ title: 'Saved', description: clientName ? `Formula saved for ${clientName}` : 'Formula saved to library' })
       } else {
         toast({ title: 'Error', description: data.error || 'Failed to save', variant: 'destructive' })
+      }
+    } catch (e: any) {
+      toast({ title: 'Error', description: e.message, variant: 'destructive' })
+    }
+    setSaving(false)
+  }
+
+  const handleListMarketplace = async () => {
+    if (saving || listed) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/formulations/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          clientName: clientName || undefined,
+          clientPhone: clientPhone || undefined,
+          salonId,
+          stylistId: salonId,
+          formData: fd,
+          result,
+          ingredients: formulaIngredients,
+          developer: formulaDeveloper,
+          ratio: formulaRatio,
+          photoUrl: photo,
+          isPublic: true,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setListed(true)
+        if (data.clientId && !clientId) setClientId(data.clientId)
+        toast({ title: 'Listed', description: 'Formula listed on marketplace!' })
+      } else {
+        toast({ title: 'Error', description: data.error || 'Failed to list', variant: 'destructive' })
       }
     } catch (e: any) {
       toast({ title: 'Error', description: e.message, variant: 'destructive' })
@@ -359,6 +401,9 @@ export default function FormulatePage() {
     setPhoto(null)
     setStep(1)
     setSaved(false)
+    setListed(false)
+    setManualEntry(false)
+    setManualProducts([{ brand: '', shadeCode: '', shadeName: '', grams: 20, developerVol: 20, processingTime: '30 min', notes: '' }])
   }
 
   return (
@@ -900,11 +945,133 @@ export default function FormulatePage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button type="button" onClick={() => setStep(4)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
-              <button type="button" onClick={handleSubmit} disabled={loading} style={btnPrimary}>
-                {loading ? <><LoaderCircle className="animate-spin" size={16} style={{ color: '#F59E0B' }} /> Generating...</> : <>Generate Formula <FlaskConical size={16} /></>}
-              </button>
+              <div style={{ display: 'flex', gap: 12 }}>
+                <button type="button" onClick={() => setManualEntry(true)} style={btnPinkOutline}><FlaskConical size={16} /> Add Formula</button>
+                <button type="button" onClick={handleSubmit} disabled={loading} style={btnPrimary}>
+                  {loading ? <><LoaderCircle className="animate-spin" size={16} style={{ color: '#F59E0B' }} /> Generating...</> : <>Generate Formula <FlaskConical size={16} /></>}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Manual Formula Entry */}
+        {step === 5 && manualEntry && (
+          <div style={card}>
+            <h2 style={{ fontSize: 18, marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><FlaskConical style={{ color: '#EC4899' }} /> Add Formula Manually</h2>
+            <p style={{ color: '#A1A1AA', fontSize: 13, marginBottom: 24 }}>Enter your custom formula products below.</p>
+
+            {manualProducts.map((prod, idx) => (
+              <div key={idx} style={{ background: 'rgba(22,22,32,0.6)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <p style={{ fontSize: 14, fontWeight: 600, color: '#F5F5F7', margin: 0 }}>Product {idx + 1}</p>
+                  {manualProducts.length > 1 && (
+                    <button type="button" onClick={() => setManualProducts(prev => prev.filter((_, i) => i !== idx))} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', fontSize: 12 }}>Remove</button>
+                  )}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                  <div>
+                    <Label style={{ color: '#F5F5F7', fontSize: 13, fontWeight: 600, marginBottom: 6, display: 'block' }}>Brand</Label>
+                    <Select value={prod.brand} onValueChange={v => setManualProducts(prev => prev.map((p, i) => i === idx ? { ...p, brand: v } : p))}>
+                      <SelectTrigger style={{ background: 'rgba(30,30,45,0.6)', borderColor: 'rgba(255,255,255,0.08)', color: '#F5F5F7', width: '100%' }}><SelectValue placeholder="Select brand" /></SelectTrigger>
+                      <SelectContent style={{ background: 'rgba(30,30,45,0.9)' }}>{brands.map(b => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label style={{ color: '#F5F5F7', fontSize: 13, fontWeight: 600, marginBottom: 6, display: 'block' }}>Shade Code</Label>
+                    <input type="text" value={prod.shadeCode} onChange={e => setManualProducts(prev => prev.map((p, i) => i === idx ? { ...p, shadeCode: e.target.value } : p))} placeholder="e.g. 7/0" style={{ width: '100%', background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 12px', color: '#F5F5F7', fontSize: 14, outline: 'none' }} />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                  <div>
+                    <Label style={{ color: '#F5F5F7', fontSize: 13, fontWeight: 600, marginBottom: 6, display: 'block' }}>Product Name</Label>
+                    <input type="text" value={prod.shadeName} onChange={e => setManualProducts(prev => prev.map((p, i) => i === idx ? { ...p, shadeName: e.target.value } : p))} placeholder="e.g. Medium Blonde" style={{ width: '100%', background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 12px', color: '#F5F5F7', fontSize: 14, outline: 'none' }} />
+                  </div>
+                  <div>
+                    <Label style={{ color: '#F5F5F7', fontSize: 13, fontWeight: 600, marginBottom: 6, display: 'block' }}>Grams</Label>
+                    <input type="number" min={1} value={prod.grams} onChange={e => setManualProducts(prev => prev.map((p, i) => i === idx ? { ...p, grams: Number(e.target.value) } : p))} style={{ width: '100%', background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 12px', color: '#F5F5F7', fontSize: 14, outline: 'none' }} />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                  <div>
+                    <Label style={{ color: '#F5F5F7', fontSize: 13, fontWeight: 600, marginBottom: 6, display: 'block' }}>Developer Volume</Label>
+                    <Select value={String(prod.developerVol)} onValueChange={v => setManualProducts(prev => prev.map((p, i) => i === idx ? { ...p, developerVol: Number(v) } : p))}>
+                      <SelectTrigger style={{ background: 'rgba(30,30,45,0.6)', borderColor: 'rgba(255,255,255,0.08)', color: '#F5F5F7', width: '100%' }}><SelectValue placeholder="Select vol" /></SelectTrigger>
+                      <SelectContent style={{ background: 'rgba(30,30,45,0.9)' }}>
+                        <SelectItem value="10">10 Vol</SelectItem>
+                        <SelectItem value="20">20 Vol</SelectItem>
+                        <SelectItem value="30">30 Vol</SelectItem>
+                        <SelectItem value="40">40 Vol</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label style={{ color: '#F5F5F7', fontSize: 13, fontWeight: 600, marginBottom: 6, display: 'block' }}>Processing Time</Label>
+                    <input type="text" value={prod.processingTime} onChange={e => setManualProducts(prev => prev.map((p, i) => i === idx ? { ...p, processingTime: e.target.value } : p))} placeholder="e.g. 30 min" style={{ width: '100%', background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 12px', color: '#F5F5F7', fontSize: 14, outline: 'none' }} />
+                  </div>
+                </div>
+                <div>
+                  <Label style={{ color: '#F5F5F7', fontSize: 13, fontWeight: 600, marginBottom: 6, display: 'block' }}>Notes</Label>
+                  <textarea value={prod.notes} onChange={e => setManualProducts(prev => prev.map((p, i) => i === idx ? { ...p, notes: e.target.value } : p))} placeholder="Optional notes..." rows={2} style={{ width: '100%', background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '8px 12px', color: '#F5F5F7', fontSize: 14, outline: 'none', resize: 'vertical' }} />
+                </div>
+              </div>
+            ))}
+
+            <button type="button" onClick={() => setManualProducts(prev => [...prev, { brand: '', shadeCode: '', shadeName: '', grams: 20, developerVol: 20, processingTime: '30 min', notes: '' }])} style={{ ...btnOutline, width: '100%', justifyContent: 'center', marginBottom: 16 }}><FlaskConical size={14} /> Add Another Product</button>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <button type="button" onClick={() => setManualEntry(false)} style={btnOutline}><ChevronLeft size={16} /> Cancel</button>
+              <button type="button" onClick={() => {
+                // Build result object matching FormulationResult shape
+                const steps = manualProducts.map((prod, idx) => ({
+                  role: idx === 0 ? 'primary' : 'secondary',
+                  product: {
+                    shadeCode: prod.shadeCode,
+                    shadeName: prod.shadeName || prod.shadeCode,
+                    brand: prod.brand,
+                    line: '',
+                    level: fd.targetLevel,
+                    tone: revToneMap[fd.targetTone] || fd.targetTone,
+                  },
+                  grams: prod.grams,
+                  developer: { volume: prod.developerVol, type: 'cream' },
+                  notes: prod.notes,
+                }))
+                const manualResult = {
+                  brand: manualProducts[0]?.brand || fd.brandPreference || 'Custom',
+                  line: '',
+                  steps,
+                  totalGrams: manualProducts.reduce((sum, p) => sum + p.grams, 0),
+                  developerVolume: manualProducts[0]?.developerVol || 20,
+                  mixingRatio: '1:1.5',
+                  processingTime: manualProducts[0]?.processingTime || '30 min',
+                  assessment: 'Manually entered formula.',
+                  warnings: [],
+                  hardStops: [],
+                  alternatives: [],
+                  strandTestRecommended: false,
+                }
+                setResult(manualResult)
+                // Convert to EditFormula ingredients
+                const ingredients: FormulaIngredient[] = steps.map((s: any, idx: number) => ({
+                  id: `ing-${idx}`,
+                  name: s.product.shadeName || 'Unknown',
+                  brand: s.product.brand || 'Custom',
+                  shadeCode: s.product.shadeCode || '?',
+                  series: s.product.line || '',
+                  targetGrams: s.grams || 20,
+                  color: HAIR_LEVELS[s.product?.level]?.hex || '#7D5038',
+                  order: idx,
+                }))
+                setFormulaIngredients(ingredients)
+                setFormulaDeveloper({ name: `${manualResult.developerVolume} Vol`, volume: manualResult.developerVolume })
+                setFormulaRatio(manualResult.mixingRatio)
+                setFormulaView('edit')
+                setManualEntry(false)
+                setStep(6)
+              }} style={btnPrimary}><Save size={16} /> Done</button>
             </div>
           </div>
         )}
@@ -1053,8 +1220,9 @@ export default function FormulatePage() {
             )}
 
             <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
-              <button type="button" onClick={() => { setResult(null); setFormulaIngredients([]); setFormulaView('edit'); setSaved(false); setClientId(null); setClientName(''); setClientPhone(''); setStep(1) }} style={{ ...btnOutline, flex: 1, justifyContent: 'center' }}><RotateCcw size={14} /> New Formula</button>
+              <button type="button" onClick={() => { setResult(null); setFormulaIngredients([]); setFormulaView('edit'); setSaved(false); setListed(false); setClientId(null); setClientName(''); setClientPhone(''); setStep(1) }} style={{ ...btnOutline, flex: 1, justifyContent: 'center' }}><RotateCcw size={14} /> New Formula</button>
               <button type="button" onClick={handleSaveFormula} disabled={saving || saved} style={{ ...btnPrimary, flex: 1, justifyContent: 'center', opacity: saved ? 0.6 : 1 }}><Save size={14} /> {saving ? 'Saving...' : saved ? 'Saved ✓' : 'Save to Library'}</button>
+              <button type="button" onClick={handleListMarketplace} disabled={saving || listed} style={{ ...btnPinkOutline, flex: 1, justifyContent: 'center', opacity: listed ? 0.6 : 1 }}><Save size={14} /> {saving ? 'Listing...' : listed ? 'Listed ✓' : 'List on Marketplace'}</button>
             </div>
 
             {/* ByondEdu: Contextual Education */}
