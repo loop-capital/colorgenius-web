@@ -635,8 +635,8 @@ export default function FormulatePage() {
 
             {/* Service Type */}
             <div style={{ marginBottom: 24 }}>
-              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4, display: 'block' }}>Service Type</Label>
-              <p style={{ color: '#71717A', fontSize: 12, marginBottom: 8 }}>What type of service are you performing?</p>
+              <Label style={{ color: '#F5F5F7', fontSize: 14, fontWeight: 600, marginBottom: 4, display: 'block' }}>Last Service</Label>
+              <p style={{ color: '#71717A', fontSize: 12, marginBottom: 8 }}>What was your last color service?</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                 {SERVICE_TYPES.map(o => (
                   <button type="button" key={o.value} onClick={() => setFd(p => ({ ...p, serviceType: o.value }))}

@@ -40,23 +40,24 @@ export default function HistoryScreen({ navigation }: any) {
   const fetchHistory = useCallback(async (refresh = false) => {
     if (refresh) setRefreshing(true);
     else setLoading(true);
-    
-    const data = await getHistory({
-      search: searchTerm || undefined,
-      type: activeFilter !== 'all' ? activeFilter : undefined,
-    });
-    setEntries(data);
-    
-    if (refresh) setRefreshing(false);
-    else setLoading(false);
+    try {
+      const data = await getHistory({
+        search: searchTerm || undefined,
+        type: activeFilter !== 'all' ? activeFilter : undefined,
+      });
+      setEntries(data);
+    } catch (e: any) {
+      console.warn('[HistoryScreen] fetchHistory failed:', e?.message);
+    } finally {
+      if (refresh) setRefreshing(false);
+      else setLoading(false);
+    }
   }, [searchTerm, activeFilter]);
 
   useEffect(() => {
     const timer = setTimeout(() => fetchHistory(), 300);
     return () => clearTimeout(timer);
   }, [searchTerm, activeFilter]);
-
-  useEffect(() => { fetchHistory(); }, []);
 
   function formatTime(dateStr: string) {
     const date = new Date(dateStr);
@@ -128,9 +129,8 @@ export default function HistoryScreen({ navigation }: any) {
               key={entry.id}
               style={styles.card}
               onPress={() => {
-                // Navigate to formulation details or client profile
-                if (entry.clientName) {
-                  navigation.navigate('ClientCollection', { clientId: entry.id, clientName: entry.clientName });
+                if (entry.clientId) {
+                  navigation.navigate('ClientCollection', { clientId: entry.clientId, clientName: entry.clientName });
                 }
               }}
             >

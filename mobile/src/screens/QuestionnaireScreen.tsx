@@ -311,24 +311,25 @@ export default function QuestionnaireScreen({ navigation }: any) {
     setLoading(true);
     try {
       // Build formulation input from consultation data
+      const conditionTypes = ['virgin', 'previously_colored', 'damaged', 'highly_damaged', 'bleached', 'gray_coverage', 'oily_scalp', 'dry_brittle'] as const;
+      const matchedType = formData.hairCondition.find((c) => conditionTypes.includes(c as any)) as typeof conditionTypes[number] | undefined;
       const input = {
-        hairTexture: 'medium' as const,
+        texture: 'medium' as const,
         hairPattern: 'straight' as const,
-        hairDensity: 'medium' as const,
+        density: 'medium' as const,
         currentLevel: formData.currentLevel,
         currentTone: formData.currentTone as ToneValue,
         targetLevel: formData.targetLevel,
         targetTone: formData.targetTone as ToneValue,
-        brand: formData.brandPreference || undefined,
-        line: formData.linePreference || undefined,
-        lastServiceType: undefined,
+        brandPreference: formData.brandPreference || undefined,
+        linePreference: formData.linePreference || undefined,
         chemicalHistory: [],
         sensitivities: [],
-        porosity: 'normal' as const,
-        condition: formData.hairCondition as any,
-        problemIndicators: [],
+        condition: {
+          type: matchedType,
+          porosity: 'normal' as const,
+        },
         specialRequests: formData.specialRequests,
-        scalpCondition: undefined,
       };
 
       const result = await submitFormulation(input);

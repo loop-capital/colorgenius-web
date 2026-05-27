@@ -23,13 +23,14 @@ export default function CameraScreen({ navigation }: any) {
   const [angle, setAngle] = useState<'roots' | 'mid' | 'ends'>('roots');
   const [authReady, setAuthReady] = useState(false);
   const cameraRef = useRef<CameraView>(null);
+  const isMounted = useRef(true);
 
-  // Pre-authenticate on mount
   useEffect(() => {
     (async () => {
       const token = await ensureAuth();
-      setAuthReady(!!token);
+      if (isMounted.current) setAuthReady(!!token);
     })();
+    return () => { isMounted.current = false; };
   }, []);
 
   if (!permission) {
@@ -112,40 +113,40 @@ export default function CameraScreen({ navigation }: any) {
       const sessionId = `mobile-${Date.now()}`;
       const uploadResult = await uploadPhoto(capturedUri, sessionId, angle);
 
-      // Trigger analysis and poll for completion
-      if (uploadResult.data?.id) {
-        setAnalyzing(true);
-        try {
-          await analyzePhoto(uploadResult.data.id);
-          // Poll for analysis completion
-          const analysis = await waitForAnalysis(uploadResult.data.id, 60000, 3000);
-          if (analysis) {
-            navigation.navigate('Formulate', {
-              photoId: uploadResult.data.id,
-              analysis,
-            });
-          } else {
-            // Timed out — still navigate with raw data
-            navigation.navigate('Formulate', {
+      if (!uploadResult.data?.id) {
+        Alert.alert('Upload Failed', 'Server returned an unexpected response. Please try again.');
+        return;
+      }
+
+      if (isMounted.current) setAnalyzing(true);
+      try {
+        await analyzePhoto(uploadResult.data.id);
+        const analysis = await waitForAnalysis(uploadResult.data.id, 60000, 3000);
+        if (isMounted.current) {
+          navigation.navigate('Formulate', { photoId: uploadResult.data.id, analysis });
+        }
+      } catch (analysisErr: any) {
+        console.error('[Camera] Analysis failed:', analysisErr.message);
+        const msg = analysisErr.message?.includes('timed out')
+          ? 'Analysis is taking longer than expected.'
+          : 'Analysis failed.';
+        Alert.alert('Analysis Issue', msg, [
+          { text: 'Go Back', style: 'cancel' },
+          {
+            text: 'Proceed Anyway',
+            onPress: () => navigation.navigate('Formulate', {
               photoId: uploadResult.data.id,
               analysis: uploadResult.data,
-            });
-          }
-        } catch (analysisErr: any) {
-          console.error('[Camera] Analysis failed:', analysisErr.message);
-          // Still navigate — user can retry analysis from Formulate screen
-          navigation.navigate('Formulate', {
-            photoId: uploadResult.data.id,
-            analysis: uploadResult.data,
-          });
-        } finally {
-          setAnalyzing(false);
-        }
+            }),
+          },
+        ]);
+      } finally {
+        if (isMounted.current) setAnalyzing(false);
       }
     } catch (err: any) {
       Alert.alert('Upload Failed', err.message || 'Please try again');
     } finally {
-      setUploading(false);
+      if (isMounted.current) setUploading(false);
     }
   };
 

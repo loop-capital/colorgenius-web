@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, createContext, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -62,8 +62,15 @@ export type RootStackParamList = {
 // ─── Navigators ───────────────────────────────────────────────────────────────
 const Stack = createStackNavigator<RootStackParamList>();
 
+// ─── Navigation ref (safe to call outside Navigator) ─────────────────────────
+const navigationRef = createNavigationContainerRef<RootStackParamList>();
+
+// ─── Drawer context (avoids prop-drilling through wrapScreen) ─────────────────
+const DrawerContext = createContext<() => void>(() => {});
+
 // ─── Custom Header ────────────────────────────────────────────────────────────
-function CustomHeader({ onOpenDrawer }: { onOpenDrawer: () => void }) {
+function CustomHeader() {
+  const onOpenDrawer = useContext(DrawerContext);
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
@@ -86,70 +93,71 @@ function CustomHeader({ onOpenDrawer }: { onOpenDrawer: () => void }) {
 }
 
 // ─── Screen Wrapper ───────────────────────────────────────────────────────────
-function ScreenWithHeader({
-  children,
-  onOpenDrawer,
-}: {
-  children: React.ReactNode;
-  onOpenDrawer: () => void;
-}) {
+function ScreenWithHeader({ children }: { children: React.ReactNode }) {
   return (
     <View style={styles.screenContainer}>
-      <CustomHeader onOpenDrawer={onOpenDrawer} />
+      <CustomHeader />
       <View style={styles.screenContent}>{children}</View>
     </View>
   );
 }
 
+// ─── Wrapped Screens (module-level — prevents remount on every drawer toggle) ──
+function WrappedDashboard(props: any) { return <ScreenWithHeader><DashboardScreen {...props} /></ScreenWithHeader>; }
+function WrappedNewService(props: any) { return <ScreenWithHeader><NewServiceScreen {...props} /></ScreenWithHeader>; }
+function WrappedFormulate(props: any) { return <ScreenWithHeader><FormulateScreen {...props} /></ScreenWithHeader>; }
+function WrappedConsultation(props: any) { return <ScreenWithHeader><QuestionnaireScreen {...props} /></ScreenWithHeader>; }
+function WrappedClients(props: any) { return <ScreenWithHeader><ClientsScreen {...props} /></ScreenWithHeader>; }
+function WrappedLibrary(props: any) { return <ScreenWithHeader><LibraryScreen {...props} /></ScreenWithHeader>; }
+function WrappedAnalyze(props: any) { return <ScreenWithHeader><AnalyzeScreen {...props} /></ScreenWithHeader>; }
+function WrappedHistory(props: any) { return <ScreenWithHeader><HistoryScreen {...props} /></ScreenWithHeader>; }
+function WrappedGallery(props: any) { return <ScreenWithHeader><GalleryScreen {...props} /></ScreenWithHeader>; }
+function WrappedGalleryUpload(props: any) { return <ScreenWithHeader><GalleryUploadScreen {...props} /></ScreenWithHeader>; }
+function WrappedClientCollection(props: any) { return <ScreenWithHeader><ClientCollectionScreen {...props} /></ScreenWithHeader>; }
+function WrappedCommunity(props: any) { return <ScreenWithHeader><CommunityScreen {...props} /></ScreenWithHeader>; }
+function WrappedInventory(props: any) { return <ScreenWithHeader><InventoryScreen {...props} /></ScreenWithHeader>; }
+function WrappedPricing(props: any) { return <ScreenWithHeader><PricingScreen {...props} /></ScreenWithHeader>; }
+function WrappedCertification(props: any) { return <ScreenWithHeader><CertificationScreen {...props} /></ScreenWithHeader>; }
+function WrappedSettings(props: any) { return <ScreenWithHeader><SettingsScreen {...props} /></ScreenWithHeader>; }
+function WrappedSubscription(props: any) { return <ScreenWithHeader><SubscriptionScreen {...props} /></ScreenWithHeader>; }
+function WrappedCamera(props: any) { return <ScreenWithHeader><CameraScreen {...props} /></ScreenWithHeader>; }
+
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function AppContent() {
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const navigation = useNavigation<any>();
 
-  const handleNavigate = useCallback(
-    (route: string) => {
-      setDrawerVisible(false);
-      setTimeout(() => {
-        navigation.navigate(route);
-      }, 100);
-    },
-    [navigation]
-  );
+  const openDrawer = useCallback(() => setDrawerVisible(true), []);
 
-  const screenOptions = {
-    headerShown: false,
-  };
-
-  const wrapScreen = (ScreenComponent: React.ComponentType<any>) =>
-    function WrappedScreen(props: any) {
-      return (
-        <ScreenWithHeader onOpenDrawer={() => setDrawerVisible(true)}>
-          <ScreenComponent {...props} />
-        </ScreenWithHeader>
-      );
-    };
+  const handleNavigate = useCallback((route: string) => {
+    setDrawerVisible(false);
+    setTimeout(() => {
+      if (navigationRef.isReady()) {
+        navigationRef.navigate(route as keyof RootStackParamList);
+      }
+    }, 100);
+  }, []);
 
   return (
-    <>
-      <Stack.Navigator screenOptions={screenOptions}>
-        <Stack.Screen name="Dashboard" component={wrapScreen(DashboardScreen)} />
-        <Stack.Screen name="NewService" component={wrapScreen(NewServiceScreen)} />
-        <Stack.Screen name="Formulate" component={wrapScreen(FormulateScreen)} />
-        <Stack.Screen name="Consultation" component={wrapScreen(QuestionnaireScreen)} />
-        <Stack.Screen name="Clients" component={wrapScreen(ClientsScreen)} />
-        <Stack.Screen name="Library" component={wrapScreen(LibraryScreen)} />
-        <Stack.Screen name="Analyze" component={wrapScreen(AnalyzeScreen)} />
-        <Stack.Screen name="History" component={wrapScreen(HistoryScreen)} />
-        <Stack.Screen name="Gallery" component={wrapScreen(GalleryScreen)} />
-        <Stack.Screen name="GalleryUpload" component={wrapScreen(GalleryUploadScreen)} />
-        <Stack.Screen name="ClientCollection" component={wrapScreen(ClientCollectionScreen)} />
-        <Stack.Screen name="Community" component={wrapScreen(CommunityScreen)} />
-        <Stack.Screen name="Inventory" component={wrapScreen(InventoryScreen)} />
-        <Stack.Screen name="Pricing" component={wrapScreen(PricingScreen)} />
-        <Stack.Screen name="Certification" component={wrapScreen(CertificationScreen)} />
-        <Stack.Screen name="Settings" component={wrapScreen(SettingsScreen)} />
-        <Stack.Screen name="Subscription" component={wrapScreen(SubscriptionScreen)} />
-        <Stack.Screen name="Camera" component={wrapScreen(CameraScreen)} />
+    <DrawerContext.Provider value={openDrawer}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Dashboard" component={WrappedDashboard} />
+        <Stack.Screen name="NewService" component={WrappedNewService} />
+        <Stack.Screen name="Formulate" component={WrappedFormulate} />
+        <Stack.Screen name="Consultation" component={WrappedConsultation} />
+        <Stack.Screen name="Clients" component={WrappedClients} />
+        <Stack.Screen name="Library" component={WrappedLibrary} />
+        <Stack.Screen name="Analyze" component={WrappedAnalyze} />
+        <Stack.Screen name="History" component={WrappedHistory} />
+        <Stack.Screen name="Gallery" component={WrappedGallery} />
+        <Stack.Screen name="GalleryUpload" component={WrappedGalleryUpload} />
+        <Stack.Screen name="ClientCollection" component={WrappedClientCollection} />
+        <Stack.Screen name="Community" component={WrappedCommunity} />
+        <Stack.Screen name="Inventory" component={WrappedInventory} />
+        <Stack.Screen name="Pricing" component={WrappedPricing} />
+        <Stack.Screen name="Certification" component={WrappedCertification} />
+        <Stack.Screen name="Settings" component={WrappedSettings} />
+        <Stack.Screen name="Subscription" component={WrappedSubscription} />
+        <Stack.Screen name="Camera" component={WrappedCamera} />
       </Stack.Navigator>
 
       <SidebarDrawer
@@ -157,14 +165,14 @@ function AppContent() {
         onClose={() => setDrawerVisible(false)}
         onNavigate={handleNavigate}
       />
-    </>
+    </DrawerContext.Provider>
   );
 }
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <StatusBar style="light" />
         <AppContent />
       </NavigationContainer>

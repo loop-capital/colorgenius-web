@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -26,43 +26,59 @@ const COLORS = {
 export default function AnalyzeScreen({ navigation }: any) {
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    ensureAuth();
+    return () => { isMounted.current = false; };
+  }, []);
 
   const handleUpload = async (uri: string) => {
-    // Auth check first
-    const token = await ensureAuth();
-    if (!token) {
-      Alert.alert('Authentication Required', 'Please log in first.');
-      return;
-    }
-
     setUploading(true);
     try {
+      const token = await ensureAuth();
+      if (!token) {
+        Alert.alert('Authentication Required', 'Please log in first.');
+        return;
+      }
+
       const sessionId = `mobile-${Date.now()}`;
       const uploadResult = await uploadPhoto(uri, sessionId, 'roots');
 
-      if (uploadResult.data?.id) {
-        setAnalyzing(true);
-        try {
-          await analyzePhoto(uploadResult.data.id);
-          const analysis = await waitForAnalysis(uploadResult.data.id, 60000, 3000);
-          navigation.navigate('Formulate', {
-            photoId: uploadResult.data.id,
-            analysis: analysis || uploadResult.data,
-          });
-        } catch (analysisErr: any) {
-          console.error('[Analyze] Analysis failed:', analysisErr.message);
-          navigation.navigate('Formulate', {
-            photoId: uploadResult.data.id,
-            analysis: uploadResult.data,
-          });
-        } finally {
-          setAnalyzing(false);
+      if (!uploadResult.data?.id) {
+        Alert.alert('Upload Failed', 'Server returned an unexpected response. Please try again.');
+        return;
+      }
+
+      if (isMounted.current) setAnalyzing(true);
+      try {
+        await analyzePhoto(uploadResult.data.id);
+        const analysis = await waitForAnalysis(uploadResult.data.id, 60000, 3000);
+        if (isMounted.current) {
+          navigation.navigate('Formulate', { photoId: uploadResult.data.id, analysis });
         }
+      } catch (analysisErr: any) {
+        console.error('[Analyze] Analysis failed:', analysisErr.message);
+        const msg = analysisErr.message?.includes('timed out')
+          ? 'Analysis is taking longer than expected.'
+          : 'Analysis failed.';
+        Alert.alert('Analysis Issue', msg, [
+          { text: 'Go Back', style: 'cancel' },
+          {
+            text: 'Proceed Anyway',
+            onPress: () => navigation.navigate('Formulate', {
+              photoId: uploadResult.data.id,
+              analysis: uploadResult.data,
+            }),
+          },
+        ]);
+      } finally {
+        if (isMounted.current) setAnalyzing(false);
       }
     } catch (err: any) {
       Alert.alert('Upload Failed', err.message || 'Please try again');
     } finally {
-      setUploading(false);
+      if (isMounted.current) setUploading(false);
     }
   };
 

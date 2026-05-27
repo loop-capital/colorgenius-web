@@ -85,10 +85,17 @@ export default function HairAnalysisCamera({ onResult, onCancel }: Props) {
   const [modelLoadProgress, setModelLoadProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState('Loading Gemma 3n model...');
   const cameraRef = useRef<CameraView>(null);
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const modelReadyRef = useRef(false);
 
   // ─── Model Status Check ────────────────────────────────────────────────────
   useEffect(() => {
     checkModelStatus();
+    return () => {
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, []);
 
   const checkModelStatus = async () => {
@@ -104,31 +111,34 @@ export default function HairAnalysisCamera({ onResult, onCancel }: Props) {
       }
 
       // Poll model status
-      const pollStatus = setInterval(async () => {
+      pollIntervalRef.current = setInterval(async () => {
         try {
-          const status = await liteRT.getModelStatus();
-          if (status.isLoaded) {
+          const modelStatus = await liteRT.getModelStatus();
+          if (modelStatus.isLoaded) {
+            modelReadyRef.current = true;
             setModelReady(true);
             setStatus('idle');
             setStatusMessage('Ready to analyze');
-            clearInterval(pollStatus);
-          } else if (status.error) {
-            setError(`Model error: ${status.error}`);
+            if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+          } else if (modelStatus.error) {
+            setError(`Model error: ${modelStatus.error}`);
             setStatus('error');
-            clearInterval(pollStatus);
-          } else if (status.progress !== undefined) {
-            setModelLoadProgress(status.progress);
-            setStatusMessage(`Loading model... ${Math.round(status.progress * 100)}%`);
+            if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+          } else if (modelStatus.progress !== undefined) {
+            setModelLoadProgress(modelStatus.progress);
+            setStatusMessage(`Loading model... ${Math.round(modelStatus.progress * 100)}%`);
           }
         } catch (e) {
           // Module not ready yet, keep polling
         }
       }, 1000);
 
-      // Timeout after 60 seconds
-      setTimeout(() => {
-        clearInterval(pollStatus);
-        if (!modelReady) {
+      // Timeout after 60 seconds — use ref to avoid stale closure on modelReady state
+      timeoutRef.current = setTimeout(() => {
+        if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+        if (!modelReadyRef.current) {
           setError('Model loading timed out. Check your internet connection.');
           setStatus('error');
         }
@@ -203,26 +213,17 @@ export default function HairAnalysisCamera({ onResult, onCancel }: Props) {
   }
 
   // ─── AI Analysis Function ──────────────────────────────────────────────────
-  const analyzeWithGemma = async (imageUri: string): Promise<HairAnalysisResult> => {
+  const analyzeWithGemma = async (base64: string): Promise<HairAnalysisResult> => {
     const { NativeModules } = await import('react-native');
     const liteRT = NativeModules.LiteRTLMNativeModule;
-    
-    // Convert image to base64 for the model
-    const response = await fetch(imageUri);
-    const blob = await response.blob();
-    const base64 = await new Promise<string>((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.readAsDataURL(blob);
-    });
 
-    // Send to on-device Gemma model
+    // Send to on-device Gemma model (base64 captured directly from camera)
     const resultText = await liteRT.analyzeImage(
-      base64,
+      `data:image/jpeg;base64,${base64}`,
       ANALYSIS_PROMPT,
       {
         maxTokens: 1024,
-        temperature: 0.1, // Low temp for accurate analysis
+        temperature: 0.1,
       }
     );
 
@@ -243,14 +244,14 @@ export default function HairAnalysisCamera({ onResult, onCancel }: Props) {
       setStatus('capturing');
       setStatusMessage('Capturing...');
 
-      // Take the photo
+      // Take the photo — request base64 here to avoid FileReader (Web API not available in RN)
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.8,
-        base64: false,
+        base64: true,
         skipProcessing: false,
       });
 
-      if (!photo?.uri) {
+      if (!photo?.uri || !photo?.base64) {
         throw new Error('Failed to capture photo');
       }
 
@@ -259,7 +260,7 @@ export default function HairAnalysisCamera({ onResult, onCancel }: Props) {
       setStatusMessage('Analyzing hair...');
 
       // Run AI analysis on-device
-      const analysisResult = await analyzeWithGemma(photo.uri);
+      const analysisResult = await analyzeWithGemma(photo.base64);
       
       // Add the image URI to the result
       const fullResult = {

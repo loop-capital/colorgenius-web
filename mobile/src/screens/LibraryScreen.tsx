@@ -228,7 +228,7 @@ export default function LibraryScreen({ navigation }: any) {
     if (marketplaceFormulas.length > 0) return;
     try {
       setMarketplaceLoading(true);
-      const response = await apiRequest<{ formulas?: any[]; data?: any[] }>('/marketplace/browse');
+      const response = await apiRequest<{ formulas?: any[]; data?: any[] }>('/v1/marketplace/browse');
       const data = response.formulas || response.data || [];
       const mapped = data.map((f: any) => ({
         id: f.id,
@@ -616,7 +616,7 @@ export default function LibraryScreen({ navigation }: any) {
       </View>
 
       {/* Formula List */}
-      {loading || marketplaceLoading ? (
+      {(activeTab === 'my-formulas' ? loading : marketplaceLoading) ? (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={COLORS.purple} />
         </View>
@@ -757,7 +757,15 @@ export default function LibraryScreen({ navigation }: any) {
                   >
                     <Text style={styles.secondaryBtnText}>Close</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.primaryBtn}>
+                  <TouchableOpacity
+                    style={styles.primaryBtn}
+                    onPress={() => {
+                      if (selectedFormula) {
+                        setSelectedFormula(null);
+                        navigation.navigate('Formulate', { autoPopulateData: selectedFormula });
+                      }
+                    }}
+                  >
                     <Text style={styles.primaryBtnText}>Use Formula</Text>
                     <ChevronRight size={16} color="#FFF" />
                   </TouchableOpacity>

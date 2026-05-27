@@ -182,21 +182,22 @@ export default function ClientCollectionScreen({ navigation }: any) {
 
   const handleUnsave = async (photoId: string) => {
     try {
-      // DELETE /api/v1/gallery/photos/{id}/save
       await apiRequest(`/v1/gallery/photos/${photoId}/save`, { method: 'DELETE' });
       setPhotos((prev) => prev.filter((p) => p.photoId !== photoId));
       setSelectedPhoto(null);
     } catch (e) {
       console.warn('Unsave failed:', e);
-      // Optimistic update anyway
-      setPhotos((prev) => prev.filter((p) => p.photoId !== photoId));
+      Alert.alert('Error', 'Failed to remove photo. Please try again.');
     }
   };
 
   const handleSaveNotes = async () => {
     if (!selectedPhoto) return;
     try {
-      // In production: PATCH /api/v1/gallery/photos/{id}/notes
+      await apiRequest(`/v1/gallery/photos/${selectedPhoto.photoId}/notes`, {
+        method: 'PATCH',
+        body: { notes: editingNotes },
+      });
       setPhotos((prev) =>
         prev.map((p) =>
           p.photoId === selectedPhoto.photoId ? { ...p, notes: editingNotes } : p

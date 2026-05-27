@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DollarSign, ChevronRight } from 'lucide-react-native';
@@ -29,19 +30,19 @@ export default function PricingScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Manage service pricing</Text>
         </View>
 
-        <TouchableOpacity style={styles.card} onPress={() => alert('Base Pricing detail - coming in next update!')}>
+        <TouchableOpacity style={styles.card} onPress={() => Alert.alert('Coming Soon', 'Base Pricing detail - coming in next update!')}>
           <Text style={styles.cardTitle}>Base Pricing</Text>
           <Text style={styles.cardDesc}>Standard service rates</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} onPress={() => alert('Add-on Pricing detail - coming in next update!')}>
+        <TouchableOpacity style={styles.card} onPress={() => Alert.alert('Coming Soon', 'Add-on Pricing detail - coming in next update!')}>
           <Text style={styles.cardTitle}>Add-on Pricing</Text>
           <Text style={styles.cardDesc}>Extra services and treatments</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} onPress={() => alert('Discount Rules detail - coming in next update!')}>
+        <TouchableOpacity style={styles.card} onPress={() => Alert.alert('Coming Soon', 'Discount Rules detail - coming in next update!')}>
           <Text style={styles.cardTitle}>Discount Rules</Text>
           <Text style={styles.cardDesc}>Promotions and loyalty</Text>
           <ChevronRight size={20} color={COLORS.textMuted} style={styles.cardArrow} />
