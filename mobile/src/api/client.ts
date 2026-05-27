@@ -213,10 +213,9 @@ const BETA_EMAIL = 'beta@colorgenius.co';
 const BETA_PASSWORD = 'betagenius';
 
 export async function ensureAuth(): Promise<string | null> {
-  let token = await getAuthToken();
+  const token = await getAuthToken();
   if (token) return token;
-  token = await loginBeta();
-  return token;
+  return null;
 }
 
 export async function loginBeta(): Promise<string | null> {
@@ -528,6 +527,25 @@ export async function savePricingConfig(config: { markupPercent: number; applyTo
   } catch {
     return false;
   }
+}
+
+// ─── Sessions (Phone Upload Code) ────────────────────────────────
+
+export async function createSession(): Promise<{ code: string; sessionId: string }> {
+  return apiRequest('/sessions', { method: 'POST' });
+}
+
+export async function getSession(code: string): Promise<{ photos: any[]; status: string }> {
+  return apiRequest(`/sessions/${code}`);
+}
+
+// ─── Send Formula to iPad Device ─────────────────────────────────
+
+export async function sendFormulaToDevice(deviceId: string, formula: any): Promise<{ success: boolean }> {
+  return apiRequest(`/salon/devices/${deviceId}/formula`, {
+    method: 'POST',
+    body: formula,
+  });
 }
 
 // ─── History ─────────────────────────────────────────────────────

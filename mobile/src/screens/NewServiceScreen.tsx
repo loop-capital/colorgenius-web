@@ -12,8 +12,9 @@ import {
   Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search, Plus, User, Phone, Mail, X, ChevronRight, Calendar, Clock } from 'lucide-react-native';
+import { Search, Plus, User, Phone, Mail, X, ChevronRight, Calendar, Clock, FlaskConical } from 'lucide-react-native';
 import { getClients, createClient, getClientLastConsultation, type Client, type LastConsultationData } from '../api/client';
+import FormulaPicker from '../components/FormulaPicker';
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
 
@@ -219,6 +220,7 @@ export default function NewServiceScreen({ navigation }: any) {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [consultation, setConsultation] = useState<LastConsultationData | null>(null);
   const [loadingConsultation, setLoadingConsultation] = useState(false);
+  const [showFormulaPicker, setShowFormulaPicker] = useState(false);
 
   const loadClients = useCallback(async () => {
     try {
@@ -383,6 +385,16 @@ export default function NewServiceScreen({ navigation }: any) {
             <Text style={styles.startBtnText}>Start Color Service</Text>
             <ChevronRight size={18} color="#FFF" />
           </TouchableOpacity>
+
+          {/* Select Formula Button */}
+          <TouchableOpacity
+            style={styles.selectFormulaBtn}
+            onPress={() => setShowFormulaPicker(true)}
+            activeOpacity={0.8}
+          >
+            <FlaskConical size={18} color={COLORS.purple} />
+            <Text style={styles.selectFormulaText}>Select Saved Formula</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -422,6 +434,35 @@ export default function NewServiceScreen({ navigation }: any) {
         onClose={() => setShowAdd(false)}
         onAdded={handleClientAdded}
       />
+
+      {/* Formula Picker Modal */}
+      <Modal
+        visible={showFormulaPicker}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowFormulaPicker(false)}
+      >
+        <View style={formulaPickerStyles.overlay}>
+          <View style={formulaPickerStyles.content}>
+            <FormulaPicker
+              visible={showFormulaPicker}
+              onSelect={(formula) => {
+                setShowFormulaPicker(false);
+                navigation.navigate('Formulate', {
+                  autoPopulateData: formula,
+                  clientId: selectedClient?.id,
+                  clientName: selectedClient?.name,
+                });
+              }}
+              onClose={() => setShowFormulaPicker(false)}
+              onCreateNew={() => {
+                setShowFormulaPicker(false);
+                navigation.navigate('Formulate');
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -580,4 +621,37 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   emptyBtnText: { color: '#FFF', fontWeight: '700', fontSize: 14 },
+  selectFormulaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.purple,
+    paddingVertical: 14,
+    marginTop: 10,
+  },
+  selectFormulaText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.purple,
+  },
+});
+
+const formulaPickerStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'flex-end',
+  },
+  content: {
+    backgroundColor: COLORS.bg,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '85%',
+    paddingTop: 16,
+    flex: 1,
+  },
 });

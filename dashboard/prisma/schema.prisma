@@ -430,48 +430,49 @@ model regional_trends {
 }
 
 model salons {
-  id                      String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                    String                 @db.VarChar(200)
-  slug                    String                 @unique @db.VarChar(200)
-  address_line1           String?                @db.VarChar(200)
-  address_line2           String?                @db.VarChar(200)
-  city                    String?                @db.VarChar(100)
-  state                   String?                @db.VarChar(2)
-  postal_code             String?                @db.VarChar(20)
-  country                 String?                @default("US") @db.VarChar(2)
-  latitude                Decimal?               @db.Decimal(10, 8)
-  longitude               Decimal?               @db.Decimal(11, 8)
-  timezone                String?                @default("America/New_York") @db.VarChar(50)
-  phone                   String?                @db.VarChar(50)
-  email                   String?                @db.VarChar(255)
-  website                 String?                @db.VarChar(255)
-  business_type           String?                @db.VarChar(50)
-  pricing_tier            String?                @db.VarChar(20)
-  subscription_tier       String?                @default("salon") @db.VarChar(20)
-  subscription_seats      Int?                   @default(5)
-  subscription_expires_at DateTime?              @db.Timestamp(6)
-  features_enabled        Json?                  @default("{\"analytics\": true, \"api_access\": false, \"multi_location\": false, \"inventory_management\": false}")
+  id                      String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                    String                   @db.VarChar(200)
+  slug                    String                   @unique @db.VarChar(200)
+  address_line1           String?                  @db.VarChar(200)
+  address_line2           String?                  @db.VarChar(200)
+  city                    String?                  @db.VarChar(100)
+  state                   String?                  @db.VarChar(2)
+  postal_code             String?                  @db.VarChar(20)
+  country                 String?                  @default("US") @db.VarChar(2)
+  latitude                Decimal?                 @db.Decimal(10, 8)
+  longitude               Decimal?                 @db.Decimal(11, 8)
+  timezone                String?                  @default("America/New_York") @db.VarChar(50)
+  phone                   String?                  @db.VarChar(50)
+  email                   String?                  @db.VarChar(255)
+  website                 String?                  @db.VarChar(255)
+  business_type           String?                  @db.VarChar(50)
+  pricing_tier            String?                  @db.VarChar(20)
+  subscription_tier       String?                  @default("salon") @db.VarChar(20)
+  subscription_seats      Int?                     @default(5)
+  subscription_expires_at DateTime?                @db.Timestamp(6)
+  features_enabled        Json?                    @default("{\"analytics\": true, \"api_access\": false, \"multi_location\": false, \"inventory_management\": false}")
   preferred_brands        String[]
-  active_stylists         Int?                   @default(0)
-  total_clients           Int?                   @default(0)
-  monthly_formulations    Int?                   @default(0)
-  settings                Json?                  @default("{}")
-  created_at              DateTime?              @default(now()) @db.Timestamp(6)
-  updated_at              DateTime?              @default(now()) @db.Timestamp(6)
-  formulaBudget           Decimal?               @default(0) @db.Decimal(10, 2)
-  salon_pin               String?                @db.VarChar(255)
-  salon_pin_set           Boolean?               @default(false)
+  active_stylists         Int?                     @default(0)
+  total_clients           Int?                     @default(0)
+  monthly_formulations    Int?                     @default(0)
+  settings                Json?                    @default("{}")
+  created_at              DateTime?                @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?                @default(now()) @db.Timestamp(6)
+  formulaBudget           Decimal?                 @default(0) @db.Decimal(10, 2)
+  salon_pin               String?                  @db.VarChar(255)
+  salon_pin_set           Boolean?                 @default(false)
   trusted_stylists        String[]
   clients                 clients[]
   formula_purchases       formula_purchases[]
+  formula_queue           formula_queue[]
   formula_usage_log       formula_usage_log[]
   formulation_sessions    formulation_sessions[]
+  inventory_items         inventory_items[]
+  inventory_transactions  inventory_transactions[]
   learning_events         learning_events[]
   salon_devices           salon_devices[]
   session_codes           session_codes[]
-  square_connections       square_connections[]
-  inventory_items          inventory_items[]
-  inventory_transactions   inventory_transactions[]
+  square_connections      square_connections?
   stylists                stylists[]
 
   @@index([slug], map: "idx_salons_slug")
@@ -627,6 +628,7 @@ model stylists {
   community_posts         community_posts[]
   formula_history         formula_history[]
   formula_photos          formula_photos[]
+  formula_queue           formula_queue[]
   formulations            formulations[]
   learning_events         learning_events[]
   photo_analyses          photo_analyses[]
@@ -693,18 +695,18 @@ model texture_analyses {
 }
 
 model users {
-  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email         String     @unique @db.VarChar(255)
-  apple_id      String?    @unique
-  password_hash String     @db.VarChar(255)
-  first_name    String?    @db.VarChar(100)
-  last_name     String?    @db.VarChar(100)
-  role          String?    @default("stylist") @db.VarChar(50)
-  is_active     Boolean?   @default(true)
-  created_at    DateTime?  @default(now()) @db.Timestamp(6)
-  updated_at    DateTime?  @default(now()) @db.Timestamp(6)
-  formulas      formulas[]
+  id                String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email             String                     @unique @db.VarChar(255)
+  password_hash     String                     @db.VarChar(255)
+  first_name        String?                    @db.VarChar(100)
+  last_name         String?                    @db.VarChar(100)
+  role              String?                    @default("stylist") @db.VarChar(50)
+  is_active         Boolean?                   @default(true)
+  created_at        DateTime?                  @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?                  @default(now()) @db.Timestamp(6)
+  apple_id          String?                    @unique
   photo_collections client_photo_collections[]
+  formulas          formulas[]
 
   @@index([email], map: "idx_users_email")
 }
@@ -795,15 +797,15 @@ model InventoryItem {
 }
 
 model BowlRemainder {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  salonId       String    @db.Uuid
-  shadeCode     String    @db.VarChar(50)
-  brand         String    @db.VarChar(100)
-  shadeName     String?   @db.VarChar(100)
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salonId        String    @db.Uuid
+  shadeCode      String    @db.VarChar(50)
+  brand          String    @db.VarChar(100)
+  shadeName      String?   @db.VarChar(100)
   remainingGrams Decimal   @db.Decimal(8, 2)
-  createdAt     DateTime? @default(now()) @db.Timestamp(6)
-  expiresAt     DateTime? @db.Timestamp(6)
-  sourceBowlId  String?   @db.VarChar(100)
+  createdAt      DateTime? @default(now()) @db.Timestamp(6)
+  expiresAt      DateTime? @db.Timestamp(6)
+  sourceBowlId   String?   @db.VarChar(100)
 
   @@unique([salonId, brand, shadeCode])
   @@index([salonId], map: "idx_bowl_remainders_salon")
@@ -844,6 +846,8 @@ model salon_devices {
   deviceName        String?  @db.VarChar(100)
   lastSeen          DateTime @default(now()) @db.Timestamp(6)
   createdAt         DateTime @default(now()) @db.Timestamp(6)
+  deviceCode        String?  @db.VarChar(4)
+  deviceType        String?  @default("ipad") @db.VarChar(20)
   salons            salons   @relation(fields: [salonId], references: [id])
 
   @@unique([salonId, deviceFingerprint], map: "uniq_salon_device")
@@ -851,36 +855,36 @@ model salon_devices {
 }
 
 model formula_photos {
-  id              String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  formula_id      String                   @db.Uuid
-  stylist_id      String                   @db.Uuid
-  client_id       String?                  @db.Uuid
-  before_url      String?
-  after_url       String
-  caption         String?                  @db.VarChar(500)
-  hair_type       String?                  @db.VarChar(20)
-  porosity        String?                  @db.VarChar(20)
-  level_before    Int?
-  level_after     Int?
-  tone_before     String?                  @db.VarChar(10)
-  tone_after      String?                  @db.VarChar(10)
-  developer_vol   Int?
-  processing_time Int?
-  is_featured     Boolean?                 @default(false)
-  is_approved     Boolean?                 @default(true)
-  upvotes         Int?                     @default(0)
-  downvotes       Int?                     @default(0)
-  score           Decimal?                 @default(0) @db.Decimal(5, 2)
-  view_count      Int?                     @default(0)
-  created_at      DateTime?                @default(now()) @db.Timestamp(6)
-  updated_at      DateTime?                @default(now()) @db.Timestamp(6)
-  photo_comments  formula_photo_comments[]
-  photo_tags      formula_photo_tags[]
-  photo_votes     formula_photo_votes[]
+  id                 String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  formula_id         String                     @db.Uuid
+  stylist_id         String                     @db.Uuid
+  client_id          String?                    @db.Uuid
+  before_url         String?
+  after_url          String
+  caption            String?                    @db.VarChar(500)
+  hair_type          String?                    @db.VarChar(20)
+  porosity           String?                    @db.VarChar(20)
+  level_before       Int?
+  level_after        Int?
+  tone_before        String?                    @db.VarChar(10)
+  tone_after         String?                    @db.VarChar(10)
+  developer_vol      Int?
+  processing_time    Int?
+  is_featured        Boolean?                   @default(false)
+  is_approved        Boolean?                   @default(true)
+  upvotes            Int?                       @default(0)
+  downvotes          Int?                       @default(0)
+  score              Decimal?                   @default(0) @db.Decimal(5, 2)
+  view_count         Int?                       @default(0)
+  created_at         DateTime?                  @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?                  @default(now()) @db.Timestamp(6)
   client_collections client_photo_collections[]
-  clients         clients?                 @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  formulas        formulas                 @relation(fields: [formula_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  stylists        stylists                 @relation(fields: [stylist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  photo_comments     formula_photo_comments[]
+  photo_tags         formula_photo_tags[]
+  photo_votes        formula_photo_votes[]
+  clients            clients?                   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  formulas           formulas                   @relation(fields: [formula_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  stylists           stylists                   @relation(fields: [stylist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([formula_id], map: "idx_formula_photos_formula")
   @@index([stylist_id], map: "idx_formula_photos_stylist")
@@ -924,9 +928,8 @@ model client_photo_collections {
   status                 String         @default("saved") @db.VarChar(20)
   created_at             DateTime?      @default(now()) @db.Timestamp(6)
   updated_at             DateTime?      @default(now()) @db.Timestamp(6)
-
-  client users         @relation(fields: [client_id], references: [id], onDelete: Cascade)
-  photo  formula_photos @relation(fields: [photo_id], references: [id], onDelete: Cascade)
+  client                 users          @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  photo                  formula_photos @relation(fields: [photo_id], references: [id], onDelete: Cascade)
 
   @@unique([client_id, photo_id], map: "uniq_client_photo")
   @@index([client_id], map: "idx_collections_client")
@@ -1103,30 +1106,30 @@ model client_visits {
 }
 
 model inventory_items {
-  id                  String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  salon_id            String                  @db.Uuid
-  source              String                  @default("manual") @db.VarChar(20)
-  square_catalog_object_id String?           @db.VarChar(255)
-  square_variation_id String?                 @db.VarChar(255)
-  brand               String?                 @db.VarChar(100)
-  product_line        String?                 @db.VarChar(100)
-  shade_code          String?                 @db.VarChar(50)
-  shade_name          String?                 @db.VarChar(100)
-  category            String?                 @db.VarChar(50)
-  quantity_on_hand    Int                     @default(0)
-  quantity_committed  Int                     @default(0)
-  unit_of_measure     String?                 @default("units") @db.VarChar(20)
-  low_stock_threshold Int                     @default(3)
-  cost_per_unit       Decimal?                @db.Decimal(10, 2)
-  retail_price        Decimal?                @db.Decimal(10, 2)
-  reorder_point       Int?
-  reorder_quantity    Int?
-  is_active           Boolean                 @default(true)
-  last_synced_at      DateTime?               @db.Timestamp(6)
-  created_at          DateTime?               @default(now()) @db.Timestamp(6)
-  updated_at          DateTime?               @default(now()) @db.Timestamp(6)
-  salon               salons                  @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  transactions        inventory_transactions[]
+  id                       String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id                 String                   @db.Uuid
+  source                   String                   @default("manual") @db.VarChar(20)
+  square_catalog_object_id String?                  @db.VarChar(255)
+  square_variation_id      String?                  @db.VarChar(255)
+  brand                    String?                  @db.VarChar(100)
+  product_line             String?                  @db.VarChar(100)
+  shade_code               String?                  @db.VarChar(50)
+  shade_name               String?                  @db.VarChar(100)
+  category                 String?                  @db.VarChar(50)
+  quantity_on_hand         Int                      @default(0)
+  quantity_committed       Int                      @default(0)
+  unit_of_measure          String?                  @default("units") @db.VarChar(20)
+  low_stock_threshold      Int                      @default(3)
+  cost_per_unit            Decimal?                 @db.Decimal(10, 2)
+  retail_price             Decimal?                 @db.Decimal(10, 2)
+  reorder_point            Int?
+  reorder_quantity         Int?
+  is_active                Boolean                  @default(true)
+  last_synced_at           DateTime?                @db.Timestamp(6)
+  created_at               DateTime?                @default(now()) @db.Timestamp(6)
+  updated_at               DateTime?                @default(now()) @db.Timestamp(6)
+  salon                    salons                   @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  transactions             inventory_transactions[]
 
   @@unique([salon_id, brand, shade_code], map: "uniq_inventory_item_salon_brand_shade")
   @@index([salon_id], map: "idx_inventory_items_salon")
@@ -1137,24 +1140,24 @@ model inventory_items {
 }
 
 model inventory_transactions {
-  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  salon_id            String          @db.Uuid
-  item_id             String          @db.Uuid
-  transaction_type    String          @db.VarChar(20)
-  quantity_change     Int
-  quantity_before     Int
-  quantity_after      Int
-  unit_cost           Decimal?        @db.Decimal(10, 2)
-  total_cost          Decimal?        @db.Decimal(10, 2)
-  reason              String?         @db.VarChar(100)
-  notes               String?
-  reference_type      String?         @db.VarChar(50)
-  reference_id        String?         @db.Uuid
-  performed_by        String?         @db.Uuid
-  square_sync_id      String?         @db.VarChar(255)
-  created_at          DateTime?       @default(now()) @db.Timestamp(6)
-  salon               salons          @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  item                inventory_items @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id         String          @db.Uuid
+  item_id          String          @db.Uuid
+  transaction_type String          @db.VarChar(20)
+  quantity_change  Int
+  quantity_before  Int
+  quantity_after   Int
+  unit_cost        Decimal?        @db.Decimal(10, 2)
+  total_cost       Decimal?        @db.Decimal(10, 2)
+  reason           String?         @db.VarChar(100)
+  notes            String?
+  reference_type   String?         @db.VarChar(50)
+  reference_id     String?         @db.Uuid
+  performed_by     String?         @db.Uuid
+  square_sync_id   String?         @db.VarChar(255)
+  created_at       DateTime?       @default(now()) @db.Timestamp(6)
+  item             inventory_items @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  salon            salons          @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([salon_id], map: "idx_inventory_transactions_salon")
   @@index([item_id], map: "idx_inventory_transactions_item")
@@ -1164,25 +1167,52 @@ model inventory_transactions {
 }
 
 model square_connections {
-  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  salon_id              String    @unique @db.Uuid
-  square_merchant_id    String?   @db.VarChar(255)
-  access_token_encrypted String?  @db.Text
-  refresh_token_encrypted String? @db.Text
-  token_expires_at      DateTime? @db.Timestamp(6)
-  scopes                String[]
-  status                String    @default("disconnected") @db.VarChar(20)
-  last_sync_at          DateTime? @db.Timestamp(6)
-  sync_error            String?
-  sync_error_at         DateTime? @db.Timestamp(6)
-  square_location_id    String?   @db.VarChar(255)
-  square_location_name  String?   @db.VarChar(255)
-  auto_sync_enabled     Boolean   @default(false)
-  sync_interval_minutes Int?      @default(60)
-  created_at            DateTime? @default(now()) @db.Timestamp(6)
-  updated_at            DateTime? @default(now()) @db.Timestamp(6)
-  salon                 salons    @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id                String    @unique @db.Uuid
+  square_merchant_id      String?   @db.VarChar(255)
+  access_token_encrypted  String?
+  refresh_token_encrypted String?
+  token_expires_at        DateTime? @db.Timestamp(6)
+  scopes                  String[]
+  status                  String    @default("disconnected") @db.VarChar(20)
+  last_sync_at            DateTime? @db.Timestamp(6)
+  sync_error              String?
+  sync_error_at           DateTime? @db.Timestamp(6)
+  square_location_id      String?   @db.VarChar(255)
+  square_location_name    String?   @db.VarChar(255)
+  auto_sync_enabled       Boolean   @default(false)
+  sync_interval_minutes   Int?      @default(60)
+  created_at              DateTime? @default(now()) @db.Timestamp(6)
+  updated_at              DateTime? @default(now()) @db.Timestamp(6)
+  salon                   salons    @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([square_merchant_id], map: "idx_square_connections_merchant")
   @@index([status], map: "idx_square_connections_status")
+}
+
+model formula_queue {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id       String    @db.Uuid
+  stylist_id     String    @db.Uuid
+  client_name    String    @db.VarChar(255)
+  brand          String    @db.VarChar(100)
+  shades         Json
+  developer_vol  Int?
+  total_grams    Decimal?  @db.Decimal(8, 2)
+  formula_result Json?
+  status         String    @default("pending") @db.VarChar(20)
+  queue_position Int       @default(0)
+  device_code    String?   @db.VarChar(4)
+  weighed_grams  Decimal?  @db.Decimal(8, 2)
+  completed_at   DateTime? @db.Timestamptz(6)
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
+  salons         salons    @relation(fields: [salon_id], references: [id], onDelete: Cascade)
+  stylists       stylists  @relation(fields: [stylist_id], references: [id])
+
+  @@index([device_code, status], map: "idx_fq_device")
+  @@index([salon_id, device_code, queue_position], map: "idx_fq_position")
+  @@index([salon_id], map: "idx_fq_salon")
+  @@index([status], map: "idx_fq_status")
+  @@index([stylist_id], map: "idx_fq_stylist")
 }

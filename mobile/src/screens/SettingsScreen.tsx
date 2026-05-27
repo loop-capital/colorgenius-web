@@ -22,6 +22,7 @@ import {
   Smartphone,
 } from 'lucide-react-native';
 import { clearAuthToken, getSettings, saveNotifications, saveAutoSync, getDefaultBrand } from '../api/client';
+import { AuthContext } from '../../App';
 
 interface SettingRowProps {
   icon: React.ReactNode;
@@ -131,6 +132,8 @@ export default function SettingsScreen() {
     }
   };
 
+  const { logout } = React.useContext(AuthContext);
+
   const handleLogout = () => {
     Alert.alert(
       'Sign Out',
@@ -141,8 +144,7 @@ export default function SettingsScreen() {
           text: 'Sign Out',
           style: 'destructive',
           onPress: async () => {
-            await clearAuthToken();
-            Alert.alert('Signed Out', 'You have been signed out.');
+            await logout();
           },
         },
       ]

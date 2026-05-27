@@ -4,7 +4,7 @@ import { NavigationContainer, createNavigationContainerRef } from '@react-naviga
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getAuthToken } from './src/api/client';
+import { getAuthToken, clearAuthToken } from './src/api/client';
 import { Menu } from 'lucide-react-native';
 
 import DashboardScreen from './src/screens/DashboardScreen';
@@ -69,6 +69,11 @@ const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 // ─── Drawer context (avoids prop-drilling through wrapScreen) ─────────────────
 const DrawerContext = createContext<() => void>(() => {});
+
+// ─── Auth context (lets any screen trigger logout → login screen) ─────────────
+export const AuthContext = createContext<{ logout: () => Promise<void> }>({
+  logout: async () => {},
+});
 
 // ─── Custom Header ────────────────────────────────────────────────────────────
 function CustomHeader() {
@@ -145,6 +150,11 @@ function AppContent() {
 
   const openDrawer = useCallback(() => setDrawerVisible(true), []);
 
+  const handleLogout = useCallback(async () => {
+    await clearAuthToken();
+    setIsAuthenticated(false);
+  }, []);
+
   const handleNavigate = useCallback((route: string) => {
     setDrawerVisible(false);
     setTimeout(() => {
@@ -179,6 +189,7 @@ function AppContent() {
 
   // Authenticated — show app
   return (
+    <AuthContext.Provider value={{ logout: handleLogout }}>
     <DrawerContext.Provider value={openDrawer}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Dashboard" component={WrappedDashboard} />
@@ -205,8 +216,10 @@ function AppContent() {
         visible={drawerVisible}
         onClose={() => setDrawerVisible(false)}
         onNavigate={handleNavigate}
+        onLogout={handleLogout}
       />
     </DrawerContext.Provider>
+    </AuthContext.Provider>
   );
 }
 

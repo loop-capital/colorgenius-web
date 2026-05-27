@@ -1,6 +1,7 @@
 // ============================================================
-// QuestionnaireScreen — 4-Step Consultation (matches web app)
-// Steps: Client Profile → Current Hair State → Desired Result → Review
+// QuestionnaireScreen — 3-Step Client Intake
+// Step 1: Client Profile  →  Step 2: Hair Characteristics  →  Step 3: Review
+// Saves client via createClient(), then navigates to Formulate with autoPopulateData
 // ============================================================
 
 import React, { useState, useCallback } from 'react';
@@ -15,16 +16,28 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronRight, ChevronLeft, CheckCircle2, User, Phone, Mail, FileText } from 'lucide-react-native';
-import { submitFormulation } from '../api/client';
+import { ChevronRight, ChevronLeft, CheckCircle2, User, Phone, Mail, FileText, FlaskConical } from 'lucide-react-native';
+import { createClient } from '../api/client';
+import FormulaPicker from '../components/FormulaPicker';
 import {
-  HAIR_LEVEL_NAMES,
-  TONES,
+  TEXTURES,
+  HAIR_PATTERNS,
+  DENSITIES,
+  POROSITY,
+  SENSITIVITIES,
+  CHEMICAL_HISTORY_ITEMS,
+  LAST_SERVICE_OPTIONS,
   CONDITION_TYPES,
-  BRANDS,
-  type ToneValue,
+  type TextureType,
+  type HairPatternType,
+  type DensityType,
+  type Porosity,
+  type ConditionType,
+  type LastServiceType,
 } from '../types';
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
@@ -43,28 +56,19 @@ const COLORS = {
   yellow: '#F59E0B',
   danger: '#EF4444',
   success: '#22C55E',
+  chipBorder: 'rgba(255,255,255,0.12)',
+  chipBg: 'rgba(255,255,255,0.05)',
+  chipActiveBg: 'rgba(147,51,234,0.2)',
+  chipActiveBorder: '#9333EA',
 };
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const STEPS = [
   { id: 1, title: 'Client Profile', label: 'Profile' },
-  { id: 2, title: 'Current Hair State', label: 'Current' },
-  { id: 3, title: 'Desired Result', label: 'Desired' },
-  { id: 4, title: 'Review & Submit', label: 'Review' },
+  { id: 2, title: 'Hair Characteristics', label: 'Hair' },
+  { id: 3, title: 'Review', label: 'Review' },
 ] as const;
-
-const HAIR_CONDITIONS = [
-  { id: 'virgin', label: 'Virgin Hair' },
-  { id: 'previously_colored', label: 'Previously Colored' },
-  { id: 'bleached', label: 'Bleached / Lightened' },
-  { id: 'damaged', label: 'Damaged' },
-  { id: 'gray', label: 'Gray Coverage Needed' },
-  { id: 'dry', label: 'Dry / Brittle' },
-  { id: 'oily', label: 'Oily Scalp' },
-  { id: 'fine', label: 'Fine / Thin' },
-  { id: 'thick', label: 'Thick / Coarse' },
-];
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -73,14 +77,16 @@ interface FormData {
   phone: string;
   email: string;
   salonNotes: string;
-  currentLevel: number;
-  currentTone: string;
-  hairCondition: string[];
-  targetLevel: number;
-  targetTone: string;
-  brandPreference: string;
-  linePreference: string;
-  specialRequests: string;
+  // Hair characteristics (client-level, relatively permanent)
+  hairCondition: string[];  // keep existing
+  texture: TextureType | '';
+  hairPattern: HairPatternType | '';
+  density: DensityType | '';
+  porosity: Porosity | '';
+  grayPercent: number;
+  chemicalHistory: string[];
+  sensitivities: string[];
+  lastChemicalService: string;
 }
 
 const INITIAL_DATA: FormData = {
@@ -88,134 +94,16 @@ const INITIAL_DATA: FormData = {
   phone: '',
   email: '',
   salonNotes: '',
-  currentLevel: 5,
-  currentTone: 'N',
   hairCondition: [],
-  targetLevel: 7,
-  targetTone: 'N',
-  brandPreference: '',
-  linePreference: '',
-  specialRequests: '',
+  texture: '',
+  hairPattern: '',
+  density: '',
+  porosity: '',
+  grayPercent: 0,
+  chemicalHistory: [],
+  sensitivities: [],
+  lastChemicalService: '',
 };
-
-// ─── Level Selector ──────────────────────────────────────────────────────────
-
-function LevelSelector({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <View style={styles.levelSection}>
-      <Text style={styles.levelLabel}>{label}</Text>
-      <View style={styles.levelRow}>
-        {Array.from({ length: 10 }, (_, i) => i + 1).map((lvl) => (
-          <TouchableOpacity
-            key={lvl}
-            style={[styles.levelChip, value === lvl && styles.levelChipActive]}
-            onPress={() => onChange(lvl)}
-          >
-            <Text
-              style={[
-                styles.levelChipText,
-                value === lvl && styles.levelChipTextActive,
-              ]}
-            >
-              {lvl}
-            </Text>
-            <Text style={styles.levelName}>{HAIR_LEVEL_NAMES[lvl]}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  );
-}
-
-// ─── Tone Selector ─────────────────────────────────────────────────────────
-
-function ToneSelector({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <View style={styles.toneSection}>
-      <Text style={styles.toneLabel}>{label}</Text>
-      <View style={styles.toneGrid}>
-        {TONES.map((tone) => (
-          <TouchableOpacity
-            key={tone.value}
-            style={[styles.toneChip, value === tone.value && styles.toneChipActive]}
-            onPress={() => onChange(tone.value)}
-          >
-            <View style={[styles.toneSwatch, { backgroundColor: tone.color }]} />
-            <Text
-              style={[
-                styles.toneChipText,
-                value === tone.value && styles.toneChipTextActive,
-              ]}
-            >
-              {tone.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  );
-}
-
-// ─── Condition Selector ────────────────────────────────────────────────────
-
-function ConditionSelector({
-  value,
-  onChange,
-}: {
-  value: string[];
-  onChange: (v: string[]) => void;
-}) {
-  const toggle = (id: string) => {
-    if (value.includes(id)) {
-      onChange(value.filter((c) => c !== id));
-    } else {
-      onChange([...value, id]);
-    }
-  };
-
-  return (
-    <View style={styles.conditionSection}>
-      <Text style={styles.conditionLabel}>Hair Condition (select all that apply)</Text>
-      <View style={styles.conditionGrid}>
-        {HAIR_CONDITIONS.map((cond) => (
-          <TouchableOpacity
-            key={cond.id}
-            style={[
-              styles.conditionChip,
-              value.includes(cond.id) && styles.conditionChipActive,
-            ]}
-            onPress={() => toggle(cond.id)}
-          >
-            <Text
-              style={[
-                styles.conditionChipText,
-                value.includes(cond.id) && styles.conditionChipTextActive,
-              ]}
-            >
-              {cond.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-  );
-}
 
 // ─── Step Indicator ──────────────────────────────────────────────────────────
 
@@ -277,16 +165,199 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
   );
 }
 
+// ─── Gray Percentage Slider ──────────────────────────────────────────────────
+
+function GraySlider({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  return (
+    <View style={styles.graySliderContainer}>
+      <Text style={styles.graySliderLabel}>Gray Percentage</Text>
+      <View style={styles.graySliderRow}>
+        <Text style={styles.graySliderValue}>{value}%</Text>
+        <View style={styles.graySliderTrack}>
+          <View style={[styles.graySliderFill, { width: `${value}%` }]} />
+        </View>
+      </View>
+      <View style={styles.graySliderDotsRow}>
+        {[0, 25, 50, 75, 100].map((pct) => (
+          <Pressable key={pct} onPress={() => onChange(pct)} style={styles.graySliderDotBtn}>
+            <View
+              style={[
+                styles.graySliderDot,
+                value >= pct && styles.graySliderDotFilled,
+              ]}
+            />
+            <Text style={styles.graySliderDotLabel}>{pct}%</Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+// ─── Multi-Chip Selector ─────────────────────────────────────────────────────
+
+interface MultiChipSelectorProps {
+  label: string;
+  options: { value: string; label: string; desc?: string; danger?: boolean; icon?: string }[];
+  selected: string[];
+  onToggle: (value: string) => void;
+}
+
+function MultiChipSelector({ label, options, selected, onToggle }: MultiChipSelectorProps) {
+  return (
+    <View style={styles.chipSection}>
+      <Text style={styles.chipLabel}>{label}</Text>
+      <View style={styles.chipGrid}>
+        {options.map((opt) => {
+          const isSelected = selected.includes(opt.value);
+          return (
+            <TouchableOpacity
+              key={opt.value}
+              style={[
+                styles.chip,
+                isSelected && styles.chipActive,
+                opt.danger && !isSelected && styles.chipDanger,
+                opt.danger && isSelected && styles.chipDangerActive,
+              ]}
+              onPress={() => onToggle(opt.value)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
+                {opt.icon ? `${opt.icon} ` : ''}{opt.label}
+              </Text>
+              {opt.desc && (
+                <Text style={styles.chipDesc} numberOfLines={1}>
+                  {opt.desc}
+                </Text>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+// ─── Single-Chip Selector ────────────────────────────────────────────────────
+
+interface SingleChipSelectorProps<T extends string> {
+  label: string;
+  options: { value: T; label: string; desc?: string; color?: string }[];
+  selected: T;
+  onSelect: (value: T) => void;
+}
+
+function SingleChipSelector<T extends string>({
+  label,
+  options,
+  selected,
+  onSelect,
+}: SingleChipSelectorProps<T>) {
+  return (
+    <View style={styles.chipSection}>
+      <Text style={styles.chipLabel}>{label}</Text>
+      <View style={styles.chipGrid}>
+        {options.map((opt) => {
+          const isSelected = opt.value === selected;
+          return (
+            <TouchableOpacity
+              key={opt.value}
+              style={[
+                styles.chip,
+                isSelected && styles.chipActive,
+              ]}
+              onPress={() => onSelect(opt.value)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
+                {opt.label}
+              </Text>
+              {opt.desc && (
+                <Text style={styles.chipDesc} numberOfLines={1}>
+                  {opt.desc}
+                </Text>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+// ─── Condition Selector (existing multi-select, adapted) ──────────────────────
+
+function ConditionSelector({
+  value,
+  onChange,
+}: {
+  value: string[];
+  onChange: (v: string[]) => void;
+}) {
+  const toggle = (id: string) => {
+    if (value.includes(id)) {
+      onChange(value.filter((c) => c !== id));
+    } else {
+      onChange([...value, id]);
+    }
+  };
+
+  return (
+    <View style={styles.chipSection}>
+      <Text style={styles.chipLabel}>Hair Condition (select all that apply)</Text>
+      <View style={styles.chipGrid}>
+        {CONDITION_TYPES.map((cond) => {
+          const isSelected = value.includes(cond.value);
+          return (
+            <TouchableOpacity
+              key={cond.value}
+              style={[
+                styles.chip,
+                isSelected && styles.chipActive,
+              ]}
+              onPress={() => toggle(cond.value)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>
+                {cond.label}
+              </Text>
+              {cond.desc && (
+                <Text style={styles.chipDesc} numberOfLines={1}>
+                  {cond.desc}
+                </Text>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function QuestionnaireScreen({ navigation }: any) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(INITIAL_DATA);
   const [loading, setLoading] = useState(false);
+  const [showFormulaPicker, setShowFormulaPicker] = useState(false);
 
   const updateField = useCallback(
     <K extends keyof FormData>(field: K, value: FormData[K]) => {
       setFormData((prev) => ({ ...prev, [field]: value }));
+    },
+    []
+  );
+
+  const toggleArray = useCallback(
+    (field: 'hairCondition' | 'chemicalHistory' | 'sensitivities', value: string) => {
+      setFormData((prev) => {
+        const current = prev[field];
+        const updated = current.includes(value)
+          ? current.filter((v) => v !== value)
+          : [...current, value];
+        return { ...prev, [field]: updated };
+      });
     },
     []
   );
@@ -296,7 +367,7 @@ export default function QuestionnaireScreen({ navigation }: any) {
       Alert.alert('Required', 'Please enter the client name');
       return;
     }
-    if (step < 4) {
+    if (step < 3) {
       setStep(step + 1);
     }
   };
@@ -307,43 +378,105 @@ export default function QuestionnaireScreen({ navigation }: any) {
     }
   };
 
-  const handleSubmit = async () => {
+  const validateStep2 = (): boolean => {
+    if (formData.texture === '') {
+      Alert.alert('Required', 'Please select hair texture');
+      return false;
+    }
+    if (formData.hairPattern === '') {
+      Alert.alert('Required', 'Please select hair pattern');
+      return false;
+    }
+    if (formData.density === '') {
+      Alert.alert('Required', 'Please select hair density');
+      return false;
+    }
+    if (formData.porosity === '') {
+      Alert.alert('Required', 'Please select hair porosity');
+      return false;
+    }
+    return true;
+  };
+
+  const buildClientPayload = () => {
+    return {
+      name: formData.clientName.trim(),
+      email: formData.email.trim() || undefined,
+      phone: formData.phone.trim() || undefined,
+      notes: formData.salonNotes.trim() || undefined,
+      conditions: [
+        ...(formData.texture ? [`Texture: ${formData.texture}`] : []),
+        ...(formData.hairPattern ? [`Pattern: ${formData.hairPattern}`] : []),
+        ...(formData.density ? [`Density: ${formData.density}`] : []),
+        ...(formData.porosity ? [`Porosity: ${formData.porosity}`] : []),
+        ...(formData.grayPercent > 0 ? [`Gray: ${formData.grayPercent}%`] : []),
+        ...(formData.lastChemicalService ? [`Last Service: ${formData.lastChemicalService}`] : []),
+        ...formData.hairCondition,
+        ...formData.chemicalHistory,
+        ...formData.sensitivities,
+      ],
+    };
+  };
+
+  const handleSaveClient = async () => {
+    if (step === 2 && !validateStep2()) return;
+    if (!formData.clientName.trim()) {
+      Alert.alert('Required', 'Please enter the client name');
+      return;
+    }
+
     setLoading(true);
     try {
-      // Build formulation input from consultation data
-      const conditionTypes = ['virgin', 'previously_colored', 'damaged', 'highly_damaged', 'bleached', 'gray_coverage', 'oily_scalp', 'dry_brittle'] as const;
-      const matchedType = formData.hairCondition.find((c) => conditionTypes.includes(c as any)) as typeof conditionTypes[number] | undefined;
-      const input = {
-        texture: 'medium' as const,
-        hairPattern: 'straight' as const,
-        density: 'medium' as const,
-        currentLevel: formData.currentLevel,
-        currentTone: formData.currentTone as ToneValue,
-        targetLevel: formData.targetLevel,
-        targetTone: formData.targetTone as ToneValue,
-        brandPreference: formData.brandPreference || undefined,
-        linePreference: formData.linePreference || undefined,
-        chemicalHistory: [],
-        sensitivities: [],
-        condition: {
-          type: matchedType,
-          porosity: 'normal' as const,
-        },
-        specialRequests: formData.specialRequests,
-      };
-
-      const result = await submitFormulation(input);
-      if (result.success) {
-        Alert.alert('Success', 'Consultation saved! Formula created.', [
+      const payload = buildClientPayload();
+      const response = await createClient(payload);
+      if (response.client) {
+        Alert.alert('Success', `Client "${formData.clientName}" saved!`, [
           {
-            text: 'View Formula',
-            onPress: () => navigation.navigate('Formulate', { initialStep: 6 }),
+            text: 'OK',
+            onPress: () => navigation.navigate('Dashboard'),
           },
-          { text: 'Done', style: 'cancel' },
         ]);
       }
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to create formula');
+      Alert.alert('Error', err.message || 'Failed to save client');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveAndFormulate = async () => {
+    if (step === 2 && !validateStep2()) return;
+    if (!formData.clientName.trim()) {
+      Alert.alert('Required', 'Please enter the client name');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload = buildClientPayload();
+      const response = await createClient(payload);
+      if (response.client?.id) {
+        const savedClientId = response.client.id;
+        navigation.navigate('Formulate', {
+          clientId: savedClientId,
+          clientName: formData.clientName,
+          autoPopulateData: {
+            texture: formData.texture,
+            hairPattern: formData.hairPattern,
+            density: formData.density,
+            conditionType: formData.hairCondition[0] || 'previously_colored',
+            porosity: formData.porosity,
+            grayPercent: formData.grayPercent,
+            chemicalHistory: formData.chemicalHistory,
+            sensitivities: formData.sensitivities,
+            lastChemicalService: formData.lastChemicalService,
+          },
+        });
+      } else {
+        Alert.alert('Error', 'Client saved but no ID returned');
+      }
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'Failed to save client');
     } finally {
       setLoading(false);
     }
@@ -411,117 +544,173 @@ export default function QuestionnaireScreen({ navigation }: any) {
 
   const renderStep2 = () => (
     <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>Current Hair State</Text>
-      <Text style={styles.stepDesc}>Document the current hair condition</Text>
+      <Text style={styles.stepTitle}>Hair Characteristics</Text>
+      <Text style={styles.stepDesc}>Document permanent hair traits for this client</Text>
 
-      <LevelSelector
-        label="Current Level"
-        value={formData.currentLevel}
-        onChange={(v) => updateField('currentLevel', v)}
+      {/* Texture */}
+      <SingleChipSelector
+        label="Texture"
+        options={TEXTURES}
+        selected={formData.texture}
+        onSelect={(v) => updateField('texture', v)}
       />
 
-      <ToneSelector
-        label="Current Tone"
-        value={formData.currentTone}
-        onChange={(v) => updateField('currentTone', v)}
+      {/* Hair Pattern */}
+      <SingleChipSelector
+        label="Hair Pattern"
+        options={HAIR_PATTERNS}
+        selected={formData.hairPattern}
+        onSelect={(v) => updateField('hairPattern', v)}
       />
 
+      {/* Density */}
+      <SingleChipSelector
+        label="Density"
+        options={DENSITIES}
+        selected={formData.density}
+        onSelect={(v) => updateField('density', v)}
+      />
+
+      {/* Porosity */}
+      <SingleChipSelector
+        label="Porosity"
+        options={POROSITY.map((p) => ({ ...p, desc: undefined }))}
+        selected={formData.porosity}
+        onSelect={(v) => updateField('porosity', v)}
+      />
+
+      {/* Gray Percentage */}
+      <GraySlider
+        value={formData.grayPercent}
+        onChange={(v) => updateField('grayPercent', v)}
+      />
+
+      {/* Condition Types (existing multi-select) */}
       <ConditionSelector
         value={formData.hairCondition}
         onChange={(v) => updateField('hairCondition', v)}
+      />
+
+      {/* Chemical History */}
+      <MultiChipSelector
+        label="Chemical History"
+        options={CHEMICAL_HISTORY_ITEMS}
+        selected={formData.chemicalHistory}
+        onToggle={(v) => toggleArray('chemicalHistory', v)}
+      />
+
+      {/* Sensitivities */}
+      <MultiChipSelector
+        label="Sensitivities"
+        options={SENSITIVITIES}
+        selected={formData.sensitivities}
+        onToggle={(v) => toggleArray('sensitivities', v)}
+      />
+
+      {/* Last Chemical Service */}
+      <SingleChipSelector
+        label="Last Chemical Service"
+        options={LAST_SERVICE_OPTIONS}
+        selected={formData.lastChemicalService as LastServiceType | ''}
+        onSelect={(v) => updateField('lastChemicalService', v)}
       />
     </View>
   );
 
   const renderStep3 = () => (
     <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>Desired Result</Text>
-      <Text style={styles.stepDesc}>Define the target color and preferences</Text>
+      <Text style={styles.stepTitle}>Review</Text>
+      <Text style={styles.stepDesc}>Review client info and hair characteristics</Text>
 
-      <LevelSelector
-        label="Target Level"
-        value={formData.targetLevel}
-        onChange={(v) => updateField('targetLevel', v)}
-      />
-
-      <ToneSelector
-        label="Target Tone"
-        value={formData.targetTone}
-        onChange={(v) => updateField('targetTone', v)}
-      />
-
-      {/* Brand Preference */}
-      <View style={styles.brandSection}>
-        <Text style={styles.brandLabel}>Brand Preference</Text>
-        <View style={styles.brandGrid}>
-          {BRANDS.map((brand) => (
-            <TouchableOpacity
-              key={brand}
-              style={[
-                styles.brandChip,
-                formData.brandPreference === brand && styles.brandChipActive,
-              ]}
-              onPress={() => updateField('brandPreference', brand)}
-            >
-              <Text
-                style={[
-                  styles.brandChipText,
-                  formData.brandPreference === brand && styles.brandChipTextActive,
-                ]}
-              >
-                {brand}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      {/* Special Requests */}
-      <View style={styles.inputGroup}>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Special requests or notes..."
-          placeholderTextColor={COLORS.textMuted}
-          multiline
-          numberOfLines={3}
-          value={formData.specialRequests}
-          onChangeText={(v) => updateField('specialRequests', v)}
-        />
-      </View>
-    </View>
-  );
-
-  const renderStep4 = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>Review & Submit</Text>
-      <Text style={styles.stepDesc}>Review all details before creating the formula</Text>
-
+      {/* Client Info */}
       <View style={styles.reviewCard}>
-        <Text style={styles.reviewSectionTitle}>Client</Text>
+        <Text style={styles.reviewSectionTitle}>Client Profile</Text>
         <Text style={styles.reviewText}>{formData.clientName || 'Not provided'}</Text>
-        {formData.phone && <Text style={styles.reviewSubtext}>{formData.phone}</Text>}
-        {formData.email && <Text style={styles.reviewSubtext}>{formData.email}</Text>}
+        {formData.phone ? <Text style={styles.reviewSubtext}>{formData.phone}</Text> : null}
+        {formData.email ? <Text style={styles.reviewSubtext}>{formData.email}</Text> : null}
+        {formData.salonNotes ? <Text style={styles.reviewSubtext}>Notes: {formData.salonNotes}</Text> : null}
+      </View>
 
-        <Text style={styles.reviewSectionTitle}>Current State</Text>
-        <Text style={styles.reviewText}>
-          Level {formData.currentLevel} — {TONES.find((t) => t.value === formData.currentTone)?.label || 'Natural'}
-        </Text>
+      {/* Hair Characteristics */}
+      <View style={styles.reviewCard}>
+        <Text style={styles.reviewSectionTitle}>Hair Characteristics</Text>
+        {formData.texture ? (
+          <Text style={styles.reviewText}>Texture: {TEXTURES.find((t) => t.value === formData.texture)?.label}</Text>
+        ) : null}
+        {formData.hairPattern ? (
+          <Text style={styles.reviewText}>Pattern: {HAIR_PATTERNS.find((p) => p.value === formData.hairPattern)?.label}</Text>
+        ) : null}
+        {formData.density ? (
+          <Text style={styles.reviewText}>Density: {DENSITIES.find((d) => d.value === formData.density)?.label}</Text>
+        ) : null}
+        {formData.porosity ? (
+          <Text style={styles.reviewText}>Porosity: {POROSITY.find((p) => p.value === formData.porosity)?.label}</Text>
+        ) : null}
+        <Text style={styles.reviewText}>Gray: {formData.grayPercent}%</Text>
         {formData.hairCondition.length > 0 && (
           <Text style={styles.reviewSubtext}>
-            {formData.hairCondition.map((c) => HAIR_CONDITIONS.find((h) => h.id === c)?.label).join(', ')}
+            Conditions: {formData.hairCondition.map((c) => CONDITION_TYPES.find((ct) => ct.value === c)?.label).filter(Boolean).join(', ')}
           </Text>
         )}
+        {formData.chemicalHistory.length > 0 && (
+          <Text style={styles.reviewSubtext}>
+            Chemical History: {formData.chemicalHistory.map((c) => CHEMICAL_HISTORY_ITEMS.find((ch) => ch.value === c)?.label).filter(Boolean).join(', ')}
+          </Text>
+        )}
+        {formData.sensitivities.length > 0 && (
+          <Text style={styles.reviewSubtext}>
+            Sensitivities: {formData.sensitivities.map((s) => SENSITIVITIES.find((sen) => sen.value === s)?.label).filter(Boolean).join(', ')}
+          </Text>
+        )}
+        {formData.lastChemicalService ? (
+          <Text style={styles.reviewSubtext}>
+            Last Service: {LAST_SERVICE_OPTIONS.find((l) => l.value === formData.lastChemicalService)?.label}
+          </Text>
+        ) : null}
+      </View>
 
-        <Text style={styles.reviewSectionTitle}>Desired Result</Text>
-        <Text style={styles.reviewText}>
-          Level {formData.targetLevel} — {TONES.find((t) => t.value === formData.targetTone)?.label || 'Natural'}
-        </Text>
-        {formData.brandPreference && (
-          <Text style={styles.reviewSubtext}>Brand: {formData.brandPreference}</Text>
-        )}
-        {formData.specialRequests && (
-          <Text style={styles.reviewSubtext}>Notes: {formData.specialRequests}</Text>
-        )}
+      {/* Action Buttons */}
+      <View style={styles.actionButtons}>
+        <TouchableOpacity
+          style={styles.applyFormulaBtn}
+          onPress={() => setShowFormulaPicker(true)}
+          activeOpacity={0.8}
+        >
+          <FlaskConical size={18} color={COLORS.purple} />
+          <Text style={styles.applyFormulaText}>Apply Saved Formula</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.saveBtn, loading && styles.saveBtnDisabled]}
+          onPress={handleSaveClient}
+          disabled={loading}
+          activeOpacity={0.8}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#FFF" />
+          ) : (
+            <>
+              <CheckCircle2 size={18} color="#FFF" />
+              <Text style={styles.saveBtnText}>Save Client</Text>
+            </>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.formulateBtn, loading && styles.saveBtnDisabled]}
+          onPress={handleSaveAndFormulate}
+          disabled={loading}
+          activeOpacity={0.8}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#FFF" />
+          ) : (
+            <>
+              <ChevronRight size={18} color="#FFF" />
+              <Text style={styles.formulateBtnText}>Save & Formulate</Text>
+            </>
+          )}
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -538,7 +727,6 @@ export default function QuestionnaireScreen({ navigation }: any) {
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderStep3()}
-          {step === 4 && renderStep4()}
 
           <View style={{ height: 40 }} />
         </ScrollView>
@@ -552,29 +740,44 @@ export default function QuestionnaireScreen({ navigation }: any) {
             </TouchableOpacity>
           )}
 
-          {step < 4 ? (
+          {step < 3 ? (
             <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
               <Text style={styles.nextBtnText}>Next</Text>
               <ChevronRight size={20} color="#FFF" />
             </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={[styles.nextBtn, loading && styles.nextBtnDisabled]}
-              onPress={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#FFF" />
-              ) : (
-                <>
-                  <Text style={styles.nextBtnText}>Create Formula</Text>
-                  <ChevronRight size={20} color="#FFF" />
-                </>
-              )}
-            </TouchableOpacity>
-          )}
+          ) : null}
         </View>
       </KeyboardAvoidingView>
+
+      {/* Formula Picker Modal */}
+      {showFormulaPicker && (
+        <Modal
+          visible={showFormulaPicker}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowFormulaPicker(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <FormulaPicker
+                visible={showFormulaPicker}
+                onSelect={(formula) => {
+                  setShowFormulaPicker(false);
+                  navigation.navigate('Formulate', {
+                    autoPopulateData: formula,
+                    clientName: formData.clientName,
+                  });
+                }}
+                onClose={() => setShowFormulaPicker(false)}
+                onCreateNew={() => {
+                  setShowFormulaPicker(false);
+                  navigation.navigate('Formulate');
+                }}
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -694,165 +897,119 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
 
-  // Level Selector
-  levelSection: {
+  // Chip Selector
+  chipSection: {
     marginBottom: 20,
   },
-  levelLabel: {
-    fontSize: 16,
+  chipLabel: {
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.textPrimary,
     marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  levelRow: {
+  chipGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
-  levelChip: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: COLORS.card,
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 2,
-  },
-  levelChipActive: {
-    backgroundColor: COLORS.purple,
-    borderColor: COLORS.purple,
-  },
-  levelChipText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.textPrimary,
-  },
-  levelChipTextActive: {
-    color: '#FFF',
-  },
-  levelName: {
-    fontSize: 8,
-    color: COLORS.textSecondary,
-  },
-
-  // Tone Selector
-  toneSection: {
-    marginBottom: 20,
-  },
-  toneLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: 12,
-  },
-  toneGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  toneChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  chip: {
     backgroundColor: COLORS.card,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    gap: 6,
+    alignItems: 'center',
   },
-  toneChipActive: {
+  chipActive: {
     backgroundColor: COLORS.purple,
     borderColor: COLORS.purple,
   },
-  toneSwatch: {
+  chipDanger: {
+    borderColor: 'rgba(239,68,68,0.3)',
+    backgroundColor: 'rgba(239,68,68,0.05)',
+  },
+  chipDangerActive: {
+    backgroundColor: 'rgba(239,68,68,0.2)',
+    borderColor: COLORS.danger,
+  },
+  chipText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+  },
+  chipTextActive: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  chipDesc: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+
+  // Gray Slider
+  graySliderContainer: {
+    marginBottom: 20,
+  },
+  graySliderLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  graySliderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 8,
+  },
+  graySliderValue: {
+    color: COLORS.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+    width: 48,
+    textAlign: 'center',
+  },
+  graySliderTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden',
+  },
+  graySliderFill: {
+    height: '100%',
+    backgroundColor: COLORS.purple,
+    borderRadius: 3,
+  },
+  graySliderDotsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
+  },
+  graySliderDotBtn: {
+    alignItems: 'center',
+  },
+  graySliderDot: {
     width: 16,
     height: 16,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 2,
+    borderColor: COLORS.chipBorder,
+    backgroundColor: 'transparent',
+    marginBottom: 4,
   },
-  toneChipText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-  toneChipTextActive: {
-    color: '#FFF',
-    fontWeight: '600',
-  },
-
-  // Condition Selector
-  conditionSection: {
-    marginBottom: 20,
-  },
-  conditionLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: 12,
-  },
-  conditionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  conditionChip: {
-    backgroundColor: COLORS.card,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  conditionChipActive: {
-    backgroundColor: COLORS.purple,
+  graySliderDotFilled: {
     borderColor: COLORS.purple,
-  },
-  conditionChipText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-  conditionChipTextActive: {
-    color: '#FFF',
-    fontWeight: '600',
-  },
-
-  // Brand Selector
-  brandSection: {
-    marginBottom: 20,
-  },
-  brandLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: COLORS.textPrimary,
-    marginBottom: 12,
-  },
-  brandGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  brandChip: {
-    backgroundColor: COLORS.card,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  brandChipActive: {
     backgroundColor: COLORS.purple,
-    borderColor: COLORS.purple,
   },
-  brandChipText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-  },
-  brandChipTextActive: {
-    color: '#FFF',
-    fontWeight: '600',
+  graySliderDotLabel: {
+    fontSize: 10,
+    color: COLORS.textMuted,
   },
 
   // Review
@@ -862,21 +1019,70 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     padding: 16,
-    gap: 8,
+    marginBottom: 12,
+    gap: 4,
   },
   reviewSectionTitle: {
     fontSize: 14,
     fontWeight: '700',
     color: COLORS.purple,
-    marginTop: 8,
+    marginBottom: 4,
   },
   reviewText: {
     fontSize: 15,
     color: COLORS.textPrimary,
+    marginBottom: 2,
   },
   reviewSubtext: {
     fontSize: 13,
     color: COLORS.textSecondary,
+  },
+
+  // Action Buttons
+  actionButtons: {
+    gap: 12,
+    marginTop: 8,
+  },
+  saveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.purple,
+    borderRadius: 14,
+    paddingVertical: 14,
+    gap: 8,
+    shadowColor: COLORS.purple,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  saveBtnDisabled: {
+    opacity: 0.5,
+  },
+  saveBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  formulateBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.pink,
+    borderRadius: 14,
+    paddingVertical: 14,
+    gap: 8,
+    shadowColor: COLORS.pink,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  formulateBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFF',
   },
 
   // Buttons
@@ -908,12 +1114,40 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 6,
   },
-  nextBtnDisabled: {
-    opacity: 0.5,
-  },
   nextBtnText: {
     fontSize: 15,
     fontWeight: '600',
     color: '#FFF',
+  },
+  // Formula Picker Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: COLORS.bg,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '85%',
+    paddingTop: 16,
+    flex: 1,
+  },
+  applyFormulaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.purple,
+    paddingVertical: 14,
+    marginBottom: 10,
+  },
+  applyFormulaText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.purple,
   },
 });

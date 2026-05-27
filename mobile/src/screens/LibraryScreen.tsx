@@ -29,8 +29,10 @@ import {
   Filter,
   Bookmark,
   ShoppingBag,
+  Plus,
 } from 'lucide-react-native';
 import { apiRequest } from '../api/client';
+import ManualFormulaEntry from '../components/ManualFormulaEntry';
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
 
@@ -173,6 +175,7 @@ export default function LibraryScreen({ navigation }: any) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [refreshing, setRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showManualEntry, setShowManualEntry] = useState(false);
 
   // Fetch formulas from API
   const fetchFormulas = useCallback(async () => {
@@ -775,6 +778,35 @@ export default function LibraryScreen({ navigation }: any) {
           </View>
         </View>
       </Modal>
+
+      {/* Floating Add Formula Button */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => setShowManualEntry(true)}
+        activeOpacity={0.8}
+      >
+        <Plus size={24} color="#FFF" />
+      </TouchableOpacity>
+
+      {/* Manual Entry Modal */}
+      <Modal
+        visible={showManualEntry}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowManualEntry(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { maxHeight: '95%', paddingTop: 0 }]}>
+            <ManualFormulaEntry
+              onClose={() => setShowManualEntry(false)}
+              onSaved={() => {
+                setShowManualEntry(false);
+                fetchFormulas();
+              }}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -1315,5 +1347,22 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: '#FFF',
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.purple,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: COLORS.purple,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+    zIndex: 100,
   },
 });

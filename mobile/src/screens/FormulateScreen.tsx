@@ -27,11 +27,22 @@ import {
   Sparkles,
   AlertTriangle,
   CheckCircle2,
+  Smartphone,
+  Send,
+  Bluetooth,
+  Save,
+  ShoppingBag,
+  FlaskConical,
 } from 'lucide-react-native';
 import {
   submitFormulation,
   type FormulationInput,
   type FormulationResult,
+  createSession,
+  getSession,
+  sendFormulaToDevice,
+  getDevices,
+  saveFormulation,
 } from '../api/client';
 import {
   HAIR_LEVEL_NAMES,
@@ -56,6 +67,7 @@ import {
   type ConditionType,
   type LastServiceType,
 } from '../types';
+// Manual formula entry is handled inline via ManualFormulaForm below
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 
@@ -600,6 +612,8 @@ function NavButtons({
   onNext,
   nextLabel,
   disabled,
+  showAddFormula,
+  onAddFormula,
 }: {
   step: number;
   totalSteps: number;
@@ -607,6 +621,8 @@ function NavButtons({
   onNext: () => void;
   nextLabel?: string;
   disabled?: boolean;
+  showAddFormula?: boolean;
+  onAddFormula?: () => void;
 }) {
   const isFirst = step === 1;
   const isLast = step === totalSteps;
@@ -621,6 +637,17 @@ function NavButtons({
         <ChevronLeft size={18} color={isFirst ? COLORS.textMuted : COLORS.textSecondary} />
         <Text style={[navStyles.backText, isFirst && navStyles.backTextDisabled]}>Back</Text>
       </TouchableOpacity>
+
+      {showAddFormula && onAddFormula && (
+        <TouchableOpacity
+          style={navStyles.addFormulaBtn}
+          onPress={onAddFormula}
+          activeOpacity={0.8}
+        >
+          <FlaskConical size={18} color="#FFF" />
+          <Text style={navStyles.addFormulaText}>Add Formula</Text>
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity
         style={[navStyles.nextBtn, disabled && navStyles.nextBtnDisabled]}
@@ -670,11 +697,30 @@ const navStyles = StyleSheet.create({
   },
   nextBtnDisabled: { opacity: 0.5 },
   nextText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
+  addFormulaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: COLORS.pink,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    shadowColor: COLORS.pink,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  addFormulaText: { fontSize: 14, fontWeight: '600', color: '#FFF' },
 });
 
 // ─── Result Card ─────────────────────────────────────────────────────────────
 
-function ResultCard({ result }: { result: FormulationResult }) {
+function ResultCard({ result, onSendToDevice }: { result: FormulationResult; onSendToDevice?: () => void }) {
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
   if (!result || !result.steps) {
     return (
       <View style={resultStyles.card}>
@@ -682,6 +728,19 @@ function ResultCard({ result }: { result: FormulationResult }) {
       </View>
     );
   }
+
+  const handleSave = async (isPublic: boolean) => {
+    if (saving || saved) return;
+    setSaving(true);
+    try {
+      await saveFormulation({ ...result, isPublic });
+      setSaved(true);
+    } catch (err) {
+      Alert.alert('Error', 'Failed to save formula. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <View style={resultStyles.card}>
@@ -781,6 +840,48 @@ function ResultCard({ result }: { result: FormulationResult }) {
           <Text style={resultStyles.strandTestText}>Strand test recommended</Text>
         </View>
       )}
+
+      {/* Save / Marketplace Buttons */}
+      {saved ? (
+        <View style={resultStyles.savedCheck}>
+          <CheckCircle2 size={20} color={COLORS.success} />
+          <Text style={resultStyles.savedText}>Saved!</Text>
+        </View>
+      ) : (
+        <View style={resultStyles.actionRow}>
+          <TouchableOpacity
+            style={[resultStyles.saveBtn, saving && resultStyles.saveBtnDisabled]}
+            onPress={() => handleSave(false)}
+            activeOpacity={0.8}
+            disabled={saving}
+          >
+            <Save size={16} color="#FFF" />
+            <Text style={resultStyles.saveBtnText}>Save to My Formulas</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[resultStyles.marketBtn, saving && resultStyles.marketBtnDisabled]}
+            onPress={() => handleSave(true)}
+            activeOpacity={0.8}
+            disabled={saving}
+          >
+            <ShoppingBag size={16} color={COLORS.pink} />
+            <Text style={resultStyles.marketBtnText}>List on Marketplace</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Send to Color Bar iPad Button */}
+      {onSendToDevice && (
+        <TouchableOpacity
+          style={resultStyles.sendBtn}
+          onPress={onSendToDevice}
+          activeOpacity={0.8}
+        >
+          <Bluetooth size={18} color="#FFF" />
+          <Text style={resultStyles.sendBtnText}>Send to Color Bar iPad</Text>
+          <Send size={16} color="#FFF" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -871,6 +972,82 @@ const resultStyles = StyleSheet.create({
     borderRadius: 10,
   },
   strandTestText: { color: COLORS.warning, fontSize: 13, fontWeight: '600' },
+  sendBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.purple,
+    borderRadius: 14,
+    paddingVertical: 14,
+    marginTop: 16,
+    shadowColor: COLORS.purple,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  sendBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  actionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 16,
+  },
+  saveBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: COLORS.purple,
+    borderRadius: 12,
+    paddingVertical: 12,
+  },
+  saveBtnDisabled: { opacity: 0.5 },
+  saveBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  marketBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    paddingVertical: 12,
+    borderWidth: 1.5,
+    borderColor: COLORS.pink,
+  },
+  marketBtnDisabled: { opacity: 0.4 },
+  marketBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.pink,
+  },
+  savedCheck: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 16,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(34,197,94,0.08)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(34,197,94,0.2)',
+  },
+  savedText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.success,
+  },
 });
 
 // ─── Summary Section (Step 6) ────────────────────────────────────────────────
@@ -1002,6 +1179,8 @@ interface FormState {
   problemIndicators: string[];
   brandPreference: string;
   developerPreference: string;
+  sessionCode: string;
+  sessionId: string;
 }
 
 const INITIAL_STATE: FormState = {
@@ -1023,6 +1202,8 @@ const INITIAL_STATE: FormState = {
   problemIndicators: [],
   brandPreference: '',
   developerPreference: '',
+  sessionCode: '',
+  sessionId: '',
 };
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
@@ -1041,6 +1222,23 @@ export default function FormulateScreen({ navigation, route }: any) {
   const [result, setResult] = useState<FormulationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Manual formula entry state
+  const [showManualEntry, setShowManualEntry] = useState(false);
+
+  // Phone upload code state
+  const [sessionCode, setSessionCode] = useState('');
+  const [sessionId, setSessionId] = useState('');
+  const [sessionCodeLoading, setSessionCodeLoading] = useState(false);
+  const [uploadedPhotos, setUploadedPhotos] = useState<any[]>([]);
+  const [pollInterval, setPollInterval] = useState<ReturnType<typeof setInterval> | null>(null);
+
+  // Device sending state
+  const [devices, setDevices] = useState<any[]>([]);
+  const [showDevicePicker, setShowDevicePicker] = useState(false);
+  const [sendingToDevice, setSendingToDevice] = useState(false);
+  const [sendSuccess, setSendSuccess] = useState(false);
+  const [savingFormula, setSavingFormula] = useState(false);
+
   const updateField = useCallback(<K extends keyof FormState>(field: K, value: FormState[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
@@ -1053,6 +1251,44 @@ export default function FormulateScreen({ navigation, route }: any) {
         : [...current, value];
       return { ...prev, [field]: updated };
     });
+  }, []);
+
+  const handleSaveToLibrary = useCallback(async (isPublic = false) => {
+    if (!result) return;
+    setSavingFormula(true);
+    try {
+      const payload = {
+        name: `Formula ${new Date().toLocaleDateString()}`,
+        brand: result.brand || formData.brandPreference || 'Custom',
+        line: result.line || '',
+        developerVolume: String(result.developerVolume || ''),
+        processingTime: String(result.processingTime || ''),
+        application: result.application || '',
+        notes: result.notes || '',
+        isPublic,
+        components: result.steps.map((step: any) => ({
+          componentType: 'color',
+          brand: step.product?.brand || '',
+          shadeCode: step.product?.shadeCode || '',
+          shadeName: step.product?.name || '',
+          grams: step.grams || 0,
+          developerVolume: step.developer?.volume ? String(step.developer.volume) : undefined,
+          notes: step.notes || undefined,
+        })),
+      };
+      await saveFormulation(payload);
+      Alert.alert('Success', isPublic ? 'Formula listed on Marketplace!' : 'Formula saved to your library!');
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'Failed to save formula');
+    } finally {
+      setSavingFormula(false);
+    }
+  }, [result, formData.brandPreference]);
+
+  const handleManualEntrySaved = useCallback((manualResult: FormulationResult) => {
+    setShowManualEntry(false);
+    setResult(manualResult);
+    setStep(6);
   }, []);
 
   const handleNext = useCallback(() => {
@@ -1120,7 +1356,103 @@ export default function FormulateScreen({ navigation, route }: any) {
     setStep(1);
     setResult(null);
     setError(null);
-  }, []);
+    setSessionCode('');
+    setSessionId('');
+    setUploadedPhotos([]);
+    setShowDevicePicker(false);
+    setSendSuccess(false);
+    setShowManualEntry(false);
+    if (pollInterval) {
+      clearInterval(pollInterval);
+      setPollInterval(null);
+    }
+  }, [pollInterval]);
+
+  // ─── Phone Upload Code ───────────────────────────────────────────────────
+
+  const handleGetSessionCode = useCallback(async () => {
+    setSessionCodeLoading(true);
+    setError(null);
+    try {
+      const response = await createSession();
+      setSessionCode(response.code);
+      setSessionId(response.sessionId);
+
+      // Start polling for uploaded photos
+      if (pollInterval) clearInterval(pollInterval);
+      const interval = setInterval(async () => {
+        try {
+          const session = await getSession(response.code);
+          if (session.photos && session.photos.length > 0) {
+            setUploadedPhotos(session.photos);
+          }
+        } catch (err) {
+          // Silently ignore polling errors
+        }
+      }, 3000);
+      setPollInterval(interval);
+    } catch (err: any) {
+      setError(err.message || 'Failed to generate session code');
+      Alert.alert('Error', err.message || 'Failed to generate session code');
+    } finally {
+      setSessionCodeLoading(false);
+    }
+  }, [pollInterval]);
+
+  // Cleanup polling on unmount
+  React.useEffect(() => {
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [pollInterval]);
+
+  // ─── Send to iPad Device ─────────────────────────────────────────────────
+
+  const handleSendToDevice = useCallback(async () => {
+    if (!result) return;
+    setSendingToDevice(true);
+    setError(null);
+    try {
+      const devicesResponse = await getDevices();
+      const deviceList = devicesResponse.devices || [];
+      if (deviceList.length === 0) {
+        Alert.alert('No Devices', 'No Color Bar iPad devices are paired. Please pair a device first.');
+        return;
+      }
+      if (deviceList.length === 1) {
+        // Send directly if only one device
+        await sendFormulaToDevice(deviceList[0].id, result);
+        setSendSuccess(true);
+        Alert.alert('Success', `Formula sent to ${deviceList[0].name || 'Color Bar iPad'}`);
+      } else {
+        // Show picker for multiple devices
+        setDevices(deviceList);
+        setShowDevicePicker(true);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to send formula to device');
+      Alert.alert('Error', err.message || 'Failed to send formula to device');
+    } finally {
+      setSendingToDevice(false);
+    }
+  }, [result]);
+
+  const handleSelectDevice = useCallback(async (deviceId: string) => {
+    if (!result) return;
+    setSendingToDevice(true);
+    setShowDevicePicker(false);
+    try {
+      await sendFormulaToDevice(deviceId, result);
+      setSendSuccess(true);
+      const device = devices.find((d) => d.id === deviceId);
+      Alert.alert('Success', `Formula sent to ${device?.name || 'Color Bar iPad'}`);
+    } catch (err: any) {
+      setError(err.message || 'Failed to send formula');
+      Alert.alert('Error', err.message || 'Failed to send formula');
+    } finally {
+      setSendingToDevice(false);
+    }
+  }, [result, devices]);
 
   // ─── Render Steps ──────────────────────────────────────────────────────────
 
@@ -1167,6 +1499,54 @@ export default function FormulateScreen({ navigation, route }: any) {
               </View>
               <ChevronRight size={20} color={COLORS.textMuted} />
             </TouchableOpacity>
+
+            {/* Phone Upload Code Section */}
+            <View style={stepStyles.divider} />
+
+            <View style={stepStyles.phoneUploadSection}>
+              <View style={stepStyles.phoneUploadHeader}>
+                <Smartphone size={20} color={COLORS.purple} />
+                <Text style={stepStyles.phoneUploadTitle}>Phone Upload</Text>
+              </View>
+              <Text style={stepStyles.phoneUploadDesc}>
+                Let your client or assistant upload photos from their phone.
+              </Text>
+
+              {!sessionCode ? (
+                <TouchableOpacity
+                  style={stepStyles.getCodeBtn}
+                  onPress={handleGetSessionCode}
+                  disabled={sessionCodeLoading}
+                  activeOpacity={0.8}
+                >
+                  {sessionCodeLoading ? (
+                    <ActivityIndicator size="small" color="#FFF" />
+                  ) : (
+                    <>
+                      <Smartphone size={16} color="#FFF" />
+                      <Text style={stepStyles.getCodeBtnText}>Get Phone Upload Code</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              ) : (
+                <View style={stepStyles.codeDisplay}>
+                  <Text style={stepStyles.codeLabel}>Session Code</Text>
+                  <Text style={stepStyles.codeValue}>{sessionCode}</Text>
+                  <Text style={stepStyles.codeUrl}>→ colorgenius.co/c</Text>
+                  <Text style={stepStyles.codeInstructions}>
+                    Share this code with your phone. They'll enter it at the URL above.
+                  </Text>
+                  {uploadedPhotos.length > 0 && (
+                    <View style={stepStyles.photosReceived}>
+                      <CheckCircle2 size={14} color={COLORS.success} />
+                      <Text style={stepStyles.photosReceivedText}>
+                        {uploadedPhotos.length} photo{uploadedPhotos.length !== 1 ? 's' : ''} received
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
+            </View>
           </View>
         );
 
@@ -1393,7 +1773,46 @@ export default function FormulateScreen({ navigation, route }: any) {
             )}
 
             {/* Result shown after generation */}
-            {result && <ResultCard result={result} />}
+            {result && <ResultCard result={result} onSendToDevice={handleSendToDevice} />}
+
+            {/* Device Picker Modal */}
+            {showDevicePicker && devices.length > 0 && (
+              <View style={stepStyles.devicePickerOverlay}>
+                <View style={stepStyles.devicePicker}>
+                  <Text style={stepStyles.devicePickerTitle}>Select Color Bar iPad</Text>
+                  {devices.map((device) => (
+                    <TouchableOpacity
+                      key={device.id}
+                      style={stepStyles.deviceOption}
+                      onPress={() => handleSelectDevice(device.id)}
+                      disabled={sendingToDevice}
+                    >
+                      <Bluetooth size={18} color={COLORS.purple} />
+                      <View style={{ flex: 1 }}>
+                        <Text style={stepStyles.deviceOptionName}>{device.name || 'Color Bar iPad'}</Text>
+                        {device.macAddress && (
+                          <Text style={stepStyles.deviceOptionMac}>{device.macAddress}</Text>
+                        )}
+                      </View>
+                      <ChevronRight size={16} color={COLORS.textMuted} />
+                    </TouchableOpacity>
+                  ))}
+                  <TouchableOpacity
+                    style={stepStyles.devicePickerCancel}
+                    onPress={() => setShowDevicePicker(false)}
+                  >
+                    <Text style={stepStyles.devicePickerCancelText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
+            {sendSuccess && (
+              <View style={stepStyles.successBanner}>
+                <CheckCircle2 size={16} color={COLORS.success} />
+                <Text style={stepStyles.successBannerText}>Formula sent to Color Bar iPad!</Text>
+              </View>
+            )}
 
             {/* Reset */}
             <TouchableOpacity style={stepStyles.resetBtn} onPress={handleReset}>
@@ -1435,14 +1854,25 @@ export default function FormulateScreen({ navigation, route }: any) {
         <StepIndicator currentStep={step} />
 
         {/* Content */}
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {renderStepContent()}
-          <View style={{ height: 24 }} />
-        </ScrollView>
+        {showManualEntry ? (
+          <ManualFormulaForm
+            onDone={(result) => {
+              setResult(result);
+              setShowManualEntry(false);
+              setStep(6);
+            }}
+            onCancel={() => setShowManualEntry(false)}
+          />
+        ) : (
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {renderStepContent()}
+            <View style={{ height: 24 }} />
+          </ScrollView>
+        )}
 
         {/* Bottom Navigation */}
         <NavButtons
@@ -1451,7 +1881,9 @@ export default function FormulateScreen({ navigation, route }: any) {
           onBack={handleBack}
           onNext={step === 6 ? handleGenerate : handleNext}
           nextLabel={step === 6 ? (loading ? 'Generating...' : 'Generate') : 'Next'}
-          disabled={loading}
+          disabled={loading || showManualEntry}
+          showAddFormula={step === 5 && !showManualEntry}
+          onAddFormula={() => setShowManualEntry(true)}
         />
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -1538,6 +1970,179 @@ const stepStyles = StyleSheet.create({
     marginTop: 12,
   },
   resetText: { fontSize: 14, fontWeight: '600', color: COLORS.textSecondary },
+  // Phone upload code styles
+  divider: {
+    height: 1,
+    backgroundColor: COLORS.cardBorder,
+    marginVertical: 20,
+  },
+  phoneUploadSection: {
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+  },
+  phoneUploadHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  phoneUploadTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+  },
+  phoneUploadDesc: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginBottom: 16,
+    lineHeight: 18,
+  },
+  getCodeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.purple,
+    borderRadius: 12,
+    paddingVertical: 14,
+    shadowColor: COLORS.purple,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  getCodeBtnText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  codeDisplay: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  codeLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  codeValue: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: COLORS.purple,
+    fontFamily: 'monospace',
+    letterSpacing: 4,
+    marginBottom: 8,
+  },
+  codeUrl: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+    marginBottom: 8,
+  },
+  codeInstructions: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  photosReceived: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 12,
+    backgroundColor: 'rgba(34,197,94,0.1)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  photosReceivedText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.success,
+  },
+  // Device picker styles
+  devicePickerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    zIndex: 100,
+  },
+  devicePicker: {
+    backgroundColor: COLORS.card,
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+  },
+  devicePickerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  deviceOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: COLORS.chipBorder,
+  },
+  deviceOptionName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+  deviceOptionMac: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+  devicePickerCancel: {
+    marginTop: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  devicePickerCancelText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  successBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(34,197,94,0.1)',
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(34,197,94,0.2)',
+  },
+  successBannerText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.success,
+  },
 });
 
 const styles = StyleSheet.create({
@@ -1569,5 +2174,339 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+  },
+});
+
+// ─── Manual Formula Form ─────────────────────────────────────────────────────
+
+interface ManualProduct {
+  id: string;
+  brand: string;
+  shadeCode: string;
+  name: string;
+  grams: string;
+  developerVolume: string;
+  processingTime: string;
+  notes: string;
+}
+
+interface ManualFormulaFormProps {
+  onDone: (result: FormulationResult) => void;
+  onCancel: () => void;
+}
+
+function ManualFormulaForm({ onDone, onCancel }: ManualFormulaFormProps) {
+  const [products, setProducts] = useState<ManualProduct[]>([
+    {
+      id: '1',
+      brand: BRANDS[0] ?? '',
+      shadeCode: '',
+      name: '',
+      grams: '',
+      developerVolume: '20vol',
+      processingTime: '',
+      notes: '',
+    },
+  ]);
+
+  const updateProduct = (id: string, field: keyof ManualProduct, value: string) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, [field]: value } : p))
+    );
+  };
+
+  const addProduct = () => {
+    setProducts((prev) => [
+      ...prev,
+      {
+        id: Math.random().toString(36).slice(2),
+        brand: BRANDS[0] ?? '',
+        shadeCode: '',
+        name: '',
+        grams: '',
+        developerVolume: '20vol',
+        processingTime: '',
+        notes: '',
+      },
+    ]);
+  };
+
+  const handleDone = () => {
+    const steps = products.map((p) => ({
+      role: 'color',
+      grams: p.grams ? parseInt(p.grams, 10) || 0 : 0,
+      product: {
+        brand: p.brand,
+        shadeCode: p.shadeCode,
+        name: p.name,
+        ratio: '1:1',
+      },
+      developer: {
+        volume: p.developerVolume ? parseInt(p.developerVolume, 10) || 0 : 0,
+      },
+      notes: p.notes,
+    }));
+
+    const result: FormulationResult = {
+      success: true,
+      steps,
+      brand: products[0]?.brand ?? '',
+      developerVolume: products[0]?.developerVolume ? parseInt(products[0].developerVolume, 10) || 0 : 0,
+      processingTime: products[0]?.processingTime ?? '',
+      warnings: [],
+      notes: products.map((p) => p.notes).filter(Boolean).join('\n'),
+      strandTestRecommended: false,
+    };
+
+    onDone(result);
+  };
+
+  return (
+    <ScrollView
+      contentContainerStyle={manualFormStyles.container}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Text style={manualFormStyles.title}>Manual Formula Entry</Text>
+      <Text style={manualFormStyles.subtitle}>Enter formula details manually</Text>
+
+      {products.map((product, index) => (
+        <View key={product.id} style={manualFormStyles.productCard}>
+          <Text style={manualFormStyles.productTitle}>Product {index + 1}</Text>
+
+          {/* Brand Selector */}
+          <Text style={manualFormStyles.label}>Brand</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={{ flexDirection: 'row', gap: 8, paddingVertical: 4 }}>
+              {BRANDS.map((brand) => (
+                <TouchableOpacity
+                  key={brand}
+                  style={[
+                    chipStyles.chip,
+                    product.brand === brand && chipStyles.chipActive,
+                  ]}
+                  onPress={() => updateProduct(product.id, 'brand', brand)}
+                >
+                  <Text
+                    style={[
+                      chipStyles.chipText,
+                      product.brand === brand && chipStyles.chipTextActive,
+                    ]}
+                  >
+                    {brand}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+
+          {/* Product/Shade Code */}
+          <Text style={manualFormStyles.label}>Product/Shade Code</Text>
+          <TextInput
+            style={manualFormStyles.input}
+            value={product.shadeCode}
+            onChangeText={(text) => updateProduct(product.id, 'shadeCode', text)}
+            placeholder="e.g. 8.3"
+            placeholderTextColor={COLORS.textMuted}
+          />
+
+          {/* Product Name */}
+          <Text style={manualFormStyles.label}>Product Name</Text>
+          <TextInput
+            style={manualFormStyles.input}
+            value={product.name}
+            onChangeText={(text) => updateProduct(product.id, 'name', text)}
+            placeholder="e.g. Golden Light Blonde"
+            placeholderTextColor={COLORS.textMuted}
+          />
+
+          {/* Grams */}
+          <Text style={manualFormStyles.label}>Grams</Text>
+          <TextInput
+            style={manualFormStyles.input}
+            value={product.grams}
+            onChangeText={(text) => updateProduct(product.id, 'grams', text)}
+            placeholder="30"
+            keyboardType="numeric"
+            placeholderTextColor={COLORS.textMuted}
+          />
+
+          {/* Developer Volume */}
+          <Text style={manualFormStyles.label}>Developer Volume</Text>
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+            {['10vol', '20vol', '30vol', '40vol'].map((dev) => (
+              <TouchableOpacity
+                key={dev}
+                style={[
+                  chipStyles.chip,
+                  product.developerVolume === dev && chipStyles.chipActive,
+                ]}
+                onPress={() => updateProduct(product.id, 'developerVolume', dev)}
+              >
+                <Text
+                  style={[
+                    chipStyles.chipText,
+                    product.developerVolume === dev && chipStyles.chipTextActive,
+                  ]}
+                >
+                  {dev}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Processing Time */}
+          <Text style={manualFormStyles.label}>Processing Time</Text>
+          <TextInput
+            style={manualFormStyles.input}
+            value={product.processingTime}
+            onChangeText={(text) => updateProduct(product.id, 'processingTime', text)}
+            placeholder="e.g. 30 minutes"
+            placeholderTextColor={COLORS.textMuted}
+          />
+
+          {/* Notes */}
+          <Text style={manualFormStyles.label}>Notes</Text>
+          <TextInput
+            style={[manualFormStyles.input, manualFormStyles.multilineInput]}
+            value={product.notes}
+            onChangeText={(text) => updateProduct(product.id, 'notes', text)}
+            placeholder="Additional notes..."
+            placeholderTextColor={COLORS.textMuted}
+            multiline
+            numberOfLines={3}
+          />
+        </View>
+      ))}
+
+      {/* Add Another Product */}
+      <TouchableOpacity style={manualFormStyles.addProductBtn} onPress={addProduct}>
+        <FlaskConical size={18} color={COLORS.purple} />
+        <Text style={manualFormStyles.addProductText}>Add Another Product</Text>
+      </TouchableOpacity>
+
+      {/* Action Buttons */}
+      <View style={manualFormStyles.actionRow}>
+        <TouchableOpacity style={manualFormStyles.cancelBtn} onPress={onCancel}>
+          <Text style={manualFormStyles.cancelText}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={manualFormStyles.doneBtn} onPress={handleDone}>
+          <CheckCircle2 size={18} color="#FFF" />
+          <Text style={manualFormStyles.doneText}>Done</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+}
+
+const manualFormStyles = StyleSheet.create({
+  container: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: COLORS.textPrimary,
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginBottom: 20,
+  },
+  productCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+  },
+  productTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: COLORS.purple,
+    marginBottom: 12,
+  },
+  label: {
+    color: COLORS.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  input: {
+    backgroundColor: COLORS.bg,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: COLORS.textPrimary,
+    fontSize: 15,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+    marginBottom: 12,
+  },
+  multilineInput: {
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  addProductBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.purple,
+    borderStyle: 'dashed',
+    marginBottom: 16,
+  },
+  addProductText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.purple,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  cancelBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.chipBorder,
+  },
+  cancelText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  doneBtn: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.purple,
+    borderRadius: 12,
+    paddingVertical: 14,
+    shadowColor: COLORS.purple,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  doneText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFF',
   },
 });

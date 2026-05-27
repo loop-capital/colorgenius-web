@@ -1,6 +1,6 @@
 # MEMORY-COLORGENIUS.md — COLORgenius Team Memory
 
-> **Last updated:** 2026-05-26 (11:30 PM)
+> **Last updated:** 2026-05-27 (08:40 AM)
 > **Identity:** I am COLORgenius 🎨 — AI Hair Color Formulation Platform
 > **Workspace:** `/home/jason/.openclaw/workspaces/colorgenius/`
 
@@ -242,11 +242,60 @@ client_photo_collections:
 
 ---
 
+## Consultation Screen Refactor — COMPLETE (May 27, 2026)
+
+**File:** `mobile/src/screens/QuestionnaireScreen.tsx`
+
+### What Changed
+- **Before:** 4-step questionnaire (Client Profile → Current Hair State → Desired Result → Review & Submit) that called `submitFormulation()` directly
+- **After:** 3-step **CLIENT INTAKE** form that saves client data and navigates to FormulateScreen
+
+### New 3-Step Flow
+1. **Step 1: Client Profile** (unchanged) — name, phone, email, salon notes
+2. **Step 2: Hair Characteristics** (expanded) — texture, pattern, density, porosity, gray %, condition types, chemical history, sensitivities, last chemical service
+3. **Step 3: Review** (replaces old Step 4) — two action buttons:
+   - **"Save Client"** — saves via `createClient()` API, navigates to Dashboard
+   - **"Save & Formulate"** — saves client, then navigates to `FormulateScreen` with `autoPopulateData` pre-filled
+
+### Auto-Populate Data Sent to FormulateScreen
+```typescript
+navigation.navigate('Formulate', {
+  clientId: savedClientId,
+  clientName: formData.clientName,
+  autoPopulateData: {
+    texture, hairPattern, density,
+    conditionType, porosity, grayPercent,
+    chemicalHistory, sensitivities, lastChemicalService,
+  }
+});
+```
+
+### FormulateScreen Already Supports autoPopulateData
+- `FormulateScreen.tsx` reads `route.params.autoPopulateData` on mount and spreads it into `INITIAL_STATE`
+- All fields match: `texture`, `hairPattern`, `density`, `porosity`, `grayPercent`, `chemicalHistory`, `sensitivities`, `lastChemicalService`
+- `conditionType` maps to `condition.type` in FormulateScreen's FormState
+
+### Type Imports Used
+All imported from `../types`:
+- `TEXTURES`, `HAIR_PATTERNS`, `DENSITIES`, `POROSITY`
+- `SENSITIVITIES`, `CHEMICAL_HISTORY_ITEMS`, `LAST_SERVICE_OPTIONS`, `CONDITION_TYPES`
+- TypeScript types: `TextureType`, `HairPatternType`, `DensityType`, `Porosity`, `ConditionType`, `LastServiceType`
+
+### API Used
+- `createClient()` already existed in `client.ts` — no changes needed
+
+### Verification
+- `npx tsc --noEmit --skipLibCheck` ✅ — zero errors in QuestionnaireScreen.tsx
+- Only pre-existing error: `App.tsx` "focus" navigation event (unrelated)
+
+---
+
 ## Next Actions
 1. **Deploy dashboard** — `cd dashboard && npx vercel --prod` to push new API endpoints live
 2. **Run Prisma migration** — `npx prisma migrate dev --name add_client_photo_collections`
 3. **Update GetUpLook** — wire gallery photos to feed public consumer gallery
 4. **Monitor TestFlight** for Build 10
+5. **Test new Consultation flow** — create client intake → verify autoPopulateData flows to FormulateScreen
 
 ## ⏰ URGENT TODO (14-Day Deadline: June 8, 2026)
 **Camera Upload Auth Integration**
@@ -296,3 +345,90 @@ client_photo_collections:
 - **GetUpLook:** Consumer-facing (color discovery, salon finder, booking)
 - **ByondEdu:** Education marketplace
 - **AgentSocial:** AI agent social network (separate)
+
+---
+
+## Formula Management System — COMPLETE (May 27, 2026)
+
+**Status:** All 4 requirements implemented, TypeScript clean
+
+### What Was Built
+
+#### 1. Step 5 "Add Formula" Button (Manual Entry)
+**File:** `mobile/src/screens/FormulateScreen.tsx`
+- Added third nav button "Add Formula" (pink, with FlaskConical icon) on Step 5 alongside "Back" and "Generate Formula"
+- When pressed, renders inline `ManualFormulaForm` with fields:
+  - Brand (horizontal chip selector)
+  - Product/Shade Code
+  - Product Name
+  - Grams (numeric)
+  - Developer Volume (10/20/30/40vol chips)
+  - Processing Time
+  - Notes (multiline)
+- Supports multiple products ("Add Another Product" button)
+- Result lands on Step 6 "Your Formula" page — same as AI output
+- All downstream features (save, send to iPad) work identically
+
+#### 2. Save to Library (Step 6 Result Card)
+**File:** `mobile/src/screens/FormulateScreen.tsx` (ResultCard component)
+- Two save buttons added below formula result:
+  - **"Save to My Formulas"** — calls `saveFormulation()` with `isPublic: false`
+  - **"List on Marketplace"** — calls `saveFormulation()` with `isPublic: true`
+- Uses existing `saveFormulation()` in `src/api/client.ts` (POST `/formulations/save`)
+- Shows success alert: "Formula saved to your library!" or "Formula listed on Marketplace!"
+- Includes loading state (disables buttons while saving)
+- Works for both AI-generated and manually-entered formulas
+
+#### 3. Library Floating "Add Formula" Button
+**File:** `mobile/src/screens/LibraryScreen.tsx`
+- Added floating action button (FAB) in bottom-right corner (purple circle, `Plus` icon)
+- Opens `ManualFormulaEntry` component as a full-screen modal
+- `ManualFormulaEntry` (separate file, 690 lines) provides:
+  - Formula Name (required)
+  - Client Name (optional)
+  - Multiple product rows (brand, shade code, name, grams, developer, notes)
+  - Add/remove product rows
+  - Global developer volume, processing time, application method
+  - "Save" and "Save & List" buttons
+  - Brand picker overlay with all supported brands
+- On save success: modal closes and library list refreshes (`fetchFormulas()`)
+
+#### 4. Formula Picker for Reuse
+**New File:** `mobile/src/components/FormulaPicker.tsx` (661 lines)
+- Shows saved formulas from `/v1/formulas/list` with search/filter
+- Features:
+  - Search by name, brand, shade code
+  - Brand filter chips
+  - Grid/list view toggle
+  - "Create New" option → navigates to FormulateScreen
+  - Select formula → returns data to parent via `onSelect` callback
+- Integrated into:
+  - **QuestionnaireScreen.tsx** — "Apply Saved Formula" button on Step 3 (Review)
+    - Opens FormulaPicker modal
+    - Selected formula navigates to FormulateScreen with `autoPopulateData`
+  - **NewServiceScreen.tsx** — "Select Saved Formula" button in selected client section
+    - Opens FormulaPicker modal
+    - Selected formula navigates to FormulateScreen with `autoPopulateData`
+
+### Files Modified
+- `mobile/src/screens/FormulateScreen.tsx` — Step 5 Add Formula button, Step 6 save buttons, ResultCard save logic
+- `mobile/src/screens/LibraryScreen.tsx` — FAB, ManualFormulaEntry modal, refresh on save
+- `mobile/src/screens/QuestionnaireScreen.tsx` — Apply Formula button, FormulaPicker modal
+- `mobile/src/screens/NewServiceScreen.tsx` — Select Formula button, FormulaPicker modal
+
+### Files Created
+- `mobile/src/components/FormulaPicker.tsx` — Reusable formula picker (661 lines)
+- `mobile/src/components/ManualFormulaEntry.tsx` — Reusable manual entry form (690 lines)
+
+### Verification
+- `npx tsc --noEmit --skipLibCheck` ✅ — only pre-existing `App.tsx` "focus" error
+- `npx expo-doctor` ✅ — same 17/18 checks (pre-existing metro.config.js issue)
+- No new npm packages added — uses existing `lucide-react-native`, React Native Modal
+- Dark theme maintained throughout (COLORS object pattern)
+
+### Next Steps
+- [ ] Deploy dashboard to Vercel (if new API endpoints needed for formula listing)
+- [ ] Test "List on Marketplace" flow end-to-end (save → verify appears in marketplace tab)
+- [ ] Test formula picker from QuestionnaireScreen with real formula data
+- [ ] Test formula picker from NewServiceScreen with real client + formula combo
+- [ ] Consider adding formula editing in Library detail modal (future enhancement)
