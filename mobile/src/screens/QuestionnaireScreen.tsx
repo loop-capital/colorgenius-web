@@ -203,7 +203,7 @@ function MultiChipSelector({ label, options, selected, onToggle }: {
 
 function SingleChipSelector<T extends string>({ label, options, selected, onSelect }: {
   label: string;
-  options: { value: T; label: string; desc?: string; color?: string }[];
+  options: { value: T; label: string; desc?: string; type?: string; color?: string }[];
   selected: T;
   onSelect: (v: T) => void;
 }) {
@@ -220,6 +220,7 @@ function SingleChipSelector<T extends string>({ label, options, selected, onSele
               onPress={() => onSelect(opt.value)}
               activeOpacity={0.7}
             >
+              {opt.type && <Text style={[styles.chipType, isSelected && styles.chipTypeActive]}>{opt.type}</Text>}
               {opt.color && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: opt.color, marginRight: 6 }} />}
               <Text style={[styles.chipText, isSelected && styles.chipTextActive]}>{opt.label}</Text>
               {opt.desc && <Text style={styles.chipDesc} numberOfLines={1}>{opt.desc}</Text>}
@@ -277,15 +278,6 @@ export default function QuestionnaireScreen({ navigation }: any) {
         email: formData.email.trim() || undefined,
         phone: formData.phone.trim() || undefined,
         notes: formData.salonNotes.trim() || undefined,
-        conditions: [
-          ...(formData.texture ? [`Texture: ${formData.texture}`] : []),
-          ...(formData.hairPattern ? [`Pattern: ${formData.hairPattern}`] : []),
-          ...(formData.density ? [`Density: ${formData.density}`] : []),
-          ...(formData.porosity ? [`Porosity: ${formData.porosity}`] : []),
-          ...(formData.grayPercent > 0 ? [`Gray: ${formData.grayPercent}%`] : []),
-          ...(formData.scalpType ? [`Scalp: ${formData.scalpType}`] : []),
-          ...formData.sensitivities,
-        ],
       });
       Alert.alert('Success', `Client "${formData.clientName}" saved!`, [
         { text: 'OK', onPress: () => navigation.navigate('Dashboard') },
@@ -309,15 +301,6 @@ export default function QuestionnaireScreen({ navigation }: any) {
         email: formData.email.trim() || undefined,
         phone: formData.phone.trim() || undefined,
         notes: formData.salonNotes.trim() || undefined,
-        conditions: [
-          ...(formData.texture ? [`Texture: ${formData.texture}`] : []),
-          ...(formData.hairPattern ? [`Pattern: ${formData.hairPattern}`] : []),
-          ...(formData.density ? [`Density: ${formData.density}`] : []),
-          ...(formData.porosity ? [`Porosity: ${formData.porosity}`] : []),
-          ...(formData.grayPercent > 0 ? [`Gray: ${formData.grayPercent}%`] : []),
-          ...(formData.scalpType ? [`Scalp: ${formData.scalpType}`] : []),
-          ...formData.sensitivities,
-        ],
       });
       if (response.client?.id) {
         navigation.navigate('Formulate', {
@@ -482,6 +465,8 @@ const styles = StyleSheet.create({
   chipGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { backgroundColor: COLORS.card, borderRadius: 20, borderWidth: 1, borderColor: COLORS.cardBorder, paddingHorizontal: 14, paddingVertical: 8, alignItems: 'center' },
   chipActive: { backgroundColor: COLORS.purple, borderColor: COLORS.purple },
+  chipType: { fontSize: 10, color: COLORS.textMuted, marginBottom: 2 },
+  chipTypeActive: { color: COLORS.purple },
   chipText: { fontSize: 13, color: COLORS.textSecondary },
   chipTextActive: { color: '#FFF', fontWeight: '600' },
   chipDesc: { fontSize: 10, color: COLORS.textMuted, marginTop: 2 },
