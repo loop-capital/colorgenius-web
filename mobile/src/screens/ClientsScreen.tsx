@@ -128,7 +128,7 @@ const modalStyles = StyleSheet.create({
   input: { flex: 1, paddingVertical: 14, fontSize: 16, color: '#F5F5F7' },
 });
 
-export default function ClientsScreen() {
+export default function ClientsScreen({ navigation }: { navigation: any }) {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -159,7 +159,10 @@ export default function ClientsScreen() {
   };
 
   const renderClient = ({ item }: { item: Client }) => (
-    <TouchableOpacity style={styles.clientCard} onPress={() => Alert.alert('Coming Soon', `Client ${item.name} detail — coming in next update!`)}>
+    <TouchableOpacity
+      style={styles.clientCard}
+      onPress={() => navigation.navigate('ClientDetail', { clientId: item.id })}
+    >
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>
           {(item.name || '').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}

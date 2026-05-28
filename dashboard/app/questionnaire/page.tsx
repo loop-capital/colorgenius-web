@@ -39,10 +39,10 @@ const TEXTURES = [
 ]
 
 const HAIR_PATTERNS = [
-  { value: 'straight', label: 'Straight', desc: 'Type 1' },
-  { value: 'wavy', label: 'Wavy', desc: 'Type 2' },
-  { value: 'curly', label: 'Curly', desc: 'Type 3' },
-  { value: 'coily', label: 'Coily', desc: 'Type 4' },
+  { value: 'straight', label: 'Straight', type: 'Type 1' },
+  { value: 'wavy', label: 'Wavy', type: 'Type 2' },
+  { value: 'curly', label: 'Curly', type: 'Type 3' },
+  { value: 'coily', label: 'Coily', type: 'Type 4' },
 ]
 
 const DENSITIES = [
@@ -184,14 +184,19 @@ export default function QuestionnairePage() {
         scalpType: formData.scalpType || undefined,
         sensitivities: formData.sensitivities,
       }
-      const res = await fetch('/api/v1/clients', {
+      const res = await fetch('/api/clients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          name: formData.clientName,
+          email: formData.email,
+          phone: formData.phone,
+          notes: formData.salonNotes,
+        }),
       })
       const data = await res.json()
-      if (data.success || data.client) {
-        return { id: data.client?.id || data.id, name: formData.clientName }
+      if (res.ok && data.client) {
+        return { id: data.client.id, name: formData.clientName }
       }
       toast({ title: 'Error', description: data.error || 'Failed to save client', variant: 'destructive' })
       return null
@@ -288,12 +293,12 @@ export default function QuestionnairePage() {
           <div className="space-y-6">
             {/* Texture */}
             <div>
-              <Label className="text-[#F5F5F7] mb-3 block">Texture</Label>
+              <Label className="text-[#F5F5F7] text-base font-medium mb-3 block">Texture</Label>
               <div className="grid grid-cols-3 gap-3">
                 {TEXTURES.map((t) => (
                   <motion.button type="button" key={t.value}
                     onClick={() => updateField('texture', t.value)}
-                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    className="flex flex-col items-center gap-1.5 py-4 px-3 rounded-xl border cursor-pointer text-center"
                     style={{
                       borderColor: formData.texture === t.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
                       background: formData.texture === t.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
@@ -301,7 +306,7 @@ export default function QuestionnairePage() {
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                   >
                     <span className="text-sm font-semibold" style={{ color: formData.texture === t.value ? '#9333EA' : '#F5F5F7' }}>{t.label}</span>
-                    <span className="text-xs text-white/40">{t.desc}</span>
+                    <span className="text-xs text-white/50">{t.desc}</span>
                   </motion.button>
                 ))}
               </div>
@@ -309,20 +314,20 @@ export default function QuestionnairePage() {
 
             {/* Hair Pattern */}
             <div>
-              <Label className="text-[#F5F5F7] mb-3 block">Hair Pattern</Label>
+              <Label className="text-[#F5F5F7] text-base font-medium mb-3 block">Hair Pattern</Label>
               <div className="grid grid-cols-4 gap-3">
                 {HAIR_PATTERNS.map((t) => (
                   <motion.button type="button" key={t.value}
                     onClick={() => updateField('hairPattern', t.value)}
-                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    className="flex flex-col items-center gap-1.5 py-4 px-2 rounded-xl border cursor-pointer text-center"
                     style={{
                       borderColor: formData.hairPattern === t.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
                       background: formData.hairPattern === t.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
                     }}
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                   >
+                    <span className="text-xs text-white/50">{t.type}</span>
                     <span className="text-sm font-semibold" style={{ color: formData.hairPattern === t.value ? '#9333EA' : '#F5F5F7' }}>{t.label}</span>
-                    <span className="text-xs text-white/40">{t.desc}</span>
                   </motion.button>
                 ))}
               </div>
@@ -330,12 +335,12 @@ export default function QuestionnairePage() {
 
             {/* Density */}
             <div>
-              <Label className="text-[#F5F5F7] mb-3 block">Density</Label>
+              <Label className="text-[#F5F5F7] text-base font-medium mb-3 block">Density</Label>
               <div className="grid grid-cols-3 gap-3">
                 {DENSITIES.map((t) => (
                   <motion.button type="button" key={t.value}
                     onClick={() => updateField('density', t.value)}
-                    className="flex flex-col items-center gap-1 p-3 rounded-lg border cursor-pointer text-center"
+                    className="flex flex-col items-center gap-1.5 py-4 px-3 rounded-xl border cursor-pointer text-center"
                     style={{
                       borderColor: formData.density === t.value ? 'rgba(147,51,234,0.4)' : 'rgba(255,255,255,0.06)',
                       background: formData.density === t.value ? 'rgba(147,51,234,0.08)' : 'rgba(255,255,255,0.02)',
@@ -343,7 +348,7 @@ export default function QuestionnairePage() {
                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                   >
                     <span className="text-sm font-semibold" style={{ color: formData.density === t.value ? '#9333EA' : '#F5F5F7' }}>{t.label}</span>
-                    <span className="text-xs text-white/40">{t.desc}</span>
+                    <span className="text-xs text-white/50">{t.desc}</span>
                   </motion.button>
                 ))}
               </div>

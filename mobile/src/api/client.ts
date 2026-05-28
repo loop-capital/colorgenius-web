@@ -392,6 +392,41 @@ export interface Client {
   conditions?: any[];
 }
 
+export async function getClientById(id: string) {
+  return apiRequest<{ client: Client }>(`/clients?id=${id}`);
+}
+
+export async function getClientFormulas(clientId: string) {
+  return apiRequest<{ formulas: FormulaEntry[] }>(`/formulas?clientId=${clientId}`);
+}
+
+export interface FormulaEntry {
+  id: string;
+  clientId?: string;
+  clientName?: string;
+  name: string;
+  createdAt: string;
+  tags?: string[];
+  formulation: {
+    brand: string;
+    line: string;
+    developerVolume: number;
+    processingTime: number;
+    application: string;
+    coverage: string;
+    steps: Array<{
+      productId?: string;
+      productName?: string;
+      shadeCode?: string;
+      grams: number;
+      role: string;
+      notes?: string;
+    }>;
+    notes: string[];
+    warnings: string[];
+  };
+}
+
 export async function getClients(search?: string) {
   const params = search ? `?search=${encodeURIComponent(search)}` : '';
   return apiRequest<{ clients: Client[]; total: number }>(`/clients${params}`);

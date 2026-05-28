@@ -199,7 +199,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<{
 export function getAuthUrl(salonId: string, redirectUri: string): string {
   const params = new URLSearchParams({
     client_id: SQUARE_APP_ID,
-    scope: 'ITEMS_READ INVENTORY_READ INVENTORY_WRITE MERCHANT_PROFILE_READ PAYMENTS_READ',
+    scope: 'ITEMS_READ INVENTORY_READ INVENTORY_WRITE MERCHANT_PROFILE_READ PAYMENTS_READ CUSTOMERS_READ',
     session: 'false',
     state: salonId,
   });

@@ -17,6 +17,7 @@ import AnalyzeScreen from './src/screens/AnalyzeScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import GalleryScreen from './src/screens/GalleryScreen';
 import GalleryUploadScreen from './src/screens/GalleryUploadScreen';
+import ClientDetailScreen from './src/screens/ClientDetailScreen';
 import ClientCollectionScreen from './src/screens/ClientCollectionScreen';
 import CommunityScreen from './src/screens/CommunityScreen';
 import InventoryScreen from './src/screens/InventoryScreen';
@@ -51,6 +52,7 @@ export type RootStackParamList = {
   History: undefined;
   Gallery: undefined;
   GalleryUpload: undefined;
+  ClientDetail: { clientId: string };
   ClientCollection: undefined;
   Community: undefined;
   Inventory: undefined;
@@ -120,6 +122,7 @@ function WrappedAnalyze(props: any) { return <ScreenWithHeader><AnalyzeScreen {.
 function WrappedHistory(props: any) { return <ScreenWithHeader><HistoryScreen {...props} /></ScreenWithHeader>; }
 function WrappedGallery(props: any) { return <ScreenWithHeader><GalleryScreen {...props} /></ScreenWithHeader>; }
 function WrappedGalleryUpload(props: any) { return <ScreenWithHeader><GalleryUploadScreen {...props} /></ScreenWithHeader>; }
+function WrappedClientDetail(props: any) { return <ScreenWithHeader><ClientDetailScreen {...props} /></ScreenWithHeader>; }
 function WrappedClientCollection(props: any) { return <ScreenWithHeader><ClientCollectionScreen {...props} /></ScreenWithHeader>; }
 function WrappedCommunity(props: any) { return <ScreenWithHeader><CommunityScreen {...props} /></ScreenWithHeader>; }
 function WrappedInventory(props: any) { return <ScreenWithHeader><InventoryScreen {...props} /></ScreenWithHeader>; }
@@ -203,6 +206,7 @@ function AppContent() {
         <Stack.Screen name="Gallery" component={WrappedGallery} />
         <Stack.Screen name="GalleryUpload" component={WrappedGalleryUpload} />
         <Stack.Screen name="ClientCollection" component={WrappedClientCollection} />
+        <Stack.Screen name="ClientDetail" component={WrappedClientDetail} />
         <Stack.Screen name="Community" component={WrappedCommunity} />
         <Stack.Screen name="Inventory" component={WrappedInventory} />
         <Stack.Screen name="Pricing" component={WrappedPricing} />

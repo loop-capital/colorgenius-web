@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion'
 import { Camera, Target, Sparkles, CheckCircle, Shield, ClipboardList, Palette, BarChart3, FlaskConical, ChartNoAxesColumn, Package, DollarSign, Scale, History, ArrowRight, Mail } from 'lucide-react'
 import ColorMatchHero from '@/components/color-match-hero'
-import { ColorMatchGallery } from '@/components/color-match/ColorMatchGallery'
 
 export default function LandingPage() {
   const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 999, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 16, display: 'inline-flex', alignItems: 'center', gap: 8 }
@@ -83,8 +82,6 @@ export default function LandingPage() {
       {/* Color Match Feature */}
       <ColorMatchHero />
 
-      {/* Trending Gallery */}
-      <ColorMatchGallery />
       <section id="tools" style={{ padding: '128px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 80 }}>
@@ -204,13 +201,6 @@ export default function LandingPage() {
       <section id="color-match" style={{ padding: '128px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <ColorMatchHero />
-        </div>
-      </section>
-
-      {/* Color Match Gallery */}
-      <section style={{ padding: '0 24px 128px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <ColorMatchGallery />
         </div>
       </section>
 

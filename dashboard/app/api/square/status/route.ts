@@ -35,6 +35,8 @@ export async function GET(request: NextRequest) {
         location_ids: connection.location_ids,
         connected_at: connection.connected_at,
         catalog_synced_at: connection.catalog_synced_at,
+        client_sync_enabled: false,
+        last_client_sync_at: null,
       },
     });
   }

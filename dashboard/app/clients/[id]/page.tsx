@@ -125,6 +125,7 @@ export default function ClientDetailPage() {
     } finally {
       setLoading(false)
     }
+  }
 
   if (loading) {
     return (
@@ -260,20 +261,21 @@ export default function ClientDetailPage() {
             </CardContent>
           </Card>
 
-          {/* Before/After Gallery Placeholder */}
+          {/* Photo Gallery — Coming Soon */}
           <Card className="card-glass mt-4">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Camera className="h-4 w-4 text-[var(--cg-accent)]" />
                 Photo Gallery
+                <Badge className="text-[10px]">Coming Soon</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 pt-0">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 opacity-50">
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className="aspect-square rounded-lg bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-2 hover:bg-white/[0.08] transition-colors cursor-pointer"
+                    className="aspect-square rounded-lg bg-white/5 border border-white/10 flex flex-col items-center justify-center gap-2"
                   >
                     <ImageIcon className="h-6 w-6 text-white/20" />
                     <span className="text-xs text-white/30">
@@ -283,7 +285,7 @@ export default function ClientDetailPage() {
                 ))}
               </div>
               <p className="text-xs text-white/30 mt-3 text-center">
-                Tap to upload before & after photos
+                Before & after photo upload coming in next update
               </p>
             </CardContent>
           </Card>
@@ -482,5 +484,4 @@ export default function ClientDetailPage() {
       </div>
     </div>
   )
-}
 }
