@@ -18,8 +18,16 @@ export async function POST(request: Request) {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
     });
 
+    // Handle non-OK responses from Supabase
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('[login] Supabase error:', errorText);
+      return NextResponse.json({ error: 'Authentication service unavailable' }, { status: 503 });
+    }
+
     const users = await res.json();
-    if (!users || users.length === 0) {
+    // Supabase returns error objects on some failures (e.g. invalid key) — those aren't arrays
+    if (!Array.isArray(users) || users.length === 0) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
