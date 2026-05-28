@@ -91,6 +91,7 @@ model clients {
   next_appointment_at DateTime?                @db.Timestamp(6)
   lifetime_value      Decimal?                 @default(0) @db.Decimal(10, 2)
   general_notes       String?
+  square_customer_id  String?                  @unique @db.VarChar(255)
   formula_notes       String?
   marketing_consent   Boolean?                 @default(false)
   consent_updated_at  DateTime?                @db.Timestamp(6)
@@ -473,6 +474,7 @@ model salons {
   salon_devices           salon_devices[]
   session_codes           session_codes[]
   square_connections      square_connections?
+  phorest_connections     phorest_connections?
   stylists                stylists[]
 
   @@index([slug], map: "idx_salons_slug")
@@ -1215,4 +1217,24 @@ model formula_queue {
   @@index([salon_id], map: "idx_fq_salon")
   @@index([status], map: "idx_fq_status")
   @@index([stylist_id], map: "idx_fq_stylist")
+}
+
+model phorest_connections {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id      String    @db.Uuid
+  business_id   String    @db.VarChar(255)
+  branch_id     String    @db.VarChar(255)
+  api_email     String    @db.VarChar(255)
+  api_password  String    @db.Text
+  server_region String    @db.VarChar(10) @default("us")
+  status        String    @db.VarChar(20) @default("disconnected")
+  last_sync_at  DateTime? @db.Timestamp(3)
+  sync_error    String?   @db.Text
+  created_at    DateTime  @default(now()) @db.Timestamp(3)
+  updated_at    DateTime  @updatedAt @db.Timestamp(3)
+  salon         salons    @relation(fields: [salon_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([salon_id])
+  @@index([business_id])
+  @@index([status])
 }

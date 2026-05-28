@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { CheckCircle, XCircle, RefreshCw, Unlink, Package, CreditCard, ArrowRight } from 'lucide-react';
+import { CheckCircle, XCircle, RefreshCw, Unlink, Package, CreditCard, ArrowRight, Users, ToggleLeft, ToggleRight } from 'lucide-react';
 
 interface SquareStatus {
   connected: boolean;
@@ -20,16 +20,24 @@ interface SyncResult {
   synced_at: string;
 }
 
+interface ClientSyncResult {
+  imported: number;
+  updated: number;
+  errors: number;
+}
+
 export default function SettingsContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<SquareStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
-  const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
-  const [error, setError] = useState('');
+  const [clientSyncEnabled, setClientSyncEnabled] = useState(false);
+  const [clientSyncing, setClientSyncing] = useState(false);
+  const [clientSyncResult, setClientSyncResult] = useState<ClientSyncResult | null>(null);
 
   useEffect(() => {
     fetchStatus();
+    fetchClientSyncToggle();
     if (searchParams.get('square_connected')) { setError(''); fetchStatus(); }
     if (searchParams.get('square_error')) setError(`Connection failed: ${searchParams.get('square_error')}`);
   }, []);
@@ -55,10 +63,39 @@ export default function SettingsContent() {
     finally { setSyncing(false); }
   }
 
-  async function handleDisconnect() {
-    if (!confirm('Disconnect Square? Inventory checks will fall back to manual mode.')) return;
-    try { await fetch('/api/square/status', { method: 'DELETE' }); fetchStatus(); }
-    catch { setError('Failed to disconnect'); }
+  async function fetchClientSyncToggle() {
+    try {
+      const res = await fetch('/api/square/clients/sync-toggle');
+      const data = await res.json();
+      if (data.success) setClientSyncEnabled(data.data?.square_client_sync === true);
+    } catch { /* ignore */ }
+  }
+
+  async function handleClientSyncToggle() {
+    const newValue = !clientSyncEnabled;
+    try {
+      const res = await fetch('/api/square/clients/sync-toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: newValue }),
+      });
+      const data = await res.json();
+      if (data.success) setClientSyncEnabled(newValue);
+    } catch { setError('Failed to toggle client sync'); }
+  }
+
+  async function handleClientSync() {
+    setClientSyncing(true); setClientSyncResult(null);
+    try {
+      const res = await fetch('/api/square/clients/sync', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setClientSyncResult(data.data);
+      } else {
+        setError(data.error || 'Client sync failed');
+      }
+    } catch { setError('Client sync failed'); }
+    finally { setClientSyncing(false); }
   }
 
   return (
@@ -107,6 +144,37 @@ export default function SettingsContent() {
                 </div>
               </div>
               <div className="p-4 rounded-xl mb-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <Users className="w-5 h-5" style={{ color: '#71717A' }} />
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: '#F5F5F7' }}>Client Import</p>
+                      <p className="text-xs" style={{ color: '#71717A' }}>Auto-import clients from Square</p>
+                    </div>
+                  </div>
+                  <button onClick={handleClientSyncToggle}
+                    className="flex items-center gap-2 transition-colors"
+                    style={{ color: clientSyncEnabled ? '#10B981' : '#71717A' }}>
+                    {clientSyncEnabled ? <ToggleRight className="w-6 h-6" /> : <ToggleLeft className="w-6 h-6" />}
+                    <span className="text-xs font-medium">{clientSyncEnabled ? 'On' : 'Off'}</span>
+                  </button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs" style={{ color: '#71717A' }}>
+                    {clientSyncResult
+                      ? `Last import: ${clientSyncResult.imported} new, ${clientSyncResult.updated} updated`
+                      : 'Import your Square customer list into COLORgenius'}
+                  </p>
+                  <button onClick={handleClientSync} disabled={clientSyncing}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+                    style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#0A0A0A' }}>
+                    <RefreshCw className={`w-3.5 h-3.5 ${clientSyncing ? 'animate-spin' : ''}`} />
+                    {clientSyncing ? 'Importing...' : 'Import Now'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl mb-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Package className="w-5 h-5" style={{ color: '#71717A' }} />
@@ -124,11 +192,13 @@ export default function SettingsContent() {
                 </div>
                 {syncResult && <p className="text-xs mt-2" style={{ color: '#10B981' }}>✅ Synced {syncResult.products_synced} products</p>}
               </div>
-              <button onClick={handleDisconnect}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-colors hover:bg-white/5"
-                style={{ color: '#EF4444', border: '1px solid rgba(239,68,68,0.2)' }}>
-                <Unlink className="w-3.5 h-3.5" /> Disconnect
-              </button>
+              <div className="flex items-center gap-4">
+                <button onClick={handleDisconnect}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-colors hover:bg-white/5"
+                  style={{ color: '#EF4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+                  <Unlink className="w-3.5 h-3.5" /> Disconnect
+                </button>
+              </div>
             </div>
           ) : (
             <div>
