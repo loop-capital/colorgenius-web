@@ -18,6 +18,7 @@ import HistoryScreen from './src/screens/HistoryScreen';
 import GalleryScreen from './src/screens/GalleryScreen';
 import GalleryUploadScreen from './src/screens/GalleryUploadScreen';
 import ClientDetailScreen from './src/screens/ClientDetailScreen';
+import ColorBarScreen from './src/screens/ColorBarScreen';
 import ClientCollectionScreen from './src/screens/ClientCollectionScreen';
 import CommunityScreen from './src/screens/CommunityScreen';
 import InventoryScreen from './src/screens/InventoryScreen';
@@ -61,6 +62,7 @@ export type RootStackParamList = {
   Settings: undefined;
   Subscription: undefined;
   Camera: undefined;
+  ColorBar: undefined;
 };
 
 // ─── Navigators ───────────────────────────────────────────────────────────────
@@ -130,6 +132,7 @@ function WrappedPricing(props: any) { return <ScreenWithHeader><PricingScreen {.
 function WrappedCertification(props: any) { return <ScreenWithHeader><CertificationScreen {...props} /></ScreenWithHeader>; }
 function WrappedSettings(props: any) { return <ScreenWithHeader><SettingsScreen {...props} /></ScreenWithHeader>; }
 function WrappedSubscription(props: any) { return <ScreenWithHeader><SubscriptionScreen {...props} /></ScreenWithHeader>; }
+function WrappedColorBar(props: any) { return <ColorBarScreen {...props} />; }
 function WrappedCamera(props: any) { return <ScreenWithHeader><CameraScreen {...props} /></ScreenWithHeader>; }
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
@@ -162,7 +165,8 @@ function AppContent() {
     setDrawerVisible(false);
     setTimeout(() => {
       if (navigationRef.isReady()) {
-        navigationRef.navigate(route as keyof RootStackParamList);
+        // Type-safe navigation via dispatch to avoid strict type mismatch
+        (navigationRef as any).navigate(route);
       }
     }, 100);
   }, []);
@@ -170,7 +174,7 @@ function AppContent() {
   // Re-check auth whenever any screen gains focus (catches logout)
   useEffect(() => {
     if (!navigationRef.isReady()) return;
-    const unsub = navigationRef.addListener('focus', () => {
+    const unsub = (navigationRef as any).addListener('state', () => {
       checkAuth();
     });
     return unsub;
@@ -213,6 +217,7 @@ function AppContent() {
         <Stack.Screen name="Certification" component={WrappedCertification} />
         <Stack.Screen name="Settings" component={WrappedSettings} />
         <Stack.Screen name="Subscription" component={WrappedSubscription} />
+        <Stack.Screen name="ColorBar" component={WrappedColorBar} />
         <Stack.Screen name="Camera" component={WrappedCamera} />
       </Stack.Navigator>
 

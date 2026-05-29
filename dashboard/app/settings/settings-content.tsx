@@ -33,6 +33,8 @@ export default function SettingsContent() {
   const [syncing, setSyncing] = useState(false);
   const [clientSyncEnabled, setClientSyncEnabled] = useState(false);
   const [clientSyncing, setClientSyncing] = useState(false);
+  const [error, setError] = useState('');
+  const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
   const [clientSyncResult, setClientSyncResult] = useState<ClientSyncResult | null>(null);
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export default function SettingsContent() {
   }
 
   async function handleClientSync() {
-    setClientSyncing(true); setClientSyncResult(null);
+    setClientSyncing(true); setClientSyncResult(null); setError('');
     try {
       const res = await fetch('/api/square/clients/sync', { method: 'POST' });
       const data = await res.json();
@@ -96,6 +98,16 @@ export default function SettingsContent() {
       }
     } catch { setError('Client sync failed'); }
     finally { setClientSyncing(false); }
+  }
+
+  async function handleDisconnect() {
+    if (!confirm('Disconnect Square? This will stop inventory sync and billing.')) return;
+    try {
+      const res = await fetch('/api/square/disconnect', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) { setStatus(null); fetchStatus(); }
+      else setError(data.error?.message || 'Disconnect failed');
+    } catch { setError('Disconnect failed'); }
   }
 
   return (

@@ -16,14 +16,15 @@ export default function LandingPage() {
             <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #9333EA, #EC4899)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ color: 'white', fontWeight: 900, fontSize: 13 }}>CG</span></div>
             <span style={{ color: 'white', fontWeight: 700, fontSize: 18 }}>ColorGenius</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hide-mobile">
+          {/* Desktop nav links — hidden on mobile */}
+          <div className="hidden md:flex" style={{ alignItems: 'center', gap: 32 }}>
             <a href="#how-it-works" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>How it Works</a>
             <a href="#color-match" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>Color Match</a>
             <a href="#features" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>Features</a>
             <a href="#tools" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>Color Tools</a>
             <a href="#pricing" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, textDecoration: 'none' }}>Pricing</a>
           </div>
-          <a href="/login" style={{ ...btnPrimary, padding: '8px 20px', fontSize: 14, textDecoration: 'none' }}>Sign In</a>
+          <a href="/login" style={{ ...btnPrimary, padding: '8px 20px', fontSize: 14, textDecoration: 'none', whiteSpace: 'nowrap' }}>Sign In</a>
         </div>
       </nav>
 
