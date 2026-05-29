@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { prisma } from '@/lib/prisma';
 
 async function generateClientSecret() {
   const teamId = process.env.APPLE_TEAM_ID!;
@@ -134,65 +135,36 @@ export async function POST(request: Request) {
       } catch {}
     }
 
-    // Create or find user in Supabase
-    const SUPABASE_URL = process.env.SUPABASE_URL || 'https://beuiayrnzbgvvqfgsenc.supabase.co';
-    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
-    const supabaseHeaders = {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=representation',
-    };
-
+    // Create or find user via Prisma
     // Check if user exists by apple_id
-    let user = null;
-    const existingRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/users?select=*&apple_id=eq.${encodeURIComponent(appleUserId)}&limit=1`,
-      { headers: supabaseHeaders }
-    );
-    const existing = await existingRes.json();
-    if (existing.length > 0) {
-      user = existing[0];
-    }
+    let user = await prisma.users.findFirst({
+      where: { apple_id: appleUserId },
+    });
 
     if (!user && email) {
-      // Check by email
-      const emailRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/users?select=*&email=eq.${encodeURIComponent(email)}&limit=1`,
-        { headers: supabaseHeaders }
-      );
-      const emailUsers = await emailRes.json();
-      if (emailUsers.length > 0) {
-        // Link Apple ID to existing account
-        const updateRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/users?id=eq.${emailUsers[0].id}`,
-          {
-            method: 'PATCH',
-            headers: supabaseHeaders,
-            body: JSON.stringify({ apple_id: appleUserId }),
-          }
-        );
-        const updated = await updateRes.json();
-        user = updated[0] || emailUsers[0];
+      // Check by email, link Apple ID to existing account
+      const emailUser = await prisma.users.findFirst({
+        where: { email },
+      });
+      if (emailUser) {
+        user = await prisma.users.update({
+          where: { id: emailUser.id },
+          data: { apple_id: appleUserId },
+        });
       }
     }
 
     if (!user) {
       // Create new user
-      const createRes = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
-        method: 'POST',
-        headers: supabaseHeaders,
-        body: JSON.stringify({
+      user = await prisma.users.create({
+        data: {
           email,
           first_name: firstName,
           last_name: lastName,
           apple_id: appleUserId,
           is_active: true,
-          created_at: new Date().toISOString(),
-        }),
+        },
       });
-      const created = await createRes.json();
-      user = created[0];
     }
 
     if (!user) {
