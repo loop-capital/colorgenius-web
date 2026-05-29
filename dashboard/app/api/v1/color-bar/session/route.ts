@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabaseClient'
+import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
 
 // POST /api/v1/color-bar/session
@@ -19,21 +19,22 @@ export async function POST(req: NextRequest) {
 
     // Try to insert into color_bar_sessions (will fail if table doesn't exist)
     try {
-      const { data, error } = await supabaseAdmin
-        .from('color_bar_sessions')
-        .insert({
+      const session = await prisma.color_bar_sessions.create({
+        data: {
           salon_id: user.userId,
           client_id: clientId || null,
           stylist_id: stylistId || user.userId,
           formula_id: formulaId || null,
           status: 'active',
-          created_at: new Date().toISOString(),
-        })
-        .select('id')
-        .single()
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+        select: {
+          id: true,
+        },
+      })
 
-      if (error) throw error
-      if (data?.id) sessionId = data.id
+      if (session?.id) sessionId = session.id
     } catch (dbError) {
       console.warn('color_bar_sessions table not found, returning mock session')
     }
