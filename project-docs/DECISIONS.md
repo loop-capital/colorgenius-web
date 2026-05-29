@@ -1,6 +1,6 @@
 # COLORgenius Architecture Decision Records (ADRs)
 
-> **Last Updated:** 2026-05-23
+> **Last Updated:** 2026-05-29
 > **Format:** Each ADR has Context, Decision, Consequences
 
 ---
@@ -138,27 +138,23 @@ Build **10-module Vagaro integration** covering: Auth, Clients, Appointments, Se
 
 ---
 
-## ADR-006: Supabase Backend
+## ADR-006: Supabase Backend → SUPERSEDED by ADR-008
 
 **Date:** 2026-04-15
-**Status:** Decided
+**Status:** Superseded (2026-05-29)
 
 ### Context
-Need database, auth, and storage. Options: Supabase, Firebase, AWS Amplify,自建 PostgreSQL.
+Need database, auth, and storage.自建 PostgreSQL.
 
-### Decision
-Use **Supabase** for backend services.
+### Original Decision
+~~Use **Supabase** for backend services.~~ **Superseded.**
 
-### Consequences
-- **+** PostgreSQL (not NoSQL)
-- **+** Built-in auth with OAuth
-- **+** Real-time subscriptions
-- **+** RLS policies for security
-- **−** Service role key rotation breaks everything
-- **−** Hobby plan limits
+### What Changed
+Supabase fully removed from app code on 2026-05-29 (commits `53452f6`, `010b952`, `3bece0f`). All routes migrated to Prisma. Auth uses custom JWT + bcrypt. OAuth callbacks use Prisma for user lookup. Only PostgreSQL remains (hosted on Supabase, accessed as plain Postgres via DATABASE_URL).
 
-### Safety Rule
-Service role key is NOT the anon key. Different permissions. Rotating keys breaks all connected services. See `LESSONS-LEARNED.md`.
+### References
+- See ADR-008 for the Prisma migration decision
+- `LESSONS-LEARNED.md` for Supabase key rotation incidents
 
 ---
 
@@ -182,3 +178,38 @@ Use **React Native with Expo**.
 
 ### Bundle Identifier
 `com.colorgenius.app` — confirmed in App Store Connect. NEVER change. See `LESSONS-LEARNED.md` AP-014.
+
+---
+
+## ADR-008: Prisma ORM (Supabase Removal)
+
+**Date:** 2026-05-29
+**Status:** Decided — implemented
+
+### Context
+Supabase was used for database, auth, and OAuth callbacks. Over time, data routes were migrated to Prisma but auth and OAuth callbacks still used Supabase REST API. This created a split ORM (Prisma for data, Supabase REST for auth) and unnecessary dependency on the Supabase client library.
+
+### Decision
+Fully remove Supabase from the app. Migrate all routes to Prisma:
+1. Auth routes (register, login, me) → Prisma + bcrypt + JWT
+2. OAuth callbacks (Apple, Google) → Prisma user lookup by social ID
+3. Remove `@supabase/supabase-js` from package.json
+4. Delete `lib/supabaseClient.ts`
+
+### Consequences
+- **+** Single ORM (Prisma) — no split data access patterns
+- **+** Can shut down COLORgenius Supabase project (after PostgreSQL migration)
+- **+** Reduced dependency surface — no Supabase client in bundle
+- **+** Simpler env vars — no SUPABASE_URL, SUPABASE_SERVICE_KEY
+- **−** Lost Supabase RLS (replaced by app-level auth via JWT)
+- **−** Lost Supabase real-time subscriptions (not currently used)
+- **−** Database still hosted on Supabase PostgreSQL (migrate to Neon/Railway later)
+
+### Migration Commits
+- `53452f6` — Auth routes migrated to Prisma, JWT enforcement on all routes
+- `010b952` — Apple/Google OAuth callbacks migrated, Supabase client removed
+- `3bece0f` — Stale env vars cleaned up
+
+### References
+- `PROJECT-MAP.md` — full API route inventory
+- `project-docs/ARCHITECTURE.md` — updated tech stack
