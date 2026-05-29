@@ -1,4 +1,5 @@
 'use client';
+/// <reference types="web-bluetooth" />
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
@@ -162,7 +163,6 @@ export function useScaleCapture(onCapture: (grams: number) => void): UseScaleCap
   const [capturing, setCapturing] = useState(false);
   const [captured, setCaptured] = useState<CaptureResult | null>(null);
   const stableCountRef = useRef(0);
-  const lastWeightRef = useRef(0);
 
   const startCapture = useCallback(() => {
     setCapturing(true);

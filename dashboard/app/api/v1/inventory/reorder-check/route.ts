@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getUserFromRequest } from "@/lib/auth";
 import { z } from "zod";
 
 const querySchema = z.object({
-  salon_id: z.string().min(1),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
 export async function GET(req: NextRequest) {
   try {
+    const user = await getUserFromRequest(req);
+    if (!user) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+    const salon_id = user.userId;
+
     const { searchParams } = new URL(req.url);
     const query = Object.fromEntries(searchParams.entries());
     const parsed = querySchema.safeParse(query);
@@ -19,7 +25,7 @@ export async function GET(req: NextRequest) {
         { status: 400 },
       );
     }
-    const { salon_id, page, limit } = parsed.data;
+    const { page, limit } = parsed.data;
     const skip = (page - 1) * limit;
 
     // Prisma cannot do column-to-column comparison, so use raw SQL for reorder_point check

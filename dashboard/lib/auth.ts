@@ -58,18 +58,13 @@ export async function clearAuthCookie(): Promise<void> {
 }
 
 /**
- * Verify a JWT token from Authorization: Bearer <token> header.
+ * Verify a JWT token string directly.
  * Returns the decoded payload or null if invalid.
  */
-export async function verifyBearerToken(
-  request: Request
+export async function verifyToken(
+  token: string
 ): Promise<{ userId: string; username: string; email: string } | null> {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-
-  const token = auth.slice(7).trim();
   if (!token) return null;
-
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET_KEY, {
       clockTolerance: 60,
@@ -83,4 +78,32 @@ export async function verifyBearerToken(
   } catch {
     return null;
   }
+}
+
+/**
+ * Verify a JWT token from Authorization: Bearer <token> header.
+ * Returns the decoded payload or null if invalid.
+ */
+export async function verifyBearerToken(
+  request: Request
+): Promise<{ userId: string; username: string; email: string } | null> {
+  const auth = request.headers.get('authorization');
+  if (!auth?.startsWith('Bearer ')) return null;
+
+  const token = auth.slice(7).trim();
+  return verifyToken(token);
+}
+
+/**
+ * Get token from cookie OR Bearer header, then verify it.
+ * Returns the decoded payload or null if invalid/missing.
+ */
+export async function getUserFromRequest(
+  request: Request
+): Promise<{ userId: string; username: string; email: string } | null> {
+  const cookieToken = await getTokenFromCookie();
+  const bearerToken = request.headers.get('authorization')?.replace('Bearer ', '');
+  const token = cookieToken || bearerToken;
+  if (!token) return null;
+  return verifyToken(token);
 }
