@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { SignJWT } from 'jose';
 import { cookies } from 'next/headers';
-
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://beuiayrnzbgvvqfgsenc.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
   try {
@@ -68,62 +66,35 @@ export async function GET(request: Request) {
     const firstName = userInfo.given_name || '';
     const lastName = userInfo.family_name || '';
 
-    const supabaseHeaders = {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=representation',
-    };
-
     // Check if user exists by google_id
-    let user = null;
-    const existingRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/users?select=*&google_id=eq.${encodeURIComponent(googleUserId)}&limit=1`,
-      { headers: supabaseHeaders }
-    );
-    const existing = await existingRes.json();
-    if (existing.length > 0) {
-      user = existing[0];
-    }
+    let user = await prisma.users.findFirst({
+      where: { google_id: googleUserId },
+    });
 
     if (!user && email) {
-      // Check by email
-      const emailRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/users?select=*&email=eq.${encodeURIComponent(email)}&limit=1`,
-        { headers: supabaseHeaders }
-      );
-      const emailUsers = await emailRes.json();
-      if (emailUsers.length > 0) {
-        // Link Google ID to existing account
-        const updateRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/users?id=eq.${emailUsers[0].id}`,
-          {
-            method: 'PATCH',
-            headers: supabaseHeaders,
-            body: JSON.stringify({ google_id: googleUserId }),
-          }
-        );
-        const updated = await updateRes.json();
-        user = updated[0] || emailUsers[0];
+      // Check by email, link Google ID to existing account
+      const emailUser = await prisma.users.findFirst({
+        where: { email },
+      });
+      if (emailUser) {
+        user = await prisma.users.update({
+          where: { id: emailUser.id },
+          data: { google_id: googleUserId },
+        });
       }
     }
 
     if (!user) {
       // Create new user
-      const createRes = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
-        method: 'POST',
-        headers: supabaseHeaders,
-        body: JSON.stringify({
+      user = await prisma.users.create({
+        data: {
           email,
           first_name: firstName,
           last_name: lastName,
           google_id: googleUserId,
           is_active: true,
-          created_at: new Date().toISOString(),
-        }),
+        },
       });
-      const created = await createRes.json();
-      user = created[0];
     }
 
     if (!user) {
