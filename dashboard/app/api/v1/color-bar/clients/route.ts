@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseClient';
+import { prisma } from '@/lib/prisma';
 import { verifyBearerToken } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
@@ -9,14 +9,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get real clients from Supabase
-    const { data: clients, error } = await supabaseAdmin
-      .from('clients')
-      .select('*')
-      .order('last_visit_at', { ascending: false })
-      .limit(50);
-
-    if (error) throw error;
+    // Get real clients from Prisma
+    const clients = await prisma.clients.findMany({
+      orderBy: { last_visit_at: 'desc' },
+      take: 50,
+    });
 
     return NextResponse.json({
       clients: clients?.map(client => ({

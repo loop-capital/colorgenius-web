@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabaseClient'
+import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
 
 export type AccountType =
@@ -30,14 +30,19 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch stylist profile from Supabase
-    const { data: stylist, error } = await supabaseAdmin
-      .from('stylists')
-      .select('id, email, name, account_type, brand_id')
-      .eq('id', user.userId)
-      .single()
+    // Fetch stylist profile from Prisma
+    const stylist = await prisma.stylists.findUnique({
+      where: { id: user.userId },
+      select: {
+        id: true,
+        email: true,
+        first_name: true,
+        last_name: true,
+        creator_tier: true,
+      },
+    })
 
-    if (error || !stylist) {
+    if (!stylist) {
       // Fallback: if no stylist row, infer from auth user
       const type: AccountType = 'stylist'
       const response: StylistMeResponse = {
@@ -51,14 +56,13 @@ export async function GET(req: NextRequest) {
     }
 
     const type: AccountType =
-      (stylist.account_type as AccountType) || 'stylist'
+      (stylist.creator_tier as AccountType) || 'stylist'
 
     const response: StylistMeResponse = {
       id: stylist.id,
       email: stylist.email || user.email,
-      name: stylist.name || user.username || user.email.split('@')[0],
+      name: [stylist.first_name, stylist.last_name].filter(Boolean).join(' ') || user.username || user.email.split('@')[0],
       type,
-      brandId: stylist.brand_id || undefined,
       permissions: buildPermissions(type),
     }
 
