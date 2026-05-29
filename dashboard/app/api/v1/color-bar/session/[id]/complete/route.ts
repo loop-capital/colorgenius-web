@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabaseClient'
+import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
 
 interface CompletedStep {
@@ -27,19 +27,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: 'Steps array is required' }, { status: 400 })
     }
 
-    // Try to update in Supabase (will fail if table doesn't exist)
+    // Try to update in Prisma (will fail if table doesn't exist)
     try {
-      const { error } = await supabaseAdmin
-        .from('color_bar_sessions')
-        .update({
+      await prisma.color_bar_sessions.update({
+        where: { id },
+        data: {
           status: 'completed',
-          steps: steps,
+          steps: steps as any,
           total_cost: totalCost || 0,
-          completed_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-
-      if (error) throw error
+          completed_at: new Date(),
+        },
+      })
     } catch (dbError) {
       console.warn('color_bar_sessions table not found, session not persisted')
     }

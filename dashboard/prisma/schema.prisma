@@ -1218,3 +1218,28 @@ model formula_queue {
   @@index([status], map: "idx_fq_status")
   @@index([stylist_id], map: "idx_fq_stylist")
 }
+
+model color_bar_sessions {
+  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id               String?   @db.Uuid
+  stylist_id             String?   @db.Uuid
+  client_id              String?   @db.Uuid
+  device_code            String?   @db.VarChar(4)
+  status                 String?   @default("active") @db.VarChar(20)
+  steps                  Json?
+  total_cost             Decimal?  @default(0) @db.Decimal(10, 2)
+  completed_at           DateTime? @db.Timestamptz(6)
+  feedback_submitted       Boolean?  @default(false)
+  feedback_rating          Int?
+  feedback_notes           String?
+  feedback_converted_to_brand Boolean? @default(false)
+  feedback_used_for_training  Boolean? @default(false)
+  feedback_submitted_at    DateTime? @db.Timestamptz(6)
+  created_at             DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([salon_id], map: "idx_color_bar_sessions_salon")
+  @@index([stylist_id], map: "idx_color_bar_sessions_stylist")
+  @@index([client_id], map: "idx_color_bar_sessions_client")
+  @@index([status], map: "idx_color_bar_sessions_status")
+}

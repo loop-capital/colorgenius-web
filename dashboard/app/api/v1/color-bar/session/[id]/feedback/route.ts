@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabaseClient'
+import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
 
 interface FeedbackBody {
@@ -32,25 +32,37 @@ export async function POST(
     }
 
     // Build update payload
-    const updatePayload: Record<string, any> = {
+    const updateData = {
       feedback_submitted: true,
       feedback_rating: body.rating,
       feedback_notes: body.notes ?? null,
       feedback_converted_to_brand: body.convertedToBrand ?? false,
       feedback_used_for_training: body.sentToTraining ?? false,
-      feedback_submitted_at: new Date().toISOString(),
+      feedback_submitted_at: new Date(),
     }
 
-    // Update the session in Supabase
-    const { data: updatedSession, error } = await supabaseAdmin
-      .from('color_bar_sessions')
-      .update(updatePayload)
-      .eq('id', id)
-      .select()
-      .single()
+    // Update the session in Prisma
+    try {
+      const updatedSession = await prisma.color_bar_sessions.update({
+        where: { id },
+        data: updateData,
+      })
 
-    if (error) {
-      console.error('Supabase feedback update error:', error)
+      return NextResponse.json(
+        {
+          success: true,
+          sessionId: id,
+          feedback: {
+            rating: body.rating,
+            notes: body.notes ?? null,
+            convertedToBrand: body.convertedToBrand ?? false,
+            sentToTraining: body.sentToTraining ?? false,
+          },
+        },
+        { status: 200 }
+      )
+    } catch (dbError) {
+      console.error('Prisma feedback update error:', dbError)
       // If table doesn't exist or row not found, still return success for offline mode
       return NextResponse.json(
         {
@@ -61,20 +73,6 @@ export async function POST(
         { status: 200 }
       )
     }
-
-    return NextResponse.json(
-      {
-        success: true,
-        sessionId: id,
-        feedback: {
-          rating: body.rating,
-          notes: body.notes ?? null,
-          convertedToBrand: body.convertedToBrand ?? false,
-          sentToTraining: body.sentToTraining ?? false,
-        },
-      },
-      { status: 200 }
-    )
   } catch (error) {
     console.error('Color bar feedback error:', error)
     return NextResponse.json(
