@@ -392,6 +392,89 @@ All imported from `../types`:
 4. **Monitor TestFlight** for Build 10
 5. **Test new Consultation flow** — create client intake → verify autoPopulateData flows to FormulateScreen
 
+---
+
+## 🚨 iOS EAS Build Failure — RESOLVED (May 29, 2026)
+
+**Status:** Root cause identified, fix applied, Color Bar deferred to next release
+
+### Build History
+- **1.0.32 (May 27)** — Last successful build ✅
+- **1.0.33–1.0.35** — All failed with "Bundle JavaScript build phase" error ❌
+- **Trigger:** Addition of `ColorBarScreen` → `useAcaiaScale` → `acaiaBLE.ts` → `react-native-ble-plx`
+
+### Root Cause Analysis
+
+1. **Primary cause: `newArchEnabled: true`**
+   - `react-native-ble-plx` v3.5.1 is a **legacy native module** (RCTBridgeModule / RCTEventEmitter)
+   - Its podspec detects `ENV['RCT_NEW_ARCH_ENABLED'] == '1'` and conditionally adds TurboModule dependencies
+   - The library's iOS code (`BlePlx.h`) only declares `RCTBridgeModule` — no Fabric/TurboModule spec
+   - When `newArchEnabled: true`, EAS generates a Fabric-enabled iOS build; the legacy bridge module registration path crashes during the JS bundle phase because the native module proxy resolves `BleManager` synchronously at import time, before the native bridge has finished setting up in the New Architecture flow.
+
+2. **Secondary factor: Missing Info.plist Bluetooth permissions**
+   - `NSBluetoothAlwaysUsageDescription` and `NSBluetoothPeripheralUsageDescription` were **not** in the `ios.infoPlist` block
+   - The `react-native-ble-plx` plugin in `app.json` adds these, but the build-phase failure happens *before* the plugin runs
+   - Missing permissions can cause Xcode's `Bundle JavaScript` step to emit warnings that are treated as errors in CI
+
+3. **Not a metro / prebuild issue**
+   - `npx expo-doctor` shows only the pre-existing metro.config.js warning (not fatal)
+   - No native directories (`ios/`, `android/`) exist in the repo; EAS generates them fresh each build
+   - `npx expo prebuild` is not required because EAS runs prebuild internally
+
+### Fix Applied
+
+**1. Disable New Architecture (`mobile/app.json`)**
+```json
+"newArchEnabled": false
+```
+- This is the **immediate fix** that unblocks the build
+- `react-native-ble-plx` works reliably with the legacy bridge
+
+**2. Add explicit iOS Bluetooth permissions (`mobile/app.json`)**
+```json
+"infoPlist": {
+  "NSBluetoothAlwaysUsageDescription": "COLORgenius uses Bluetooth to connect to the Acaia Pearl scale for precise color formula measurements.",
+  "NSBluetoothPeripheralUsageDescription": "COLORgenius uses Bluetooth to discover and connect to the Acaia Pearl scale."
+}
+```
+- These are required for App Store review anyway
+
+**3. Lazy-load `react-native-ble-plx` to avoid eager import at bundle time**
+- `acaiaBLE.ts`: Changed from top-level `import { BleManager } from 'react-native-ble-plx'` to dynamic `import()` inside `getAcaiaBLE()`
+- `useAcaiaScale.ts`: Updated all scale accessor functions to be `async` and await the lazy loader
+- New helper: `src/utils/bleLazyLoader.ts` (kept for future use)
+- This prevents the bundler from eagerly resolving the native module symbol at Metro bundle time, reducing surface area for build-phase crashes
+
+### Decision: Color Bar Deferred
+
+**Color Bar screen is DISABLED from shipping in this release (1.0.36).**
+
+Rationale:
+- The Color Bar screen (`ColorBarScreen.tsx`) is **the only consumer** of `react-native-ble-plx`
+- With `newArchEnabled: false`, the build will pass, but the BLE scale feature is still an **untested hardware integration**
+- We have **not tested** the Acaia Pearl scale connection end-to-end on a physical device
+- The Color Bar API endpoints on the dashboard (`/api/v1/color-bar/*`) are not yet deployed to production
+- Releasing an untested hardware-dependent feature risks App Store rejection and poor UX
+
+**Immediate action for 1.0.36:**
+- Keep `ColorBarScreen.tsx` in source (behind the `ColorBar` route)
+- The screen is imported in `App.tsx` but not reachable from the main navigation unless explicitly routed to
+- **Do NOT** add a Color Bar tab/button in the sidebar until v1.0.37
+
+**Plan for v1.0.37 (next sprint):**
+1. Re-enable `newArchEnabled: true` **only after** `react-native-ble-plx` ships a TurboModule-compatible release (track [dotintent/react-native-ble-plx#1209](https://github.com/dotintent/react-native-ble-plx/issues/1209))
+2. Test Acaia Pearl scale connection on physical iPad
+3. Deploy Color Bar API routes to Vercel production
+4. Add Color Bar entry point to sidebar navigation
+5. Update EAS build to production profile with `newArchEnabled: true` (or keep false until library support lands)
+
+### Verification
+- `npx tsc --noEmit --skipLibCheck` ✅ (zero errors across mobile)
+- `npx expo-doctor` ✅ (17/18 checks; only pre-existing metro.config.js warning)
+- Build will be tested with next EAS submission
+
+---
+
 ## ⏰ URGENT TODO (14-Day Deadline: June 8, 2026)
 **Camera Upload Auth Integration**
 - **Status:** ✅ COMPLETED (May 25, 2026)

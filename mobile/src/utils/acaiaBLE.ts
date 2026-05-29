@@ -25,8 +25,18 @@
  *   6. Heartbeat (weight request) every 10s to prevent scale auto-sleep
  */
 
-import { BleManager, Device, Characteristic, State as BleState } from 'react-native-ble-plx';
 import { Platform, PermissionsAndroid } from 'react-native';
+import type { BleManager as BleManagerType, Device, Characteristic, State } from 'react-native-ble-plx';
+
+let _BleManagerClass: typeof BleManagerType | null = null;
+let _BleState: typeof State | null = null;
+
+async function loadBlePlx() {
+  if (_BleManagerClass) return;
+  const mod = await import('react-native-ble-plx');
+  _BleManagerClass = mod.BleManager;
+  _BleState = mod.State;
+}
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -307,7 +317,7 @@ function isAcaiaDevice(name: string | null | undefined): boolean {
 // ─── AcaiaBLE Class ──────────────────────────────────────────────────────────
 
 export class AcaiaBLE {
-  private manager: BleManager;
+  private manager: BleManagerType;
   private device: Device | null = null;
   private characteristic: Characteristic | null = null;
   private listeners: Map<string, Set<(e: ScaleEvent) => void>> = new Map();
@@ -325,7 +335,10 @@ export class AcaiaBLE {
   private _connectionMonitor: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
-    this.manager = new BleManager();
+    if (!_BleManagerClass) {
+      throw new Error('BleManager not loaded. Call getAcaiaBLE() instead.');
+    }
+    this.manager = new _BleManagerClass();
   }
 
   // ─── Public Getters ──────────────────────────────────────────────────────
@@ -400,7 +413,7 @@ export class AcaiaBLE {
       // For now, this check runs against the JS-only BleManager.
       const state = await this.manager.state();
 
-      if (state !== BleState.PoweredOn) {
+      if (state !== _BleState!.PoweredOn) {
         const msg = `Bluetooth is ${state.toLowerCase()}. Please enable Bluetooth in Settings.`;
         return { available: false, error: msg };
       }
@@ -479,7 +492,7 @@ export class AcaiaBLE {
       this.manager.startDeviceScan(
         [SCALE_SERVICE_UUID],
         { allowDuplicates: false },
-        (error, device) => {
+        (error: any, device: any) => {
           if (error) {
             clearTimeout(timeout);
             this.manager.stopDeviceScan();
@@ -520,13 +533,13 @@ export class AcaiaBLE {
       // Connect to device
       this.device = await this.manager.connectToDevice(deviceId, {
         timeout: 10_000,
-      });
+      })!;
 
       // Discover services and characteristics
-      await this.device.discoverAllServicesAndCharacteristics();
+      await this.device!.discoverAllServicesAndCharacteristics();
 
       // Get the scale characteristic
-      const services = await this.device.services();
+      const services = await this.device!.services();
       const scaleService = services.find((s) => s.uuid.toLowerCase() === SCALE_SERVICE_UUID.toLowerCase());
 
       if (!scaleService) {
@@ -799,15 +812,34 @@ export class AcaiaBLE {
 // ─── Singleton ───────────────────────────────────────────────────────────────
 
 let _instance: AcaiaBLE | null = null;
+let _blePromise: Promise<AcaiaBLE> | null = null;
+
+/** Ensure lazy BLE module is loaded before constructing */
+async function ensureBleModule(): Promise<void> {
+  if (_BleManagerClass) return;
+  await loadBlePlx();
+}
 
 /**
  * Get the singleton AcaiaBLE instance.
  * Creates one if it doesn't exist.
  */
-export function getAcaiaBLE(): AcaiaBLE {
-  if (!_instance) {
-    _instance = new AcaiaBLE();
+export async function getAcaiaBLE(): Promise<AcaiaBLE> {
+  if (_instance) return _instance;
+  if (!_blePromise) {
+    _blePromise = ensureBleModule().then(() => {
+      _instance = new AcaiaBLE();
+      _blePromise = null;
+      return _instance;
+    });
   }
+  return _blePromise;
+}
+
+/**
+ * Synchronous getter — only safe *after* async init via {@link getAcaiaBLE}.
+ */
+export function getAcaiaBLESync(): AcaiaBLE | null {
   return _instance;
 }
 
