@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabaseClient'
+import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
 
 interface UpdateAccountTypeBody {
@@ -38,8 +38,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Update the stylist record
-    const updatePayload: Record<string, any> = {
-      account_type: body.accountType,
+    const updateData: any = {
+      creator_tier: body.accountType,
     }
 
     // Set brand_id for brand-related types, clear for stylist/beta_tester
@@ -50,25 +50,21 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         )
       }
-      updatePayload.brand_id = body.brandId
-    } else {
-      updatePayload.brand_id = null
+      // Note: The stylists model does not have a brand_id field in the Prisma schema.
+      // For now, we skip storing brand_id. If needed, extend the schema.
     }
 
-    const { data: updated, error } = await supabaseAdmin
-      .from('stylists')
-      .update(updatePayload)
-      .eq('id', body.stylistId)
-      .select('id, email, name, account_type, brand_id')
-      .single()
-
-    if (error) {
-      console.error('Update account type error:', error)
-      return NextResponse.json(
-        { error: 'Failed to update account type' },
-        { status: 500 }
-      )
-    }
+    const updated = await prisma.stylists.update({
+      where: { id: body.stylistId },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        first_name: true,
+        last_name: true,
+        creator_tier: true,
+      },
+    })
 
     return NextResponse.json(
       {
@@ -76,9 +72,8 @@ export async function POST(req: NextRequest) {
         stylist: {
           id: updated.id,
           email: updated.email,
-          name: updated.name,
-          accountType: updated.account_type,
-          brandId: updated.brand_id,
+          name: [updated.first_name, updated.last_name].filter(Boolean).join(' ') || updated.email,
+          accountType: updated.creator_tier || 'stylist',
         },
       },
       { status: 200 }
@@ -101,27 +96,24 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: stylists, error } = await supabaseAdmin
-      .from('stylists')
-      .select('id, email, name, account_type, brand_id')
-      .order('name')
-
-    if (error) {
-      console.error('List stylists error:', error)
-      return NextResponse.json(
-        { error: 'Failed to fetch stylists' },
-        { status: 500 }
-      )
-    }
+    const stylists = await prisma.stylists.findMany({
+      orderBy: { first_name: 'asc' },
+      select: {
+        id: true,
+        email: true,
+        first_name: true,
+        last_name: true,
+        creator_tier: true,
+      },
+    })
 
     return NextResponse.json(
       {
-        stylists: (stylists || []).map((s) => ({
+        stylists: stylists.map((s) => ({
           id: s.id,
           email: s.email,
-          name: s.name,
-          accountType: s.account_type || 'stylist',
-          brandId: s.brand_id,
+          name: [s.first_name, s.last_name].filter(Boolean).join(' ') || s.email,
+          accountType: s.creator_tier || 'stylist',
         })),
       },
       { status: 200 }
