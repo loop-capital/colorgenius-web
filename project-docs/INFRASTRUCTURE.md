@@ -1,6 +1,6 @@
 # COLORgenius Infrastructure
 
-> **Last Updated:** 2026-05-23
+> **Last Updated:** 2026-05-29
 > **Deploy Target:** Vercel (web) + EAS (mobile)
 
 ---
@@ -19,17 +19,23 @@
 
 | Variable | Purpose | Required |
 |----------|---------|----------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (client-safe) | Yes |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role (server-only) | Yes |
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `JWT_SECRET` | JWT signing key | Yes |
 | `SQUARE_APPLICATION_ID` | Square app ID | Yes |
 | `SQUARE_ACCESS_TOKEN` | Square sandbox/prod token | Yes |
 | `SQUARE_LOCATION_ID` | Square location for payments | Yes |
-| `VAGARO_CLIENT_ID` | Vagaro OAuth client ID | Yes |
-| `VAGARO_CLIENT_SECRET` | Vagaro OAuth secret | Yes |
-| `NEXT_PUBLIC_APP_URL` | Production URL (colorgenius.co) | Yes |
+| `GOOGLE_CLIENT_ID` | Google Sign In | Yes |
+| `GOOGLE_CLIENT_SECRET` | Google Sign In | Yes |
+| `APPLE_TEAM_ID` | Apple Sign In | Yes |
+| `APPLE_KEY_ID` | Apple Sign In | Yes |
+| `APPLE_SERVICES_ID` | Apple Sign In | Yes |
+| `APPLE_PRIVATE_KEY` | Apple Sign In | Yes |
+| `R2_ACCOUNT_ID` | Cloudflare R2 storage | Yes |
+| `R2_ACCESS_KEY_ID` | Cloudflare R2 storage | Yes |
+| `R2_SECRET_ACCESS_KEY` | Cloudflare R2 storage | Yes |
+| `R2_BUCKET_NAME` | Cloudflare R2 storage | Yes |
+| `OPENAI_API_KEY` | AI assistant (optional) | Optional |
 | `OLLAMA_BASE_URL` | Kimi K2.6 fallback endpoint | Optional |
-| `LITERT_LM_MODEL_PATH` | Gemma model path for server tests | Optional |
 
 ### `.env.local` (Local Dev)
 Copy from `.env.example` and fill in values. Never commit `.env.local`.
@@ -65,18 +71,24 @@ eas submit --platform ios
 
 ---
 
-## Supabase Configuration
+## Database (PostgreSQL via Prisma)
 
-### RLS Policies
-Every table must have Row Level Security enabled. Default: deny all, then grant per role.
+### Connection
+- **ORM:** Prisma (schema at `prisma/schema.prisma`)
+- **Host:** Currently Supabase PostgreSQL (migrate to Neon/Railway later)
+- **Connection string:** `DATABASE_URL` in Vercel env vars
+- **Models:** 62 models (users, clients, formulas, inventory_items, etc.)
 
-### Connection Pooling
-- **Max connections:** 60 (Hobby plan)
-- **Connection string:** Use Supabase pooler for serverless functions
+### Migrations
+```bash
+npx prisma migrate dev    # Create migration
+npx prisma migrate deploy # Apply to production
+npx prisma generate        # Regenerate client
+```
 
-### Storage Buckets
-- `product-images` — brand shade swatches
-- `client-photos` — NOT USED (photos on-device only)
+### Storage
+- **Product images:** Cloudflare R2 (`colorgenius-photos-beta` bucket)
+- **Client photos:** On-device only (never uploaded)
 
 ---
 
@@ -110,7 +122,7 @@ Every table must have Row Level Security enabled. Default: deny all, then grant 
 ## Backup & Recovery
 
 ### Database
-- **Supabase backups:** Daily automated (Hobby: 7-day retention)
+- **Host backups:** Automated by PostgreSQL host (Neon/Railway/Supabase)
 - **Manual export:** `pg_dump` before major schema changes
 
 ### Git
@@ -122,6 +134,6 @@ Every table must have Row Level Security enabled. Default: deny all, then grant 
 ## Monitoring
 
 - **Vercel Analytics:** Web vitals, error tracking
-- **Supabase Dashboard:** Query performance, slow queries
+- **Prisma Studio:** Query performance, data inspection
 - **Square Dashboard:** Payment success rates
 - **Uptime:** Colorist-facing — if formulate is down, salon can't work

@@ -1,6 +1,6 @@
 # COLORgenius Architecture
 
-> **Last Updated:** 2026-05-23
+> **Last Updated:** 2026-05-29
 > **Scope:** Web dashboard + native iOS app for AI hair color formulation
 > **On-device AI:** Photos never leave the user's phone
 
@@ -71,7 +71,7 @@ When a colorist mixes a formula using the on-screen scale widget:
 Bowl Widget ──▶ Bluetooth Scale ──▶ Weight Log ──▶ Inventory Deduction
                                       │
                                       ▼
-                              Supabase (inventory table)
+                              PostgreSQL (inventory_items table)
 ```
 
 ---
@@ -126,14 +126,14 @@ Bowl Widget ──▶ Bluetooth Scale ──▶ Weight Log ──▶ Inventory D
 
 ---
 
-## Backend: Supabase
+## Backend: PostgreSQL (Prisma)
 
 | Service | Use |
 |---------|-----|
-| **Auth** | OAuth (Google, Vagaro), JWT sessions |
-| **Database** | PostgreSQL with RLS policies |
-| **Storage** | Product images, brand assets |
-| **Edge Functions** | Lightweight compute, webhooks |
+| **Database** | PostgreSQL via Prisma ORM |
+| **Auth** | Custom JWT (jose) + bcrypt |
+| **Storage** | Cloudflare R2 (product images, brand assets) |
+| **Payments** | Square SDK |
 
 ---
 
@@ -163,8 +163,8 @@ Bowl Widget ──▶ Bluetooth Scale ──▶ Weight Log ──▶ Inventory D
 | **Web** | Next.js 14 (App Router), TypeScript, Tailwind |
 | **Mobile** | React Native, Expo |
 | **API** | Next.js API Routes (`/api/v1/...`) |
-| **Auth** | Supabase Auth (OAuth) |
-| **Database** | Supabase PostgreSQL |
+| **Auth** | Custom JWT (jose) + bcrypt |
+| **Database** | PostgreSQL via Prisma ORM |
 | **AI (On-device)** | Gemma E4B via LiteRT-LM |
 | **AI (Fallback)** | Kimi K2.6 via Ollama |
 | **Payments** | Square SDK |
@@ -200,8 +200,8 @@ colorgenius/
 │       ├── davines/
 │       ├── wella/
 │       └── ...
+├── prisma/                # Prisma schema, migrations
 ├── docs/                  # Additional documentation
-├── supabase/              # Schema, migrations, RLS policies
 ├── .claude/               # Agent definitions, commands, hooks
 │   ├── agents/
 │   ├── commands/
