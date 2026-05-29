@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabaseClient'
+import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
 
 // GET /api/v1/color-bar/formulas/:clientId?limit=10
@@ -15,25 +15,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
     const { searchParams } = new URL(req.url)
     const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 50)
 
-    // Get real client visits from Supabase
-    const { data: visits, error } = await supabaseAdmin
-      .from('client_visits')
-      .select('*')
-      .eq('client_id', clientId)
-      .order('visit_date', { ascending: false })
-      .limit(limit)
-
-    if (error) throw error
+    // Get real client visits from Prisma
+    const visits = await prisma.client_visits.findMany({
+      where: { client_id: clientId },
+      orderBy: { visit_date: 'desc' },
+      take: limit,
+    })
 
     // Get formulas for these visits
-    const { data: formulas, error: formulaError } = await supabaseAdmin
-      .from('formulas')
-      .select('*')
-      .eq('client_id', clientId)
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (formulaError) throw formulaError
+    const formulas = await prisma.formulas.findMany({
+      where: { client_id: clientId },
+      orderBy: { created_at: 'desc' },
+      take: limit,
+    })
 
     // Format the response
     const formattedFormulas = visits?.map((visit) => {
@@ -46,7 +40,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
                 .join(' '),
               shadeCode: formula.product_shade || '',
               brand: formula.product_brand || '',
-              targetGrams: formula.color_grams || 45,
+              targetGrams: 45,
               actualGrams: 0,
               completed: false,
               role: 'color',
@@ -55,7 +49,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
               product: `${formula.developer_vol || 20}vol Developer`,
               shadeCode: `${formula.developer_vol || 20}V`,
               brand: formula.product_brand || '',
-              targetGrams: formula.developer_grams || 45,
+              targetGrams: 45,
               actualGrams: 0,
               completed: false,
               role: 'developer',
@@ -68,9 +62,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
         createdAt: visit.visit_date,
         steps: colorSteps,
         developerVolume: formula?.developer_vol || 20,
-        processingTime: formula?.processing_time || 35,
+        processingTime: formula?.processing_time || 30,
         totalGrams,
-        totalCost: formula?.cost || 0,
+        totalCost: 0,
         notes: formula?.notes || '',
       }
     }) || []
