@@ -1,16 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getUserFromRequest } from "@/lib/auth";
 import { inventoryItemSchema, inventoryListQuerySchema } from "@/lib/vish/schemas";
+
+function authError(status: number, message: string) {
+  return NextResponse.json({ error: message }, { status });
+}
 
 export async function GET(req: NextRequest) {
   try {
+    const user = await getUserFromRequest(req);
+    if (!user) {
+      return authError(401, "Authentication required");
+    }
+    const salon_id = user.userId;
+
     const { searchParams } = new URL(req.url);
     const query = Object.fromEntries(searchParams.entries());
     const parsed = inventoryListQuerySchema.safeParse(query);
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid query", issues: parsed.error.issues }, { status: 400 });
     }
-    const { salon_id, brand, category, lowStock, source, page, limit } = parsed.data;
+    const { brand, category, lowStock, source, page, limit } = parsed.data;
     const skip = (page - 1) * limit;
 
     const where: any = { salon_id, is_active: true };
@@ -19,7 +30,6 @@ export async function GET(req: NextRequest) {
     if (source) where.source = source;
     if (lowStock) {
       where.low_stock_threshold = { not: null };
-      // Prisma can't do column-to-column comparison, so we filter in-memory below
     }
 
     const [items, total] = await Promise.all([
@@ -43,6 +53,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await getUserFromRequest(req);
+    if (!user) {
+      return authError(401, "Authentication required");
+    }
+    const salon_id = user.userId;
+
     const body = await req.json();
     const parsed = inventoryItemSchema.safeParse(body);
     if (!parsed.success) {
@@ -51,6 +67,7 @@ export async function POST(req: NextRequest) {
 
     const data = {
       ...parsed.data,
+      salon_id,
       source: "manual" as const,
     };
 

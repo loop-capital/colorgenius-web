@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server';
 import { generateToken, setAuthCookie } from '@/lib/auth';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://beuiayrnzbgvvqfgsenc.supabase.co';
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
@@ -14,25 +12,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
     }
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/users?select=*&email=eq.${encodeURIComponent(email)}&is_active=eq.true&limit=1`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    const user = await prisma.users.findFirst({
+      where: { email, is_active: true },
     });
 
-    // Handle non-OK responses from Supabase
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error('[login] Supabase error:', errorText);
-      return NextResponse.json({ error: 'Authentication service unavailable' }, { status: 503 });
-    }
-
-    const users = await res.json();
-    // Supabase returns error objects on some failures (e.g. invalid key) — those aren't arrays
-    if (!Array.isArray(users) || users.length === 0) {
+    if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const user = users[0];
-    const storedHash: string = user.password_hash;
+    const storedHash: string = user.password_hash || '';
 
     // Support bcrypt hashes ($2b$) and legacy SHA256 hashes during migration
     let passwordValid = false;
@@ -44,10 +32,9 @@ export async function POST(request: Request) {
       passwordValid = storedHash === sha256Hash;
       if (passwordValid) {
         const newHash = await bcrypt.hash(password, 12);
-        await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${user.id}`, {
-          method: 'PATCH',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password_hash: newHash }),
+        await prisma.users.update({
+          where: { id: user.id },
+          data: { password_hash: newHash },
         });
       }
     }

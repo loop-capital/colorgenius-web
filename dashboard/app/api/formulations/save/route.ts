@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyBearerToken } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
+  const user = await verifyBearerToken(request);
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const { clientId, clientName, clientPhone, clientEmail, salonId, stylistId, formData, result, ingredients, developer, ratio, photoUrl } = body;

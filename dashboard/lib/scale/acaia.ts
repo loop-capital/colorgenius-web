@@ -1,3 +1,4 @@
+/// <reference types="web-bluetooth" />
 /**
  * Acaia BLE Protocol — Works with Pearl 2021, Lunar, and other Acaia scales
  * Based on reverse-engineered protocol from bpowers/btscale
