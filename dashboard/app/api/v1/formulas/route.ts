@@ -1,22 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getUserFromRequest } from "@/lib/auth";
 import { formulaSchema } from "@/lib/vish/schemas";
 import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
+  const user = await getUserFromRequest(req);
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
   // Rate limiting: allow 10 requests per minute per client for formula creation
   const clientId = getClientIdentifier(req);
   const rateLimitResult = rateLimit(clientId, 60000, 10); // 10 requests per minute
-  
+
   if (!rateLimitResult.success) {
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Rate limit exceeded. Please try again later.",
       rateLimit: {
         limit: 10,
         remaining: rateLimitResult.remaining,
         resetTime: rateLimitResult.resetTime
       }
-    }, { 
+    }, {
       status: 429,
       headers: {
         'X-RateLimit-Limit': '10',
