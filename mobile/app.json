@@ -35,7 +35,11 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.READ_EXTERNAL_STORAGE"
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.BLUETOOTH_SCAN"
       ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
@@ -59,6 +63,14 @@
         "expo-image-picker",
         {
           "photosPermission": "COLORgenius accesses your photo library so you can upload hair photos for AI color analysis."
+        }
+      ],
+      [
+        "react-native-ble-plx",
+        {
+          "isBackgroundEnabled": true,
+          "neverForLocation": true,
+          "bluetoothAlwaysPermission": "COLORgenius uses Bluetooth to connect to the Acaia Pearl scale for precise color formula measurements."
         }
       ]
     ]

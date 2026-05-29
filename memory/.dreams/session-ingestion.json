@@ -22,14 +22,14 @@
       "lineCount": 2,
       "lastContentLine": 2
     },
-    "colorgenius-architect:sessions/colorgenius-architect/5319c848-4d8a-40e3-8e89-70eb724b809a.jsonl": {
+    "colorgenius-architect:sessions/colorgenius-architect/5319c848-4d8a-40e3-8e89-70eb724b809a.jsonl.deleted.2026-05-27T19-53-21.551Z": {
       "mtimeMs": 1777317224401,
       "size": 146421,
       "contentHash": "d544a4565be320631cda5efefffa31de517e7726750fe3f5f0593f8f2f537331",
       "lineCount": 6,
       "lastContentLine": 6
     },
-    "colorgenius-architect:sessions/colorgenius-architect/56a43fee-7b49-4c88-a8fd-17bf46558ed5.jsonl": {
+    "colorgenius-architect:sessions/colorgenius-architect/56a43fee-7b49-4c88-a8fd-17bf46558ed5.jsonl.deleted.2026-05-27T12-18-19.897Z": {
       "mtimeMs": 1777292123795,
       "size": 33200,
       "contentHash": "26d90f3ad5e28624f938196557b9cce9b2ceee963b744f45e3294713cd259621",
@@ -42,6 +42,13 @@
       "contentHash": "e131a285cd2835fb453dd0c0af40250b612acfbdec3f63564d669ed945877df6",
       "lineCount": 4,
       "lastContentLine": 4
+    },
+    "colorgenius-architect:sessions/colorgenius-architect/605fd461-1276-4e3d-8b72-86a9f26addb1.jsonl": {
+      "mtimeMs": 1780002689878,
+      "size": 80293,
+      "contentHash": "5fb74f41b8d8e642262f911af6c8e2355f3de61d8f93dabbcc19279178710fbb",
+      "lineCount": 2,
+      "lastContentLine": 2
     },
     "colorgenius-architect:sessions/colorgenius-architect/631c32c9-8713-46dd-8ff7-e6b9030b2d56.jsonl": {
       "mtimeMs": 1778900348535,
@@ -64,14 +71,14 @@
       "lineCount": 3,
       "lastContentLine": 3
     },
-    "colorgenius-architect:sessions/colorgenius-architect/7aa5df73-2ad5-43e0-bcb9-3530d0264387.jsonl": {
+    "colorgenius-architect:sessions/colorgenius-architect/7aa5df73-2ad5-43e0-bcb9-3530d0264387.jsonl.deleted.2026-05-27T19-53-21.550Z": {
       "mtimeMs": 1777315903365,
       "size": 115406,
       "contentHash": "ddd3c854d36978a02a5dc2af4b383d9ce6e8b4f7ee16e4547d9a629ef1bf38a4",
       "lineCount": 6,
       "lastContentLine": 6
     },
-    "colorgenius-architect:sessions/colorgenius-architect/84945ccd-1829-4b77-af06-796ffe86e435.jsonl": {
+    "colorgenius-architect:sessions/colorgenius-architect/84945ccd-1829-4b77-af06-796ffe86e435.jsonl.deleted.2026-05-27T12-23-08.954Z": {
       "mtimeMs": 1777292536212,
       "size": 220761,
       "contentHash": "57d7b2566aebec23c24bc995dc2e6fcc8029fd73951a998172d7dd459c5cf271",
@@ -141,7 +148,7 @@
       "lineCount": 8,
       "lastContentLine": 8
     },
-    "colorgenius-architect:sessions/colorgenius-architect/e047fe6b-df9b-49b0-9fd1-6e6d2b83ac28.jsonl": {
+    "colorgenius-architect:sessions/colorgenius-architect/e047fe6b-df9b-49b0-9fd1-6e6d2b83ac28.jsonl.deleted.2026-05-27T12-14-41.503Z": {
       "mtimeMs": 1777292066615,
       "size": 39859,
       "contentHash": "884a306bcf8482760a1d51e4c6d77c313d1b31bfcbfef86c6d2d6de9aebf44cc",
@@ -155,7 +162,7 @@
       "lineCount": 2,
       "lastContentLine": 2
     },
-    "colorgenius-ceo:sessions/colorgenius-ceo/01c17a92-3fd0-4127-9137-d0123a038d7e.jsonl": {
+    "colorgenius-ceo:sessions/colorgenius-ceo/01c17a92-3fd0-4127-9137-d0123a038d7e.jsonl.deleted.2026-05-28T17-29-06.484Z": {
       "mtimeMs": 1777397261872,
       "size": 100373,
       "contentHash": "2425b80427a6ac88273682e72e3b04f16f2d9202cf5669501285df4e027a86d3",
@@ -351,7 +358,7 @@
       "lineCount": 9,
       "lastContentLine": 9
     },
-    "colorgenius-ceo:sessions/colorgenius-ceo/4c48f43d-8ebf-4dc2-bc26-c23f9122b36a.jsonl": {
+    "colorgenius-ceo:sessions/colorgenius-ceo/4c48f43d-8ebf-4dc2-bc26-c23f9122b36a.jsonl.deleted.2026-05-27T09-22-40.114Z": {
       "mtimeMs": 1777281714353,
       "size": 83440,
       "contentHash": "0f4041bd8207b982fc5e8849c8b025eed48582ff0cec6f31d46691dc2616a3a1",
@@ -379,7 +386,7 @@
       "lineCount": 139,
       "lastContentLine": 139
     },
-    "colorgenius-ceo:sessions/colorgenius-ceo/57bc0ea9-920a-4358-95ac-5f04190722b2.jsonl": {
+    "colorgenius-ceo:sessions/colorgenius-ceo/57bc0ea9-920a-4358-95ac-5f04190722b2.jsonl.deleted.2026-05-28T09-27-57.444Z": {
       "mtimeMs": 1777368184889,
       "size": 102096,
       "contentHash": "e852f666c3ccbce8810b12035cad9780e876d73aad6e805739360f2d4a610718",
@@ -498,7 +505,7 @@
       "lineCount": 53,
       "lastContentLine": 53
     },
-    "colorgenius-ceo:sessions/colorgenius-ceo/875c4e39-4aae-4214-91dc-c910d9b9b525.jsonl": {
+    "colorgenius-ceo:sessions/colorgenius-ceo/875c4e39-4aae-4214-91dc-c910d9b9b525.jsonl.deleted.2026-05-28T12-02-39.815Z": {
       "mtimeMs": 1777377727376,
       "size": 35420,
       "contentHash": "7bf03613c8396001af36a4e6df3f04f158fbf96395910883b9ad6696bf9d8e45",
@@ -575,13 +582,6 @@
       "lineCount": 5,
       "lastContentLine": 5
     },
-    "colorgenius-ceo:sessions/colorgenius-ceo/a9964cba-f1cb-4ef3-95a4-de53cd79fc94.jsonl.reset.2026-04-28T16-18-14.783Z": {
-      "mtimeMs": 1777345321085,
-      "size": 2467753,
-      "contentHash": "a9211de36fe9f242fdbb02f80e30e33c1459c06ccab691d8218a7dc04f16cbd5",
-      "lineCount": 379,
-      "lastContentLine": 379
-    },
     "colorgenius-ceo:sessions/colorgenius-ceo/afb7f5e7-cc5f-4817-b5be-021811ca119f.jsonl": {
       "mtimeMs": 1779003084923,
       "size": 1993905,
@@ -652,13 +652,6 @@
       "lineCount": 6,
       "lastContentLine": 6
     },
-    "colorgenius-ceo:sessions/colorgenius-ceo/cddd609b-d547-4cb6-8d35-ecfe8b72f610.jsonl.reset.2026-04-27T11-32-58.387Z": {
-      "mtimeMs": 1777271482165,
-      "size": 1037755,
-      "contentHash": "4251fab88adc52e8b88dcf8ff954d9bd5aa5a36aca8b0741de337f8a063166b0",
-      "lineCount": 71,
-      "lastContentLine": 71
-    },
     "colorgenius-ceo:sessions/colorgenius-ceo/cfcec1a5-f844-4069-a461-d55654c92710.jsonl": {
       "mtimeMs": 1777766083529,
       "size": 695,
@@ -715,7 +708,7 @@
       "lineCount": 7,
       "lastContentLine": 7
     },
-    "colorgenius-ceo:sessions/colorgenius-ceo/ef0c2638-8342-41ec-a32a-557cbdbf214a.jsonl": {
+    "colorgenius-ceo:sessions/colorgenius-ceo/ef0c2638-8342-41ec-a32a-557cbdbf214a.jsonl.deleted.2026-05-28T00-12-43.072Z": {
       "mtimeMs": 1777334816476,
       "size": 10097,
       "contentHash": "eaa241845404d6039fd6bab375237617cb3eccc07b7b983906e604c98650d325",
@@ -750,6 +743,13 @@
       "lineCount": 7,
       "lastContentLine": 7
     },
+    "colorgenius-dev:sessions/colorgenius-dev/02bc9c55-2e2b-4df0-ab88-91a7b1e4cc8b.jsonl": {
+      "mtimeMs": 1780029291400,
+      "size": 203052,
+      "contentHash": "5bc75bddcb079c6366a14c762c71be2e12ea9e4986d4cfd4a5cb9a506d478f19",
+      "lineCount": 3,
+      "lastContentLine": 3
+    },
     "colorgenius-dev:sessions/colorgenius-dev/03306821-5adc-4683-96f5-e4b82b5ca956.jsonl": {
       "mtimeMs": 1779166641460,
       "size": 73196,
@@ -777,6 +777,13 @@
       "contentHash": "976bb44edaf82df70383f649474c9af93796cbf02b840de1bdbd39449f09ab8f",
       "lineCount": 23,
       "lastContentLine": 23
+    },
+    "colorgenius-dev:sessions/colorgenius-dev/0c43cd9c-d3f2-4fd3-a90e-880f4ccd29b6.jsonl": {
+      "mtimeMs": 1780002671442,
+      "size": 16365,
+      "contentHash": "906e9bcf936356e430199e00236d1986d1100380cf85cadd7f2d372660da166a",
+      "lineCount": 2,
+      "lastContentLine": 2
     },
     "colorgenius-dev:sessions/colorgenius-dev/0d42db4a-ce3d-4c72-bf29-eff6b0d4b7fc.jsonl": {
       "mtimeMs": 1777815084301,
@@ -862,7 +869,7 @@
       "lineCount": 30,
       "lastContentLine": 30
     },
-    "colorgenius-dev:sessions/colorgenius-dev/266377b2-2fea-4d5a-9d9d-f945aad0b357.jsonl": {
+    "colorgenius-dev:sessions/colorgenius-dev/266377b2-2fea-4d5a-9d9d-f945aad0b357.jsonl.deleted.2026-05-27T19-53-21.980Z": {
       "mtimeMs": 1777315870672,
       "size": 201428,
       "contentHash": "bbaaae4433d8b0404c4e8f65d70f95f50f3240b0f12152b39988ad1c4c186ece",
@@ -904,7 +911,7 @@
       "lineCount": 4,
       "lastContentLine": 4
     },
-    "colorgenius-dev:sessions/colorgenius-dev/3e50fb91-4512-4555-8125-1c94c0661f6a.jsonl": {
+    "colorgenius-dev:sessions/colorgenius-dev/3e50fb91-4512-4555-8125-1c94c0661f6a.jsonl.deleted.2026-05-27T12-42-53.613Z": {
       "mtimeMs": 1777293263717,
       "size": 292330,
       "contentHash": "d78acfe68f5343b095a66ec1bc97a889b1b91bba76ab704e0dfe150a55ce7169",
@@ -939,7 +946,7 @@
       "lineCount": 5,
       "lastContentLine": 5
     },
-    "colorgenius-dev:sessions/colorgenius-dev/4492bc89-653e-4064-be4c-00941b032fbd.jsonl": {
+    "colorgenius-dev:sessions/colorgenius-dev/4492bc89-653e-4064-be4c-00941b032fbd.jsonl.deleted.2026-05-27T12-11-39.224Z": {
       "mtimeMs": 1777291784147,
       "size": 108719,
       "contentHash": "ede374ec07943e27681c8fe6e86b59824185166d8c0ecc38c128f83558a4b6a0",
@@ -1093,7 +1100,7 @@
       "lineCount": 6,
       "lastContentLine": 6
     },
-    "colorgenius-dev:sessions/colorgenius-dev/68acdfd0-f533-4128-ad4c-6651cf00f762.jsonl": {
+    "colorgenius-dev:sessions/colorgenius-dev/68acdfd0-f533-4128-ad4c-6651cf00f762.jsonl.deleted.2026-05-27T21-21-38.840Z": {
       "mtimeMs": 1777324774295,
       "size": 107264,
       "contentHash": "4eec0f45b38f549798a049a768dfdeaa3b0a5675cb12539b4fbec9c982cebae8",
@@ -1149,7 +1156,7 @@
       "lineCount": 12,
       "lastContentLine": 12
     },
-    "colorgenius-dev:sessions/colorgenius-dev/725e69d0-1a63-4d0e-9a89-6844c8767701.jsonl": {
+    "colorgenius-dev:sessions/colorgenius-dev/725e69d0-1a63-4d0e-9a89-6844c8767701.jsonl.deleted.2026-05-27T12-05-08.240Z": {
       "mtimeMs": 1777291440062,
       "size": 138579,
       "contentHash": "bdd77b89690b3220b029ba4b9f6d5163648cccf9847131e012bcb8926cf9e460",
@@ -1301,7 +1308,7 @@
       "size": 83599,
       "contentHash": "52d74d45cf001909d4fa84a7a55891d38d5055149934226bacf937a2c524bbb4",
       "lineCount": 26,
-      "lastContentLine": 24
+      "lastContentLine": 26
     },
     "colorgenius-dev:sessions/colorgenius-dev/ae4325a3-3de0-4994-8594-e82a909c155b.jsonl": {
       "mtimeMs": 1778886419357,
@@ -1464,6 +1471,13 @@
       "lineCount": 9,
       "lastContentLine": 9
     },
+    "colorgenius-dev:sessions/colorgenius-dev/ebda0832-421d-4bee-bc09-a8bfe8b49e36.jsonl": {
+      "mtimeMs": 1780002858854,
+      "size": 99679,
+      "contentHash": "d552d6b7f70539ca78fc64b402e1a278c3a1c71df5d0fc40d6f8005f9737b0e5",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
     "colorgenius-dev:sessions/colorgenius-dev/ee20faed-dedc-4040-bac0-e926e661ad59.jsonl.deleted.2026-05-27T06-31-58.777Z": {
       "mtimeMs": 1777268616453,
       "size": 169438,
@@ -1478,7 +1492,7 @@
       "lineCount": 7,
       "lastContentLine": 7
     },
-    "colorgenius-dev:sessions/colorgenius-dev/f1dc2bbb-9214-4ba4-ac9e-00a903db6b25.jsonl": {
+    "colorgenius-dev:sessions/colorgenius-dev/f1dc2bbb-9214-4ba4-ac9e-00a903db6b25.jsonl.deleted.2026-05-27T21-21-38.840Z": {
       "mtimeMs": 1777324583291,
       "size": 162215,
       "contentHash": "9444357c07dc7464809ec70226160d16f315eb1246844f59f96cd1d2372471b1",
@@ -1506,21 +1520,21 @@
       "lineCount": 4,
       "lastContentLine": 4
     },
-    "colorgenius-dev:sessions/colorgenius-dev/fbbedc45-3e22-49d5-b4fd-c693bdf8af04.jsonl": {
+    "colorgenius-dev:sessions/colorgenius-dev/fbbedc45-3e22-49d5-b4fd-c693bdf8af04.jsonl.deleted.2026-05-27T21-21-38.839Z": {
       "mtimeMs": 1777324713471,
       "size": 206125,
       "contentHash": "fc46201a90abaf9bfbc371a78726314baf09cd13e3d7cd635496e73eb09e3936",
       "lineCount": 11,
       "lastContentLine": 11
     },
-    "colorgenius-dev:sessions/colorgenius-dev/fd23dc75-bda4-4e5e-a51a-1c7c5c592e5e.jsonl": {
+    "colorgenius-dev:sessions/colorgenius-dev/fd23dc75-bda4-4e5e-a51a-1c7c5c592e5e.jsonl.deleted.2026-05-27T20-19-05.710Z": {
       "mtimeMs": 1777320261014,
       "size": 441395,
       "contentHash": "fa87e7bca2aeb9ff1f23ea36f7669998838115fbe64b51e14d25ab3d74c447a1",
       "lineCount": 29,
       "lastContentLine": 29
     },
-    "colorgenius-dev:sessions/colorgenius-dev/fd61a88b-f84b-410e-9813-6f2aa1ffde01.jsonl": {
+    "colorgenius-dev:sessions/colorgenius-dev/fd61a88b-f84b-410e-9813-6f2aa1ffde01.jsonl.deleted.2026-05-27T21-21-38.841Z": {
       "mtimeMs": 1777324836647,
       "size": 80690,
       "contentHash": "95ce3e16bb45f99825eff91e753defb01acad6c57390a2f029e6c84be4bef66f",
@@ -1548,7 +1562,14 @@
       "lineCount": 9,
       "lastContentLine": 9
     },
-    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/183f4dbf-3ada-4e64-a6be-a3bf825482e7.jsonl": {
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/01f10325-96dc-4f4d-8e75-1651232adeb8.jsonl": {
+      "mtimeMs": 1780003203794,
+      "size": 3195,
+      "contentHash": "455bb39e1f1f3eb40d624159429b5e7faa921d6a7ff51fba06a508b9417aba5d",
+      "lineCount": 2,
+      "lastContentLine": 2
+    },
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/183f4dbf-3ada-4e64-a6be-a3bf825482e7.jsonl.deleted.2026-05-28T01-35-35.083Z": {
       "mtimeMs": 1777338289990,
       "size": 35884,
       "contentHash": "89826fad7a8f7a87a6254e3ccc55df44ad39d7ee90d4083f78ea022f2074405c",
@@ -1562,7 +1583,7 @@
       "lineCount": 4,
       "lastContentLine": 4
     },
-    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/256b45ac-9ab3-41de-b978-0b465337b3bc.jsonl": {
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/256b45ac-9ab3-41de-b978-0b465337b3bc.jsonl.deleted.2026-05-27T22-58-31.595Z": {
       "mtimeMs": 1777329432204,
       "size": 23691,
       "contentHash": "ba11a524ca3db653a8a44d9ff7108d9e78b610cb7ef5763804076443b78744a9",
@@ -1582,6 +1603,13 @@
       "contentHash": "d5af6cb064dd8b0995f64ed5e0488eb4b7df6c4f78de90c00bd3ca8f01f6530d",
       "lineCount": 2,
       "lastContentLine": 2
+    },
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/573cc1ed-c773-4936-8002-74ed4762f22c.jsonl": {
+      "mtimeMs": 1780003295090,
+      "size": 43043,
+      "contentHash": "94300af89999e8870bd9bd186f4ff2f24509ad56856010dea95661d7d3d0d1a4",
+      "lineCount": 5,
+      "lastContentLine": 5
     },
     "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/5de0835b-6951-4205-8783-c77fde18c172.jsonl": {
       "mtimeMs": 1779838092882,
@@ -1604,6 +1632,13 @@
       "lineCount": 2,
       "lastContentLine": 2
     },
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/6f9e14c5-cbec-4cec-bec2-5cb52f19fd8e.jsonl": {
+      "mtimeMs": 1780030613340,
+      "size": 111548,
+      "contentHash": "803bb982c0f69a0c1cfbd7b1c2fcb0a948e0cdd2c46b436a5707985e9e680da9",
+      "lineCount": 4,
+      "lastContentLine": 4
+    },
     "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/6fc3d8fe-1055-4276-8712-c82118901a3e.jsonl": {
       "mtimeMs": 1778862048996,
       "size": 2554,
@@ -1611,21 +1646,35 @@
       "lineCount": 1,
       "lastContentLine": 1
     },
-    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/758b4553-42af-4205-9381-e8beaf4a9223.jsonl": {
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/758b4553-42af-4205-9381-e8beaf4a9223.jsonl.deleted.2026-05-28T01-01-41.240Z": {
       "mtimeMs": 1777337886097,
       "size": 7591,
       "contentHash": "55d981508835dcfb4a4f685f90d7ad8955b279228e679ea6d2f37061d8cb5ebe",
       "lineCount": 9,
       "lastContentLine": 9
     },
-    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/945e0253-7f65-44ce-b5d8-f86790085482.jsonl": {
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/86b94af7-8aab-4254-badc-eeacda31b760.jsonl": {
+      "mtimeMs": 1779917868238,
+      "size": 1086,
+      "contentHash": "a930635066307b8dfa88ad1d2b7a62d8f5a3b2fa07a3102f576eac2a9bb143f7",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/907d0c97-59bc-4263-bb3b-e54cb9991a02.jsonl": {
+      "mtimeMs": 1780003198774,
+      "size": 3524,
+      "contentHash": "453ccc5e7f40471904ef5f567efc0b0daf65d65448a1652b8846b8e683623718",
+      "lineCount": 2,
+      "lastContentLine": 2
+    },
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/945e0253-7f65-44ce-b5d8-f86790085482.jsonl.deleted.2026-05-28T01-01-41.241Z": {
       "mtimeMs": 1777337835254,
       "size": 3952,
       "contentHash": "046d78e8e5f359a748bad660f19da0e288381fcabaa33ca6d063b0d5c0f80209",
       "lineCount": 2,
       "lastContentLine": 2
     },
-    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/b0aad0a9-b631-4086-bcbf-a0651f8ca52f.jsonl": {
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/b0aad0a9-b631-4086-bcbf-a0651f8ca52f.jsonl.deleted.2026-05-28T01-01-41.241Z": {
       "mtimeMs": 1777337915493,
       "size": 7641,
       "contentHash": "e33f4cf0412480beb3af4b9d2fd601b461d676bbf262116bee24ae28eca998b2",
@@ -1639,12 +1688,19 @@
       "lineCount": 1,
       "lastContentLine": 1
     },
-    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/c3ce14cb-31d5-4153-bf12-91829eb3337b.jsonl": {
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/c3ce14cb-31d5-4153-bf12-91829eb3337b.jsonl.deleted.2026-05-28T01-01-41.241Z": {
       "mtimeMs": 1777338033245,
       "size": 25179,
       "contentHash": "db8035e37f5774ffad72b58dcd04fd59ba798b495a3dde830f958637560d414e",
       "lineCount": 8,
       "lastContentLine": 8
+    },
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/cd32da5c-fe14-41d4-8ca5-bbfbe861f6a4.jsonl": {
+      "mtimeMs": 1780003249106,
+      "size": 3157,
+      "contentHash": "d6931c7501be9f5b0b20ae3f56f717217b575c415d1856fa5aa04427b11303ac",
+      "lineCount": 2,
+      "lastContentLine": 2
     },
     "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/d9b2392c-ce97-4237-a032-892d364e05aa.jsonl": {
       "mtimeMs": 1778861719636,
@@ -1659,6 +1715,13 @@
       "contentHash": "ebc51869067d57653b4731a9d1600f9f1867e819b32b7a7863b5cfcdfbcfc558",
       "lineCount": 4,
       "lastContentLine": 4
+    },
+    "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/dd074654-14cf-49ab-b7d1-8153496b2419.jsonl": {
+      "mtimeMs": 1780003208138,
+      "size": 3113,
+      "contentHash": "4bdc106e190e04468b6347d10ac25d63f90ec7a44ca9871ba257cda5c5d60b30",
+      "lineCount": 2,
+      "lastContentLine": 2
     },
     "colorgenius-dev-qwen:sessions/colorgenius-dev-qwen/e5962caf-ea08-4aa4-bc44-3a7d4421aa61.jsonl": {
       "mtimeMs": 1779837714154,
@@ -1779,7 +1842,7 @@
       "lineCount": 1,
       "lastContentLine": 1
     },
-    "colorgenius-devops:sessions/colorgenius-devops/b51417d4-743d-4e99-9929-a4f6746acb65.jsonl": {
+    "colorgenius-devops:sessions/colorgenius-devops/b51417d4-743d-4e99-9929-a4f6746acb65.jsonl.deleted.2026-05-27T19-53-22.242Z": {
       "mtimeMs": 1777315907061,
       "size": 300708,
       "contentHash": "0211392fd2ff17d97c18f4917c05e36259a0bd305dcb29ce1a31390f3611d48f",
@@ -1793,7 +1856,7 @@
       "lineCount": 66,
       "lastContentLine": 66
     },
-    "colorgenius-devops:sessions/colorgenius-devops/eaaf55e9-264c-4eee-9a8c-16b89865a4d9.jsonl": {
+    "colorgenius-devops:sessions/colorgenius-devops/eaaf55e9-264c-4eee-9a8c-16b89865a4d9.jsonl.deleted.2026-05-27T19-53-22.242Z": {
       "mtimeMs": 1777316266125,
       "size": 199242,
       "contentHash": "3a0540bfd43f146ebe0c7c512206670ad2441001960003f4ead8773e0a4bb744",
@@ -1849,7 +1912,7 @@
       "lineCount": 7,
       "lastContentLine": 7
     },
-    "colorgenius-meta:sessions/colorgenius-meta/231ae181-d9f5-4e73-a0a7-b38ec31b0c0f.jsonl": {
+    "colorgenius-meta:sessions/colorgenius-meta/231ae181-d9f5-4e73-a0a7-b38ec31b0c0f.jsonl.deleted.2026-05-27T18-51-40.925Z": {
       "mtimeMs": 1777315710826,
       "size": 271368,
       "contentHash": "264fdf27d3a1039f392daaef5a4013c337abe8124b9abce51f7e3246d1aeda5e",
@@ -1926,14 +1989,14 @@
       "lineCount": 20,
       "lastContentLine": 20
     },
-    "colorgenius-research:sessions/colorgenius-research/6979d76c-81e1-4343-9b4a-ea2f4320f8fb.jsonl": {
+    "colorgenius-research:sessions/colorgenius-research/6979d76c-81e1-4343-9b4a-ea2f4320f8fb.jsonl.deleted.2026-05-27T18-51-40.514Z": {
       "mtimeMs": 1777315671886,
       "size": 161564,
       "contentHash": "a45a08ea205dfbdeb3e0497b444a1cf41e088842ddb0a7dc1f955939e69aef37",
       "lineCount": 1,
       "lastContentLine": 1
     },
-    "colorgenius-research:sessions/colorgenius-research/6e364043-d2de-4024-bee7-933272631131.jsonl": {
+    "colorgenius-research:sessions/colorgenius-research/6e364043-d2de-4024-bee7-933272631131.jsonl.deleted.2026-05-27T12-07-43.289Z": {
       "mtimeMs": 1777291440250,
       "size": 133963,
       "contentHash": "996d03bf40eb18ecdfb5c054f4ffa08f9de790cdfc6f0e74d01ae399fe9a3868",
@@ -2003,7 +2066,7 @@
       "lineCount": 2,
       "lastContentLine": 2
     },
-    "colorgenius-research:sessions/colorgenius-research/c2aeb0bd-d7a3-43c7-9027-49628c8bc5e5.jsonl": {
+    "colorgenius-research:sessions/colorgenius-research/c2aeb0bd-d7a3-43c7-9027-49628c8bc5e5.jsonl.deleted.2026-05-27T19-53-22.693Z": {
       "mtimeMs": 1777315838076,
       "size": 223735,
       "contentHash": "11da3bf84e146b55b215aeb7715bcc0c3f88f5ce2ac5dc818ec0eece2d284570",
@@ -3771,7 +3834,9 @@
       "1171613ef08703c7cbd78b7a3589878d82d221fa",
       "bf827ac76541486e70ea4f173790f546adb0d93a",
       "75dd2a8a64cccf4cef730066baa3c5160e46fef2",
-      "d09954e643506c204a20d79a3fc44f342c908671"
+      "d09954e643506c204a20d79a3fc44f342c908671",
+      "be97717447d72242798f71192e7e9e37de05d24b",
+      "43f345c4a4b701626a58e84366b91ca52a4139c2"
     ],
     "colorgenius-dev-qwen:4b372b09-2a10-4bab-a771-41c4d8513063": [
       "92a2a50119d5786f85cf7df9164fb24c57c467dc",
@@ -3797,6 +3862,57 @@
     "colorgenius-dev-qwen:e5962caf-ea08-4aa4-bc44-3a7d4421aa61": [
       "6abc215a5ca4fe33c5887ab689f3d076761418d8",
       "6bae84e4f3d84e07d66328e1fa7b314868595a01"
+    ],
+    "colorgenius-dev-qwen:86b94af7-8aab-4254-badc-eeacda31b760": [
+      "d84c9ffe53f25f70b9f4178c3577e9e942d177f6"
+    ],
+    "colorgenius-architect:605fd461-1276-4e3d-8b72-86a9f26addb1": [
+      "5a7efa1b802c63db426cbffc8b9067e81309333c",
+      "5b69063bd611a06fb0f565477dd3508a0403c3f7"
+    ],
+    "colorgenius-ceo:01c17a92-3fd0-4127-9137-d0123a038d7e": [],
+    "colorgenius-ceo:57bc0ea9-920a-4358-95ac-5f04190722b2": [],
+    "colorgenius-ceo:875c4e39-4aae-4214-91dc-c910d9b9b525": [],
+    "colorgenius-dev:02bc9c55-2e2b-4df0-ab88-91a7b1e4cc8b": [
+      "0c9d91a6561a41ccadda0af7373bffbf6acb1a56",
+      "258fbf7d01b647f05659c7df227da501d5867205",
+      "7d2a73abbd03aaeeb351ca35919c591cd2bbc20d"
+    ],
+    "colorgenius-dev:0c43cd9c-d3f2-4fd3-a90e-880f4ccd29b6": [
+      "aa5422319f4505e9253f8d7018ffb865ef79ad93",
+      "c45d1443181dce2580c477beb58c5df4144af7ae"
+    ],
+    "colorgenius-dev:ebda0832-421d-4bee-bc09-a8bfe8b49e36": [
+      "b5011127bf2da5176cb99d638d182954b70ecb27"
+    ],
+    "colorgenius-dev-qwen:01f10325-96dc-4f4d-8e75-1651232adeb8": [
+      "3ac55adcacdd7233ccb8005499d03f160724bac1",
+      "8ac48d99403a197f1f7647425a690f8ea4f7f808"
+    ],
+    "colorgenius-dev-qwen:573cc1ed-c773-4936-8002-74ed4762f22c": [
+      "3c1608c5844a675f61fde0de809f8af135de2297",
+      "b88c3aac61b24f11745645d98b97fe453339709b",
+      "d8ce8821eba372a89768435ac37a8dac0fcae0bf",
+      "faf2ad701d8d3f3bebdb4a5500c886c16dfe1576",
+      "73973f1b2f28c06c508b9a23548f1992b6c3a212"
+    ],
+    "colorgenius-dev-qwen:6f9e14c5-cbec-4cec-bec2-5cb52f19fd8e": [
+      "3770719bbaa92a1164be7e347109197333d7b6cc",
+      "8097abc8dca7a7d50c1cff60b1f2f89224cd763b",
+      "a83709f535f62c424e56eb31282d2bfe5867a8ff",
+      "1acb65dbc36e03f6a64579de7e241282e245ee5e"
+    ],
+    "colorgenius-dev-qwen:907d0c97-59bc-4263-bb3b-e54cb9991a02": [
+      "ea912e51e2389e012c48ff566d37be8f4b5296d3",
+      "ba9c5df891f27d6d00e7ec3f6fd7434f4ad727fd"
+    ],
+    "colorgenius-dev-qwen:cd32da5c-fe14-41d4-8ca5-bbfbe861f6a4": [
+      "95b8f74273451729d0d154e580141fecd4f54111",
+      "3c002011ac6eadf83c7ab407e1f7d3f8f3e538c4"
+    ],
+    "colorgenius-dev-qwen:dd074654-14cf-49ab-b7d1-8153496b2419": [
+      "5d479f929656bb246ea3ee56c7e307cdd81dc68f",
+      "961b19d19f8c413073299410e6f0cd0bb190065c"
     ]
   }
 }

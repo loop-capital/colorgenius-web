@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 model Client {
@@ -86,4 +86,24 @@ model Visit {
   @@index([clientId])
   @@index([visitDate])
   @@index([formulaId])
+}
+
+model ColorBarSession {
+  id          String   @id @default(cuid())
+  salonId     String
+  clientId    String?
+  stylistId   String
+  formulaId   String?
+  status      String   // active, completed, cancelled
+  steps       Json?    // [{ product, shadeCode, targetGrams, actualGrams }]
+  totalCost   Float?
+  squareOrderId String?
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+
+  @@index([salonId])
+  @@index([clientId])
+  @@index([stylistId])
+  @@index([status])
+  @@index([createdAt])
 }

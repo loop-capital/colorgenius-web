@@ -145,6 +145,7 @@ export { blendColor } from '@/lib/color-utils'
 const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 const btnOutline = { padding: '12px 24px', border: '1px solid rgba(255,255,255,0.12)', color: '#A1A1AA', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 const btnPinkOutline = { padding: '12px 24px', border: '1px solid rgba(236,72,153,0.4)', color: '#EC4899', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 600 }
+const btnPurpleOutline = { padding: '12px 24px', border: '1.5px solid #9333EA', color: '#9333EA', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 600 }
 
 export default function FormulatePage() {
   const { toast } = useToast()
@@ -948,7 +949,7 @@ export default function FormulatePage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button type="button" onClick={() => setStep(4)} style={btnOutline}><ChevronLeft size={16} /> Back</button>
               <div style={{ display: 'flex', gap: 12 }}>
-                <button type="button" onClick={() => setManualEntry(true)} style={btnPinkOutline}><FlaskConical size={16} /> Add Formula</button>
+                <button type="button" onClick={() => setManualEntry(true)} style={btnPurpleOutline}><FlaskConical size={16} /> My Formula</button>
                 <button type="button" onClick={handleSubmit} disabled={loading} style={btnPrimary}>
                   {loading ? <><LoaderCircle className="animate-spin" size={16} style={{ color: '#F59E0B' }} /> Generating...</> : <>Generate Formula <FlaskConical size={16} /></>}
                 </button>

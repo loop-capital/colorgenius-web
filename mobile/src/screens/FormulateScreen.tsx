@@ -33,6 +33,7 @@ import {
   Save,
   ShoppingBag,
   FlaskConical,
+  Pencil,
 } from 'lucide-react-native';
 import {
   submitFormulation,
@@ -67,6 +68,7 @@ import {
   type ConditionType,
   type LastServiceType,
 } from '../types';
+import EditFormulaForm from '../components/EditFormulaForm';
 // Manual formula entry is handled inline via ManualFormulaForm below
 
 // ─── Constants ─────────────────────────────────────────────────────────────
@@ -640,12 +642,12 @@ function NavButtons({
 
       {showAddFormula && onAddFormula && (
         <TouchableOpacity
-          style={navStyles.addFormulaBtn}
+          style={navStyles.myFormulaBtn}
           onPress={onAddFormula}
           activeOpacity={0.8}
         >
-          <FlaskConical size={18} color="#FFF" />
-          <Text style={navStyles.addFormulaText}>Add Formula</Text>
+          <FlaskConical size={18} color={COLORS.purple} />
+          <Text style={navStyles.myFormulaText}>My Formula</Text>
         </TouchableOpacity>
       )}
 
@@ -713,11 +715,24 @@ const navStyles = StyleSheet.create({
     elevation: 4,
   },
   addFormulaText: { fontSize: 14, fontWeight: '600', color: '#FFF' },
+  myFormulaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderWidth: 1.5,
+    borderColor: COLORS.purple,
+  },
+  myFormulaText: { fontSize: 14, fontWeight: '600', color: COLORS.purple },
 });
 
 // ─── Result Card ─────────────────────────────────────────────────────────────
 
-function ResultCard({ result, onSendToDevice }: { result: FormulationResult; onSendToDevice?: () => void }) {
+function ResultCard({ result, onSendToDevice, onEditFormula }: { result: FormulationResult; onSendToDevice?: () => void; onEditFormula?: () => void }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -870,6 +885,18 @@ function ResultCard({ result, onSendToDevice }: { result: FormulationResult; onS
         </View>
       )}
 
+      {/* Edit Formula Button */}
+      {onEditFormula && (
+        <TouchableOpacity
+          style={resultStyles.editBtn}
+          onPress={onEditFormula}
+          activeOpacity={0.8}
+        >
+          <Pencil size={18} color={COLORS.purple} />
+          <Text style={resultStyles.editBtnText}>Edit Formula</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Send to Color Bar iPad Button */}
       {onSendToDevice && (
         <TouchableOpacity
@@ -991,6 +1018,22 @@ const resultStyles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: '#FFF',
+  },
+  editBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: COLORS.purple,
+    marginTop: 12,
+  },
+  editBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.purple,
   },
   actionRow: {
     flexDirection: 'row',
@@ -1420,12 +1463,10 @@ export default function FormulateScreen({ navigation, route }: any) {
         return;
       }
       if (deviceList.length === 1) {
-        // Send directly if only one device
         await sendFormulaToDevice(deviceList[0].id, result);
         setSendSuccess(true);
         Alert.alert('Success', `Formula sent to ${deviceList[0].name || 'Color Bar iPad'}`);
       } else {
-        // Show picker for multiple devices
         setDevices(deviceList);
         setShowDevicePicker(true);
       }
@@ -1453,6 +1494,22 @@ export default function FormulateScreen({ navigation, route }: any) {
       setSendingToDevice(false);
     }
   }, [result, devices]);
+
+  // ─── Edit Formula Result ─────────────────────────────────────────────────
+  const [editingResult, setEditingResult] = useState(false);
+
+  const handleEditResult = useCallback(() => {
+    setEditingResult(true);
+  }, []);
+
+  const handleSaveEditedResult = useCallback((updatedResult: FormulationResult) => {
+    setResult(updatedResult);
+    setEditingResult(false);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingResult(false);
+  }, []);
 
   // ─── Render Steps ──────────────────────────────────────────────────────────
 
@@ -1773,7 +1830,7 @@ export default function FormulateScreen({ navigation, route }: any) {
             )}
 
             {/* Result shown after generation */}
-            {result && <ResultCard result={result} onSendToDevice={handleSendToDevice} />}
+            {result && !editingResult && <ResultCard result={result} onSendToDevice={handleSendToDevice} onEditFormula={handleEditResult} />}
 
             {/* Device Picker Modal */}
             {showDevicePicker && devices.length > 0 && (
@@ -1851,7 +1908,7 @@ export default function FormulateScreen({ navigation, route }: any) {
         </View>
 
         {/* Step Indicator */}
-        <StepIndicator currentStep={step} />
+        {!editingResult && <StepIndicator currentStep={step} />}
 
         {/* Content */}
         {showManualEntry ? (
@@ -1862,6 +1919,13 @@ export default function FormulateScreen({ navigation, route }: any) {
               setStep(6);
             }}
             onCancel={() => setShowManualEntry(false)}
+          />
+        ) : editingResult && result ? (
+          <EditFormulaForm
+            result={result}
+            brands={BRANDS}
+            onSave={handleSaveEditedResult}
+            onCancel={handleCancelEdit}
           />
         ) : (
           <ScrollView
@@ -1881,7 +1945,7 @@ export default function FormulateScreen({ navigation, route }: any) {
           onBack={handleBack}
           onNext={step === 6 ? handleGenerate : handleNext}
           nextLabel={step === 6 ? (loading ? 'Generating...' : 'Generate') : 'Next'}
-          disabled={loading || showManualEntry}
+          disabled={loading || showManualEntry || editingResult}
           showAddFormula={step === 5 && !showManualEntry}
           onAddFormula={() => setShowManualEntry(true)}
         />
