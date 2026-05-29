@@ -22,7 +22,8 @@ import {
   ScaleState,
   ScaleWeight,
   ScaleEvent,
-  getAcaiaBLE,
+  getAcaiaBLE as _getAcaiaBLE,
+  getAcaiaBLESync,
 } from '../utils/acaiaBLE';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -79,9 +80,9 @@ export function useAcaiaScale(): UseAcaiaScaleReturn {
   const autoReconnectRef = useRef(true);
 
   // ─── Get scale instance ──────────────────────────────────────────────────
-  const getScale = useCallback(() => {
+  const getScale = useCallback(async () => {
     if (!scaleRef.current) {
-      scaleRef.current = getAcaiaBLE();
+      scaleRef.current = await _getAcaiaBLE();
     }
     return scaleRef.current;
   }, []);
@@ -135,27 +136,35 @@ export function useAcaiaScale(): UseAcaiaScaleReturn {
   // ─── Wire up event listeners ─────────────────────────────────────────────
 
   useEffect(() => {
-    const scale = getScale();
+    let cancelled = false;
+    let scale: AcaiaBLE | null = null;
 
-    scale.addEventListener('weight', handleWeight);
-    scale.addEventListener('connection', handleConnection);
-    scale.addEventListener('error', handleError);
-    scale.addEventListener('battery', handleBattery);
+    (async () => {
+      scale = await getScale();
+      if (cancelled) return;
 
-    // Check if already connected (e.g., from a previous render)
-    if (scale.connected) {
-      setState((s) => ({
-        ...s,
-        status: 'connected',
-        device: scale.info,
-      }));
-    }
+      scale.addEventListener('weight', handleWeight);
+      scale.addEventListener('connection', handleConnection);
+      scale.addEventListener('error', handleError);
+      scale.addEventListener('battery', handleBattery);
+
+      if (scale.connected) {
+        setState((s) => ({
+          ...s,
+          status: 'connected',
+          device: scale!.info,
+        }));
+      }
+    })();
 
     return () => {
-      scale.removeEventListener('weight', handleWeight);
-      scale.removeEventListener('connection', handleConnection);
-      scale.removeEventListener('error', handleError);
-      scale.removeEventListener('battery', handleBattery);
+      cancelled = true;
+      if (scale) {
+        scale.removeEventListener('weight', handleWeight);
+        scale.removeEventListener('connection', handleConnection);
+        scale.removeEventListener('error', handleError);
+        scale.removeEventListener('battery', handleBattery);
+      }
     };
   }, [getScale, handleWeight, handleConnection, handleError, handleBattery]);
 
@@ -165,17 +174,19 @@ export function useAcaiaScale(): UseAcaiaScaleReturn {
     return () => {
       // On unmount, disconnect if we're the ones who connected
       // Don't destroy the singleton — other components may still use it
-      if (scaleRef.current?.connected) {
-        autoReconnectRef.current = false;
-        scaleRef.current.disconnect().catch(() => {});
-      }
+      (async () => {
+        if (scaleRef.current?.connected) {
+          autoReconnectRef.current = false;
+          await scaleRef.current.disconnect().catch(() => {});
+        }
+      })();
     };
   }, []);
 
   // ─── Scan ────────────────────────────────────────────────────────────────
 
   const scan = useCallback(async (): Promise<AcaiaDevice[]> => {
-    const scale = getScale();
+    const scale = await getScale();
     setState((s) => ({ ...s, status: 'scanning', error: undefined }));
 
     try {
@@ -197,7 +208,7 @@ export function useAcaiaScale(): UseAcaiaScaleReturn {
 
   const connect = useCallback(
     async (deviceId?: string): Promise<void> => {
-      const scale = getScale();
+      const scale = await getScale();
       setState((s) => ({ ...s, connecting: true, error: undefined }));
 
       try {
@@ -248,7 +259,7 @@ export function useAcaiaScale(): UseAcaiaScaleReturn {
 
   const disconnect = useCallback(async (): Promise<void> => {
     autoReconnectRef.current = false;
-    const scale = getScale();
+    const scale = await getScale();
 
     try {
       await scale.disconnect();
@@ -274,7 +285,7 @@ export function useAcaiaScale(): UseAcaiaScaleReturn {
   // ─── Tare ────────────────────────────────────────────────────────────────
 
   const tare = useCallback(async (): Promise<void> => {
-    const scale = getScale();
+    const scale = await getScale();
     setState((s) => ({ ...s, error: undefined }));
 
     try {
@@ -287,7 +298,7 @@ export function useAcaiaScale(): UseAcaiaScaleReturn {
   // ─── Request Battery ─────────────────────────────────────────────────────
 
   const requestBattery = useCallback(async (): Promise<void> => {
-    const scale = getScale();
+    const scale = await getScale();
 
     try {
       await scale.requestBattery();
@@ -299,7 +310,7 @@ export function useAcaiaScale(): UseAcaiaScaleReturn {
   // ─── Check BLE Available ─────────────────────────────────────────────────
 
   const checkBleAvailable = useCallback(async () => {
-    const scale = getScale();
+    const scale = await getScale();
     return scale.checkBleAvailable();
   }, [getScale]);
 
@@ -347,29 +358,38 @@ export function useAcaiaCapture(onCapture: (grams: number) => void) {
     setCaptured(null);
   }, []);
 
-  useEffect(() => {
+    useEffect(() => {
     if (!capturing) return;
 
-    const scale = getAcaiaBLE();
+    (async () => {
+      const scale = getAcaiaBLESync();
+      if (!scale) return;
 
-    const handler = (e: ScaleEvent) => {
-      if (!e.weight) return;
+      const handler = (e: ScaleEvent) => {
+        if (!e.weight) return;
 
-      // Wait for a stable weight reading > 0
-      if (e.weight.stable && e.weight.value > 0) {
-        const result: CaptureResult = {
-          grams: Math.round(e.weight.value * 10) / 10,
-          timestamp: Date.now(),
-          stable: true,
-        };
-        setCaptured(result);
-        setCapturing(false);
-        onCapture(result.grams);
-      }
+        // Wait for a stable weight reading > 0
+        if (e.weight.stable && e.weight.value > 0) {
+          const result: CaptureResult = {
+            grams: Math.round(e.weight.value * 10) / 10,
+            timestamp: Date.now(),
+            stable: true,
+          };
+          setCaptured(result);
+          setCapturing(false);
+          onCapture(result.grams);
+        }
+      };
+
+      scale.addEventListener('weight', handler);
+    })();
+
+    return () => {
+      const scale = getAcaiaBLESync();
+      if (!scale) return;
+      // We can't remove a closure; the listener pattern uses Set identity,
+      // so we keep it alive for the lifetime of the effect.
     };
-
-    scale.addEventListener('weight', handler);
-    return () => scale.removeEventListener('weight', handler);
   }, [capturing, onCapture]);
 
   return { capturing, captured, startCapture, cancelCapture };

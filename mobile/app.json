@@ -7,7 +7,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -20,7 +20,9 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "COLORgenius uses your camera to capture hair photos for AI color analysis.",
-        "NSPhotoLibraryUsageDescription": "COLORgenius accesses your photo library so you can upload hair photos for AI color analysis."
+        "NSPhotoLibraryUsageDescription": "COLORgenius accesses your photo library so you can upload hair photos for AI color analysis.",
+        "NSBluetoothAlwaysUsageDescription": "COLORgenius uses Bluetooth to connect to the Acaia Pearl scale for precise color formula measurements.",
+        "NSBluetoothPeripheralUsageDescription": "COLORgenius uses Bluetooth to discover and connect to the Acaia Pearl scale."
       },
       "config": {
         "usesNonExemptEncryption": false

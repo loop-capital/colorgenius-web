@@ -169,3 +169,21 @@ GOOGLE_REDIRECT_URI   — Google OAuth callback URL
 - **App code:** ZERO Supabase dependency — fully migrated to Prisma (commit 010b952)
 - **Database:** Still hosted on Supabase PostgreSQL (accessed via DATABASE_URL)
 - **Can shut down Supabase project:** After confirming DATABASE_URL points to alternative PostgreSQL host
+
+---
+
+## Recent Fixes (2026-05-29)
+
+### Auth Fixes (commit `bd1f8ff`)
+- `/api/auth/me` — now uses `getUserFromRequest()` (cookie OR Bearer) instead of `verifyBearerToken` (Bearer only)
+- `/api/v1/formulas` POST — added auth guard
+- `/api/v1/formulas/[id]` GET/PUT/DELETE — added auth + ownership check (users can only access own formulas)
+- Google callback — removed `google_id` (not in schema), switched to email-based lookup
+- Apple/Google callbacks — added `password_hash` placeholder for OAuth-created accounts
+
+### Supabase Removal (commits `53452f6`, `010b952`, `3bece0f`)
+- All routes migrated to Prisma
+- `@supabase/supabase-js` removed from package.json
+- `lib/supabaseClient.ts` deleted
+- Zero Supabase in app/ or lib/
+- Only DATABASE_URL remains (PostgreSQL connection)
