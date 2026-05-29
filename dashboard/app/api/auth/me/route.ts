@@ -1,18 +1,16 @@
 import { NextResponse } from 'next/server';
-import { verifyBearerToken } from '@/lib/auth';
+import { getUserFromRequest } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
-  const bearer = await verifyBearerToken(request);
-  const token = bearer?.userId ? bearer : null;
-
-  if (!token) {
+  const user = await getUserFromRequest(request);
+  if (!user) {
     return NextResponse.json({ user: null }, { status: 401 });
   }
 
   try {
     const user = await prisma.users.findUnique({
-      where: { id: token.userId },
+      where: { id: user.userId },
       select: { id: true, first_name: true, email: true },
     });
 
@@ -23,9 +21,9 @@ export async function GET(request: Request) {
     return NextResponse.json({
       user: {
         id: user.id,
-        username: user.first_name || token.username,
-        email: user.email || token.email,
-        salonName: user.first_name || token.username,
+        username: user.first_name || user.username,
+        email: user.email,
+        salonName: user.first_name || user.username,
       }
     });
   } catch {

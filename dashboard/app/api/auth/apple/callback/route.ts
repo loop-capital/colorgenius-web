@@ -155,13 +155,14 @@ export async function POST(request: Request) {
     }
 
     if (!user) {
-      // Create new user
       user = await prisma.users.create({
         data: {
           email,
           first_name: firstName,
           last_name: lastName,
           apple_id: appleUserId,
+          // Placeholder — Apple users never use password login
+          password_hash: `$APPLE$${appleUserId}`,
           is_active: true,
         },
       });

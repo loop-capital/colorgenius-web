@@ -66,32 +66,19 @@ export async function GET(request: Request) {
     const firstName = userInfo.given_name || '';
     const lastName = userInfo.family_name || '';
 
-    // Check if user exists by google_id
-    let user = await prisma.users.findFirst({
-      where: { google_id: googleUserId },
-    });
+    // Look up user by email (google_id not in schema)
+    let user = email
+      ? await prisma.users.findFirst({ where: { email } })
+      : null;
 
     if (!user && email) {
-      // Check by email, link Google ID to existing account
-      const emailUser = await prisma.users.findFirst({
-        where: { email },
-      });
-      if (emailUser) {
-        user = await prisma.users.update({
-          where: { id: emailUser.id },
-          data: { google_id: googleUserId },
-        });
-      }
-    }
-
-    if (!user) {
-      // Create new user
       user = await prisma.users.create({
         data: {
           email,
           first_name: firstName,
           last_name: lastName,
-          google_id: googleUserId,
+          // Placeholder — Google users never use password login
+          password_hash: `$GOOGLE$${googleUserId}`,
           is_active: true,
         },
       });
