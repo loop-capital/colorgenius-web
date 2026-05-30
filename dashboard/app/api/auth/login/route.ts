@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     } as any);
 
     await setAuthCookie(token);
-    return NextResponse.json({ success: true, user: { email: user.email, username: user.first_name } });
+    return NextResponse.json({ success: true, token, user: { email: user.email, username: user.first_name } });
   } catch (error: any) {
     return NextResponse.json({ error: 'Login failed: ' + error.message }, { status: 500 });
   }
