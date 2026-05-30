@@ -80,7 +80,9 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         <View style={styles.content}>
           {/* Logo / Title */}
           <View style={styles.header}>
-            <Text style={styles.logo}>🎨</Text>
+            <View style={styles.logoCircle}>
+              <Text style={styles.logoText}>CG</Text>
+            </View>
             <Text style={styles.title}>COLORgenius</Text>
             <Text style={styles.subtitle}>AI Hair Color Formulation</Text>
           </View>
@@ -166,7 +168,8 @@ const styles = StyleSheet.create({
   keyboard: { flex: 1 },
   content: { flex: 1, justifyContent: 'center', paddingHorizontal: 32 },
   header: { alignItems: 'center', marginBottom: 40 },
-  logo: { fontSize: 48, marginBottom: 12 },
+  logoCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#9333EA', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  logoText: { fontSize: 24, fontWeight: '800', color: '#FFF' },
   title: { fontSize: 28, fontWeight: '800', color: COLORS.textPrimary },
   subtitle: { fontSize: 14, color: COLORS.textSecondary, marginTop: 6 },
   inputGroup: { marginBottom: 20 },
