@@ -358,37 +358,30 @@ export function useAcaiaCapture(onCapture: (grams: number) => void) {
     setCaptured(null);
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     if (!capturing) return;
 
-    (async () => {
-      const scale = getAcaiaBLESync();
-      if (!scale) return;
+    const scale = getAcaiaBLESync();
+    if (!scale) return;
 
-      const handler = (e: ScaleEvent) => {
-        if (!e.weight) return;
+    const handler = (e: ScaleEvent) => {
+      if (!e.weight) return;
+      if (e.weight.stable && e.weight.value > 0) {
+        const result: CaptureResult = {
+          grams: Math.round(e.weight.value * 10) / 10,
+          timestamp: Date.now(),
+          stable: true,
+        };
+        setCaptured(result);
+        setCapturing(false);
+        onCapture(result.grams);
+      }
+    };
 
-        // Wait for a stable weight reading > 0
-        if (e.weight.stable && e.weight.value > 0) {
-          const result: CaptureResult = {
-            grams: Math.round(e.weight.value * 10) / 10,
-            timestamp: Date.now(),
-            stable: true,
-          };
-          setCaptured(result);
-          setCapturing(false);
-          onCapture(result.grams);
-        }
-      };
-
-      scale.addEventListener('weight', handler);
-    })();
+    scale.addEventListener('weight', handler);
 
     return () => {
-      const scale = getAcaiaBLESync();
-      if (!scale) return;
-      // We can't remove a closure; the listener pattern uses Set identity,
-      // so we keep it alive for the lifetime of the effect.
+      scale.removeEventListener('weight', handler);
     };
   }, [capturing, onCapture]);
 

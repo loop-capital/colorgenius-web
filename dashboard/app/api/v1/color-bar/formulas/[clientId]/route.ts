@@ -2,10 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
 
-// GET /api/v1/color-bar/formulas/:clientId?limit=10
+const PRICE_RULES: Record<string, { color: number; developer: number; markup: number }> = {
+  davines:      { color: 0.12, developer: 0.04, markup: 2.5 },
+  redken:       { color: 0.11, developer: 0.04, markup: 2.5 },
+  wella:        { color: 0.13, developer: 0.05, markup: 2.5 },
+  schwarzkopf:  { color: 0.12, developer: 0.04, markup: 2.5 },
+  olaplex:      { color: 0.40, developer: 0.04, markup: 3.0 },
+  k18:          { color: 0.50, developer: 0.04, markup: 3.0 },
+  default:      { color: 0.10, developer: 0.03, markup: 2.0 },
+}
+
+function parseMixingRatio(ratio: string | null | undefined): [number, number] {
+  if (!ratio) return [1, 1.5]
+  const parts = ratio.split(':').map(Number)
+  if (parts.length !== 2 || parts.some(isNaN) || parts.some(n => n <= 0)) return [1, 1.5]
+  return [parts[0], parts[1]]
+}
+
+// GET /api/v1/color-bar/formulas/:clientId?limit=10&totalWeight=90
 export async function GET(req: NextRequest, { params }: { params: Promise<{ clientId: string }> }) {
   try {
-    // Verify authentication (Bearer token from mobile app)
     const user = await verifyBearerToken(req)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -13,25 +29,33 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
 
     const { clientId } = await params
     const { searchParams } = new URL(req.url)
-    const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 50)
+    const limit = Math.min(parseInt(searchParams.get('limit') || '10', 10), 50)
+    const totalWeight = Math.min(Math.max(parseInt(searchParams.get('totalWeight') || '90', 10), 10), 500)
 
-    // Get real client visits from Prisma
     const visits = await prisma.client_visits.findMany({
       where: { client_id: clientId },
       orderBy: { visit_date: 'desc' },
       take: limit,
     })
 
-    // Get formulas for these visits
     const formulas = await prisma.formulas.findMany({
       where: { client_id: clientId },
       orderBy: { created_at: 'desc' },
       take: limit,
     })
 
-    // Format the response
-    const formattedFormulas = visits?.map((visit) => {
+    const formattedFormulas = (visits ?? []).map((visit) => {
       const formula = formulas?.find(f => f.id === visit.formula_id)
+
+      const [colorRatio, devRatio] = parseMixingRatio(formula?.mixing_ratio)
+      const colorGrams = Math.round(totalWeight * colorRatio / (colorRatio + devRatio))
+      const devGrams = totalWeight - colorGrams
+
+      const prices = PRICE_RULES[(formula?.product_brand ?? '').toLowerCase()] ?? PRICE_RULES.default
+      const totalCost = Math.round(
+        (colorGrams * prices.color + devGrams * prices.developer) * prices.markup * 100
+      ) / 100
+
       const colorSteps = formula
         ? [
             {
@@ -40,7 +64,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
                 .join(' '),
               shadeCode: formula.product_shade || '',
               brand: formula.product_brand || '',
-              targetGrams: 45,
+              targetGrams: colorGrams,
               actualGrams: 0,
               completed: false,
               role: 'color',
@@ -49,14 +73,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
               product: `${formula.developer_vol || 20}vol Developer`,
               shadeCode: `${formula.developer_vol || 20}V`,
               brand: formula.product_brand || '',
-              targetGrams: 45,
+              targetGrams: devGrams,
               actualGrams: 0,
               completed: false,
               role: 'developer',
             },
           ]
         : []
+
       const totalGrams = colorSteps.reduce((sum, s) => sum + s.targetGrams, 0)
+
       return {
         id: visit.id,
         createdAt: visit.visit_date,
@@ -64,10 +90,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
         developerVolume: formula?.developer_vol || 20,
         processingTime: formula?.processing_time || 30,
         totalGrams,
-        totalCost: 0,
+        totalCost,
         notes: formula?.notes || '',
       }
-    }) || []
+    })
 
     return NextResponse.json({ formulas: formattedFormulas })
   } catch (error) {

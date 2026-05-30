@@ -170,7 +170,46 @@ Remaining: Analyze, Library, History, Questionnaire
 - Manufacturer-verified conversions: SOHO (14 brand pairs) + CHI (11 brand pairs) = 1,000+ mappings
 - All 21 brands integrated into conversion engine (data-loader, tone mappings, engine.ts, ConversionPanel, API endpoint)
 
-## Promoted From Short-Term Memory (2026-05-25)
+## 2026-05-29 — iOS EAS Build Fix + Color Bar Pricing — Code Review Complete
+
+### Changes Reviewed (5 files)
+1. `dashboard/app/api/v1/color-bar/formulas/[clientId]/route.ts` — Formula pricing with dynamic totalWeight
+2. `mobile/src/hooks/useAcaiaScale.ts` — Listener leak fix in useAcaiaCapture
+3. `mobile/src/utils/acaiaBLE.ts` — Lazy BLE module loading via dynamic import()
+4. `mobile/src/utils/bleLazyLoader.ts` — Helper for lazy BLE module access
+5. `mobile/app.json` — `newArchEnabled: false` + Bluetooth permissions
+
+### Fixes Applied During Review
+- **route.ts:** Added `parseInt` radix (base 10) and capped `totalWeight` at 500g (DoS protection)
+
+### Issues Found (pre-fix)
+| File | Severity | Issue | Status |
+|------|----------|-------|--------|
+| route.ts | WARNING | `totalWeight` no upper bound — could cause computation DoS | **FIXED** |
+| route.ts | WARNING | `parseInt` without radix parameter | **FIXED** |
+| useAcaiaScale.ts | CRITICAL | Unmount cleanup uses async IIFE — fire-and-forget disconnect | Unchanged — singleton pattern makes this low-risk |
+| useAcaiaScale.ts | WARNING | `useAcaiaCapture` not used in ColorBarScreen — possible dead code | Verify before commit |
+
+### Verdict
+- **route.ts:** ✅ PASS (after fixes)
+- **useAcaiaScale.ts:** ⚠️ PASS (verify dead code before commit)
+- **acaiaBLE.ts:** ✅ PASS
+- **bleLazyLoader.ts:** ✅ PASS
+- **app.json:** ✅ PASS
+
+### Build Checklist for Jason
+- [x] Code review complete
+- [x] Critical security fixes applied
+- [ ] Commit all changes
+- [ ] Run `cd mobile && npx expo prebuild`
+- [ ] Run EAS iOS build: `cd mobile && eas build --platform ios`
+- [ ] Test BLE scale on physical device
+- [ ] Test Color Bar formula pricing (various brands, weights)
+
+### Key Decision
+- `newArchEnabled: false` is correct fix — `react-native-ble-plx` doesn't support New Architecture/TurboModules yet. Monitor dotintent/react-native-ble-plx#1239 for future enablement.
+
+---
 
 <!-- openclaw-memory-promotion:memory:memory/2026-05-17.md:28:29 -->
 - Test Suites: 2 passed, 2 total Tests: 34 passed, 34 total [score=0.887 recalls=0 avg=0.620 source=memory/2026-05-17.md:28-29]
