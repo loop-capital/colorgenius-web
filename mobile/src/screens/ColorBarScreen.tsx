@@ -35,7 +35,7 @@ import {
   Beaker,
   X,
 } from 'lucide-react-native';
-import { useAcaiaScale } from '../hooks/useAcaiaScale';
+import { useAcaiaScale, useAcaiaCapture } from '../hooks/useAcaiaScale';
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 
@@ -274,6 +274,11 @@ function StepCard({
   index,
   isActive,
   scaleWeight,
+  weightStable,
+  scaleConnected,
+  isCapturing,
+  onStartCapture,
+  onCancelCapture,
   onComplete,
   onAdjust,
 }: {
@@ -281,6 +286,11 @@ function StepCard({
   index: number;
   isActive: boolean;
   scaleWeight: number;
+  weightStable: boolean;
+  scaleConnected: boolean;
+  isCapturing: boolean;
+  onStartCapture: (index: number) => void;
+  onCancelCapture: (index: number) => void;
   onComplete: (index: number, actualGrams: number) => void;
   onAdjust: (index: number, delta: number) => void;
 }) {
@@ -378,59 +388,76 @@ function StepCard({
       {/* Action Buttons */}
       {isActive && !step.completed && (
         <View style={styles.stepActions}>
-          {scaleWeight <= 0 && (
-            <View style={styles.manualWeightRow}>
-              <Text style={styles.weightLabel}>MANUAL ENTRY (g)</Text>
-              <TextInput
-                style={styles.manualWeightInput}
-                value={manualWeight}
-                onChangeText={setManualWeight}
-                keyboardType="decimal-pad"
-                placeholder={`Target: ${step.targetGrams}g`}
-                placeholderTextColor={COLORS.textMuted}
-              />
+          {isCapturing ? (
+            // ── Capture mode ──
+            <View style={styles.captureRow}>
+              {scaleWeight <= 0 ? (
+                <Text style={styles.captureHint}>Pour onto scale...</Text>
+              ) : weightStable ? (
+                <Text style={[styles.captureHint, { color: COLORS.green }]}>Capturing...</Text>
+              ) : (
+                <Text style={[styles.captureHint, { color: COLORS.yellow }]}>Hold steady...</Text>
+              )}
+              <TouchableOpacity
+                style={styles.cancelCaptureBtn}
+                onPress={() => onCancelCapture(index)}
+              >
+                <X size={16} color={COLORS.textSecondary} />
+                <Text style={styles.cancelCaptureBtnText}>Cancel</Text>
+              </TouchableOpacity>
             </View>
+          ) : (
+            // ── Normal / manual mode ──
+            <>
+              {scaleConnected ? (
+                <TouchableOpacity
+                  style={styles.startWeighBtn}
+                  onPress={() => onStartCapture(index)}
+                >
+                  <Scale size={22} color="#fff" />
+                  <Text style={styles.startWeighBtnText}>Start Weighing</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.manualWeightRow}>
+                  <Text style={styles.weightLabel}>MANUAL ENTRY (g)</Text>
+                  <TextInput
+                    style={styles.manualWeightInput}
+                    value={manualWeight}
+                    onChangeText={setManualWeight}
+                    keyboardType="decimal-pad"
+                    placeholder={`Target: ${step.targetGrams}g`}
+                    placeholderTextColor={COLORS.textMuted}
+                  />
+                </View>
+              )}
+              <View style={styles.adjustRow}>
+                <TouchableOpacity style={styles.adjustBtn} onPress={() => onAdjust(index, -5)}>
+                  <Text style={styles.adjustBtnText}>-5</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.adjustBtn} onPress={() => onAdjust(index, -1)}>
+                  <Text style={styles.adjustBtnText}>-1</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.completeBtn, { opacity: canComplete ? 1 : 0.5 }]}
+                  onPress={() => canComplete && onComplete(index, effectiveWeight)}
+                  disabled={!canComplete}
+                >
+                  <CheckCircle2 size={20} color="#fff" />
+                  <Text style={styles.completeBtnText}>
+                    {scaleWeight > 0 && Math.abs(scaleWeight - step.targetGrams) < 2
+                      ? 'Perfect!'
+                      : 'Accept'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.adjustBtn} onPress={() => onAdjust(index, 1)}>
+                  <Text style={styles.adjustBtnText}>+1</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.adjustBtn} onPress={() => onAdjust(index, 5)}>
+                  <Text style={styles.adjustBtnText}>+5</Text>
+                </TouchableOpacity>
+              </View>
+            </>
           )}
-          <View style={styles.adjustRow}>
-            <TouchableOpacity
-              style={styles.adjustBtn}
-              onPress={() => onAdjust(index, -5)}
-            >
-              <Text style={styles.adjustBtnText}>-5</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.adjustBtn}
-              onPress={() => onAdjust(index, -1)}
-            >
-              <Text style={styles.adjustBtnText}>-1</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.completeBtn, { opacity: canComplete ? 1 : 0.5 }]}
-              onPress={() => canComplete && onComplete(index, effectiveWeight)}
-              disabled={!canComplete}
-            >
-              <CheckCircle2 size={20} color="#fff" />
-              <Text style={styles.completeBtnText}>
-                {scaleWeight > 0 && Math.abs(scaleWeight - step.targetGrams) < 2
-                  ? 'Perfect!'
-                  : 'Accept'}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.adjustBtn}
-              onPress={() => onAdjust(index, 1)}
-            >
-              <Text style={styles.adjustBtnText}>+1</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.adjustBtn}
-              onPress={() => onAdjust(index, 5)}
-            >
-              <Text style={styles.adjustBtnText}>+5</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       )}
 
@@ -475,8 +502,14 @@ export default function ColorBarScreen({ navigation, route }: any) {
   const [sessionCost, setSessionCost] = useState(0);
   const [showSearch, setShowSearch] = useState(true);
 
-  // Scale integration
-  const { weight: scaleWeight, status: scaleStatus, connect: connectScale, error: scaleError } = useAcaiaScale();
+  // Scale integration — live weight + connection management
+  const {
+    weight: scaleWeight,
+    weightStable,
+    status: scaleStatus,
+    connect: connectScale,
+    error: scaleError,
+  } = useAcaiaScale();
 
   // Load clients from API on mount
   useEffect(() => {
@@ -596,6 +629,31 @@ export default function ColorBarScreen({ navigation, route }: any) {
       }
     },
     [steps, sessionCost, formula]
+  );
+
+  // Capture integration — auto-captures stable weight for current step
+  const handleCapture = useCallback(
+    (grams: number) => {
+      handleCompleteStep(currentStep, grams);
+    },
+    [currentStep, handleCompleteStep]
+  );
+
+  const { capturing, startCapture, cancelCapture } = useAcaiaCapture(handleCapture);
+
+  const handleStartCapture = useCallback(
+    (index: number) => {
+      if (index !== currentStep) return;
+      startCapture();
+    },
+    [currentStep, startCapture]
+  );
+
+  const handleCancelCapture = useCallback(
+    (_index: number) => {
+      cancelCapture();
+    },
+    [cancelCapture]
   );
 
   // Handle weight adjustment (manual override)
@@ -767,6 +825,11 @@ export default function ColorBarScreen({ navigation, route }: any) {
             index={index}
             isActive={index === currentStep && !step.completed}
             scaleWeight={index === currentStep ? scaleWeight : 0}
+            weightStable={index === currentStep ? weightStable : false}
+            scaleConnected={scaleStatus === 'connected'}
+            isCapturing={index === currentStep && capturing}
+            onStartCapture={handleStartCapture}
+            onCancelCapture={handleCancelCapture}
             onComplete={handleCompleteStep}
             onAdjust={handleAdjustWeight}
           />
@@ -1212,5 +1275,48 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#fff',
+  },
+
+  // Capture workflow
+  startWeighBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 14,
+    backgroundColor: COLORS.purple,
+    borderRadius: 14,
+    marginBottom: 12,
+  },
+  startWeighBtnText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  captureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    marginBottom: 4,
+  },
+  captureHint: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  cancelCaptureBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: COLORS.border,
+  },
+  cancelCaptureBtnText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
 });
