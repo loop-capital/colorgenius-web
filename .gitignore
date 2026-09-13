@@ -57,3 +57,8 @@ coverage/
 
 # Archives (local only, not committed)
 archives/
+
+# Environment files (nested too) - real secrets found tracked 2026-09-13
+**/.env
+**/.env.*
+!**/.env.example
