@@ -57,6 +57,22 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Previously this logged (and billed) usage against ANY active listing,
+    // with no check the salon had ever actually acquired it — a real gap
+    // for a "per-use licensing is the core paid model" system. A free
+    // formula (per_use_cents === 0) needs no license on file.
+    if (listing.per_use_cents > 0) {
+      const license = await prisma.formula_purchases.findFirst({
+        where: { salonId, formulaId: listing.id, status: 'completed' },
+      });
+      if (!license) {
+        return NextResponse.json<ApiResponse>({
+          success: false,
+          error: { code: 'NOT_LICENSED', message: 'Add this formula to your library before using it' },
+        }, { status: 403 });
+      }
+    }
+
     const feeCents = listing.per_use_cents;
     const creatorPayoutCents = Math.round(feeCents * (CREATOR_SHARE_PCT / 100));
     const platformFeeCents = feeCents - creatorPayoutCents;

@@ -520,14 +520,53 @@ export async function browseMarketplace(params?: {
 // Creates a pending purchase + a real Square-hosted checkout link — open
 // checkout_url in a browser, payment is confirmed server-side via webhook,
 // never assume success just because this call returned.
+// Adds a formula to the salon's library — free or licensed (per-use), no
+// upfront charge either way. Licensed formulas bill the salon monthly
+// based on actual use (see logFormulaUsage), not at acquisition time.
 export async function purchaseFormula(templateId: string): Promise<{
   success: boolean;
-  data?: { id: string; checkout_url: string; price_cents: number };
+  data?: { id: string; template_id: string; title: string; is_free: boolean; per_use_cents: number };
   error?: { code: string; message: string };
 }> {
   return apiRequest('/marketplace/purchase', {
     method: 'POST',
     body: { template_id: templateId },
+  });
+}
+
+export interface LicensedFormula {
+  license_id: string;
+  formula_id: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  tier: string;
+  per_use_cents: number;
+  is_free: boolean;
+  photo_url: string | null;
+  share_code: string | null;
+  creator_name: string;
+  total_uses: number;
+  acquired_at: string;
+}
+
+export async function getMyLicensedFormulas(): Promise<{
+  success: boolean;
+  data?: LicensedFormula[];
+  error?: { code: string; message: string };
+}> {
+  return apiRequest('/marketplace/purchases');
+}
+
+export async function logFormulaUsage(formulaId: string, params?: { clientName?: string; serviceId?: string }): Promise<{
+  success: boolean;
+  data?: { cost_cents: number };
+  error?: { code: string; message: string };
+}> {
+  return apiRequest('/marketplace/usage', {
+    method: 'POST',
+    body: { formula_id: formulaId, client_name: params?.clientName, service_id: params?.serviceId },
   });
 }
 

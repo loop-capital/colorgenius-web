@@ -31,7 +31,7 @@ import {
   ShoppingBag,
   Plus,
 } from 'lucide-react-native';
-import { apiRequest } from '../api/client';
+import { apiRequest, getMyLicensedFormulas } from '../api/client';
 import ManualFormulaEntry from '../components/ManualFormulaEntry';
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
@@ -99,7 +99,10 @@ const TONE_OPTIONS = [
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function LibraryScreen({ navigation }: any) {
-  const [activeTab, setActiveTab] = useState<'my-formulas' | 'marketplace'>('my-formulas');
+  const [activeTab, setActiveTab] = useState<'my-formulas' | 'licensed' | 'marketplace'>('my-formulas');
+  const [licensedFormulas, setLicensedFormulas] = useState<Formula[]>([]);
+  const [licensedLoading, setLicensedLoading] = useState(false);
+  const [licensedError, setLicensedError] = useState<string | null>(null);
   const [formulas, setFormulas] = useState<Formula[]>([]);
   const [formulasError, setFormulasError] = useState<string | null>(null);
   const [marketplaceFormulas, setMarketplaceFormulas] = useState<Formula[]>([]);
@@ -207,14 +210,55 @@ export default function LibraryScreen({ navigation }: any) {
     }
   }, [marketplaceFormulas.length]);
 
+  // Licensed = formulas the salon has actually acquired (free or per-use
+  // licensed) — previously there was no way to see this list anywhere.
+  const fetchLicensed = useCallback(async () => {
+    if (licensedFormulas.length > 0) return;
+    try {
+      setLicensedLoading(true);
+      setLicensedError(null);
+      const res = await getMyLicensedFormulas();
+      if (!res.success) throw new Error(res.error?.message || 'Failed to load your licensed formulas.');
+      const mapped: Formula[] = (res.data || []).map((f) => ({
+        id: f.license_id,
+        name: f.title,
+        clientName: f.creator_name || 'Community',
+        brand: f.category || 'Formula',
+        line: '',
+        createdAt: f.acquired_at,
+        tags: f.tags,
+        developer: '',
+        developerVolume: '',
+        totalVolume: '',
+        processingTime: '',
+        application: '',
+        coverage: '',
+        notes: f.description || '',
+        shades: [],
+        confidence: 0,
+        priceCents: f.per_use_cents,
+        shareCode: f.share_code || undefined,
+      }));
+      setLicensedFormulas(mapped);
+    } catch (e) {
+      setLicensedFormulas([]);
+      setLicensedError(e instanceof Error ? e.message : 'Failed to load your licensed formulas.');
+    } finally {
+      setLicensedLoading(false);
+    }
+  }, [licensedFormulas.length]);
+
+  const currentList = activeTab === 'my-formulas' ? formulas : activeTab === 'licensed' ? licensedFormulas : marketplaceFormulas;
+  const currentLoading = activeTab === 'my-formulas' ? loading : activeTab === 'licensed' ? licensedLoading : marketplaceLoading;
+  const currentError = activeTab === 'my-formulas' ? formulasError : activeTab === 'licensed' ? licensedError : marketplaceError;
+  const currentRetry = activeTab === 'my-formulas' ? fetchFormulas : activeTab === 'licensed' ? fetchLicensed : fetchMarketplace;
+
   const brands = useMemo(() => {
-    const list = activeTab === 'my-formulas' ? formulas : marketplaceFormulas;
-    return Array.from(new Set(list.map((f) => f.brand)));
-  }, [formulas, marketplaceFormulas, activeTab]);
+    return Array.from(new Set(currentList.map((f) => f.brand)));
+  }, [currentList]);
 
   const filteredFormulas = useMemo(() => {
-    const list = activeTab === 'my-formulas' ? formulas : marketplaceFormulas;
-    let result = [...list];
+    let result = [...currentList];
 
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase();
@@ -238,7 +282,7 @@ export default function LibraryScreen({ navigation }: any) {
     }
 
     return result;
-  }, [formulas, marketplaceFormulas, activeTab, searchTerm, filterBrand, filterTone]);
+  }, [currentList, searchTerm, filterBrand, filterTone]);
 
   const renderFormulaCard = ({ item: formula }: { item: Formula }) => (
     <TouchableOpacity
@@ -390,6 +434,26 @@ export default function LibraryScreen({ navigation }: any) {
             ]}
           >
             My Formulas
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'licensed' && styles.tabActive]}
+          onPress={() => {
+            setActiveTab('licensed');
+            fetchLicensed();
+          }}
+        >
+          <FlaskConical
+            size={14}
+            color={activeTab === 'licensed' ? '#0A0A1A' : COLORS.textSecondary}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'licensed' && styles.tabTextActive,
+            ]}
+          >
+            Licensed
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -561,27 +625,25 @@ export default function LibraryScreen({ navigation }: any) {
       <View style={styles.resultsBar}>
         <Text style={styles.resultsText}>
           Showing {filteredFormulas.length} of{' '}
-          {activeTab === 'my-formulas' ? formulas.length : marketplaceFormulas.length}{' '}
+          {currentList.length}{' '}
           formulas
         </Text>
       </View>
 
       {/* Formula List */}
-      {(activeTab === 'my-formulas' ? loading : marketplaceLoading) ? (
+      {currentLoading ? (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={COLORS.purple} />
         </View>
-      ) : (activeTab === 'my-formulas' ? formulasError : marketplaceError) ? (
+      ) : currentError ? (
         <View style={styles.centered}>
           <FlaskConical size={48} color="rgba(255,255,255,0.06)" />
           <Text style={styles.emptyTitle}>
-            {activeTab === 'my-formulas' ? "Couldn't load your formulas" : "Couldn't load the marketplace"}
+            {activeTab === 'my-formulas' ? "Couldn't load your formulas" : activeTab === 'licensed' ? "Couldn't load your licensed formulas" : "Couldn't load the marketplace"}
           </Text>
-          <Text style={styles.emptySubtext}>
-            {activeTab === 'my-formulas' ? formulasError : marketplaceError}
-          </Text>
+          <Text style={styles.emptySubtext}>{currentError}</Text>
           <TouchableOpacity
-            onPress={activeTab === 'my-formulas' ? fetchFormulas : fetchMarketplace}
+            onPress={currentRetry}
             style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, backgroundColor: COLORS.purple }}
           >
             <Text style={{ color: '#FFF', fontWeight: '600', fontSize: 13 }}>Retry</Text>
@@ -594,7 +656,9 @@ export default function LibraryScreen({ navigation }: any) {
           <Text style={styles.emptySubtext}>
             {activeTab === 'my-formulas'
               ? 'Save your first formula to build your library.'
-              : 'Community formulas will appear here once published.'}
+              : activeTab === 'licensed'
+                ? 'Add a free or licensed formula from the Marketplace tab to see it here.'
+                : 'Community formulas will appear here once published.'}
           </Text>
         </View>
       ) : viewMode === 'grid' ? (

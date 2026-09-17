@@ -9,7 +9,6 @@ import {
   ScrollView,
   Image,
   Alert,
-  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrendingUp, Star, Sparkles, Heart, MessageCircle } from 'lucide-react-native';
@@ -98,25 +97,34 @@ function PostCard({ post, onLike }: { post: CommunityPost; onLike: (id: string) 
 // ─── Marketplace Card ────────────────────────────────────────────────────────
 
 function MarketplaceCard({ item }: { item: MarketplaceListing }) {
-  const [buying, setBuying] = useState(false);
+  const [acquiring, setAcquiring] = useState(false);
 
-  const handleBuy = async () => {
-    setBuying(true);
+  // Adding to the library is free and instant, whether the formula is free
+  // or licensed — a license only ever bills the salon for actual use
+  // (logFormulaUsage, called wherever a licensed formula gets mixed),
+  // never at acquisition. No checkout redirect needed here at all.
+  const handleAdd = async () => {
+    setAcquiring(true);
     try {
       const res = await purchaseFormula(item.id);
-      if (!res.success || !res.data?.checkout_url) {
-        throw new Error(res.error?.message || 'Failed to start checkout');
+      if (!res.success || !res.data) {
+        throw new Error(res.error?.message || 'Failed to add to your library');
       }
-      await Linking.openURL(res.data.checkout_url);
+      Alert.alert(
+        'Added to Library',
+        res.data.is_free
+          ? `${res.data.title} is now in your salon's library.`
+          : `${res.data.title} is now in your salon's library. You'll be billed $${(res.data.per_use_cents / 100).toFixed(2)} each time it's used.`
+      );
     } catch (err) {
-      Alert.alert('Couldn’t start checkout', err instanceof Error ? err.message : 'Try again.');
+      Alert.alert('Couldn’t add formula', err instanceof Error ? err.message : 'Try again.');
     } finally {
-      setBuying(false);
+      setAcquiring(false);
     }
   };
 
   return (
-    <TouchableOpacity style={styles.marketCard} onPress={handleBuy} disabled={buying}>
+    <TouchableOpacity style={styles.marketCard} onPress={handleAdd} disabled={acquiring}>
       <View style={styles.marketBadge}>
         <Text style={styles.marketBadgeText}>{item.category || 'Formula'}</Text>
       </View>
@@ -125,7 +133,7 @@ function MarketplaceCard({ item }: { item: MarketplaceListing }) {
         by {item.creator?.display_name || item.creator?.first_name || 'Community Stylist'}
       </Text>
       <Text style={styles.marketPrice}>
-        {buying ? 'Opening checkout...' : item.price_cents ? `$${(item.price_cents / 100).toFixed(2)}` : 'Free'}
+        {acquiring ? 'Adding...' : item.price_cents ? `$${(item.price_cents / 100).toFixed(2)}/use` : 'Free'}
       </Text>
     </TouchableOpacity>
   );
