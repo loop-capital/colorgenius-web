@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { CheckCircle, XCircle, RefreshCw, Unlink, Package, CreditCard, ArrowRight, Users, ToggleLeft, ToggleRight, Clock } from 'lucide-react';
 import PhorestCard from './phorest-card';
+import CloverCard from './clover-card';
 
 interface SquareStatus {
   connected: boolean;
@@ -240,25 +241,28 @@ export default function SettingsContent() {
         </p>
 
         <PhorestCard />
+        <CloverCard />
 
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-1 gap-3 mb-6">
           {[
-            { name: 'GlossGenius', logo: 'G' },
-            { name: 'Vagaro', logo: 'V' },
-            { name: 'Zenoti', logo: 'Z' },
-            { name: 'Clover', logo: 'C' },
-            { name: 'Mindbody', logo: 'M' },
+            { name: 'Zenoti', logo: 'Z', note: 'Coming soon' },
+            { name: 'Vagaro', logo: 'V', note: 'Requires the paid API add-on enabled on your Vagaro account first' },
+            { name: 'Mindbody', logo: 'M', note: 'Coming soon' },
+            { name: 'GlossGenius', logo: 'G', note: 'GlossGenius doesn’t offer a public API yet' },
           ].map((p) => (
             <div key={p.name} className="rounded-xl p-4 flex items-center justify-between"
               style={{ background: '#0F0F1A', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
                   style={{ background: 'rgba(255,255,255,0.06)', color: '#A1A1AA' }}>{p.logo}</div>
-                <span className="text-sm font-medium" style={{ color: '#F5F5F7' }}>{p.name}</span>
+                <div>
+                  <p className="text-sm font-medium" style={{ color: '#F5F5F7' }}>{p.name}</p>
+                  <p className="text-[11px]" style={{ color: '#71717A' }}>{p.note}</p>
+                </div>
               </div>
-              <div className="flex items-center gap-1 px-2 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+              <div className="flex items-center gap-1 px-2 py-1 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.04)' }}>
                 <Clock className="w-3 h-3" style={{ color: '#71717A' }} />
-                <span className="text-[10px] font-medium" style={{ color: '#71717A' }}>Coming soon</span>
+                <span className="text-[10px] font-medium" style={{ color: '#71717A' }}>Not yet</span>
               </div>
             </div>
           ))}

@@ -165,15 +165,18 @@ async function completeSession(sessionId: string, steps: FormulaStep[], token: s
   return await res.json();
 }
 
-interface SquareOrderResult {
-  squareOrderId: string;
+interface PosOrderResult {
+  orderId: string;
+  provider: 'square' | 'clover';
   totalCost: number;
   pricingWarnings: string[];
   message: string;
 }
 
-async function pushOrderToSquare(sessionId: string, token: string): Promise<SquareOrderResult> {
-  const res = await fetch(`${API_BASE}/square-order`, {
+// Provider-agnostic — pushes to whichever POS the salon has connected
+// (Square or Clover today), so the app doesn't need to know or care which.
+async function pushOrderToPos(sessionId: string, token: string): Promise<PosOrderResult> {
+  const res = await fetch(`${API_BASE}/pos-order`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -183,7 +186,7 @@ async function pushOrderToSquare(sessionId: string, token: string): Promise<Squa
   });
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(data?.error || `Failed to push order to Square (${res.status})`);
+    throw new Error(data?.error || `Failed to push order (${res.status})`);
   }
   return data;
 }
@@ -631,10 +634,10 @@ export default function ColorBarScreen({ navigation, route }: any) {
             : sessionCost;
         Alert.alert(
           'Formula Complete!',
-          `Total cost: ${formatCost(finalCost)}\nReady to push to Square Register?`,
+          `Total cost: ${formatCost(finalCost)}\nReady to push to your POS?`,
           [
             { text: 'Review', style: 'cancel' },
-            { text: 'Push to Square', onPress: handlePushToSquare },
+            { text: 'Push to POS', onPress: handlePushToPos },
           ]
         );
       }
@@ -678,30 +681,31 @@ export default function ColorBarScreen({ navigation, route }: any) {
     });
   }, []);
 
-  // Handle push to Square — completes the session (server computes the real
+  // Handle push to POS — completes the session (server computes the real
   // charge from actual pricing rules) then pushes that exact amount onto
-  // the salon's own connected Square account as a real order. Previously
-  // this only called completeSession and showed a fake "Order created"
-  // alert — no Square order was ever actually created.
-  const handlePushToSquare = useCallback(async () => {
+  // the salon's own connected POS (Square or Clover) as a real order.
+  // Previously this only called completeSession and showed a fake "Order
+  // created" alert — no POS order was ever actually created.
+  const handlePushToPos = useCallback(async () => {
     if (!session.id || !formula) return;
 
     try {
       const completed = await completeSession(session.id, steps, token);
       setSessionCost(completed.totalCost);
 
-      const order = await pushOrderToSquare(session.id, token);
+      const order = await pushOrderToPos(session.id, token);
 
       const warnings = [...(completed.pricingWarnings || []), ...(order.pricingWarnings || [])];
+      const posName = order.provider === 'clover' ? 'Clover' : 'Square Register';
       Alert.alert(
-        'Pushed to Square',
-        `${formatCost(order.totalCost)} added to Square Register.${warnings.length ? '\n\n' + warnings.join('\n') : ''} Complete payment at the register.`
+        `Pushed to ${posName}`,
+        `${formatCost(order.totalCost)} added to ${posName}.${warnings.length ? '\n\n' + warnings.join('\n') : ''} Complete payment there.`
       );
     } catch (err) {
-      console.error('Push to Square error:', err);
-      const message = err instanceof Error ? err.message : 'Failed to push to Square. Try again.';
-      if (message.includes('SQUARE_NOT_CONNECTED') || message.toLowerCase().includes("hasn")) {
-        Alert.alert('Square not connected', 'Connect Square for this salon in Settings first.');
+      console.error('Push to POS error:', err);
+      const message = err instanceof Error ? err.message : 'Failed to push order. Try again.';
+      if (message.includes('NOT_CONNECTED') || message.toLowerCase().includes("hasn")) {
+        Alert.alert('No POS connected', 'Connect Square, Clover, or another supported system for this salon in Settings first.');
       } else {
         Alert.alert('Error', message);
       }
@@ -890,11 +894,11 @@ export default function ColorBarScreen({ navigation, route }: any) {
 
           <TouchableOpacity
             style={[styles.pushBtn, { opacity: session.status === 'completed' ? 1 : 0.5 }]}
-            onPress={handlePushToSquare}
+            onPress={handlePushToPos}
             disabled={session.status !== 'completed'}
           >
             <Send size={18} color="#fff" />
-            <Text style={styles.pushBtnText}>Push to Square</Text>
+            <Text style={styles.pushBtnText}>Push to POS</Text>
           </TouchableOpacity>
         </View>
       </View>
