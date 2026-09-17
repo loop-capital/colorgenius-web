@@ -4,8 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { formulas } from '@/lib/api/mock-data';
-import { generateShareCode } from '@/lib/share-code';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
@@ -16,10 +15,12 @@ export async function GET(
     const normalized = code.toUpperCase().replace(/^CG-/, '');
     const fullCode = `CG-${normalized}`;
 
-    // Find formula by matching generated share code
-    const formula = formulas.find(f => generateShareCode(f.id) === fullCode);
+    const listing = await prisma.formula_listings.findUnique({
+      where: { share_code: fullCode },
+      include: { creator: { select: { display_name: true, first_name: true, avatar_url: true } } },
+    });
 
-    if (!formula) {
+    if (!listing || !listing.is_active) {
       return NextResponse.json({
         success: false,
         error: { code: 'NOT_FOUND', message: `No formula found for code ${fullCode}` },
@@ -31,18 +32,18 @@ export async function GET(
       data: {
         share_code: fullCode,
         formula: {
-          id: formula.id,
-          title: formula.title,
-          description: formula.description,
-          creator_name: formula.creator_name,
-          creator_avatar: formula.creator_avatar,
-          category: formula.category,
-          tier: formula.tier,
-          score: formula.score,
-          per_use_cents: formula.per_use_cents,
-          rating: formula.rating,
-          usage_count: formula.usage_count,
-          tags: formula.tags,
+          id: listing.id,
+          title: listing.title,
+          description: listing.description,
+          creator_name: listing.creator.display_name || listing.creator.first_name,
+          creator_avatar: listing.creator.avatar_url,
+          category: listing.category,
+          tier: listing.tier,
+          score: listing.score,
+          per_use_cents: listing.per_use_cents,
+          rating: listing.rating,
+          usage_count: listing.usage_count,
+          tags: listing.tags,
         },
       },
     });

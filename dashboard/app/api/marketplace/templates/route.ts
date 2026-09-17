@@ -5,64 +5,50 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateOrThrow, listTemplateSchema } from '@/lib/api/validation';
-import { communityPosts, templates, generateId } from '@/lib/api/mock-data';
-import { Template, ApiResponse } from '@/lib/api/types';
-
-function getUserFromAuth(request: NextRequest): { id: string; name: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id, name] = token.split(':');
-  if (!id || !name) return null;
-  return { id, name };
-}
+import { prisma } from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/auth';
+import { getOrCreateStylistForUser } from '@/lib/stylist';
+import { ApiResponse } from '@/lib/api/types';
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json<ApiResponse>({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
+    }
+    const stylist = await getOrCreateStylistForUser(authUser.userId);
+    if (!stylist) {
+      return NextResponse.json<ApiResponse>({
+        success: false,
+        error: { code: 'NO_PROFILE', message: 'No creator profile for this account' },
+      }, { status: 400 });
     }
 
     const body = await request.json().catch(() => ({}));
     const data = validateOrThrow(listTemplateSchema, body);
 
-    // Verify community post exists
-    const post = communityPosts.find(p => p.id === data.community_post_id);
-    if (!post) {
-      return NextResponse.json<ApiResponse>({
-        success: false,
-        error: { code: 'POST_NOT_FOUND', message: 'Community post not found' },
-      }, { status: 404 });
-    }
+    // NOTE: community_post_id is accepted but not verified against a real table —
+    // community is still on mock data as of this pass (see lib/api/mock-data.ts).
 
-    const template: Template = {
-      id: generateId(),
-      creator_id: user.id,
-      creator_name: user.name,
-      community_post_id: data.community_post_id,
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      tags: data.tags || [],
-      price_cents: data.price_cents,
-      rating: 0,
-      review_count: 0,
-      purchase_count: 0,
-      adaptation_params: data.adaptation_params || {},
-      is_active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    const listing = await prisma.formula_listings.create({
+      data: {
+        creator_id: stylist.id,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        tags: data.tags || [],
+        tier: 'community', // directly-priced listing, not auto-scored like /publish
+        price_cents: data.price_cents,
+        per_use_cents: 0,
+      },
+    });
 
-    templates.push(template);
-
-    return NextResponse.json<ApiResponse<Template>>({
+    return NextResponse.json<ApiResponse>({
       success: true,
-      data: template,
+      data: listing,
     }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to list template';

@@ -39,6 +39,7 @@ function RegisterContent() {
       });
       const data = await res.json();
       if (data.success) {
+        if (data.token) localStorage.setItem('colorgenius_token', data.token);
         setStep(2); // Move to profile setup
       } else {
         setError(data.error?.message || 'Registration failed');
@@ -57,7 +58,8 @@ function RegisterContent() {
     try {
       const res = await fetch('/api/profile', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${handle}:temp` },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           instagram: form.get('instagram'),
           bio: form.get('bio'),

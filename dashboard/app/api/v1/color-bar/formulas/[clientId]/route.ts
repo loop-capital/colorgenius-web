@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { verifyBearerToken } from '@/lib/auth'
+import { getUserFromRequest } from '@/lib/auth'
 
 const PRICE_RULES: Record<string, { color: number; developer: number; markup: number }> = {
   davines:      { color: 0.12, developer: 0.04, markup: 2.5 },
@@ -22,7 +22,7 @@ function parseMixingRatio(ratio: string | null | undefined): [number, number] {
 // GET /api/v1/color-bar/formulas/:clientId?limit=10&totalWeight=90
 export async function GET(req: NextRequest, { params }: { params: Promise<{ clientId: string }> }) {
   try {
-    const user = await verifyBearerToken(req)
+    const user = await getUserFromRequest(req)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

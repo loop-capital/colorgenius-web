@@ -1,23 +1,20 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { jwtVerify } from 'jose';
 import { PrismaClient } from '@prisma/client';
+import { getUserFromRequest } from '@/lib/auth';
+import { getSalonIdForUser } from '@/lib/stylist';
 
 const prisma = new PrismaClient();
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'cg-secret-key');
 
-async function getAuthUser() {
-  const token = cookies().get('auth-token')?.value;
-  if (!token) return null;
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, { clockTolerance: 60 });
-    return payload as { id: string; email: string; salon_id?: string };
-  } catch { return null; }
+async function getAuthUser(request: Request) {
+  const authUser = await getUserFromRequest(request);
+  if (!authUser) return null;
+  const salon_id = await getSalonIdForUser(authUser.userId);
+  return { id: authUser.userId, email: authUser.email, salon_id: salon_id || undefined };
 }
 
 export async function POST(request: Request) {
   try {
-    const user = await getAuthUser();
+    const user = await getAuthUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -56,7 +53,7 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const user = await getAuthUser();
+    const user = await getAuthUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }

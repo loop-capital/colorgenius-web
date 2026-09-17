@@ -5,40 +5,40 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateOrThrow, purchaseSchema } from '@/lib/api/validation';
-import { templates, purchases, generateId } from '@/lib/api/mock-data';
-import { Purchase, ApiResponse } from '@/lib/api/types';
-
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
-}
+import { prisma } from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/auth';
+import { getSalonIdForUser } from '@/lib/stylist';
+import { ApiResponse } from '@/lib/api/types';
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json<ApiResponse>({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
+    }
+    const salonId = await getSalonIdForUser(authUser.userId);
+    if (!salonId) {
+      return NextResponse.json<ApiResponse>({
+        success: false,
+        error: { code: 'NO_SALON', message: 'This account is not linked to a salon yet' },
+      }, { status: 400 });
     }
 
     const body = await request.json().catch(() => ({}));
     const data = validateOrThrow(purchaseSchema, body);
 
-    const template = templates.find(t => t.id === data.template_id);
-    if (!template) {
+    const listing = await prisma.formula_listings.findUnique({ where: { id: data.template_id } });
+    if (!listing) {
       return NextResponse.json<ApiResponse>({
         success: false,
         error: { code: 'TEMPLATE_NOT_FOUND', message: 'Template not found' },
       }, { status: 404 });
     }
 
-    if (!template.is_active) {
+    if (!listing.is_active) {
       return NextResponse.json<ApiResponse>({
         success: false,
         error: { code: 'TEMPLATE_INACTIVE', message: 'Template is no longer available' },
@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if already purchased
-    const existing = purchases.find(
-      p => p.buyer_id === user.id && p.template_id === data.template_id && p.status === 'completed'
-    );
+    const existing = await prisma.formula_purchases.findFirst({
+      where: { salonId, formulaId: listing.id },
+    });
     if (existing) {
       return NextResponse.json<ApiResponse>({
         success: false,
@@ -56,29 +56,39 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const platformFee = Math.round(template.price_cents * 0.20); // 20% platform fee
-    const creatorEarnings = template.price_cents - platformFee;
+    const platformFeeCents = Math.round(listing.price_cents * 0.20); // 20% platform fee
+    const creatorEarningsCents = listing.price_cents - platformFeeCents;
 
-    const purchase: Purchase = {
-      id: generateId(),
-      buyer_id: user.id,
-      template_id: data.template_id,
-      price_paid_cents: template.price_cents,
-      creator_earnings_cents: creatorEarnings,
-      platform_fee_cents: platformFee,
-      status: 'completed',
-      created_at: new Date().toISOString(),
-    };
+    const purchase = await prisma.$transaction(async (tx) => {
+      const p = await tx.formula_purchases.create({
+        data: {
+          salonId,
+          formulaId: listing.id,
+          totalUses: 0,
+          remainingUses: null, // one-time purchase = unlimited use, not metered
+          perUseFee: 0,
+          blockPrice: listing.price_cents / 100,
+        },
+      });
+      await tx.formula_listings.update({
+        where: { id: listing.id },
+        data: { purchase_count: { increment: 1 } },
+      });
+      return p;
+    });
 
-    purchases.push(purchase);
-
-    // Update template stats
-    template.purchase_count += 1;
-    template.updated_at = new Date().toISOString();
-
-    return NextResponse.json<ApiResponse<Purchase>>({
+    return NextResponse.json<ApiResponse>({
       success: true,
-      data: purchase,
+      data: {
+        id: purchase.id,
+        buyer_id: salonId,
+        template_id: listing.id,
+        price_paid_cents: listing.price_cents,
+        creator_earnings_cents: creatorEarningsCents,
+        platform_fee_cents: platformFeeCents,
+        status: 'completed',
+        created_at: purchase.purchasedAt,
+      },
     }, { status: 201 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to process purchase';

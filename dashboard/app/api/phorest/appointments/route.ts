@@ -9,18 +9,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPhorestUpcomingAppointments, syncPhorestAppointments, loadPhorestConnection } from '@/integrations/phorest';
 
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
+import { getUserFromRequest } from '@/lib/auth';
+import { getSalonIdForUser } from '@/lib/stylist';
+
+async function resolveSalonId(request: NextRequest): Promise<string | null> {
+  const authUser = await getUserFromRequest(request);
+  if (!authUser) return null;
+  return getSalonIdForUser(authUser.userId);
 }
 
 export async function GET(request: NextRequest) {
-  const user = getUserFromAuth(request);
-  const salonId = user?.id || 'default';
+  const salonId = await resolveSalonId(request);
+  if (!salonId) {
+    return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required.' } }, { status: 401 });
+  }
 
   try {
     const { searchParams } = new URL(request.url);
@@ -71,8 +73,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const user = getUserFromAuth(request);
-  const salonId = user?.id || 'default';
+  const salonId = await resolveSalonId(request);
+  if (!salonId) {
+    return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required.' } }, { status: 401 });
+  }
 
   try {
     const body = await request.json();

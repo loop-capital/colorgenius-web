@@ -11,31 +11,24 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { verifyBearerToken } from '@/lib/auth';
+import { getUserFromRequest } from '@/lib/auth';
+import { getSalonIdForUser } from '@/lib/stylist';
 import { encryptPhorestPassword, decryptPhorestPassword } from '@/lib/phorest-crypto';
 import { validatePhorestCredentials, PhorestCredentials } from '@/integrations/phorest';
 
 // ─── Helpers ───────────────────────────────────────────────────
 
-function getSalonIdFromRequest(request: NextRequest): string | null {
-  const salonId = request.headers.get('x-salon-id');
-  if (salonId) return salonId;
-
-  const auth = request.headers.get('authorization');
-  if (auth?.startsWith('Bearer ')) {
-    const token = auth.slice(7);
-    const [id] = token.split(':');
-    if (id) return id;
-  }
-  return null;
+async function getSalonIdFromRequest(request: NextRequest): Promise<string | null> {
+  const authUser = await getUserFromRequest(request);
+  if (!authUser) return null;
+  return getSalonIdForUser(authUser.userId);
 }
 
 // ─── POST: Save & Connect ──────────────────────────────────────
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await verifyBearerToken(request);
-    const salonId = user?.userId || getSalonIdFromRequest(request);
+    const salonId = await getSalonIdFromRequest(request);
 
     if (!salonId) {
       return NextResponse.json(
@@ -138,8 +131,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await verifyBearerToken(request);
-    const salonId = user?.userId || getSalonIdFromRequest(request);
+    const salonId = await getSalonIdFromRequest(request);
 
     if (!salonId) {
       return NextResponse.json(
@@ -191,8 +183,7 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await verifyBearerToken(request);
-    const salonId = user?.userId || getSalonIdFromRequest(request);
+    const salonId = await getSalonIdFromRequest(request);
 
     if (!salonId) {
       return NextResponse.json(

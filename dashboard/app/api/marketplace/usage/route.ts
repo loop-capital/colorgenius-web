@@ -8,9 +8,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateOrThrow } from '@/lib/api/validation';
-import { formulas, useEvents, generateId } from '@/lib/api/mock-data';
-import { ApiResponse, FormulaUseEvent, TIER_PRICING, Formula } from '@/lib/api/types';
+import { prisma } from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/auth';
+import { getSalonIdForUser } from '@/lib/stylist';
+import { ApiResponse } from '@/lib/api/types';
 import { z } from 'zod';
+
+const CREATOR_SHARE_PCT = 70;
 
 const logUsageSchema = z.object({
   formula_id: z.string().min(1),
@@ -18,85 +22,67 @@ const logUsageSchema = z.object({
   service_id: z.string().optional(),
 });
 
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json<ApiResponse>({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
+    }
+    const salonId = await getSalonIdForUser(authUser.userId);
+    if (!salonId) {
+      return NextResponse.json<ApiResponse>({
+        success: false,
+        error: { code: 'NO_SALON', message: 'This account is not linked to a salon yet' },
+      }, { status: 400 });
     }
 
     const body = await request.json().catch(() => ({}));
     const data = validateOrThrow(logUsageSchema, body);
 
-    const formula = formulas.find(f => f.id === data.formula_id);
-    if (!formula) {
+    const listing = await prisma.formula_listings.findUnique({ where: { id: data.formula_id } });
+    if (!listing) {
       return NextResponse.json<ApiResponse>({
         success: false,
         error: { code: 'FORMULA_NOT_FOUND', message: 'Formula not found' },
       }, { status: 404 });
     }
 
-    if (!formula.is_active) {
+    if (!listing.is_active) {
       return NextResponse.json<ApiResponse>({
         success: false,
         error: { code: 'FORMULA_INACTIVE', message: 'This formula is no longer available' },
       }, { status: 400 });
     }
 
-    // Don't charge for community (free) formulas
-    const tierPricing = TIER_PRICING[formula.tier];
-    if (tierPricing.per_use_cents === 0) {
-      // Still log the use for analytics, just no billing
-      const event: FormulaUseEvent = {
-        id: generateId(),
-        formula_id: data.formula_id,
-        stylist_id: user.id,
-        client_name: data.client_name,
-        service_id: data.service_id,
-        used_at: new Date().toISOString(),
-        billed: false,
-      };
-      useEvents.push(event);
+    const feeCents = listing.per_use_cents;
+    const creatorPayoutCents = Math.round(feeCents * (CREATOR_SHARE_PCT / 100));
+    const platformFeeCents = feeCents - creatorPayoutCents;
 
-      return NextResponse.json<ApiResponse<{ event: FormulaUseEvent; cost_cents: number }>>({
-        success: true,
-        data: { event, cost_cents: 0 },
+    const event = await prisma.$transaction(async (tx) => {
+      const e = await tx.formula_usage_log.create({
+        data: {
+          salonId,
+          formulaId: listing.id,
+          stylistId: authUser.userId,
+          creatorId: listing.creator_id,
+          feeAmount: feeCents / 100,
+          creatorPayout: creatorPayoutCents / 100,
+          platformFee: platformFeeCents / 100,
+        },
       });
-    }
+      await tx.formula_listings.update({
+        where: { id: listing.id },
+        data: { usage_count: { increment: 1 } },
+      });
+      return e;
+    });
 
-    // Log the usage event
-    const event: FormulaUseEvent = {
-      id: generateId(),
-      formula_id: data.formula_id,
-      stylist_id: user.id,
-      client_name: data.client_name,
-      service_id: data.service_id,
-      used_at: new Date().toISOString(),
-      billed: false,
-    };
-    useEvents.push(event);
-
-    // Increment formula usage count
-    formula.usage_count++;
-
-    return NextResponse.json<ApiResponse<{ event: FormulaUseEvent; cost_cents: number }>>({
+    return NextResponse.json<ApiResponse<{ event: typeof event; cost_cents: number }>>({
       success: true,
-      data: {
-        event,
-        cost_cents: tierPricing.per_use_cents,
-      },
+      data: { event, cost_cents: feeCents },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Internal error';
@@ -113,11 +99,11 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json<ApiResponse>({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
     }
 
@@ -125,27 +111,26 @@ export async function GET(request: NextRequest) {
     const period = searchParams.get('period'); // "2026-05"
     const formulaId = searchParams.get('formula_id');
 
-    let userEvents = useEvents.filter(e => e.stylist_id === user.id);
-
+    const where: any = { stylistId: authUser.userId };
+    if (formulaId) where.formulaId = formulaId;
     if (period) {
-      userEvents = userEvents.filter(e => e.used_at.startsWith(period));
-    }
-    if (formulaId) {
-      userEvents = userEvents.filter(e => e.formula_id === formulaId);
+      const [year, month] = period.split('-').map(Number);
+      where.usedAt = {
+        gte: new Date(Date.UTC(year, month - 1, 1)),
+        lt: new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1)),
+      };
     }
 
-    // Sort newest first
-    userEvents.sort((a, b) => new Date(b.used_at).getTime() - new Date(a.used_at).getTime());
+    const userEvents = await prisma.formula_usage_log.findMany({
+      where,
+      orderBy: { usedAt: 'desc' },
+    });
 
-    // Calculate total unbilled cost
-    const unbilledEvents = userEvents.filter(e => !e.billed);
-    const totalUnbilledCents = unbilledEvents.reduce((sum, e) => {
-      const formula = formulas.find(f => f.id === e.formula_id);
-      return sum + (formula ? TIER_PRICING[formula.tier].per_use_cents : 0);
-    }, 0);
+    const unbilledEvents = userEvents.filter(e => !e.billingInvoiceId);
+    const totalUnbilledCents = unbilledEvents.reduce((sum, e) => sum + Math.round(Number(e.feeAmount) * 100), 0);
 
     return NextResponse.json<ApiResponse<{
-      events: FormulaUseEvent[];
+      events: typeof userEvents;
       total_unbilled_cents: number;
       total_uses: number;
     }>>({

@@ -11,20 +11,26 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validatePhorestCredentials, savePhorestConnection, loadPhorestConnection, removePhorestConnection, isPhorestConnected } from '@/integrations/phorest';
+import { getUserFromRequest } from '@/lib/auth';
+import { getSalonIdForUser } from '@/lib/stylist';
 
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
+async function requireSalonId(request: NextRequest): Promise<{ salonId: string } | { error: NextResponse }> {
+  const authUser = await getUserFromRequest(request);
+  if (!authUser) {
+    return { error: NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required.' } }, { status: 401 }) };
+  }
+  const salonId = await getSalonIdForUser(authUser.userId);
+  if (!salonId) {
+    return { error: NextResponse.json({ success: false, error: { code: 'NO_SALON', message: 'This account is not linked to a salon yet.' } }, { status: 400 }) };
+  }
+  return { salonId };
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    const salonId = user?.id || 'default';
+    const resolved = await requireSalonId(request);
+    if ('error' in resolved) return resolved.error;
+    const { salonId } = resolved;
 
     const body = await request.json();
     const { username, password, businessId, region = 'us' } = body;
@@ -82,8 +88,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const user = getUserFromAuth(request);
-  const salonId = user?.id || 'default';
+  const resolved = await requireSalonId(request);
+  if ('error' in resolved) return resolved.error;
+  const { salonId } = resolved;
 
   try {
     const connection = await loadPhorestConnection(salonId);
@@ -123,8 +130,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const user = getUserFromAuth(request);
-  const salonId = user?.id || 'default';
+  const resolved = await requireSalonId(request);
+  if ('error' in resolved) return resolved.error;
+  const { salonId } = resolved;
 
   await removePhorestConnection(salonId);
 

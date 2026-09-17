@@ -9,6 +9,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSalonClient, getConnection, saveConnection } from '@/lib/square-multi';
 import { prisma } from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/auth';
+import { getSalonIdForUser } from '@/lib/stylist';
+
+async function resolveSalonId(request: NextRequest): Promise<string | null> {
+  const authUser = await getUserFromRequest(request);
+  if (!authUser) return null;
+  return getSalonIdForUser(authUser.userId);
+}
 
 interface SyncedProduct {
   square_catalog_id: string;
@@ -33,8 +41,10 @@ function mapCategory(squareCategory?: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = request.headers.get('authorization');
-    const salonId = auth?.startsWith('Bearer ') ? auth.slice(7).split(':')[0] : 'default';
+    const salonId = await resolveSalonId(request);
+    if (!salonId) {
+      return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required.' } }, { status: 401 });
+    }
 
     // Check that the salon has inventory_management enabled
     const salon = await prisma.salons.findUnique({ where: { id: salonId } });
@@ -188,8 +198,10 @@ export async function POST(request: NextRequest) {
  * Get synced products for a salon from the database
  */
 export async function GET(request: NextRequest) {
-  const auth = request.headers.get('authorization');
-  const salonId = auth?.startsWith('Bearer ') ? auth.slice(7).split(':')[0] : 'default';
+  const salonId = await resolveSalonId(request);
+  if (!salonId) {
+    return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required.' } }, { status: 401 });
+  }
 
   const items = await prisma.inventory_items.findMany({
     where: {

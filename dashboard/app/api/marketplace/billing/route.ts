@@ -8,51 +8,40 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateOrThrow } from '@/lib/api/validation';
-import { formulas, useEvents, billingInvoices, generateId } from '@/lib/api/mock-data';
-import {
-  ApiResponse,
-  MonthlyBillingInvoice,
-  BillingLineItem,
-  TIER_PRICING,
-  Formula,
-} from '@/lib/api/types';
+import { prisma } from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/auth';
+import { ApiResponse, BillingLineItem } from '@/lib/api/types';
 import { z } from 'zod';
+
+const CREATOR_SHARE_PCT = 70;
 
 const processBillingSchema = z.object({
   period: z.string().regex(/^\d{4}-\d{2}$/, 'Period must be YYYY-MM format'),
   stylist_id: z.string().optional(), // Admin can bill a specific stylist
 });
 
-function getUserFromAuth(request: NextRequest): { id: string; role?: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id, role] = token.split(':');
-  if (!id) return null;
-  return { id, role };
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json<ApiResponse>({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
     }
 
     const body = await request.json().catch(() => ({}));
     const data = validateOrThrow(processBillingSchema, body);
 
-    const targetStylistId = user.role === 'admin' && data.stylist_id
+    const callingUser = await prisma.users.findUnique({ where: { id: authUser.userId }, select: { role: true } });
+    const targetStylistId = callingUser?.role === 'admin' && data.stylist_id
       ? data.stylist_id
-      : user.id;
+      : authUser.userId;
 
     // Check if already billed for this period
-    const existing = billingInvoices.find(
-      i => i.stylist_id === targetStylistId && i.billing_period === data.period
-    );
+    const existing = await prisma.formula_billing_invoices.findUnique({
+      where: { stylist_id_billing_period: { stylist_id: targetStylistId, billing_period: data.period } },
+    });
     if (existing) {
       return NextResponse.json<ApiResponse>({
         success: false,
@@ -60,86 +49,88 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Get all unbilled usage events for this period
-    const periodEvents = useEvents.filter(
-      e => e.stylist_id === targetStylistId
-        && !e.billed
-        && e.used_at.startsWith(data.period)
-    );
+    const [year, month] = data.period.split('-').map(Number);
+    const periodStart = new Date(Date.UTC(year, month - 1, 1));
+    const periodEnd = new Date(Date.UTC(month === 12 ? year + 1 : year, month === 12 ? 0 : month, 1));
 
-    if (periodEvents.length === 0) {
+    // Get all unbilled usage events for this period
+    const periodEvents = await prisma.formula_usage_log.findMany({
+      where: {
+        stylistId: targetStylistId,
+        billingInvoiceId: null,
+        usedAt: { gte: periodStart, lt: periodEnd },
+      },
+      include: { listing: { select: { id: true, title: true, tier: true, creator_id: true } } },
+    });
+
+    const billable = periodEvents.filter(e => Number(e.feeAmount) > 0);
+    if (billable.length === 0) {
       return NextResponse.json<ApiResponse>({
         success: false,
         error: { code: 'NO_USAGE', message: 'No unbilled usage found for this period' },
       }, { status: 400 });
     }
 
-    // Aggregate by formula
-    const formulaUsage = new Map<string, number>();
-    for (const event of periodEvents) {
-      formulaUsage.set(event.formula_id, (formulaUsage.get(event.formula_id) || 0) + 1);
+    // Aggregate by formula listing
+    const byFormula = new Map<string, { title: string; tier: string; creator_id: string; count: number; feeCents: number }>();
+    for (const e of billable) {
+      const key = e.formulaId;
+      const feeCents = Math.round(Number(e.feeAmount) * 100);
+      const existing2 = byFormula.get(key);
+      if (existing2) {
+        existing2.count += 1;
+      } else {
+        byFormula.set(key, {
+          title: e.listing.title,
+          tier: e.listing.tier,
+          creator_id: e.listing.creator_id,
+          count: 1,
+          feeCents,
+        });
+      }
     }
 
-    // Build line items
     const lineItems: BillingLineItem[] = [];
     let totalCents = 0;
-
-    for (const [formulaId, count] of formulaUsage) {
-      const formula = formulas.find(f => f.id === formulaId);
-      if (!formula) continue;
-
-      const tierPricing = TIER_PRICING[formula.tier];
-      if (tierPricing.per_use_cents === 0) continue; // Free tier, skip
-
-      const lineTotal = tierPricing.per_use_cents * count;
-      const creatorEarnings = Math.round(lineTotal * (tierPricing.creator_share_pct / 100));
+    for (const [formulaId, agg] of byFormula) {
+      const lineTotal = agg.feeCents * agg.count;
+      const creatorEarnings = Math.round(lineTotal * (CREATOR_SHARE_PCT / 100));
       const platformFee = lineTotal - creatorEarnings;
-
       lineItems.push({
         formula_id: formulaId,
-        formula_title: formula.title,
-        creator_id: formula.creator_id,
-        tier: formula.tier,
-        use_count: count,
-        per_use_cents: tierPricing.per_use_cents,
+        formula_title: agg.title,
+        creator_id: agg.creator_id,
+        tier: agg.tier,
+        use_count: agg.count,
+        per_use_cents: agg.feeCents,
         total_cents: lineTotal,
         creator_earnings_cents: creatorEarnings,
         platform_fee_cents: platformFee,
       });
-
       totalCents += lineTotal;
-    }
-
-    if (totalCents === 0) {
-      return NextResponse.json<ApiResponse>({
-        success: false,
-        error: { code: 'FREE_TIER_ONLY', message: 'Only free-tier formulas used this period' },
-      }, { status: 400 });
     }
 
     const totalCreatorEarnings = lineItems.reduce((sum, l) => sum + l.creator_earnings_cents, 0);
     const totalPlatformFee = lineItems.reduce((sum, l) => sum + l.platform_fee_cents, 0);
 
-    // Create invoice
-    const invoice: MonthlyBillingInvoice = {
-      id: generateId(),
-      stylist_id: targetStylistId,
-      billing_period: data.period,
-      total_cents: totalCents,
-      total_creator_earnings_cents: totalCreatorEarnings,
-      total_platform_fee_cents: totalPlatformFee,
-      line_items: lineItems,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-    };
-
-    // Mark events as billed
-    for (const event of periodEvents) {
-      event.billed = true;
-      event.billing_period = data.period;
-    }
-
-    billingInvoices.push(invoice);
+    const invoice = await prisma.$transaction(async (tx) => {
+      const inv = await tx.formula_billing_invoices.create({
+        data: {
+          stylist_id: targetStylistId,
+          billing_period: data.period,
+          total_cents: totalCents,
+          total_creator_earnings_cents: totalCreatorEarnings,
+          total_platform_fee_cents: totalPlatformFee,
+          line_items: lineItems as any,
+          status: 'pending',
+        },
+      });
+      await tx.formula_usage_log.updateMany({
+        where: { id: { in: billable.map(e => e.id) } },
+        data: { billingInvoiceId: inv.id },
+      });
+      return inv;
+    });
 
     // TODO: In production, call Square to charge the stylist's card on file
     // const payment = await createSquarePayment({
@@ -154,7 +145,7 @@ export async function POST(request: NextRequest) {
     //   await createCreatorPayout(line.creator_id, line.creator_earnings_cents);
     // }
 
-    return NextResponse.json<ApiResponse<MonthlyBillingInvoice>>({
+    return NextResponse.json<ApiResponse<typeof invoice>>({
       success: true,
       data: invoice,
     });
@@ -173,25 +164,23 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json<ApiResponse>({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period');
 
-    let invoices = billingInvoices.filter(i => i.stylist_id === user.id);
-    if (period) {
-      invoices = invoices.filter(i => i.billing_period === period);
-    }
+    const invoices = await prisma.formula_billing_invoices.findMany({
+      where: { stylist_id: authUser.userId, ...(period ? { billing_period: period } : {}) },
+      orderBy: { created_at: 'desc' },
+    });
 
-    invoices.sort((a, b) => b.created_at.localeCompare(a.created_at));
-
-    return NextResponse.json<ApiResponse<{ invoices: MonthlyBillingInvoice[] }>>({
+    return NextResponse.json<ApiResponse<{ invoices: typeof invoices }>>({
       success: true,
       data: { invoices },
     });

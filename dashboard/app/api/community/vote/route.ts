@@ -5,32 +5,42 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateOrThrow, voteSchema } from '@/lib/api/validation';
-import { communityPosts, votes, updatePostScore } from '@/lib/api/mock-data';
-import { VoteRecord, ApiResponse } from '@/lib/api/types';
-
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
-}
+import { prisma } from '@/lib/prisma';
+import { ApiResponse } from '@/lib/api/types';
+import { getUserFromRequest } from '@/lib/auth';
+import { getOrCreateStylistForUser } from '@/lib/stylist';
 
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json<ApiResponse>({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
+    }
+    const stylist = await getOrCreateStylistForUser(authUser.userId);
+    if (!stylist) {
+      return NextResponse.json<ApiResponse>({
+        success: false,
+        error: { code: 'NO_PROFILE', message: 'No creator profile for this account' },
+      }, { status: 400 });
     }
 
     const body = await request.json().catch(() => ({}));
     const data = validateOrThrow(voteSchema, body);
 
-    const post = communityPosts.find(p => p.id === data.post_id);
+    // 'save'/'unsave' have no real backing table (community_posts/post_likes only
+    // model likes) — rather than keep faking it against an in-memory array, be
+    // honest that it isn't built yet.
+    if (data.action === 'save' || data.action === 'unsave') {
+      return NextResponse.json<ApiResponse>({
+        success: false,
+        error: { code: 'NOT_IMPLEMENTED', message: 'Saving posts is not available yet' },
+      }, { status: 501 });
+    }
+
+    const post = await prisma.community_posts.findUnique({ where: { id: data.post_id } });
     if (!post) {
       return NextResponse.json<ApiResponse>({
         success: false,
@@ -38,51 +48,32 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // Check for existing vote to toggle
-    const existingIdx = votes.findIndex(
-      v => v.post_id === data.post_id && v.user_id === user.id &&
-        ((data.action === 'like' && v.action === 'like') ||
-         (data.action === 'save' && v.action === 'save') ||
-         (data.action === 'unlike' && v.action === 'like') ||
-         (data.action === 'unsave' && v.action === 'save'))
-    );
+    const existing = await prisma.post_likes.findUnique({
+      where: { post_id_user_id: { post_id: data.post_id, user_id: stylist.id } },
+    });
 
+    let likeCount = post.like_count;
     if (data.action === 'like') {
-      if (existingIdx >= 0) {
-        // Already liked
-        return NextResponse.json<ApiResponse>({
-          success: true,
-          data: { post_id: data.post_id, action: data.action, likes: post.likes, saves: post.saves },
-        });
+      if (!existing) {
+        await prisma.$transaction([
+          prisma.post_likes.create({ data: { post_id: data.post_id, user_id: stylist.id } }),
+          prisma.community_posts.update({ where: { id: data.post_id }, data: { like_count: { increment: 1 } } }),
+        ]);
+        likeCount += 1;
       }
-      post.likes += 1;
-      votes.push({ post_id: data.post_id, user_id: user.id, action: 'like', created_at: new Date().toISOString() });
     } else if (data.action === 'unlike') {
-      if (existingIdx >= 0) {
-        post.likes = Math.max(0, post.likes - 1);
-        votes.splice(existingIdx, 1);
-      }
-    } else if (data.action === 'save') {
-      if (existingIdx >= 0) {
-        return NextResponse.json<ApiResponse>({
-          success: true,
-          data: { post_id: data.post_id, action: data.action, likes: post.likes, saves: post.saves },
-        });
-      }
-      post.saves += 1;
-      votes.push({ post_id: data.post_id, user_id: user.id, action: 'save', created_at: new Date().toISOString() });
-    } else if (data.action === 'unsave') {
-      if (existingIdx >= 0) {
-        post.saves = Math.max(0, post.saves - 1);
-        votes.splice(existingIdx, 1);
+      if (existing) {
+        await prisma.$transaction([
+          prisma.post_likes.delete({ where: { id: existing.id } }),
+          prisma.community_posts.update({ where: { id: data.post_id }, data: { like_count: { decrement: 1 } } }),
+        ]);
+        likeCount = Math.max(0, likeCount - 1);
       }
     }
 
-    updatePostScore(post.id);
-
     return NextResponse.json<ApiResponse>({
       success: true,
-      data: { post_id: data.post_id, action: data.action, likes: post.likes, saves: post.saves },
+      data: { post_id: data.post_id, action: data.action, likes: likeCount, saves: 0 },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to process vote';

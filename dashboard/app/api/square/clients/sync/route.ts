@@ -1,29 +1,29 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { jwtVerify } from 'jose';
 import { PrismaClient } from '@prisma/client';
-import { createSalonClient } from '@/lib/square-multi';
+import { createSalonClient, isConnected } from '@/lib/square-multi';
+import { getUserFromRequest } from '@/lib/auth';
+import { getSalonIdForUser } from '@/lib/stylist';
 
 const prisma = new PrismaClient();
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'cg-secret-key');
 
-async function getAuthUser() {
-  const token = cookies().get('auth-token')?.value;
-  if (!token) return null;
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, { clockTolerance: 60 });
-    return payload as { id: string; email: string; salon_id?: string };
-  } catch { return null; }
+async function getAuthUser(request: Request) {
+  const authUser = await getUserFromRequest(request);
+  if (!authUser) return null;
+  const salon_id = await getSalonIdForUser(authUser.userId);
+  return { id: authUser.userId, email: authUser.email, salon_id: salon_id || undefined };
 }
 
 // Map Square customer to COLORgenius client schema
 function mapSquareCustomer(customer: any, salonId: string) {
-  const name = `${customer.given_name || ''} ${customer.family_name || ''}`.trim();
+  // Square SDK v44 customer fields are camelCase (givenName, emailAddress, ...),
+  // not the snake_case this previously assumed — every synced client was
+  // silently coming through as "Unknown" with no email/phone before this fix.
+  const name = `${customer.givenName || ''} ${customer.familyName || ''}`.trim();
   return {
-    first_name: customer.given_name || name || 'Unknown',
-    last_name: customer.family_name || '',
-    email: customer.email_address || null,
-    phone: customer.phone_number || null,
+    first_name: customer.givenName || name || 'Unknown',
+    last_name: customer.familyName || '',
+    email: customer.emailAddress || null,
+    phone: customer.phoneNumber || null,
     square_customer_id: customer.id,
     salon_id: salonId,
     general_notes: customer.note || null,
@@ -32,7 +32,7 @@ function mapSquareCustomer(customer: any, salonId: string) {
 
 export async function POST(request: Request) {
   try {
-    const user = await getAuthUser();
+    const user = await getAuthUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
@@ -45,26 +45,31 @@ export async function POST(request: Request) {
     }
 
     // Check Square is connected for this salon
+    if (!(await isConnected(salonId))) {
+      return NextResponse.json({ error: 'Square not connected for this salon' }, { status: 400 });
+    }
+
     const squareConn = await prisma.square_connections.findFirst({
       where: { salon_id: salonId },
     });
-
-    if (!squareConn?.access_token) {
+    if (!squareConn) {
       return NextResponse.json({ error: 'Square not connected for this salon' }, { status: 400 });
     }
 
     const stats = { imported: 0, updated: 0, skipped: 0, errors: 0, details: [] as any[] };
 
-    // Use existing createSalonClient from lib/square-multi
-    const square = createSalonClient(squareConn.access_token);
+    const square = await createSalonClient(salonId);
+    if (!square) {
+      return NextResponse.json({ error: 'Square not connected for this salon' }, { status: 400 });
+    }
 
     // Paginate through all Square customers (100 per page)
     let cursor: string | undefined;
     let hasMore = true;
 
     while (hasMore) {
-      const result: any = await square.customersApi.listCustomers(cursor, undefined, 100);
-      const customers = result.result?.customers || [];
+      const result: any = await square.customers.list({ cursor, limit: 100 });
+      const customers = result.data || [];
 
       for (const customer of customers) {
         try {
@@ -114,7 +119,7 @@ export async function POST(request: Request) {
         }
       }
 
-      cursor = result.result?.cursor;
+      cursor = result.response?.cursor;
       hasMore = !!cursor && customers.length === 100;
     }
 

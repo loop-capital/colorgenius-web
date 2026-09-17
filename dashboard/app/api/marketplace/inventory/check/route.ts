@@ -5,7 +5,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { clientRequests } from '@/lib/api/mock-data';
 
 // Try to import Square — may fail if not configured
 let getInventoryCounts: ((ids: string[]) => Promise<Map<string, number>>) | null = null;
@@ -51,10 +50,11 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Get required products from client requests
-    const relatedRequests = clientRequests.filter(r => r.formula_id === formula_id);
-    const allProducts = relatedRequests.flatMap(r => r.required_products ?? []);
-    const uniqueProductNames = [...new Set(allProducts)];
+    // NOTE: required_products was never actually populated anywhere in the
+    // original prototype either (formula_client_requests has no such column) —
+    // this always evaluated to an empty list. Left as-is pending a real design
+    // for per-formula required-product lists.
+    const uniqueProductNames: string[] = [];
 
     // Try to check Square inventory
     const catalogIds = uniqueProductNames

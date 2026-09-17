@@ -11,6 +11,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { prisma } from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/auth';
+import { getSalonIdForUser } from '@/lib/stylist';
 
 // ── Subscription Plans ──
 
@@ -66,45 +69,31 @@ const PLANS: SubscriptionPlan[] = [
   },
 ];
 
-// ── In-memory subscription store ──
+// ── Real, DB-backed subscription store (prisma.subscriptions) ──
+// subscriber_type is always 'salon' here; subscriber_id is the salon's real id,
+// resolved from the authenticated user via users.salon_id (see lib/stylist.ts).
 
-interface SalonSubscription {
-  salon_id: string;
-  plan_id: string;
-  status: 'active' | 'trialing' | 'canceled' | 'past_due';
-  started_at: string;
-  trial_ends_at?: string;
-  canceled_at?: string;
-  square_subscription_id?: string;
-}
-
-const subscriptions = new Map<string, SalonSubscription>();
-
-// Seed with a default trial for testing
-subscriptions.set('buyer-1', {
-  salon_id: 'buyer-1',
-  plan_id: 'pro',
-  status: 'trialing',
-  started_at: '2026-05-10T00:00:00Z',
-  trial_ends_at: '2026-05-24T00:00:00Z',
-});
-
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
+async function requireSalonId(request: NextRequest): Promise<{ salonId: string } | { error: NextResponse }> {
+  const authUser = await getUserFromRequest(request);
+  if (!authUser) {
+    return { error: NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED' } }, { status: 401 }) };
+  }
+  const salonId = await getSalonIdForUser(authUser.userId);
+  if (!salonId) {
+    return { error: NextResponse.json({ success: false, error: { code: 'NO_SALON', message: 'This account is not linked to a salon yet.' } }, { status: 400 }) };
+  }
+  return { salonId };
 }
 
 export async function GET(request: NextRequest) {
-  const user = getUserFromAuth(request);
-  if (!user) {
-    return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED' } }, { status: 401 });
-  }
+  const resolved = await requireSalonId(request);
+  if ('error' in resolved) return resolved.error;
+  const { salonId } = resolved;
 
-  const sub = subscriptions.get(user.id);
+  const sub = await prisma.subscriptions.findFirst({
+    where: { subscriber_type: 'salon', subscriber_id: salonId },
+    orderBy: { created_at: 'desc' },
+  });
 
   if (!sub) {
     // No subscription — return available plans
@@ -118,7 +107,8 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const plan = PLANS.find(p => p.id === sub.plan_id);
+  const plan = PLANS.find(p => p.id === sub.tier);
+  const trialEndsAt = sub.status === 'trialing' ? sub.current_period_end : null;
 
   return NextResponse.json({
     success: true,
@@ -127,9 +117,9 @@ export async function GET(request: NextRequest) {
       current_plan: plan,
       subscription: sub,
       plans: PLANS,
-      trial_active: sub.status === 'trialing' && sub.trial_ends_at && new Date(sub.trial_ends_at) > new Date(),
-      trial_days_remaining: sub.trial_ends_at
-        ? Math.max(0, Math.ceil((new Date(sub.trial_ends_at).getTime() - Date.now()) / 86400000))
+      trial_active: sub.status === 'trialing' && !!trialEndsAt && trialEndsAt > new Date(),
+      trial_days_remaining: trialEndsAt
+        ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / 86400000))
         : 0,
     },
   });
@@ -141,10 +131,9 @@ const subscribeSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const user = getUserFromAuth(request);
-  if (!user) {
-    return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED' } }, { status: 401 });
-  }
+  const resolved = await requireSalonId(request);
+  if ('error' in resolved) return resolved.error;
+  const { salonId } = resolved;
 
   try {
     const body = await request.json().catch(() => ({}));
@@ -155,18 +144,46 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: { code: 'INVALID_PLAN' } }, { status: 400 });
     }
 
-    // TODO: Create Square subscription when payment_method_id is provided
-    // For now, activate immediately with trial
+    // TODO: Create a real Square subscription when payment_method_id is provided —
+    // needs a Square customer id + subscription plan variation id configured on the
+    // Square side first (square_plan_id above is currently unpopulated for every
+    // plan). Not something to fabricate here; activating on a trial in the meantime
+    // so the rest of the flow (persistence, plan gating) is real and testable.
+    const now = new Date();
+    const trialEnd = new Date(now.getTime() + 14 * 86400000); // 14-day trial
 
-    const sub: SalonSubscription = {
-      salon_id: user.id,
-      plan_id: data.plan_id,
-      status: 'trialing',
-      started_at: new Date().toISOString(),
-      trial_ends_at: new Date(Date.now() + 14 * 86400000).toISOString(), // 14-day trial
-    };
+    // subscriptions has no unique constraint on (subscriber_type, subscriber_id),
+    // so this is a plain find-then-write rather than a Prisma upsert.
+    const existing = await prisma.subscriptions.findFirst({
+      where: { subscriber_type: 'salon', subscriber_id: salonId },
+    });
 
-    subscriptions.set(user.id, sub);
+    const sub = existing
+      ? await prisma.subscriptions.update({
+          where: { id: existing.id },
+          data: {
+            tier: data.plan_id,
+            monthly_price: plan.price_cents / 100,
+            status: 'trialing',
+            current_period_start: now,
+            current_period_end: trialEnd,
+            canceled_at: null,
+            cancellation_reason: null,
+            updated_at: now,
+          },
+        })
+      : await prisma.subscriptions.create({
+          data: {
+            subscriber_type: 'salon',
+            subscriber_id: salonId,
+            tier: data.plan_id,
+            monthly_price: plan.price_cents / 100,
+            billing_interval: 'monthly',
+            status: 'trialing',
+            current_period_start: now,
+            current_period_end: trialEnd,
+          },
+        });
 
     return NextResponse.json({
       success: true,
@@ -185,20 +202,23 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const user = getUserFromAuth(request);
-  if (!user) {
-    return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED' } }, { status: 401 });
-  }
+  const resolved = await requireSalonId(request);
+  if ('error' in resolved) return resolved.error;
+  const { salonId } = resolved;
 
-  const sub = subscriptions.get(user.id);
-  if (!sub) {
+  const existing = await prisma.subscriptions.findFirst({
+    where: { subscriber_type: 'salon', subscriber_id: salonId },
+  });
+  if (!existing) {
     return NextResponse.json({ success: false, error: { code: 'NO_SUBSCRIPTION' } }, { status: 400 });
   }
 
-  sub.status = 'canceled';
-  sub.canceled_at = new Date().toISOString();
+  const sub = await prisma.subscriptions.update({
+    where: { id: existing.id },
+    data: { status: 'canceled', canceled_at: new Date() },
+  });
 
-  // TODO: Cancel Square subscription if connected
+  // TODO: Cancel the real Square subscription too, once POST actually creates one.
 
   return NextResponse.json({
     success: true,

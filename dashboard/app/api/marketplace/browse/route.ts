@@ -5,25 +5,18 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { validateOrThrow, browseQuerySchema } from '@/lib/api/validation';
-import { templates } from '@/lib/api/mock-data';
-import { Template, ApiResponse } from '@/lib/api/types';
-
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
-}
+import { prisma } from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/auth';
+import { ApiResponse } from '@/lib/api/types';
+import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json<ApiResponse>({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
     }
 
@@ -39,51 +32,40 @@ export async function GET(request: NextRequest) {
     };
     const query = validateOrThrow(browseQuerySchema, raw);
 
-    let results = [...templates].filter(t => t.is_active);
+    const where: Prisma.formula_listingsWhereInput = { is_active: true };
+    if (query.category) where.category = { equals: query.category, mode: 'insensitive' };
+    if (query.price_min !== undefined || query.price_max !== undefined) {
+      where.price_cents = {};
+      if (query.price_min !== undefined) where.price_cents.gte = query.price_min;
+      if (query.price_max !== undefined) where.price_cents.lte = query.price_max;
+    }
+    if (query.rating !== undefined) where.rating = { gte: query.rating };
 
-    // Apply filters
-    if (query.category) {
-      results = results.filter(t => t.category.toLowerCase() === query.category!.toLowerCase());
-    }
-    if (query.price_min !== undefined) {
-      results = results.filter(t => t.price_cents >= query.price_min!);
-    }
-    if (query.price_max !== undefined) {
-      results = results.filter(t => t.price_cents <= query.price_max!);
-    }
-    if (query.rating !== undefined) {
-      results = results.filter(t => (t.rating / 10) >= query.rating!);
-    }
+    const orderBy: Prisma.formula_listingsOrderByWithRelationInput =
+      query.sort === 'newest' ? { created_at: 'desc' } :
+      query.sort === 'price' ? { price_cents: 'asc' } :
+      { purchase_count: 'desc' }; // popular
 
-    // Sort
-    if (query.sort === 'newest') {
-      results.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-    } else if (query.sort === 'price') {
-      results.sort((a, b) => a.price_cents - b.price_cents);
-    } else {
-      // popular: by purchase count descending
-      results.sort((a, b) => b.purchase_count - a.purchase_count);
-    }
+    // Cursor pagination (by id, consistent with the ordering above being stable enough for a marketplace listing)
+    const results = await prisma.formula_listings.findMany({
+      where,
+      orderBy,
+      take: query.limit + 1,
+      ...(query.cursor ? { cursor: { id: query.cursor }, skip: 1 } : {}),
+      include: {
+        creator: { select: { id: true, display_name: true, first_name: true, avatar_url: true, is_verified: true } },
+      },
+    });
 
-    // Cursor pagination
-    let startIdx = 0;
-    if (query.cursor) {
-      const idx = results.findIndex(t => t.id === query.cursor);
-      if (idx >= 0) startIdx = idx + 1;
-    }
+    const hasMore = results.length > query.limit;
+    const page = hasMore ? results.slice(0, query.limit) : results;
+    const nextCursor = hasMore ? page[page.length - 1].id : undefined;
+    const total = await prisma.formula_listings.count({ where });
 
-    const page = results.slice(startIdx, startIdx + query.limit);
-    const nextCursor = page.length === query.limit && startIdx + query.limit < results.length
-      ? page[page.length - 1].id
-      : undefined;
-
-    return NextResponse.json<ApiResponse<Template[]>>({
+    return NextResponse.json<ApiResponse<typeof page>>({
       success: true,
       data: page,
-      meta: {
-        cursor: nextCursor,
-        total: results.length,
-      },
+      meta: { cursor: nextCursor, total },
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to browse marketplace';

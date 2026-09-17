@@ -73,7 +73,10 @@ export type PostIdParamInput = z.infer<typeof postIdParamSchema>;
 // ─── Marketplace ──────────────────────────────────────────────────────────────
 
 export const listTemplateSchema = z.object({
-  community_post_id: z.string().uuid(),
+  // community posts aren't backed by real, stable ids yet (still on mock data
+  // as of this pass) — kept optional rather than enforced against a table that
+  // doesn't exist, until community is migrated off mock-data.ts too.
+  community_post_id: z.string().uuid().optional(),
   price_cents: z.coerce.number().int().min(0).max(1000000),
   adaptation_params: z.record(z.string(), z.unknown()).default({}),
   title: z.string().min(1).max(200),

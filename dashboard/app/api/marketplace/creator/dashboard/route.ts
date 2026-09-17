@@ -4,55 +4,70 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { templates, purchases } from '@/lib/api/mock-data';
+import { prisma } from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/auth';
+import { getOrCreateStylistForUser } from '@/lib/stylist';
 import { CreatorEarnings, ApiResponse } from '@/lib/api/types';
 
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
-}
+const PLATFORM_FEE_PCT = 0.20; // matches /api/marketplace/purchase's one-time-purchase split
 
 export async function GET(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json<ApiResponse>({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
     }
-
-    const creatorTemplates = templates.filter(t => t.creator_id === user.id);
-    const creatorPurchases = purchases.filter(
-      p => p.status === 'completed' && creatorTemplates.some(t => t.id === p.template_id)
-    );
-
-    const totalEarnings = creatorPurchases.reduce((sum, p) => sum + p.creator_earnings_cents, 0);
-    const pendingPayout = creatorPurchases
-      .filter(p => p.status === 'completed')
-      .reduce((sum, p) => sum + p.creator_earnings_cents, 0);
-
-    // Aggregate by template
-    const templateStats = new Map<string, { title: string; sales: number; earnings: number }>();
-    for (const purchase of creatorPurchases) {
-      const tmpl = creatorTemplates.find(t => t.id === purchase.template_id);
-      if (!tmpl) continue;
-      const existing = templateStats.get(tmpl.id);
-      if (existing) {
-        existing.sales += 1;
-        existing.earnings += purchase.creator_earnings_cents;
-      } else {
-        templateStats.set(tmpl.id, {
-          title: tmpl.title,
-          sales: 1,
-          earnings: purchase.creator_earnings_cents,
-        });
-      }
+    const stylist = await getOrCreateStylistForUser(authUser.userId);
+    if (!stylist) {
+      return NextResponse.json<ApiResponse>({
+        success: false,
+        error: { code: 'NO_PROFILE', message: 'No creator profile for this account' },
+      }, { status: 400 });
     }
+
+    const listings = await prisma.formula_listings.findMany({
+      where: { creator_id: stylist.id },
+      include: {
+        purchases: true, // one-time purchases (price_cents, 80/20 split)
+        usage_log: true, // metered per-use (per_use_cents, 70/30 split, already stored)
+      },
+    });
+
+    let totalSales = 0;
+    let totalEarningsCents = 0;
+    const templateStats = new Map<string, { title: string; sales: number; earnings: number }>();
+
+    for (const listing of listings) {
+      let listingSales = 0;
+      let listingEarnings = 0;
+
+      for (const purchase of listing.purchases) {
+        const earnings = Math.round(listing.price_cents * (1 - PLATFORM_FEE_PCT));
+        listingSales += 1;
+        listingEarnings += earnings;
+      }
+      for (const usage of listing.usage_log) {
+        listingSales += 1;
+        listingEarnings += Math.round(Number(usage.creatorPayout) * 100);
+      }
+
+      if (listingSales > 0) {
+        templateStats.set(listing.id, { title: listing.title, sales: listingSales, earnings: listingEarnings });
+      }
+      totalSales += listingSales;
+      totalEarningsCents += listingEarnings;
+    }
+
+    // Pending payout = earnings from usage not yet billed (one-time purchases are
+    // already "settled" at purchase time; metered usage waits for the monthly invoice)
+    const unbilledUsage = await prisma.formula_usage_log.findMany({
+      where: { creatorId: stylist.id, billingInvoiceId: null },
+      select: { creatorPayout: true },
+    });
+    const pendingPayoutCents = unbilledUsage.reduce((sum, u) => sum + Math.round(Number(u.creatorPayout) * 100), 0);
 
     const topTemplates = Array.from(templateStats.entries())
       .map(([template_id, stats]) => ({ template_id, title: stats.title, sales: stats.sales, earnings_cents: stats.earnings }))
@@ -60,11 +75,11 @@ export async function GET(request: NextRequest) {
       .slice(0, 5);
 
     const dashboard: CreatorEarnings = {
-      creator_id: user.id,
-      total_sales: creatorPurchases.length,
-      total_earnings_cents: totalEarnings,
-      pending_payout_cents: pendingPayout,
-      templates_count: creatorTemplates.length,
+      creator_id: stylist.id,
+      total_sales: totalSales,
+      total_earnings_cents: totalEarningsCents,
+      pending_payout_cents: pendingPayoutCents,
+      templates_count: listings.length,
       top_templates: topTemplates,
     };
 

@@ -11,31 +11,24 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { formulas, generateId } from '@/lib/api/mock-data';
+import { prisma } from '@/lib/prisma';
+import { getUserFromRequest } from '@/lib/auth';
+import { getOrCreateStylistForUser } from '@/lib/stylist';
 import { generateShareCode } from '@/lib/share-code';
-import { Formula, FormulaTier, getTierForScore } from '@/lib/api/types';
+import { FormulaTier, getTierForScore } from '@/lib/api/types';
 import { z } from 'zod';
 
+// creator_id/creator_name/creator_avatar removed from input — the creator is
+// always the authenticated caller, never client-supplied (previously anyone
+// could publish a listing attributed to any other user's id).
 const publishSchema = z.object({
-  source_formula_id: z.string().min(1),
+  source_formula_id: z.string().min(1).optional(),
   title: z.string().min(3).max(100),
   description: z.string().min(10).max(500),
   category: z.string().min(1),
   tags: z.array(z.string()).max(10).default([]),
   photo_url: z.string().url().optional(),
-  creator_id: z.string().min(1),
-  creator_name: z.string().min(1),
-  creator_avatar: z.string().url().optional(),
 });
-
-function getUserFromAuth(request: NextRequest): { id: string } | null {
-  const auth = request.headers.get('authorization');
-  if (!auth?.startsWith('Bearer ')) return null;
-  const token = auth.slice(7);
-  const [id] = token.split(':');
-  if (!id) return null;
-  return { id };
-}
 
 /**
  * Score a formula based on analysis criteria
@@ -60,23 +53,37 @@ function scoreFormula(data: z.infer<typeof publishSchema>): number {
   return Math.min(score, 100);
 }
 
+const TIER_PER_USE_CENTS: Record<FormulaTier, number> = {
+  community: 0,
+  professional: 299,
+  master: 499,
+  signature: 799,
+};
+
 export async function POST(request: NextRequest) {
   try {
-    const user = getUserFromAuth(request);
-    if (!user) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Bearer token required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       }, { status: 401 });
+    }
+    const stylist = await getOrCreateStylistForUser(authUser.userId);
+    if (!stylist) {
+      return NextResponse.json({
+        success: false,
+        error: { code: 'NO_PROFILE', message: 'No creator profile for this account' },
+      }, { status: 400 });
     }
 
     const body = await request.json().catch(() => ({}));
     const data = publishSchema.parse(body);
 
-    // Check if formula with same title already exists from this creator
-    const duplicate = formulas.find(
-      f => f.creator_id === data.creator_id && f.title.toLowerCase() === data.title.toLowerCase()
-    );
+    // Check if a listing with the same title already exists from this creator
+    const duplicate = await prisma.formula_listings.findFirst({
+      where: { creator_id: stylist.id, title: { equals: data.title, mode: 'insensitive' } },
+    });
     if (duplicate) {
       return NextResponse.json({
         success: false,
@@ -84,58 +91,52 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // If publishing from an existing formula, verify the caller actually owns it
+    if (data.source_formula_id) {
+      const source = await prisma.formulas.findUnique({ where: { id: data.source_formula_id } });
+      if (!source || source.stylist_id !== authUser.userId) {
+        return NextResponse.json({
+          success: false,
+          error: { code: 'FORMULA_NOT_FOUND', message: 'Formula not found' },
+        }, { status: 404 });
+      }
+    }
+
     // Score the formula
     const score = scoreFormula(data);
     const tier = getTierForScore(score);
+    const perUseCents = TIER_PER_USE_CENTS[tier];
 
-    // Get tier pricing
-    const tierPricing: Record<FormulaTier, number> = {
-      community: 0,
-      professional: 299,
-      master: 499,
-      signature: 799,
-    };
+    const listing = await prisma.formula_listings.create({
+      data: {
+        creator_id: stylist.id,
+        source_formula_id: data.source_formula_id,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        tags: data.tags,
+        photo_url: data.photo_url,
+        score,
+        tier,
+        price_cents: perUseCents,
+        per_use_cents: perUseCents,
+      },
+    });
 
-    const newFormula: Formula = {
-      id: `fm-${generateId().slice(0, 8)}`,
-      creator_id: data.creator_id,
-      creator_name: data.creator_name,
-      creator_avatar: data.creator_avatar,
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      tags: data.tags,
-      score,
-      tier,
-      price_cents: tierPricing[tier],
-      per_use_cents: tierPricing[tier],
-      usage_count: 0,
-      purchase_count: 0,
-      share_code: '', // Will be generated below
-      rating: 0,
-      review_count: 0,
-      is_active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    // Generate share code
-    newFormula.share_code = generateShareCode(newFormula.id);
-
-    // Add to marketplace
-    formulas.push(newFormula as unknown as typeof formulas[0]);
+    const shareCode = generateShareCode(listing.id);
+    await prisma.formula_listings.update({ where: { id: listing.id }, data: { share_code: shareCode } });
 
     return NextResponse.json({
       success: true,
       data: {
-        formula: newFormula,
+        formula: { ...listing, share_code: shareCode },
         message: `Published! Your formula scored ${score}/100 and earned the "${tier}" tier.`,
         tier_info: {
           tier,
           score,
-          per_use_cents: tierPricing[tier],
-          per_use_display: tierPricing[tier] === 0 ? 'Free' : `$${(tierPricing[tier] / 100).toFixed(2)}/use`,
-          creator_earnings: tierPricing[tier] === 0 ? '$0' : `$${((tierPricing[tier] * 0.7) / 100).toFixed(2)}/use`,
+          per_use_cents: perUseCents,
+          per_use_display: perUseCents === 0 ? 'Free' : `$${(perUseCents / 100).toFixed(2)}/use`,
+          creator_earnings: perUseCents === 0 ? '$0' : `$${((perUseCents * 0.7) / 100).toFixed(2)}/use`,
         },
       },
     }, { status: 201 });

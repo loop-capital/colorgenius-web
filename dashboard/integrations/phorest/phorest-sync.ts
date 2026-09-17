@@ -12,6 +12,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { encryptPhorestPassword, decryptPhorestPassword } from '@/lib/phorest-crypto';
 import { PhorestClient } from './phorest-client';
 import {
   PhorestCredentials,
@@ -544,8 +545,7 @@ export async function savePhorestConnection(config: PhorestConnectionConfig): Pr
       ${JSON.stringify({
         business_id: config.business_id,
         username: config.username,
-        // NOTE: In production, encrypt password with a KMS or at least env-based AES
-        password_encrypted: config.password,
+        password_encrypted: encryptPhorestPassword(config.password),
         region: config.region,
         default_branch_id: config.default_branch_id,
         auto_sync_enabled: config.auto_sync_enabled ?? false,
@@ -576,7 +576,7 @@ export async function loadPhorestConnection(salonId: string): Promise<PhorestCon
       salon_id: salonId,
       business_id: phorest.business_id,
       username: phorest.username,
-      password: phorest.password_encrypted,
+      password: decryptPhorestPassword(phorest.password_encrypted),
       region: phorest.region || 'us',
       default_branch_id: phorest.default_branch_id,
       auto_sync_enabled: phorest.auto_sync_enabled,
