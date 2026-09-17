@@ -3,57 +3,90 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  FlatList,
+  ScrollView,
+  Image,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { TrendingUp, Star, Sparkles, Heart, Eye } from 'lucide-react-native';
-import { getPublicGallery, getTrendingGallery, browseMarketplace } from '../api/client';
+import { TrendingUp, Star, Sparkles, Heart, MessageCircle } from 'lucide-react-native';
+import { apiRequest } from '../api/client';
 
-interface TabButtonProps {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-  icon: React.ReactNode;
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface CommunityPost {
+  id: string;
+  type: string;
+  content: string;
+  formulaLabel: string | null;
+  tags: string[];
+  likeCount: number;
+  commentCount: number;
+  createdAt: string;
+  author: {
+    id: string;
+    name: string;
+    avatar?: string;
+    tier?: string;
+    isVerified?: boolean;
+  };
+  photos: { id: string; url: string; label?: string }[];
+  liked?: boolean;
 }
 
-function TabButton({ label, active, onPress, icon }: TabButtonProps) {
+interface MarketplaceListing {
+  id: string;
+  title: string;
+  category: string;
+  price_cents: number;
+  share_code: string | null;
+  creator?: { display_name?: string; first_name?: string };
+}
+
+// ─── Tab Button ──────────────────────────────────────────────────────────────
+
+function TabButton({ label, active, onPress, icon }: { label: string; active: boolean; onPress: () => void; icon: React.ReactNode }) {
   return (
-    <TouchableOpacity
-      style={[styles.tab, active && styles.tabActive]}
-      onPress={onPress}
-    >
+    <TouchableOpacity style={[styles.tab, active && styles.tabActive]} onPress={onPress}>
       {icon}
       <Text style={[styles.tabText, active && styles.tabTextActive]}>{label}</Text>
     </TouchableOpacity>
   );
 }
 
-function PhotoCard({ item, index }: { item: any; index: number }) {
+// ─── Post Card ───────────────────────────────────────────────────────────────
+
+function PostCard({ post, onLike }: { post: CommunityPost; onLike: (id: string) => void }) {
+  const photo = post.photos[0];
   return (
-    <View style={styles.photoCard}>
-      <View style={styles.photoPlaceholder}>
-        <Sparkles size={32} color="#9333EA" />
-      </View>
-      <View style={styles.photoInfo}>
-        <Text style={styles.photoTitle} numberOfLines={1}>
-          {item.title || item.description || `Formulation #${index + 1}`}
+    <View style={styles.postCard}>
+      {photo ? (
+        <Image source={{ uri: photo.url }} style={styles.postImage} />
+      ) : (
+        <View style={styles.postImagePlaceholder}>
+          <Sparkles size={28} color="#9333EA" />
+        </View>
+      )}
+      <View style={styles.postInfo}>
+        <Text style={styles.postAuthor} numberOfLines={1}>
+          {post.author.name}{post.author.isVerified ? ' ✓' : ''}
         </Text>
-        <Text style={styles.photoMeta}>
-          {item.stylist_name || 'COLORgenius Community'}
-        </Text>
-        <View style={styles.photoStats}>
-          <View style={styles.photoStat}>
-            <Heart size={14} color="#EF4444" />
-            <Text style={styles.photoStatText}>{item.likes || Math.floor(Math.random() * 50) + 10}</Text>
-          </View>
-          <View style={styles.photoStat}>
-            <Eye size={14} color="#A1A1AA" />
-            <Text style={styles.photoStatText}>{item.views || Math.floor(Math.random() * 200) + 50}</Text>
+        {post.content ? (
+          <Text style={styles.postContent} numberOfLines={2}>{post.content}</Text>
+        ) : null}
+        {post.formulaLabel ? (
+          <Text style={styles.postFormula} numberOfLines={1}>{post.formulaLabel}</Text>
+        ) : null}
+        <View style={styles.postStats}>
+          <TouchableOpacity style={styles.postStat} onPress={() => onLike(post.id)}>
+            <Heart size={14} color={post.liked ? '#EF4444' : '#A1A1AA'} fill={post.liked ? '#EF4444' : 'transparent'} />
+            <Text style={styles.postStatText}>{post.likeCount}</Text>
+          </TouchableOpacity>
+          <View style={styles.postStat}>
+            <MessageCircle size={14} color="#A1A1AA" />
+            <Text style={styles.postStatText}>{post.commentCount}</Text>
           </View>
         </View>
       </View>
@@ -61,62 +94,68 @@ function PhotoCard({ item, index }: { item: any; index: number }) {
   );
 }
 
-function MarketplaceItem({ item }: { item: any }) {
+// ─── Marketplace Card ────────────────────────────────────────────────────────
+
+function MarketplaceCard({ item }: { item: MarketplaceListing }) {
   return (
-    <TouchableOpacity style={styles.marketCard} onPress={() => Alert.alert('Coming Soon', 'Marketplace item detail - coming in next update!')}>
+    <TouchableOpacity
+      style={styles.marketCard}
+      onPress={() => Alert.alert(item.title, `Share code: ${item.share_code || 'N/A'}\nPrice: ${item.price_cents ? `$${(item.price_cents / 100).toFixed(2)}` : 'Free'}`)}
+    >
       <View style={styles.marketBadge}>
         <Text style={styles.marketBadgeText}>{item.category || 'Formula'}</Text>
       </View>
-      <Text style={styles.marketTitle} numberOfLines={2}>
-        {item.title || item.name || 'Custom Formulation'}
-      </Text>
+      <Text style={styles.marketTitle} numberOfLines={2}>{item.title}</Text>
       <Text style={styles.marketCreator} numberOfLines={1}>
-        by {item.creator_name || 'Community Stylist'}
+        by {item.creator?.display_name || item.creator?.first_name || 'Community Stylist'}
       </Text>
-      <View style={styles.marketFooter}>
-        <Text style={styles.marketPrice}>
-          {item.price ? `$${item.price}` : 'Free'}
-        </Text>
-        <TouchableOpacity style={styles.marketBtn} onPress={() => Alert.alert('Coming Soon', 'View marketplace item - coming in next update!')}>
-          <Text style={styles.marketBtnText}>View</Text>
-        </TouchableOpacity>
-      </View>
+      <Text style={styles.marketPrice}>
+        {item.price_cents ? `$${(item.price_cents / 100).toFixed(2)}` : 'Free'}
+      </Text>
     </TouchableOpacity>
   );
 }
 
+// ─── Main Screen ─────────────────────────────────────────────────────────────
+
 export default function CommunityScreen() {
-  const [activeTab, setActiveTab] = useState<'trending' | 'gallery' | 'marketplace'>('trending');
+  const [activeTab, setActiveTab] = useState<'trending' | 'recent' | 'marketplace'>('trending');
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [trending, setTrending] = useState<any[]>([]);
-  const [gallery, setGallery] = useState<any[]>([]);
-  const [marketplace, setMarketplace] = useState<any[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [marketplace, setMarketplace] = useState<MarketplaceListing[]>([]);
 
-  const loadData = useCallback(async () => {
-    try {
-      const results = await Promise.allSettled([
-        getTrendingGallery(),
-        getPublicGallery(1),
-        browseMarketplace({ page: 1 }),
-      ]);
-
-      if (results[0].status === 'fulfilled') {
-        setTrending(results[0].value.photos || []);
-      }
-      if (results[1].status === 'fulfilled') {
-        setGallery(results[1].value.photos || []);
-      }
-      if (results[2].status === 'fulfilled') {
-        setMarketplace(results[2].value.items || []);
-      }
-    } catch {}
-    finally {
-      setLoading(false);
-    }
+  const loadPosts = useCallback(async (tab: 'trending' | 'recent') => {
+    const backendTab = tab === 'recent' ? 'all' : 'trending';
+    const data = await apiRequest<{ items: CommunityPost[] }>(`/v1/community/posts?tab=${backendTab}&limit=20`);
+    return data.items || [];
   }, []);
 
-  useEffect(() => { loadData(); }, []);
+  const loadMarketplace = useCallback(async () => {
+    const data = await apiRequest<{ success: boolean; data?: MarketplaceListing[] }>('/marketplace/browse');
+    return data.data || [];
+  }, []);
+
+  const loadData = useCallback(async () => {
+    setLoadError(null);
+    try {
+      if (activeTab === 'marketplace') {
+        setMarketplace(await loadMarketplace());
+      } else {
+        setPosts(await loadPosts(activeTab));
+      }
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : 'Failed to load. Check your connection.');
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab, loadPosts, loadMarketplace]);
+
+  useEffect(() => {
+    setLoading(true);
+    loadData();
+  }, [loadData]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -124,24 +163,25 @@ export default function CommunityScreen() {
     setRefreshing(false);
   };
 
-  // Sample data for prototype when API returns empty
-  const samplePhotos = trending.length > 0 ? trending : Array.from({ length: 8 }, (_, i) => ({
-    id: `sample-${i}`,
-    title: ['Balayage Blend', 'Root Melt', 'Platinum Lift', 'Copper Glow', 'Brunette Dimension', 'Vivid Violet', 'Honey Blonde', 'Silver Fox'][i],
-    stylist_name: ['Sarah M.', 'James K.', 'Maria L.', 'Alex T.', 'Chris R.', 'Dana P.', 'Lin W.', 'Omar F.'][i],
-    likes: Math.floor(Math.random() * 80) + 20,
-    views: Math.floor(Math.random() * 300) + 100,
-  }));
-
-  const sampleMarket = marketplace.length > 0 ? marketplace : Array.from({ length: 6 }, (_, i) => ({
-    id: `mkt-${i}`,
-    title: ['Professional Balayage Formula', 'Gray Coverage System', 'Platinum Toning Guide', 'Vivid Color Maintenance', 'Root Touch-Up Kit', 'Dimensional Brunette'][i],
-    category: ['Technique', 'Coverage', 'Toning', 'Maintenance', 'Roots', 'Dimension'][i],
-    creator_name: ['ColorMaster', 'GrayGone', 'PlatinumPro', 'VividVibes', 'RootRescue', 'DimensionQueen'][i],
-    price: [29, 19, 24, 15, 12, 22][i],
-  }));
-
-  const data = activeTab === 'trending' ? samplePhotos : activeTab === 'gallery' ? gallery : marketplace;
+  const handleLike = async (postId: string) => {
+    // Optimistic update
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId ? { ...p, liked: !p.liked, likeCount: p.likeCount + (p.liked ? -1 : 1) } : p
+      )
+    );
+    try {
+      await apiRequest<{ liked: boolean }>(`/v1/community/posts/${postId}/like`, { method: 'POST' });
+    } catch (e) {
+      // Revert on failure
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId ? { ...p, liked: !p.liked, likeCount: p.likeCount + (p.liked ? -1 : 1) } : p
+        )
+      );
+      Alert.alert('Couldn’t save your like', e instanceof Error ? e.message : 'Check your connection and try again.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -158,10 +198,10 @@ export default function CommunityScreen() {
           icon={<TrendingUp size={16} color={activeTab === 'trending' ? '#9333EA' : '#A1A1AA'} />}
         />
         <TabButton
-          label="Gallery"
-          active={activeTab === 'gallery'}
-          onPress={() => setActiveTab('gallery')}
-          icon={<Star size={16} color={activeTab === 'gallery' ? '#9333EA' : '#A1A1AA'} />}
+          label="Recent"
+          active={activeTab === 'recent'}
+          onPress={() => setActiveTab('recent')}
+          icon={<Star size={16} color={activeTab === 'recent' ? '#9333EA' : '#A1A1AA'} />}
         />
         <TabButton
           label="Marketplace"
@@ -175,31 +215,44 @@ export default function CommunityScreen() {
         <View style={styles.center}>
           <ActivityIndicator size="large" color="#9333EA" />
         </View>
+      ) : loadError ? (
+        <View style={styles.center}>
+          <Sparkles size={48} color="#9333EA" />
+          <Text style={styles.emptyTitle}>Couldn&apos;t load this</Text>
+          <Text style={styles.emptyText}>{loadError}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={() => { setLoading(true); loadData(); }}>
+            <Text style={styles.retryBtnText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
         <ScrollView
           contentContainerStyle={styles.content}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
           {activeTab === 'marketplace' ? (
-            <View style={styles.marketGrid}>
-              {(sampleMarket).map((item: any) => (
-                <MarketplaceItem key={item.id} item={item} />
-              ))}
-            </View>
-          ) : (
-            (data.length > 0 ? data : samplePhotos).map((item: any, index: number) => (
-              <PhotoCard key={item.id || index} item={item} index={index} />
-            ))
-          )}
-
-          {data.length === 0 && activeTab === 'gallery' && (
+            marketplace.length === 0 ? (
+              <View style={styles.empty}>
+                <Sparkles size={48} color="#9333EA" />
+                <Text style={styles.emptyTitle}>No formulas listed yet</Text>
+                <Text style={styles.emptyText}>Published formulas will show up here.</Text>
+              </View>
+            ) : (
+              <View style={styles.marketGrid}>
+                {marketplace.map((item) => (
+                  <MarketplaceCard key={item.id} item={item} />
+                ))}
+              </View>
+            )
+          ) : posts.length === 0 ? (
             <View style={styles.empty}>
               <Sparkles size={48} color="#9333EA" />
-              <Text style={styles.emptyTitle}>No photos yet</Text>
+              <Text style={styles.emptyTitle}>No posts yet</Text>
               <Text style={styles.emptyText}>
-                Share your formulations to the gallery and inspire the community
+                Share your formulations to the community and inspire others.
               </Text>
             </View>
+          ) : (
+            posts.map((post) => <PostCard key={post.id} post={post} onLike={handleLike} />)
           )}
 
           <View style={{ height: 40 }} />
@@ -237,33 +290,30 @@ const styles = StyleSheet.create({
   tabTextActive: { color: '#9333EA' },
 
   content: { padding: 16 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 },
 
-  photoCard: {
+  postCard: {
     flexDirection: 'row',
     backgroundColor: '#161620',
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
   },
-  photoPlaceholder: {
+  postImage: { width: 90, height: 90 },
+  postImagePlaceholder: {
     width: 90,
     height: 90,
     backgroundColor: 'rgba(147,51,234,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  photoInfo: { flex: 1, padding: 12, justifyContent: 'center' },
-  photoTitle: { fontSize: 15, fontWeight: '700', color: '#F5F5F7' },
-  photoMeta: { fontSize: 12, color: '#A1A1AA', marginTop: 2 },
-  photoStats: { flexDirection: 'row', gap: 12, marginTop: 6 },
-  photoStat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  photoStatText: { fontSize: 12, color: '#A1A1AA' },
+  postInfo: { flex: 1, padding: 12, justifyContent: 'center' },
+  postAuthor: { fontSize: 14, fontWeight: '700', color: '#F5F5F7' },
+  postContent: { fontSize: 12, color: '#A1A1AA', marginTop: 2 },
+  postFormula: { fontSize: 12, color: '#9333EA', marginTop: 2, fontWeight: '600' },
+  postStats: { flexDirection: 'row', gap: 14, marginTop: 6 },
+  postStat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  postStatText: { fontSize: 12, color: '#A1A1AA' },
 
   marketGrid: {
     flexDirection: 'row',
@@ -275,11 +325,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#161620',
     borderRadius: 12,
     padding: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
   },
   marketBadge: {
     backgroundColor: 'rgba(147,51,234,0.15)',
@@ -292,22 +337,18 @@ const styles = StyleSheet.create({
   marketBadgeText: { fontSize: 10, fontWeight: '700', color: '#9333EA', textTransform: 'uppercase' },
   marketTitle: { fontSize: 14, fontWeight: '700', color: '#F5F5F7' },
   marketCreator: { fontSize: 11, color: '#A1A1AA', marginTop: 4 },
-  marketFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  marketPrice: { fontSize: 16, fontWeight: '800', color: '#10B981' },
-  marketBtn: {
-    backgroundColor: '#9333EA',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  marketBtnText: { color: '#161620', fontSize: 11, fontWeight: '700' },
+  marketPrice: { fontSize: 16, fontWeight: '800', color: '#10B981', marginTop: 8 },
 
   empty: { alignItems: 'center', paddingTop: 60 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: '#A1A1AA', marginTop: 12 },
   emptyText: { fontSize: 14, color: '#A1A1AA', textAlign: 'center', marginTop: 6, paddingHorizontal: 40 },
+
+  retryBtn: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#9333EA',
+  },
+  retryBtnText: { fontSize: 13, fontWeight: '600', color: '#FFF' },
 });

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { getUserFromRequest } from '@/lib/auth'
+import { getOrCreateStylistForUser } from '@/lib/stylist'
+import { requireAdmin } from '@/lib/admin'
 
 const prisma = new PrismaClient()
 
@@ -55,27 +58,67 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 // PATCH /api/v1/gallery/photos/[id] — Update photo (caption, featured, etc.)
+// Previously had no auth at all — anyone could edit any photo's caption, or
+// flip is_featured/is_approved (a moderation control) on any post.
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const user = await getUserFromRequest(req)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { id } = await params
+    const photo = await prisma.formula_photos.findUnique({ where: { id }, select: { stylist_id: true } })
+    if (!photo) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
     const body = await req.json()
     const update: any = {}
-    if (body.caption !== undefined) update.caption = body.caption
-    if (body.isFeatured !== undefined) update.is_featured = body.isFeatured
-    if (body.isApproved !== undefined) update.is_approved = body.isApproved
 
-    const photo = await prisma.formula_photos.update({ where: { id }, data: update })
-    return NextResponse.json({ id: photo.id, updated: true })
+    // isFeatured/isApproved are moderation controls — admin only.
+    if (body.isFeatured !== undefined || body.isApproved !== undefined) {
+      const admin = await requireAdmin(req)
+      if (!admin) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      if (body.isFeatured !== undefined) update.is_featured = body.isFeatured
+      if (body.isApproved !== undefined) update.is_approved = body.isApproved
+    }
+
+    // caption may only be edited by the photo's own creator.
+    if (body.caption !== undefined) {
+      const stylist = await getOrCreateStylistForUser(user.userId)
+      if (!stylist || stylist.id !== photo.stylist_id) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      update.caption = body.caption
+    }
+
+    const updated = await prisma.formula_photos.update({ where: { id }, data: update })
+    return NextResponse.json({ id: updated.id, updated: true })
   } catch (error) {
     console.error('Photo PATCH error:', error)
     return NextResponse.json({ error: 'Failed to update photo' }, { status: 500 })
   }
 }
 
-// DELETE /api/v1/gallery/photos/[id]
+// DELETE /api/v1/gallery/photos/[id] — the photo's own creator, or an admin.
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const user = await getUserFromRequest(req)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { id } = await params
+    const photo = await prisma.formula_photos.findUnique({ where: { id }, select: { stylist_id: true } })
+    if (!photo) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+    const stylist = await getOrCreateStylistForUser(user.userId)
+    const isOwner = stylist && stylist.id === photo.stylist_id
+    if (!isOwner && !(await requireAdmin(req))) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     await prisma.formula_photos.delete({ where: { id } })
     return NextResponse.json({ deleted: true })
   } catch (error) {

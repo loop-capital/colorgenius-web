@@ -1,17 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { getUserFromRequest } from '@/lib/auth'
 
 const prisma = new PrismaClient()
 
 // POST /api/v1/gallery/photos/[id]/vote — Upvote or downvote a photo
+// Previously took voterId straight from the request body (unauthenticated —
+// anyone could vote as any id, repeatedly) AND expected {voterId, vote: 1|-1}
+// while the mobile app has only ever sent {direction: 'up'|'down'} — every
+// real vote tap has been failing with 400 since the app shipped this button.
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params
-    const { voterId, vote } = await req.json() // vote: 1 or -1
-
-    if (!voterId || ![-1, 1].includes(vote)) {
-      return NextResponse.json({ error: 'voterId and vote (1 or -1) required' }, { status: 400 })
+    const user = await getUserFromRequest(req)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const { id } = await params
+    const body = await req.json().catch(() => ({}))
+    const direction = body.direction === 'down' ? -1 : body.direction === 'up' ? 1 : null
+    const vote = direction ?? (body.vote === -1 || body.vote === 1 ? body.vote : null)
+    if (vote === null) {
+      return NextResponse.json({ error: "direction ('up'|'down') is required" }, { status: 400 })
+    }
+
+    const voterId = user.userId
 
     // Check photo exists
     const photo = await prisma.formula_photos.findUnique({ where: { id } })

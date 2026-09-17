@@ -15,6 +15,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Modal,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -69,81 +70,15 @@ interface Photo {
   shades?: string[];
 }
 
-// ─── Mock Data (fallback) ────────────────────────────────────────────────────
-
-const MOCK_PHOTOS: Photo[] = [
-  {
-    id: '1',
-    beforeUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37a?w=400',
-    afterUrl: 'https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=400',
-    caption: 'From brassy orange to cool ash blonde in one session. Used Wella Koleston Perfect 9/16 with 30vol developer.',
-    hairType: 'Fine / Medium',
-    porosity: 'Normal',
-    levelBefore: 6,
-    levelAfter: 9,
-    developerVol: '30Vol',
-    stylistName: 'Emma Richardson',
-    upvotes: 234,
-    downvotes: 3,
-    score: 231,
-    viewCount: 1205,
-    commentCount: 18,
-    tags: ['transformation', 'ash-blonde', 'correction'],
-    createdAt: '2026-05-20T10:00:00Z',
-    brand: 'Wella',
-    shades: ['9/16'],
-  },
-  {
-    id: '2',
-    beforeUrl: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37a?w=400',
-    afterUrl: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400',
-    caption: 'Soft balayage for a warm, dimensional look. Lived-in color that grows out beautifully.',
-    hairType: 'Thick / Coarse',
-    porosity: 'Low',
-    levelBefore: 4,
-    levelAfter: 7,
-    developerVol: '20Vol',
-    stylistName: 'Jessica Park',
-    upvotes: 189,
-    downvotes: 2,
-    score: 187,
-    viewCount: 890,
-    commentCount: 12,
-    tags: ['balayage', 'warm', 'dimensional'],
-    createdAt: '2026-05-18T14:30:00Z',
-    brand: 'Davines',
-    shades: ['7.35', '8.04'],
-  },
-  {
-    id: '3',
-    afterUrl: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=400',
-    caption: 'Vivid copper transformation. Pre-lightened to level 7 before applying custom vivid mix.',
-    hairType: 'Medium',
-    porosity: 'High',
-    levelBefore: 3,
-    levelAfter: 7,
-    developerVol: '40Vol',
-    stylistName: 'Marco DeLuca',
-    upvotes: 156,
-    downvotes: 5,
-    score: 151,
-    viewCount: 678,
-    commentCount: 8,
-    tags: ['vivid', 'copper', 'creative'],
-    createdAt: '2026-05-15T09:00:00Z',
-    brand: 'Joico',
-    shades: ['7CC'],
-  },
-];
-
 const BRANDS = ['Wella', 'Davines', 'Schwarzkopf', 'Joico', 'Lanza', 'Goldwell', 'Matrix', 'Redken'];
 const LEVELS = Array.from({ length: 10 }, (_, i) => i + 1);
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export default function GalleryScreen({ navigation }: any) {
-  const [photos, setPhotos] = useState<Photo[]>(MOCK_PHOTOS);
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [sortBy, setSortBy] = useState<'score' | 'recent' | 'featured'>('score');
   const [filterBrand, setFilterBrand] = useState('');
@@ -155,6 +90,7 @@ export default function GalleryScreen({ navigation }: any) {
   const fetchPhotos = useCallback(async () => {
     try {
       setLoading(true);
+      setLoadError(null);
       const params = new URLSearchParams();
       params.append('sort', sortBy);
       params.append('limit', '20');
@@ -167,33 +103,31 @@ export default function GalleryScreen({ navigation }: any) {
         total: number;
       }>(`/v1/gallery/photos?${params}`);
 
-      if (data.items?.length > 0) {
-        const mapped: Photo[] = data.items.map((p: any) => ({
-          id: p.id,
-          beforeUrl: p.beforeUrl,
-          afterUrl: p.afterUrl,
-          caption: p.caption,
-          hairType: p.hairType,
-          porosity: p.porosity,
-          levelBefore: p.levelBefore,
-          levelAfter: p.levelAfter,
-          developerVol: p.developerVol,
-          stylistName: p.stylistName,
-          stylistAvatar: p.stylistAvatar,
-          upvotes: p.upvotes || 0,
-          downvotes: p.downvotes || 0,
-          score: p.score || 0,
-          viewCount: p.viewCount || 0,
-          commentCount: p.commentCount || 0,
-          tags: p.tags || [],
-          createdAt: p.createdAt,
-          brand: p.brand,
-          shades: p.shades,
-        }));
-        setPhotos(mapped);
-      }
+      const mapped: Photo[] = (data.items || []).map((p: any) => ({
+        id: p.id,
+        beforeUrl: p.beforeUrl,
+        afterUrl: p.afterUrl,
+        caption: p.caption,
+        hairType: p.hairType,
+        porosity: p.porosity,
+        levelBefore: p.levelBefore,
+        levelAfter: p.levelAfter,
+        developerVol: p.developerVol,
+        stylistName: p.stylistName,
+        stylistAvatar: p.stylistAvatar,
+        upvotes: p.upvotes || 0,
+        downvotes: p.downvotes || 0,
+        score: p.score || 0,
+        viewCount: p.viewCount || 0,
+        commentCount: p.commentCount || 0,
+        tags: p.tags || [],
+        createdAt: p.createdAt,
+        brand: p.brand,
+        shades: p.shades,
+      }));
+      setPhotos(mapped);
     } catch (e) {
-      console.warn('Gallery fetch failed, using mock data');
+      setLoadError(e instanceof Error ? e.message : 'Failed to load the gallery. Check your connection.');
     } finally {
       setLoading(false);
     }
@@ -236,7 +170,7 @@ export default function GalleryScreen({ navigation }: any) {
       );
       setVotedPhotos((prev) => new Set([...prev, photoId]));
     } catch (e) {
-      console.warn('Vote failed');
+      Alert.alert('Couldn’t save your vote', e instanceof Error ? e.message : 'Check your connection and try again.');
     }
   };
 
@@ -499,6 +433,14 @@ export default function GalleryScreen({ navigation }: any) {
       {loading ? (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={COLORS.purple} />
+        </View>
+      ) : loadError ? (
+        <View style={styles.centered}>
+          <Text style={styles.emptyTitle}>Couldn&apos;t load the gallery</Text>
+          <Text style={styles.emptySubtext}>{loadError}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={fetchPhotos}>
+            <Text style={styles.retryBtnText}>Retry</Text>
+          </TouchableOpacity>
         </View>
       ) : photos.length === 0 ? (
         <View style={styles.centered}>
@@ -769,6 +711,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textMuted,
     textAlign: 'center',
+  },
+  retryBtn: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: COLORS.purple,
+  },
+  retryBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FFF',
   },
 
   // Photo Card

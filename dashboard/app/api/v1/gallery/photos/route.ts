@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
+import { getUserFromRequest } from '@/lib/auth'
+import { getOrCreateStylistForUser } from '@/lib/stylist'
 
 const prisma = new PrismaClient()
 
@@ -32,6 +34,8 @@ export async function GET(req: NextRequest) {
         include: {
           photo_tags: { select: { tag: true } },
           _count: { select: { photo_comments: true } },
+          stylists: { select: { display_name: true, first_name: true, avatar_url: true } },
+          formulas: { select: { product_brand: true, product_shade: true } },
         },
       }),
       prisma.formula_photos.count({ where }),
@@ -62,6 +66,10 @@ export async function GET(req: NextRequest) {
         tags: p.photo_tags.map(t => t.tag),
         commentCount: p._count.photo_comments,
         createdAt: p.created_at,
+        stylistName: p.stylists?.display_name || p.stylists?.first_name || undefined,
+        stylistAvatar: p.stylists?.avatar_url || undefined,
+        brand: p.formulas?.product_brand || undefined,
+        shades: p.formulas?.product_shade ? [p.formulas.product_shade] : [],
       })),
       total,
       limit,
@@ -76,21 +84,34 @@ export async function GET(req: NextRequest) {
 // POST /api/v1/gallery/photos — Create a new photo post
 export async function POST(req: NextRequest) {
   try {
+    const user = await getUserFromRequest(req)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    // stylist_id has a real, enforced FK to stylists.id, not users.id —
+    // this previously took stylistId straight from the client body
+    // (unauthenticated, and the wrong id space even if it had been the
+    // caller's own).
+    const stylist = await getOrCreateStylistForUser(user.userId)
+    if (!stylist) {
+      return NextResponse.json({ error: 'Could not resolve your stylist profile' }, { status: 400 })
+    }
+
     const body = await req.json()
     const {
-      formulaId, stylistId, clientId, beforeUrl, afterUrl,
+      formulaId, clientId, beforeUrl, afterUrl,
       caption, hairType, porosity, levelBefore, levelAfter,
       toneBefore, toneAfter, developerVol, processingTime, tags,
     } = body
 
-    if (!formulaId || !stylistId || !afterUrl) {
-      return NextResponse.json({ error: 'formulaId, stylistId, and afterUrl are required' }, { status: 400 })
+    if (!formulaId || !afterUrl) {
+      return NextResponse.json({ error: 'formulaId and afterUrl are required' }, { status: 400 })
     }
 
     const photo = await prisma.formula_photos.create({
       data: {
         formula_id: formulaId,
-        stylist_id: stylistId,
+        stylist_id: stylist.id,
         client_id: clientId || null,
         before_url: beforeUrl || null,
         after_url: afterUrl,
@@ -112,9 +133,6 @@ export async function POST(req: NextRequest) {
         data: tags.map((tag: string) => ({ photo_id: photo.id, tag })),
       })
     }
-
-    // Increment view count on the formula
-    await prisma.formula_photos.update({ where: { id: photo.id }, data: { view_count: 1 } })
 
     return NextResponse.json({ id: photo.id, createdAt: photo.created_at }, { status: 201 })
   } catch (error) {

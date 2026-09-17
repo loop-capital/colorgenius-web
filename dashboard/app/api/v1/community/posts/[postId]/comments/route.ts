@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getUserFromRequest } from '@/lib/auth'
+import { getOrCreateStylistForUser } from '@/lib/stylist'
 
 // GET /api/v1/community/posts/[postId]/comments — fetch comments
 export async function GET(req: NextRequest, { params }: { params: Promise<{ postId: string }> }) {
@@ -60,15 +62,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ post
 }
 
 // POST /api/v1/community/posts/[postId]/comments — add comment
+// Previously took userId straight from the request body — anyone could
+// comment as any user with no auth at all.
 export async function POST(req: NextRequest, { params }: { params: Promise<{ postId: string }> }) {
   try {
+    const authUser = await getUserFromRequest(req)
+    if (!authUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const stylist = await getOrCreateStylistForUser(authUser.userId)
+    if (!stylist) {
+      return NextResponse.json({ error: 'Could not resolve your stylist profile' }, { status: 400 })
+    }
+
     const { postId } = await params
     const body = await req.json()
-    const { userId, content, parentId } = body
+    const { content, parentId } = body
 
-    if (!userId || !content?.trim()) {
-      return NextResponse.json({ error: 'userId and content required' }, { status: 400 })
+    if (!content?.trim()) {
+      return NextResponse.json({ error: 'content required' }, { status: 400 })
     }
+
+    const userId = stylist.id
 
     // Check if user is verified (auto-approve) or new (needs approval)
     const user = await prisma.stylists.findUnique({

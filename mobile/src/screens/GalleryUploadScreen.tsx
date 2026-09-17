@@ -75,6 +75,7 @@ export default function GalleryUploadScreen({ navigation }: any) {
   const [formulas, setFormulas] = useState<FormulaOption[]>([]);
   const [selectedFormula, setSelectedFormula] = useState<FormulaOption | null>(null);
   const [formulaLoading, setFormulaLoading] = useState(false);
+  const [formulaLoadError, setFormulaLoadError] = useState<string | null>(null);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<'back' | 'front'>('back');
@@ -105,6 +106,7 @@ export default function GalleryUploadScreen({ navigation }: any) {
   const fetchFormulas = async () => {
     try {
       setFormulaLoading(true);
+      setFormulaLoadError(null);
       const response = await apiRequest<{ items?: any[]; formulas?: any[] }>('/v1/formulas/list?limit=100');
       const items = response.items || response.formulas || [];
       const mapped: FormulaOption[] = items.map((f: any) => ({
@@ -121,30 +123,8 @@ export default function GalleryUploadScreen({ navigation }: any) {
       }));
       setFormulas(mapped);
     } catch (e) {
-      console.warn('Failed to fetch formulas:', e);
-      // Fallback mock
-      setFormulas([
-        {
-          id: 'demo-1',
-          name: 'Summer Balayage',
-          brand: 'Wella',
-          line: 'Koleston Perfect',
-          clientName: 'Sarah Chen',
-          developerVol: 30,
-          processingTime: 35,
-          shades: ['7/73', '8/73'],
-        },
-        {
-          id: 'demo-2',
-          name: 'Root Touch-Up',
-          brand: 'Schwarzkopf',
-          line: 'Igora Royal',
-          clientName: 'Jennifer Martinez',
-          developerVol: 10,
-          processingTime: 30,
-          shades: ['5-0'],
-        },
-      ]);
+      setFormulas([]);
+      setFormulaLoadError(e instanceof Error ? e.message : 'Failed to load your formulas.');
     } finally {
       setFormulaLoading(false);
     }
@@ -464,6 +444,15 @@ export default function GalleryUploadScreen({ navigation }: any) {
 
             {formulaLoading ? (
               <ActivityIndicator size="large" color={COLORS.purple} style={{ marginTop: 40 }} />
+            ) : formulaLoadError ? (
+              <View style={styles.emptyState}>
+                <FlaskConical size={48} color="rgba(255,255,255,0.06)" />
+                <Text style={styles.emptyTitle}>Couldn&apos;t load your formulas</Text>
+                <Text style={styles.emptySubtext}>{formulaLoadError}</Text>
+                <TouchableOpacity onPress={fetchFormulas} style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, backgroundColor: COLORS.purple }}>
+                  <Text style={{ color: '#FFF', fontWeight: '600', fontSize: 13 }}>Retry</Text>
+                </TouchableOpacity>
+              </View>
             ) : formulas.length === 0 ? (
               <View style={styles.emptyState}>
                 <FlaskConical size={48} color="rgba(255,255,255,0.06)" />

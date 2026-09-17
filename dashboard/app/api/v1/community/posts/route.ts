@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getUserFromRequest } from '@/lib/auth'
+import { getOrCreateStylistForUser } from '@/lib/stylist'
+import { uploadToR2 } from '@/lib/r2'
 
 // GET /api/v1/community/posts — fetch feed posts
 export async function GET(req: NextRequest) {
@@ -91,8 +94,22 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/v1/community/posts — create a new post
+// Previously took stylistId straight from the request (body or form field,
+// literally commented "// TODO: get stylist_id from auth session") and
+// stored a fake placeholder URL instead of actually uploading photos —
+// anyone could post as any stylist, and every posted photo was a broken
+// link.
 export async function POST(req: NextRequest) {
   try {
+    const user = await getUserFromRequest(req)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const stylist = await getOrCreateStylistForUser(user.userId)
+    if (!stylist) {
+      return NextResponse.json({ error: 'Could not resolve your stylist profile' }, { status: 400 })
+    }
+
     const contentType = req.headers.get('content-type') || ''
 
     // Handle FormData (with photos)
@@ -105,17 +122,10 @@ export async function POST(req: NextRequest) {
       const tags = JSON.parse(tagsStr)
       const photoCount = parseInt((formData.get('photoCount') as string) || '0')
 
-      // TODO: get stylist_id from auth session
-      const stylistId = formData.get('stylistId') as string
-
-      if (!stylistId) {
-        return NextResponse.json({ error: 'stylistId required' }, { status: 400 })
-      }
-
       // Create post
       const post = await prisma.community_posts.create({
         data: {
-          stylist_id: stylistId,
+          stylist_id: stylist.id,
           type,
           content,
           formula_label: formulaLabel,
@@ -123,20 +133,17 @@ export async function POST(req: NextRequest) {
         },
       })
 
-      // Handle photo uploads (placeholder — in production, upload to R2/S3)
+      // Real photo uploads to R2 — this previously wrote a fake
+      // /uploads/community/... path that pointed at nothing.
       for (let i = 0; i < photoCount; i++) {
         const file = formData.get(`photo_${i}`) as File | null
         const label = (formData.get(`photo_${i}_label`) as string) || 'detail'
         if (file) {
-          // In production: upload file to storage and get URL
-          // For now, store a placeholder
+          const ext = file.type.split('/')[1] || 'jpg'
+          const key = `community/${stylist.id}/${post.id}/${i}-${Date.now()}.${ext}`
+          const url = await uploadToR2(key, Buffer.from(await file.arrayBuffer()), file.type)
           await prisma.community_post_photos.create({
-            data: {
-              post_id: post.id,
-              url: `/uploads/community/${post.id}_${i}.jpg`, // placeholder
-              label,
-              order: i,
-            },
+            data: { post_id: post.id, url, label, order: i },
           })
         }
       }
@@ -153,15 +160,11 @@ export async function POST(req: NextRequest) {
 
     // Handle JSON (no photos, text-only post)
     const body = await req.json()
-    const { type, content, formulaLabel, tags, stylistId } = body
-
-    if (!stylistId) {
-      return NextResponse.json({ error: 'stylistId required' }, { status: 400 })
-    }
+    const { type, content, formulaLabel, tags } = body
 
     const post = await prisma.community_posts.create({
       data: {
-        stylist_id: stylistId,
+        stylist_id: stylist.id,
         type: type || 'tip',
         content: content || '',
         formula_label: formulaLabel || null,

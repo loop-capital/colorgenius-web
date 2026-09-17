@@ -74,74 +74,10 @@ interface Formula {
   notes: string;
   shades: Shade[];
   confidence: number;
+  /** Marketplace listings only — cents, and the public share code. */
+  priceCents?: number;
+  shareCode?: string;
 }
-
-// ─── Mock Data (fallback) ────────────────────────────────────────────────────
-
-const MOCK_FORMULAS: Formula[] = [
-  {
-    id: '1',
-    name: 'Summer Balayage Formula',
-    clientName: 'Jennifer Martinez',
-    brand: 'Wella',
-    line: 'Koleston Perfect ME+',
-    createdAt: '2026-04-20',
-    tags: ['balayage', 'summer'],
-    developer: '30Vol',
-    developerVolume: '30ml',
-    totalVolume: '60ml',
-    processingTime: '35 min',
-    application: 'Balayage',
-    coverage: 'Partial',
-    notes: 'Apply to mid-lengths and ends using balayage technique.',
-    shades: [
-      { code: '7/73', name: 'Golden Blonde', hex: '#C08C5A' },
-      { code: '8/73', name: 'Light Golden Blonde', hex: '#D4AA7D' },
-    ],
-    confidence: 94,
-  },
-  {
-    id: '2',
-    name: 'Root Touch-Up — Natural Brown',
-    clientName: 'Sarah Chen',
-    brand: 'Schwarzkopf',
-    line: 'Igora Royal',
-    createdAt: '2026-04-18',
-    tags: ['root-touch-up', 'gray-coverage'],
-    developer: '10Vol',
-    developerVolume: '20ml',
-    totalVolume: '40ml',
-    processingTime: '30 min',
-    application: 'Root application',
-    coverage: 'Full',
-    notes: 'Section hair into quadrants. Apply directly to regrowth only.',
-    shades: [
-      { code: '5-0', name: 'Light Brown Natural', hex: '#7D5038' },
-    ],
-    confidence: 91,
-  },
-  {
-    id: '3',
-    name: 'Vivid Rose Gold Blend',
-    clientName: 'Mia Johnson',
-    brand: 'Joico',
-    line: 'Color Intensity',
-    createdAt: '2026-04-15',
-    tags: ['vivid', 'rose-gold'],
-    developer: '15Vol',
-    developerVolume: '25ml',
-    totalVolume: '50ml',
-    processingTime: '20 min',
-    application: 'Global',
-    coverage: 'Full',
-    notes: 'Pre-lighten to level 8 before applying.',
-    shades: [
-      { code: 'R', name: 'Vivid Red', hex: '#D44444' },
-      { code: 'P', name: 'Pink', hex: '#E892A0' },
-    ],
-    confidence: 87,
-  },
-];
 
 // ─── Tone Options ────────────────────────────────────────────────────────────
 
@@ -164,8 +100,10 @@ const TONE_OPTIONS = [
 
 export default function LibraryScreen({ navigation }: any) {
   const [activeTab, setActiveTab] = useState<'my-formulas' | 'marketplace'>('my-formulas');
-  const [formulas, setFormulas] = useState<Formula[]>(MOCK_FORMULAS);
+  const [formulas, setFormulas] = useState<Formula[]>([]);
+  const [formulasError, setFormulasError] = useState<string | null>(null);
   const [marketplaceFormulas, setMarketplaceFormulas] = useState<Formula[]>([]);
+  const [marketplaceError, setMarketplaceError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBrand, setFilterBrand] = useState('');
   const [filterTone, setFilterTone] = useState('');
@@ -181,36 +119,36 @@ export default function LibraryScreen({ navigation }: any) {
   const fetchFormulas = useCallback(async () => {
     try {
       setLoading(true);
+      setFormulasError(null);
       const response = await apiRequest<{ items: any[] }>('/v1/formulas/list?limit=100');
-      if (response.items?.length > 0) {
-        const mapped = response.items.map((f: any) => ({
-          id: f.id,
-          name: f.name || 'Untitled Formula',
-          clientName: f.clientName || 'Unknown',
-          brand: f.brand || 'Unknown',
-          line: f.productLine || '',
-          createdAt: f.createdAt || new Date().toISOString(),
-          tags: f.tags || [],
-          developer: f.developerVolume ? f.developerVolume + 'Vol' : '20Vol',
-          developerVolume: f.developerVolume ? f.developerVolume + 'ml' : '60ml',
-          totalVolume: f.totalVolume || '60ml',
-          processingTime: f.processingTime ? f.processingTime + ' min' : '30 min',
-          application: f.application || 'Full Head',
-          coverage: f.coverage || 'Roots',
-          notes: f.notes || '',
-          shades: (f.components || [])
-            .filter((c: any) => c.componentType === 'color')
-            .map((c: any) => ({
-              code: c.shadeCode || '?',
-              name: c.shadeName || c.shadeCode || 'Unknown',
-              hex: '#9333EA',
-            })),
-          confidence: f.confidence || 85,
-        }));
-        setFormulas(mapped);
-      }
+      const mapped = (response.items || []).map((f: any) => ({
+        id: f.id,
+        name: f.name || 'Untitled Formula',
+        clientName: f.clientName || 'Unknown',
+        brand: f.brand || 'Unknown',
+        line: f.productLine || '',
+        createdAt: f.createdAt || new Date().toISOString(),
+        tags: f.tags || [],
+        developer: f.developerVolume ? f.developerVolume + 'Vol' : '20Vol',
+        developerVolume: f.developerVolume ? f.developerVolume + 'ml' : '60ml',
+        totalVolume: f.totalVolume || '60ml',
+        processingTime: f.processingTime ? f.processingTime + ' min' : '30 min',
+        application: f.application || 'Full Head',
+        coverage: f.coverage || 'Roots',
+        notes: f.notes || '',
+        shades: (f.components || [])
+          .filter((c: any) => c.componentType === 'color')
+          .map((c: any) => ({
+            code: c.shadeCode || '?',
+            name: c.shadeName || c.shadeCode || 'Unknown',
+            hex: '#9333EA',
+          })),
+        confidence: f.confidence || 85,
+      }));
+      setFormulas(mapped);
     } catch (e) {
-      console.warn('Failed to fetch formulas, using mock data');
+      setFormulas([]);
+      setFormulasError(e instanceof Error ? e.message : 'Failed to load your formulas.');
     } finally {
       setLoading(false);
     }
@@ -226,34 +164,44 @@ export default function LibraryScreen({ navigation }: any) {
     setRefreshing(false);
   };
 
-  // Fetch marketplace
+  // Fetch marketplace — was calling /v1/marketplace/browse, but the real
+  // route lives at /marketplace/browse (no v1 prefix); this tab 404'd on
+  // every load and silently showed an empty list. Listings intentionally
+  // don't include the underlying recipe (shades/developer/etc.) here —
+  // that's the thing being sold, withheld until purchase, same as
+  // GET /marketplace/lookup/:code.
   const fetchMarketplace = useCallback(async () => {
     if (marketplaceFormulas.length > 0) return;
     try {
       setMarketplaceLoading(true);
-      const response = await apiRequest<{ formulas?: any[]; data?: any[] }>('/v1/marketplace/browse');
-      const data = response.formulas || response.data || [];
+      setMarketplaceError(null);
+      const response = await apiRequest<{ success: boolean; data?: any[]; error?: { message?: string } }>('/marketplace/browse');
+      if (!response.success) throw new Error(response.error?.message || 'Failed to load the marketplace.');
+      const data = response.data || [];
       const mapped = data.map((f: any) => ({
         id: f.id,
-        name: f.name || f.brand + ' Formula',
-        clientName: f.creator || 'Community',
-        brand: f.brand || 'Unknown',
-        line: f.line || '',
-        createdAt: f.createdAt || new Date().toISOString(),
+        name: f.title || 'Untitled Formula',
+        clientName: f.creator?.display_name || f.creator?.first_name || 'Community',
+        brand: f.category || 'Formula',
+        line: '',
+        createdAt: f.created_at || new Date().toISOString(),
         tags: f.tags || [],
-        developer: f.developerVolume || '20Vol',
-        developerVolume: f.developerVolume || '60ml',
-        totalVolume: f.totalVolume || '60ml',
-        processingTime: f.processingTime || '30 min',
-        application: f.application || 'Full Head',
-        coverage: f.coverage || 'Roots',
-        notes: f.notes || '',
-        shades: f.shades || [],
-        confidence: f.confidence || 85,
+        developer: '',
+        developerVolume: '',
+        totalVolume: '',
+        processingTime: '',
+        application: '',
+        coverage: '',
+        notes: f.description || '',
+        shades: [],
+        confidence: f.rating ? Math.round(Number(f.rating) * 20) : 0,
+        priceCents: f.price_cents,
+        shareCode: f.share_code,
       }));
       setMarketplaceFormulas(mapped);
     } catch (e) {
-      console.warn('Failed to fetch marketplace');
+      setMarketplaceFormulas([]);
+      setMarketplaceError(e instanceof Error ? e.message : 'Failed to load the marketplace.');
     } finally {
       setMarketplaceLoading(false);
     }
@@ -622,6 +570,22 @@ export default function LibraryScreen({ navigation }: any) {
       {(activeTab === 'my-formulas' ? loading : marketplaceLoading) ? (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={COLORS.purple} />
+        </View>
+      ) : (activeTab === 'my-formulas' ? formulasError : marketplaceError) ? (
+        <View style={styles.centered}>
+          <FlaskConical size={48} color="rgba(255,255,255,0.06)" />
+          <Text style={styles.emptyTitle}>
+            {activeTab === 'my-formulas' ? "Couldn't load your formulas" : "Couldn't load the marketplace"}
+          </Text>
+          <Text style={styles.emptySubtext}>
+            {activeTab === 'my-formulas' ? formulasError : marketplaceError}
+          </Text>
+          <TouchableOpacity
+            onPress={activeTab === 'my-formulas' ? fetchFormulas : fetchMarketplace}
+            style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 10, backgroundColor: COLORS.purple }}
+          >
+            <Text style={{ color: '#FFF', fontWeight: '600', fontSize: 13 }}>Retry</Text>
+          </TouchableOpacity>
         </View>
       ) : filteredFormulas.length === 0 ? (
         <View style={styles.centered}>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser, requireAuth } from '@/lib/api/auth';
+import { getOrCreateStylistForUser } from '@/lib/stylist';
 import { uploadToR2 } from '@/lib/r2';
 
 // POST /api/v1/gallery/photos/upload — Upload before/after photo pair
@@ -12,9 +13,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // formula_photos.stylist_id has a real, enforced FK to stylists.id — a
+    // different table from users.id (the authenticated identity). Every
+    // upload was hard-failing with a foreign-key violation before this fix.
+    const stylist = await getOrCreateStylistForUser(user.id);
+    if (!stylist) {
+      return NextResponse.json({ error: 'Could not resolve your stylist profile' }, { status: 400 });
+    }
+
     const formData = await req.formData();
     const formulaId = formData.get('formulaId') as string;
-    const stylistId = user.id;
+    const stylistId = stylist.id;
     const clientId = formData.get('clientId') as string | null;
     const caption = formData.get('caption') as string | null;
     const hairType = formData.get('hairType') as string | null;

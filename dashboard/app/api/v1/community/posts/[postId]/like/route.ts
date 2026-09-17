@@ -1,16 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getUserFromRequest } from '@/lib/auth'
+import { getOrCreateStylistForUser } from '@/lib/stylist'
 
 // POST /api/v1/community/posts/[postId]/like — toggle like
+// Previously took userId straight from the request body — anyone could
+// like/unlike as any user, repeatedly, with no auth at all.
 export async function POST(req: NextRequest, { params }: { params: Promise<{ postId: string }> }) {
   try {
-    const { postId } = await params
-    const body = await req.json()
-    const { userId } = body
-
-    if (!userId) {
-      return NextResponse.json({ error: 'userId required' }, { status: 400 })
+    const user = await getUserFromRequest(req)
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const stylist = await getOrCreateStylistForUser(user.userId)
+    if (!stylist) {
+      return NextResponse.json({ error: 'Could not resolve your stylist profile' }, { status: 400 })
+    }
+    const userId = stylist.id
+
+    const { postId } = await params
 
     // Check if already liked
     const existing = await prisma.post_likes.findUnique({
