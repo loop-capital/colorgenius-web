@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { PorosityTestCalculator } from "@/components/tools/PorosityTestCalculator";
+import { PorosityTest } from "@/components/tools/PorosityTest";
 
 export const metadata: Metadata = {
   title: "Hair Porosity Test | ColorGenius",
-  description: "Take our 5-question hair porosity quiz for personalized product recommendations and care tips. Free tool by ColorGenius.",
+  description: "Take a 5-question hair porosity quiz to determine low, medium, or high porosity and get personalized product and care routine recommendations.",
   openGraph: {
     title: "Hair Porosity Test | ColorGenius",
-    description: "Discover your client’s porosity level in under a minute.",
+    description: "Discover your client’s hair porosity in 60 seconds.",
   },
 };
 
@@ -22,10 +22,10 @@ export default function PorosityTestPage() {
             Hair Porosity Test
           </h1>
           <p className="mt-1 text-sm" style={{ color: "var(--cg-text-secondary)" }}>
-            Answer 5 quick questions to identify low, medium, or high porosity and get tailored recommendations.
+            Answer 5 quick questions about water absorption, product behavior, drying time, shine, and color retention.
           </p>
         </div>
-        <PorosityTestCalculator />
+        <PorosityTest />
       </div>
     </div>
   );

@@ -3,10 +3,10 @@ import { ColorCorrectionCalculator } from "@/components/tools/ColorCorrectionCal
 
 export const metadata: Metadata = {
   title: "Color Correction Calculator | ColorGenius",
-  description: "Find the right corrector shade, technique, and developer recommendation to neutralize orange, brass, yellow, or red tones. Free tool by ColorGenius.",
+  description: "Find the right corrector shade, technique, and developer to neutralize unwanted hair color tones. Free salon tool by ColorGenius.",
   openGraph: {
     title: "Color Correction Calculator | ColorGenius",
-    description: "Neutralize unwanted tones with the right corrector.",
+    description: "Cancel orange, brass, yellow, red, green, ash, or purple tones with confidence.",
   },
 };
 
@@ -22,7 +22,7 @@ export default function ColorCorrectionPage() {
             Color Correction Calculator
           </h1>
           <p className="mt-1 text-sm" style={{ color: "var(--cg-text-secondary)" }}>
-            Match unwanted tones to the complementary corrector shade and technique.
+            Select the unwanted tone, current level, and target tone to get a neutralization plan.
           </p>
         </div>
         <ColorCorrectionCalculator />

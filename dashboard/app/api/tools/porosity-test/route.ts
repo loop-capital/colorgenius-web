@@ -1,104 +1,130 @@
 import { z } from "zod";
 import { parseToolBody, toolResponse, toolError } from "@/lib/tools/calculator-utils";
 
-const porosityQuestionSchema = z.object({
-  questionId: z.coerce.number().int().min(0).max(4),
-  selectedOption: z.coerce.number().int().min(0).max(2),
-});
-
 export const porosityTestSchema = z.object({
-  answers: z.array(porosityQuestionSchema).length(5),
+  answers: z.record(z.coerce.number().int().min(0).max(2)),
 });
 
 export type PorosityTestInput = z.infer<typeof porosityTestSchema>;
 export type PorosityLevel = "low" | "medium" | "high";
 
-export interface PorosityTestResult {
-  porosityLevel: PorosityLevel;
-  score: number;
-  description: string;
-  productRecommendations: string[];
-  careTips: string[];
+export interface PorosityQuestion {
+  id: string;
+  question: string;
+  options: { value: string; label: string; score: number }[];
 }
 
-export const QUESTIONS = [
-  "How long does it take your hair to fully absorb water?",
-  "How does your hair feel when wet?",
-  "How long does your hair take to air dry?",
-  "How does your hair react to product?",
-  "How often do you need moisture/protein?",
-];
+export interface PorosityTestResult {
+  level: PorosityLevel;
+  score: number;
+  maxScore: number;
+  percentage: number;
+  description: string;
+  recommendations: string[];
+  routine: string[];
+}
 
-export const OPTIONS = [
-  ["Quickly", "Normally", "Slowly / beads up"],
-  ["Soft, smooth", "Average texture", "Rough, tangles easily"],
-  ["Dries quickly", "Normal drying time", "Takes a long time"],
-  ["Absorbs well", "Average absorption", "Sits on top / builds up"],
-  ["Needs frequent moisture", "Balanced", "Needs protein, gets weighed down easily"],
+export const porosityQuestions: PorosityQuestion[] = [
+  {
+    id: "water",
+    question: "When your hair is wet, water tends to…",
+    options: [
+      { value: "beads", label: "Bead up and roll off", score: 0 },
+      { value: "normal", label: "Absorb at a normal rate", score: 1 },
+      { value: "absorb", label: "Absorb quickly", score: 2 },
+    ],
+  },
+  {
+    id: "product",
+    question: "Products feel like they…",
+    options: [
+      { value: "sit", label: "Sit on top of the hair", score: 0 },
+      { value: "normal", label: "Penetrate after a few minutes", score: 1 },
+      { value: "absorb", label: "Absorb instantly", score: 2 },
+    ],
+  },
+  {
+    id: "dry",
+    question: "Air-drying time is…",
+    options: [
+      { value: "long", label: "Very long (4+ hours)", score: 0 },
+      { value: "normal", label: "Average (1–3 hours)", score: 1 },
+      { value: "short", label: "Very fast (under 1 hour)", score: 2 },
+    ],
+  },
+  {
+    id: "shine",
+    question: "Natural shine level is…",
+    options: [
+      { value: "high", label: "High shine but prone to frizz", score: 0 },
+      { value: "balanced", label: "Balanced", score: 1 },
+      { value: "dull", label: "Dull or prone to breakage", score: 2 },
+    ],
+  },
+  {
+    id: "color",
+    question: "Color tends to…",
+    options: [
+      { value: "resist", label: "Resist processing or look patchy", score: 0 },
+      { value: "normal", label: "Process predictably", score: 1 },
+      { value: "fade", label: "Fade quickly", score: 2 },
+    ],
+  },
 ];
 
 export function calculatePorosity(input: PorosityTestInput): PorosityTestResult {
-  const score = input.answers.reduce((sum, answer) => sum + answer.selectedOption, 0);
+  const maxScore = porosityQuestions.length * 2;
+  let score = 0;
+  for (const q of porosityQuestions) {
+    const answer = input.answers[q.id];
+    if (answer != null) score += answer;
+  }
 
-  let porosityLevel: PorosityLevel;
-  if (score <= 3) porosityLevel = "low";
-  else if (score <= 7) porosityLevel = "medium";
-  else porosityLevel = "high";
+  let level: PorosityLevel = "medium";
+  if (score <= 3) level = "low";
+  else if (score >= 7) level = "high";
+  else level = "medium";
+
+  const percentage = Math.round((score / maxScore) * 100);
 
   const descriptions: Record<PorosityLevel, string> = {
-    low: "Low porosity hair has a tight cuticle layer. It repels water and product initially, takes longer to dry, and is prone to buildup. Heat helps products penetrate.",
-    medium: "Medium porosity hair is balanced. It absorbs and retains moisture well, holds styles, and generally responds predictably to product.",
-    high: "High porosity hair has lifted or damaged cuticles. It absorbs moisture quickly but loses it just as fast, tangles easily, and benefits from heavier sealing products and protein.",
+    low: "Cuticle is tightly closed. Hair resists moisture and product absorption and can feel greasy at the roots.",
+    medium: "Cuticle is balanced. Hair accepts moisture and product at a normal rate and is generally resilient.",
+    high: "Cuticle is lifted or damaged. Hair absorbs moisture and product quickly but also loses it fast, leading to dryness and fragility.",
   };
 
-  const productRecommendations: Record<PorosityLevel, string[]> = {
+  const recommendations: Record<PorosityLevel, string[]> = {
     low: [
-      "Lightweight, water-based leave-ins",
-      "Heat caps or warm towels for deep conditioning",
-      "Clarifying shampoo to prevent buildup",
-      "Avoid heavy butters and oils as primary moisturizers",
+      "Use lightweight, liquid-based leave-ins and avoid heavy oils near roots.",
+      "Apply products on damp hair to help penetration.",
+      "Clarify periodically to remove buildup.",
     ],
     medium: [
-      "Balanced moisture and protein routine",
-      "Weekly conditioning treatments",
-      "Lightweight oils for sealing",
-      "pH-balanced shampoo and conditioner",
+      "Maintain a balanced routine with occasional protein and regular moisture.",
+      "Use heat protection before thermal styling.",
+      "Deep condition weekly based on seasonal needs.",
     ],
     high: [
-      "Protein reconstructor treatments",
-      "Heavy creams and butters for sealing",
-      "Acidic rinses to smooth cuticle",
-      "Pre-poo oils to reduce porosity exposure",
+      "Prioritize protein-moisture balance with bonding treatments.",
+      "Seal with heavier creams or oils on ends.",
+      "Avoid excessive heat and overwashing.",
     ],
   };
 
-  const careTips: Record<PorosityLevel, string[]> = {
-    low: [
-      "Apply products to damp, warm hair for better absorption",
-      "Use indirect heat during deep conditioning",
-      "Avoid over-conditioning — buildup will dull hair",
-      "Rinse with lukewarm water, not cold",
-    ],
-    medium: [
-      "Maintain a consistent wash and condition routine",
-      "Alternate moisture and protein treatments every 2-4 weeks",
-      "Protect hair from heat damage with thermal protectant",
-      "Regular trims keep ends healthy",
-    ],
-    high: [
-      "Limit chemical services and heat styling",
-      "Layer leave-in conditioner + cream + oil for retention",
-      "Use lower developer volumes and bond builders when coloring",
-      "Sleep on silk or satin to reduce friction",
-    ],
+  const routines: Record<PorosityLevel, string[]> = {
+    low: ["Clarify shampoo", "Lightweight conditioner", "Heat-activated treatments"],
+    medium: ["Balanced shampoo", "Weekly mask", "Heat protectant"],
+    high: ["Repair/bonding shampoo", "Protein + moisture mask", "Leave-in sealant"],
   };
 
   return {
-    porosityLevel,
+    level,
     score,
-    description: descriptions[porosityLevel],
-    productRecommendations: productRecommendations[porosityLevel],
-    careTips: careTips[porosityLevel],
+    maxScore,
+    percentage,
+    description: descriptions[level],
+    recommendations: recommendations[level],
+    routine: routines[level],
   };
 }
 
@@ -114,5 +140,5 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  return toolError("Use POST with a JSON body to calculate porosity", 405);
+  return toolResponse({ questions: porosityQuestions });
 }

@@ -35,15 +35,18 @@ const toneOptions = [
   { value: "brass", label: "Brass" },
   { value: "yellow", label: "Yellow" },
   { value: "red", label: "Red" },
+  { value: "green", label: "Green" },
+  { value: "ash", label: "Ash / Too Cool" },
+  { value: "purple", label: "Purple / Too Violet" },
 ];
 
 const targetToneOptions = [
-  { value: "ash", label: "Ash" },
-  { value: "beige", label: "Beige" },
   { value: "neutral", label: "Neutral" },
   { value: "cool", label: "Cool" },
   { value: "warm", label: "Warm" },
-  { value: "violet", label: "Violet" },
+  { value: "ash", label: "Ash" },
+  { value: "beige", label: "Beige" },
+  { value: "golden", label: "Golden" },
 ];
 
 export function ColorCorrectionCalculator({ className }: { className?: string }) {
@@ -55,7 +58,7 @@ export function ColorCorrectionCalculator({ className }: { className?: string })
     defaultValues: {
       unwantedTone: "orange",
       currentLevel: 7,
-      targetTone: "ash",
+      targetTone: "neutral",
     },
     mode: "onChange",
   });
@@ -67,10 +70,11 @@ export function ColorCorrectionCalculator({ className }: { className?: string })
     if (!parsed.success) {
       return {
         correctorShade: "",
-        technique: "",
+        technique: "tone-on-tone",
         developerRecommendation: 10,
-        reasoning: [],
-        processingTimeMinutes: 15,
+        processingTimeMinutes: 10,
+        formulaGuidance: "",
+        notes: [],
       };
     }
     return calculateColorCorrection(parsed.data);
@@ -164,6 +168,9 @@ export function ColorCorrectionCalculator({ className }: { className?: string })
                 className="border-white/[0.06] bg-[#0A0A0F]"
                 style={{ color: "var(--cg-text-primary)" }}
               />
+              {form.formState.errors.currentLevel && (
+                <p className="text-xs text-red-400">{form.formState.errors.currentLevel.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="targetTone" style={{ color: "var(--cg-text-primary)" }}>
@@ -227,7 +234,7 @@ export function ColorCorrectionCalculator({ className }: { className?: string })
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                {result.correctorShade}
+                {result.correctorShade || "—"}
               </p>
             </div>
 
@@ -245,9 +252,18 @@ export function ColorCorrectionCalculator({ className }: { className?: string })
               </p>
             </div>
 
-            {result.reasoning.length > 0 && (
+            <div className="mt-4 rounded-lg p-4" style={{ background: "rgba(147,51,234,0.04)" }}>
+              <p className="mb-2 text-sm font-semibold" style={{ color: "var(--cg-text-primary)" }}>
+                Formula Guidance
+              </p>
+              <p className="text-sm" style={{ color: "var(--cg-text-secondary)" }}>
+                {result.formulaGuidance || "—"}
+              </p>
+            </div>
+
+            {result.notes.length > 0 && (
               <ul className="mt-4 space-y-2">
-                {result.reasoning.map((reason, i) => (
+                {result.notes.map((reason, i) => (
                   <li
                     key={i}
                     className="flex items-start gap-2 text-sm"

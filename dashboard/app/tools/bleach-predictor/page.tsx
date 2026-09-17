@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { BleachPredictorCalculator } from "@/components/tools/BleachPredictorCalculator";
+import { BleachPredictor } from "@/components/tools/BleachPredictor";
 
 export const metadata: Metadata = {
   title: "Bleach Level Predictor | ColorGenius",
-  description: "Predict bleach lift levels, risk, and technique recommendations based on starting level, developer, time, and hair condition. Free tool by ColorGenius.",
+  description: "Predict bleach lift level, risk, and recommended technique based on starting level, developer volume, processing time, and hair condition. Free salon tool by ColorGenius.",
   openGraph: {
     title: "Bleach Level Predictor | ColorGenius",
-    description: "Lift smarter with risk-aware bleach predictions.",
+    description: "Know your lift and risk before you bleach.",
   },
 };
 
@@ -22,10 +22,10 @@ export default function BleachPredictorPage() {
             Bleach Level Predictor
           </h1>
           <p className="mt-1 text-sm" style={{ color: "var(--cg-text-secondary)" }}>
-            Estimate lift, assess risk, and choose the safest technique for every bleaching service.
+            Enter starting level, developer, processing time, and hair condition to predict lift and assess risk.
           </p>
         </div>
-        <BleachPredictorCalculator />
+        <BleachPredictor />
       </div>
     </div>
   );

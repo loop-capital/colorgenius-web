@@ -2,82 +2,100 @@ import { z } from "zod";
 import { parseToolBody, toolResponse, toolError } from "@/lib/tools/calculator-utils";
 
 export const colorCorrectionSchema = z.object({
-  unwantedTone: z.enum(["orange", "brass", "yellow", "red"]),
+  unwantedTone: z.enum(["orange", "brass", "yellow", "red", "green", "ash", "purple"]),
   currentLevel: z.coerce.number().int().min(1).max(10),
-  targetTone: z.enum(["ash", "beige", "neutral", "cool", "warm", "violet"]),
+  targetTone: z.enum(["neutral", "cool", "warm", "ash", "beige", "golden"]),
 });
 
 export type ColorCorrectionInput = z.infer<typeof colorCorrectionSchema>;
+export type UnwantedTone = ColorCorrectionInput["unwantedTone"];
+export type TargetTone = ColorCorrectionInput["targetTone"];
 
 export interface ColorCorrectionResult {
   correctorShade: string;
-  technique: string;
-  developerRecommendation: 10 | 20 | 30 | 40;
-  reasoning: string[];
+  technique: "tone-on-tone" | "pre-pigment" | "cancel" | "fill-and-tone";
+  developerRecommendation: number;
   processingTimeMinutes: number;
+  formulaGuidance: string;
+  notes: string[];
 }
 
-const COMPLEMENTARY_CORRECTORS: Record<
-  ColorCorrectionInput["unwantedTone"],
-  Partial<Record<ColorCorrectionInput["targetTone"], string>>
+const toneWheel: Record<
+  UnwantedTone,
+  { opposite: string; neutralizers: string[]; levelRange: [number, number] }
 > = {
-  orange: {
-    ash: "Blue-based ash",
-    cool: "Blue-violet ash",
-    neutral: "Neutral blue",
-    violet: "Blue-violet",
-  },
-  brass: {
-    ash: "Blue-violet ash",
-    cool: "Blue ash",
-    neutral: "Neutral ash",
-    violet: "Violet",
-  },
-  yellow: {
-    ash: "Violet ash",
-    cool: "Violet",
-    neutral: "Neutral violet",
-    violet: "Deep violet",
-  },
-  red: {
-    ash: "Green-based ash",
-    cool: "Green-neutral",
-    neutral: "Neutral green",
-    beige: "Beige with green reflect",
-  },
+  orange: { opposite: "blue", neutralizers: ["blue", "ash-blue"], levelRange: [5, 7] },
+  brass: { opposite: "blue-violet", neutralizers: ["violet", "blue-violet"], levelRange: [6, 8] },
+  yellow: { opposite: "violet", neutralizers: ["violet", "purple"], levelRange: [7, 10] },
+  red: { opposite: "green", neutralizers: ["green", "ash-green"], levelRange: [4, 6] },
+  green: { opposite: "red", neutralizers: ["red", "red-violet"], levelRange: [3, 5] },
+  ash: { opposite: "warmth", neutralizers: ["gold", "warm brown"], levelRange: [6, 9] },
+  purple: { opposite: "yellow", neutralizers: ["gold", "yellow-gold"], levelRange: [7, 10] },
 };
 
 export function calculateColorCorrection(input: ColorCorrectionInput): ColorCorrectionResult {
   const { unwantedTone, currentLevel, targetTone } = input;
+  const info = toneWheel[unwantedTone];
 
-  const correctorShade =
-    COMPLEMENTARY_CORRECTORS[unwantedTone][targetTone] ??
-    (unwantedTone === "red" ? "Green-based corrector" : "Violet-based corrector");
+  let correctorShade = info.neutralizers[0];
+  let technique: ColorCorrectionResult["technique"] = "tone-on-tone";
+  let developerRecommendation = 10;
+  let processingTimeMinutes = 10;
+  let formulaGuidance = "";
 
-  let developerRecommendation: 10 | 20 | 30 | 40 = 10;
-  if (currentLevel >= 7) developerRecommendation = 10;
-  else if (currentLevel >= 5) developerRecommendation = 20;
-  else developerRecommendation = 20;
+  if (currentLevel < info.levelRange[0]) {
+    technique = "pre-pigment";
+    developerRecommendation = 10;
+    processingTimeMinutes = 15;
+    formulaGuidance = `Fill with a warm/${correctorShade} shade at the target level before applying final tone.`;
+  } else if (unwantedTone === "green" || unwantedTone === "red") {
+    technique = "cancel";
+    developerRecommendation = 10;
+    processingTimeMinutes = 10;
+    formulaGuidance = `Apply a ${correctorShade}-based direct dye or toner to neutralize the ${unwantedTone} reflection.`;
+  } else if (currentLevel >= info.levelRange[0] && currentLevel <= info.levelRange[1]) {
+    technique = "tone-on-tone";
+    developerRecommendation = targetTone === "warm" ? 10 : 6;
+    processingTimeMinutes = targetTone === "warm" ? 15 : 10;
+    formulaGuidance = `Use a level ${currentLevel} ${correctorShade} toner to cancel ${unwantedTone} while keeping the base level stable.`;
+  } else {
+    technique = "fill-and-tone";
+    developerRecommendation = 10;
+    processingTimeMinutes = 20;
+    formulaGuidance = `Fill missing warmth first, then tone with ${correctorShade} to refine the final reflection.`;
+  }
 
-  const processingTimeMinutes = 15;
+  if (targetTone === "cool" || targetTone === "ash") {
+    correctorShade = info.neutralizers[0];
+    developerRecommendation = Math.min(developerRecommendation, 10);
+  } else if (targetTone === "warm" || targetTone === "golden") {
+    if (unwantedTone === "ash" || unwantedTone === "purple") {
+      correctorShade = info.neutralizers[0];
+    } else {
+      correctorShade = "warm neutral";
+    }
+    developerRecommendation = Math.max(developerRecommendation, 10);
+  }
 
-  const reasoning: string[] = [
-    `${unwantedTone.charAt(0).toUpperCase() + unwantedTone.slice(1)} is neutralized by its complementary base in ${correctorShade.toLowerCase()}.`,
-    currentLevel >= 7
-      ? "Level 7+ is already light enough for a pure tone-on-tone correction."
-      : "Level 1-6 may need pre-lightening or a stronger corrector formulation.",
-  ];
-
-  if (unwantedTone === "red" && targetTone === "warm") {
-    reasoning.push("Red to warm is not a correction — confirm the client’s target before formulating.");
+  const notes: string[] = [];
+  notes.push(`Primary neutralizer: ${correctorShade} (opposite ${info.opposite} on the color wheel).`);
+  if (currentLevel > 8 && (unwantedTone === "orange" || unwantedTone === "red")) {
+    notes.push("Orange/red at level 8+ is usually leftover pigment from prior dark color — a targeted fill may be needed before toning.");
+  }
+  if (targetTone === "ash" && currentLevel < 7) {
+    notes.push("Ash tones at darker levels can look muddy; ensure enough lift or warmth is present.");
+  }
+  if (unwantedTone === "green") {
+    notes.push("Green often comes from ash on overly porous hair — red or copper fill cancels it.");
   }
 
   return {
     correctorShade,
-    technique: "Apply corrector to areas of unwanted tone only. Process up to 15 minutes, then emulsify and evaluate before adding target shade.",
+    technique,
     developerRecommendation,
-    reasoning,
     processingTimeMinutes,
+    formulaGuidance,
+    notes,
   };
 }
 

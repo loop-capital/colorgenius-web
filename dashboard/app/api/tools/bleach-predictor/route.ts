@@ -3,82 +3,96 @@ import { parseToolBody, toolResponse, toolError } from "@/lib/tools/calculator-u
 
 export const bleachPredictorSchema = z.object({
   startingLevel: z.coerce.number().int().min(1).max(10),
-  developerVolume: z.union([z.literal(10), z.literal(20), z.literal(30), z.literal(40)]),
+  developerVolume: z.coerce.number().int().refine((v) => [10, 20, 30, 40].includes(v), {
+    message: "Developer volume must be 10, 20, 30, or 40 vol",
+  }),
   processingTimeMinutes: z.coerce.number().int().min(5).max(60),
-  hairCondition: z.enum(["healthy", "normal", "fragile", "compromised"]),
+  hairCondition: z.enum(["healthy", "processed", "damaged"]),
 });
 
 export type BleachPredictorInput = z.infer<typeof bleachPredictorSchema>;
+export type HairCondition = "healthy" | "processed" | "damaged";
 
 export interface BleachPredictorResult {
   predictedLevel: number;
   liftLevels: number;
-  riskLevel: "low" | "moderate" | "high" | "extreme";
-  techniqueRecommendation: string;
-  developerRecommendation: 10 | 20 | 30 | 40;
-  processingRecommendation: number;
-  safetyNotes: string[];
+  risk: "low" | "moderate" | "high" | "extreme";
+  riskColor: string;
+  recommendedTechnique: string;
+  processingGuidance: string;
+  notes: string[];
 }
 
-const CONDITION_MULTIPLIERS: Record<BleachPredictorInput["hairCondition"], number> = {
+const conditionMultiplier: Record<HairCondition, number> = {
   healthy: 1,
-  normal: 0.9,
-  fragile: 0.75,
-  compromised: 0.6,
+  processed: 0.85,
+  damaged: 0.65,
 };
 
-const DEVELOPER_LIFT: Record<10 | 20 | 30 | 40, number> = {
-  10: 0,
-  20: 1,
-  30: 2,
-  40: 3,
-};
-
-export function calculateBleachPredictor(input: BleachPredictorInput): BleachPredictorResult {
+export function calculateBleachPrediction(input: BleachPredictorInput): BleachPredictorResult {
   const { startingLevel, developerVolume, processingTimeMinutes, hairCondition } = input;
 
-  const baseLift = DEVELOPER_LIFT[developerVolume];
-  const timeBonus = Math.min(Math.floor((processingTimeMinutes - 10) / 10) * 0.5, 2);
-  const rawLift = (baseLift + timeBonus) * CONDITION_MULTIPLIERS[hairCondition];
-  const liftLevels = Number(rawLift.toFixed(1));
-  const predictedLevel = Math.max(1, Math.min(10, startingLevel - Math.floor(rawLift)));
+  const maxLiftPerVolume: Record<number, number> = {
+    10: 1,
+    20: 2,
+    30: 3,
+    40: 4,
+  };
 
-  let riskLevel: BleachPredictorResult["riskLevel"] = "low";
-  if (hairCondition === "compromised") riskLevel = "extreme";
-  else if (hairCondition === "fragile" && (developerVolume >= 30 || processingTimeMinutes > 30)) riskLevel = "high";
-  else if (hairCondition === "fragile") riskLevel = "moderate";
-  else if (developerVolume === 40 || processingTimeMinutes > 35) riskLevel = "high";
-  else if (developerVolume >= 30) riskLevel = "moderate";
+  const baseLift = maxLiftPerVolume[developerVolume] ?? 1;
+  const timeFactor = Math.min(processingTimeMinutes / 30, 1);
+  const conditionFactor = conditionMultiplier[hairCondition];
 
-  let techniqueRecommendation = "Standard on-scalp or off-scalp lightening application.";
-  if (riskLevel === "high" || riskLevel === "extreme") {
-    techniqueRecommendation = "Use foils/balayage for heat control, work in small sections, and never overlap previously lightened hair.";
-  } else if (developerVolume >= 30) {
-    techniqueRecommendation = "Off-scalp or freehand technique recommended; monitor elasticity every 10 minutes.";
+  const estimatedLift = baseLift * (0.4 + 0.6 * timeFactor) * conditionFactor;
+  const liftLevels = Math.max(0, Math.round(estimatedLift * 10) / 10);
+  let predictedLevel = Math.max(1, Math.min(10, startingLevel - Math.floor(liftLevels)));
+
+  if (predictedLevel === startingLevel && liftLevels >= 0.5) {
+    predictedLevel = Math.max(1, predictedLevel - 1);
   }
 
-  let recommendedDeveloper: 10 | 20 | 30 | 40 = developerVolume;
-  if (hairCondition === "fragile" && developerVolume >= 40) recommendedDeveloper = 30;
-  if (hairCondition === "compromised") recommendedDeveloper = 20;
-
-  const recommendedProcessing = Math.min(processingTimeMinutes, hairCondition === "fragile" ? 25 : hairCondition === "compromised" ? 20 : 35);
-
-  const safetyNotes: string[] = [];
-  if (predictedLevel <= 1 && startingLevel > 6) safetyNotes.push("Predicted lift may not reach pale yellow; consider a second lightening session.");
-  if (hairCondition === "fragile" || hairCondition === "compromised") {
-    safetyNotes.push("Fragile/compromised hair — prioritize bond builder and avoid 40 vol.");
+  let risk: "low" | "moderate" | "high" | "extreme" = "low";
+  let riskColor = "#10B981";
+  if (developerVolume === 40 || processingTimeMinutes > 45 || (hairCondition === "damaged" && developerVolume >= 30)) {
+    risk = "extreme";
+    riskColor = "#EF4444";
+  } else if (developerVolume >= 30 || processingTimeMinutes > 35 || hairCondition === "damaged") {
+    risk = "high";
+    riskColor = "#F59E0B";
+  } else if (developerVolume >= 20 || processingTimeMinutes > 25 || hairCondition === "processed") {
+    risk = "moderate";
+    riskColor = "#FBBF24";
   }
-  if (processingTimeMinutes > 45) safetyNotes.push("Processing beyond 45 minutes risks severe breakage on any hair type.");
-  if (recommendedDeveloper < developerVolume) safetyNotes.push(`Developer reduced to ${recommendedDeveloper} vol to protect hair condition.`);
+
+  const techniques: Record<HairCondition, string> = {
+    healthy: "Full-head or virgin application with standard foiling.",
+    processed: "Low-and-slow foiling; consider bond builder and lower developer.",
+    damaged: "Baby lights or balayage with 10–20 vol only; mandatory bond builder.",
+  };
+
+  const processingGuidance = processingTimeMinutes > 30
+    ? "Check every 5 minutes after 30 min. Do not exceed manufacturer maximums."
+    : "Check at 15 and 25 minutes for even lift.";
+
+  const notes: string[] = [];
+  if (hairCondition === "damaged" && developerVolume >= 30) {
+    notes.push("High developer on damaged hair greatly increases breakage risk — use bond builder and lower vol.");
+  }
+  if (processingTimeMinutes > 45) {
+    notes.push("Extended processing time can cause severe damage; rinse immediately if elasticity is lost.");
+  }
+  if (predictedLevel <= 4 && startingLevel > 6) {
+    notes.push("Achieving very light results from a darker base may require multiple sessions.");
+  }
 
   return {
     predictedLevel,
     liftLevels,
-    riskLevel,
-    techniqueRecommendation,
-    developerRecommendation: recommendedDeveloper,
-    processingRecommendation: recommendedProcessing,
-    safetyNotes,
+    risk,
+    riskColor,
+    recommendedTechnique: techniques[hairCondition],
+    processingGuidance,
+    notes,
   };
 }
 
@@ -86,7 +100,7 @@ export async function POST(request: Request) {
   const { data, error } = await parseToolBody(request, bleachPredictorSchema);
   if (error) return error;
   try {
-    const result = calculateBleachPredictor(data);
+    const result = calculateBleachPrediction(data);
     return toolResponse(result);
   } catch (e) {
     return toolError(e instanceof Error ? e.message : "Calculation failed", 500);
