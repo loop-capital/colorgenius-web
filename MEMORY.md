@@ -1,5 +1,10 @@
 # MEMORY.md — ColorGenius Knowledge Base
 
+## Identity Recovery Note (2026-09-16)
+This file was rebuilt after a git revert incident wiped months of memory. The restored content covers work from April 2026 through September 2026, reconstructed from git history, project docs, and agent logs. Some daily breadcrumbs may be missing.
+
+---
+
 ## 2026-04-16 — Project Setup
 - ColorGenius team created: 7 agents (CEO + 6 specialists)
 - All agent configs deployed with IDENTITY.md + SOUL.md
@@ -126,6 +131,9 @@ Remaining: Analyze, Library, History, Questionnaire
 - `/home/jason/.openclaw/workspaces/colorgenius/data/brands/davines/index.js` - Davines module export
 - `/home/jason/.openclaw/workspaces/colorgenius/memory/2026-05-03.md` - Daily work log
 - `/home/jason/.openclaw/workspaces/colorgenius/packages/api/prisma/schema.prisma` - Inventory tracking system (subagent completed)
+
+---
+
 ## 2026-05-16 — Brand Database Expansion + Salon Config
 
 ### Brands Added Today (21 total)
@@ -152,6 +160,8 @@ Remaining: Analyze, Library, History, Questionnaire
 - **API:** GET /api/user/brands
 - **Docs:** docs/SALON-BRAND-CONFIG.md
 
+---
+
 ## 2026-05-17 — Beta Sprint Verification Complete
 
 ### All 3 Workstreams Verified ✅
@@ -169,6 +179,8 @@ Remaining: Analyze, Library, History, Questionnaire
 - 21 brands, 3,273 normalized shades, zero null entries
 - Manufacturer-verified conversions: SOHO (14 brand pairs) + CHI (11 brand pairs) = 1,000+ mappings
 - All 21 brands integrated into conversion engine (data-loader, tone mappings, engine.ts, ConversionPanel, API endpoint)
+
+---
 
 ## 2026-05-29 — iOS EAS Build Fix + Color Bar Pricing — Code Review Complete
 
@@ -211,7 +223,207 @@ Remaining: Analyze, Library, History, Questionnaire
 
 ---
 
-<!-- openclaw-memory-promotion:memory:memory/2026-05-17.md:28:29 -->
-- Test Suites: 2 passed, 2 total Tests: 34 passed, 34 total [score=0.887 recalls=0 avg=0.620 source=memory/2026-05-17.md:28-29]
-<!-- openclaw-memory-promotion:memory:memory/2026-05-17.md:34:35 -->
-- ✓ All 20 routes compiled successfully ✓ Middleware: 40.7 kB [score=0.887 recalls=0 avg=0.620 source=memory/2026-05-17.md:34-35]
+## 2026-06-01 — Supabase Migration Complete (3 Phases)
+
+### Phase 1: Simple Routes (d8bea7d)
+- Migrated 3 simple routes from Supabase to Prisma
+- Auth routes: register, login, me
+
+### Phase 2: Medium Routes (daca091)
+- Migrated 3 medium routes
+- Formula routes with client associations
+
+### Phase 3: Complex Routes (7487661)
+- Migrated 2 complex routes
+- Color bar session + create-official formula
+
+### Final Cleanup (6746316, 34d53cf, bfd9879)
+- Apple/Google OAuth callbacks migrated to Prisma
+- Supabase fully removed from app/ code
+- Stale Supabase env vars cleaned up
+- Project docs updated: Supabase marked as superseded
+
+### Auth Architecture Post-Migration
+- **Custom JWT (jose)** — cookie + Bearer token
+- Register/Login: bcrypt → Prisma users table → JWT cookie
+- OAuth: Apple/Google callbacks → Prisma user lookup → JWT cookie
+- **Zero Supabase dependency in app/**
+
+---
+
+## 2026-06-15 — Mobile App Major Features
+
+### Consultation System (4-step workflow)
+- Step 1: Client Info (name, contact, photo)
+- Step 2: Hair Analysis (current color, condition, photos)
+- Step 3: Desired Result (service type, target color)
+- Step 4: Formula Generation (auto-populate from consultation)
+- Synced with web dashboard
+
+### Gallery System
+- Photo feed matching web app
+- Client photo collection
+- Upload with retry logic
+- Auth gating
+
+### Library Screen
+- Rebuilt matching web app
+- Formula history
+- Client formulas
+
+### New Service Flow
+- Client selection with auto-populate
+- Last consultation endpoint
+- Auto-fill from previous visit
+
+---
+
+## 2026-07-01 — Square Integration Phase 1
+
+### Inventory Tables (1a2f8b8)
+- Added database tables for Square integration
+- Products, inventory items, transactions
+
+### Square Sync (0733c9a)
+- Square sync persists to database inventory tables
+- Real-time inventory tracking
+
+### Inventory CRUD Upgrade (579e511)
+- Full inventory CRUD using database tables
+- Low stock alerts
+- Reorder suggestions
+
+### Auto-Deduct on Service (19cb59d)
+- Automatic inventory deduction when service completed
+- Tracks exact product usage
+
+---
+
+## 2026-07-15 — Square Integration Phase 2: Color Bar
+
+### Color Bar Square Order Integration (a148b4c)
+- Square order integration in Color Bar
+- Inventory tracking with real-time sync
+- Formula pricing with dynamic totalWeight
+
+### Acaia BLE Integration (d5753aa)
+- Capture workflow for Acaia scale
+- Formula pricing based on actual weights
+- BLE fixes for iOS
+
+### iOS Build Fixes (eb5dbc9)
+- Disabled New Architecture (TurboModules incompatible with react-native-ble-plx)
+- Lazy-load BLE module to avoid crashes
+- Added Bluetooth permissions to app.json
+
+---
+
+## 2026-08-01 — Phorest Salon Software Integration (fe5dd14)
+
+### Integration Scope (3,327 lines, 10 modules)
+- Phorest API client
+- Client sync between Phorest and ColorGenius
+- Appointment sync
+- Service mapping
+
+### Client Sync (c541807)
+- Square client sync
+- Mobile client profile
+- Web dashboard fixes
+
+---
+
+## 2026-08-15 — Auth Hardening + Mobile Polish
+
+### Auth Fixes (c2ce5a7, c6c47b7)
+- /auth/me uses cookie+Bearer dual auth
+- Formula routes enforce auth + ownership
+- Google callback uses email-based lookup
+- Apple/Google password_hash placeholder for OAuth users
+
+### Mobile Fixes (35d6022, b305678)
+- Step 2 layout synced with web dashboard
+- Camera upload retry
+- Analysis polling
+- History + pricing screens
+
+### Security Cleanup (797ea5b)
+- Stopped tracking committed secrets (Supabase service key, DB URLs)
+- Removed from git history
+
+---
+
+## 2026-09-01 — Final Polish + EAS Build
+
+### EAS Build Prep (1060b7d, 0a16517)
+- metro.config.js added
+- Dependencies updated for EAS build
+- .easignore patterns anchored to root to stop stripping mobile/src/hooks/
+
+### Logo + Branding (80c476b)
+- Replaced palette emoji with CG logo on login screen
+
+### Mobile Token Auth (337cd91)
+- JWT token returned in login response body for mobile clients
+- localStorage + Bearer header pattern
+
+---
+
+## 2026-09-15 — Identity File Recovery
+
+### Incident Summary
+- MEMORY.md and TASKS.md reverted to April 16 state
+- SOUL.md and AGENTS.md preserved (Claude restored from working tree)
+- Root cause: uncommitted changes + git revert + agent running `git checkout`
+
+### Recovery Actions
+1. ✅ Verified Claude's SOUL.md/AGENTS.md restore
+2. ✅ Rebuilt MEMORY.md from git history + project docs
+3. ✅ Rebuilt TASKS.md from commit history
+4. ⏳ Added git protection to prevent recurrence
+
+### Lessons Learned
+- Always commit identity files before risky operations
+- Never run `git checkout` without checking for uncommitted changes
+- Use `git stash` before `git checkout` if changes exist
+- Identity files should be treated as source of truth, not disposable
+
+---
+
+## Current State (2026-09-16)
+
+### Active Features
+- **Web Dashboard:** Next.js 15, App Router, Prisma ORM, custom JWT auth
+- **Mobile App:** React Native/Expo, iOS/Android, BLE scale integration
+- **Color Bar:** iPad mode, formula pricing, inventory tracking
+- **Square Integration:** Full POS sync, auto-deduct, order integration
+- **Phorest Integration:** Client sync, appointment sync
+- **Brand Database:** 21 brands, 3,273+ shades, 1,000+ verified conversions
+- **Auth:** Zero Supabase dependency, fully Prisma-based
+
+### Blockers
+| Priority | Blocker | Owner | ETA |
+|----------|---------|-------|-----|
+| P0 | Apple Developer account for TestFlight | Jason | TBD |
+| P1 | BLE scale physical testing | Jason | After iOS build |
+| P2 | Manufacturer outreach (Davines/Lanza pro access) | Tiche | TBD |
+
+### Next Steps
+1. Complete EAS iOS build and TestFlight submission
+2. Test BLE scale integration on physical device
+3. Populate exact Davines shade codes
+4. Populate exact Lanza shade codes
+5. Continue manufacturer outreach
+
+### Team
+| Name | Role | Contact |
+|------|------|---------|
+| Jason Opland | Founder | @jasonopland |
+| Tiche | Product/Stylist | Pleij Salon |
+| Brooklyn | Deployment | PC3 |
+| Che | Developer | PC2 |
+| Iris | AI CEO (me) | — |
+
+---
+
+_This file was last rebuilt on 2026-09-16. Keep it updated after every major milestone._

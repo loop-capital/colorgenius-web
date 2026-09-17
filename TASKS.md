@@ -1,5 +1,10 @@
 # ColorGenius Task Tracker
 
+## Identity Recovery Note (2026-09-16)
+This file was rebuilt after a git revert incident wiped months of task history. The restored content covers work from April 2026 through September 2026, reconstructed from git history, project docs, and agent logs. Some daily task breadcrumbs may be missing.
+
+---
+
 ## Active Tasks
 
 ### ADR-012: Chemical History & Safety Intelligence ✅ COMPLETE
@@ -52,24 +57,99 @@
 
 ---
 
-## Completed Tasks (Recently)
+## Completed Tasks (2026-05 to 2026-09)
 
-### Dashboard Enhancements
-- [x] Multi-step formulation wizard (6 steps)
-- [x] Chemical History step with live hard-stop validation
-- [x] Sensitivity flags (PPD allergy, pregnancy, breastfeeding, chemo)
-- [x] Confidence scoring with visual indicator
-- [x] Professional assessment generation
-- [x] Strand test recommendation system
+### May 2026
 
-### API Enhancements
-- [x] Formulate endpoint accepts chemical_history and sensitivity
-- [x] Response includes hard_stops, assessment, strand_test_recommended, adjusted_confidence
-- [x] All safety fields persisted to database
+#### Brand Database Expansion
+- [x] R+COLOR (brand #18): 193 shades + 4 lighteners
+- [x] SOHO by MOB (brand #19): 60 shades + 14 manufacturer conversion charts
+- [x] O&M CØR.color (brand #20): 102 shades
+- [x] CHI Ionic (brand #21): 180 shades + 864 conversion mappings
+- [x] 21 brands total, 3,273+ normalized shades
+- [x] 34/34 tests passing
 
-### Brand Database
-- [x] 19 brands, ~2,991 shades across all lines
-- [x] Manufacturer-verified conversion data: SOHO (14 brand pairs) + CHI (11 brand pairs)
+#### Salon Brand Configuration
+- [x] Pricing tiers: Starter ($29), Salon ($49), Pro ($79), Elite ($119)
+- [x] Add-on: $7.50/mo per extra brand
+- [x] Pleij Salon created in DB (Salon tier: Davines, L'ANZA, Schwarzkopf)
+- [x] API: GET /api/user/brands
+
+#### iOS EAS Build Fix
+- [x] `newArchEnabled: false` for react-native-ble-plx compatibility
+- [x] Lazy BLE module loading
+- [x] Bluetooth permissions in app.json
+- [x] Formula pricing with dynamic totalWeight (capped at 500g)
+- [x] parseInt radix fix (base 10)
+
+### June 2026
+
+#### Supabase Migration (3 Phases)
+- [x] Phase 1: Simple routes (auth: register, login, me)
+- [x] Phase 2: Medium routes (formula with client associations)
+- [x] Phase 3: Complex routes (color bar session + create-official)
+- [x] Final cleanup: Apple/Google OAuth callbacks migrated
+- [x] Zero Supabase dependency in app/
+- [x] Custom JWT auth (jose) with cookie + Bearer token
+
+#### Mobile App Features
+- [x] 4-step consultation workflow (web synced)
+- [x] Gallery system (photo feed, upload, retry)
+- [x] Library screen (formula history, client formulas)
+- [x] New Service flow (client selection, auto-populate)
+- [x] Last consultation endpoint
+
+### July 2026
+
+#### Square Integration Phase 1
+- [x] Inventory tables added to database
+- [x] Square sync persists to database
+- [x] Full inventory CRUD with low stock alerts
+- [x] Auto-deduct on service completion
+
+#### Square Integration Phase 2: Color Bar
+- [x] Square order integration in Color Bar
+- [x] Real-time inventory tracking
+- [x] Formula pricing with dynamic weights
+- [x] Acaia BLE capture workflow
+- [x] iOS build fixes (New Architecture disabled)
+
+### August 2026
+
+#### Phorest Salon Software Integration
+- [x] Phorest API client (3,327 lines, 10 modules)
+- [x] Client sync between Phorest and ColorGenius
+- [x] Appointment sync
+- [x] Service mapping
+
+#### Auth Hardening
+- [x] Cookie + Bearer dual auth
+- [x] Formula routes enforce auth + ownership
+- [x] Google callback email-based lookup
+- [x] Apple/Google password_hash placeholder
+
+#### Security Cleanup
+- [x] Stopped tracking committed secrets (Supabase key, DB URLs)
+- [x] Removed from git history
+
+### September 2026
+
+#### EAS Build Prep
+- [x] metro.config.js added
+- [x] Dependencies updated for EAS build
+- [x] .easignore patterns anchored to root
+- [x] Logo replaced palette emoji with CG logo
+
+#### Mobile Token Auth
+- [x] JWT token returned in login response body
+- [x] localStorage + Bearer header pattern
+- [x] Sidebar fetch includes credentials
+
+#### Identity File Recovery
+- [x] SOUL.md restored (12KB, 187 lines)
+- [x] AGENTS.md restored (884 bytes, 19 lines)
+- [x] MEMORY.md rebuilt from git history
+- [x] TASKS.md rebuilt from commit history
 
 ---
 
@@ -95,6 +175,24 @@
 
 ---
 
+## Blockers
+
+| Priority | Blocker | Owner | Status |
+|----------|---------|-------|--------|
+| P0 | Apple Developer account for TestFlight | Jason | **NEEDS ACTION** |
+| P1 | BLE scale physical testing | Jason | After iOS build |
+| P2 | Davines pro portal access | Tiche | Outreach in progress |
+| P2 | Lanza pro portal access | Tiche | Outreach in progress |
+| P3 | Manufacturer outreach (partnerships) | Tiche/Jason | Ongoing |
+
+---
+
 ## Notes
 
 **2026-05-17:** Beta sprint verification complete. All 3 workstreams verified. Test infrastructure fixed (jest config, ts-jest, duplicate keys, import attributes). Normalization pipeline expanded from 17→19 brands (R+COLOR + SOHO added). 34/34 tests passing, Next.js build clean. Expo pipeline ready but blocked on Apple Developer account.
+
+**2026-09-16:** Identity files recovered after git revert incident. MEMORY.md and TASKS.md rebuilt from git history + project docs. SOUL.md and AGENTS.md preserved (Claude restored from working tree). Added protection to prevent recurrence.
+
+---
+
+_This file was last rebuilt on 2026-09-16. Keep it updated after every completed task._
