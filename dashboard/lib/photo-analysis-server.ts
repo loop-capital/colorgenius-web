@@ -519,6 +519,12 @@ async function analyzeWithKimi(jpegBase64: string): Promise<VisionResult | null>
       body: JSON.stringify({
         model: OLLAMA_MODEL,
         stream: false,
+        // kimi-k2.6 is a reasoning model — left to default, it emits a huge
+        // chain-of-thought trace before answering (measured: ~89s / 2706
+        // thinking tokens for a single flat-color test image) and blows
+        // through OLLAMA_TIMEOUT_MS every time. With this set, the same
+        // request returns the same well-formed JSON in ~2.5s.
+        think: false,
         messages: [{
           role: 'user',
           content: VISION_PROMPT,

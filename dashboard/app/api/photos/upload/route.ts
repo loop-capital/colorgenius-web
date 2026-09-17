@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadToR2, getPresignedUploadUrl, R2_PUBLIC_URL } from '@/lib/r2';
 import { prisma } from '@/lib/prisma';
-import { verifyBearerToken } from '@/lib/auth';
+import { getUserFromRequest } from '@/lib/auth';
+import { getOrCreateStylistForUser } from '@/lib/stylist';
 
 /**
  * POST /api/photos/upload
@@ -31,18 +32,26 @@ import { verifyBearerToken } from '@/lib/auth';
 export async function POST(request: NextRequest) {
   try {
     // ─── Auth check ──────────────────────────────────────────────
-    const authPayload = await verifyBearerToken(request);
-    if (!authPayload) {
+    const authUser = await getUserFromRequest(request);
+    if (!authUser) {
       return NextResponse.json(
-        { error: 'Unauthorized. Valid Bearer token required.' },
+        { error: 'Unauthorized. Authentication required.' },
         { status: 401 }
       );
     }
 
-    // Look up user to get stylist_id (users.id === stylists.id in this schema)
-    // The JWT payload userId maps to the users.id column; photo_analyses.stylist_id
-    // references stylists.id, but in practice user.id == stylist.id.
-    const stylistId = authPayload.userId;
+    // photo_analyses.stylist_id has a real FK to stylists.id, which is NOT the
+    // same as users.id (a prior version of this file assumed they were equal —
+    // they aren't; see prisma/migrations/20260917000000_.../migration.sql for
+    // the users<->stylists bridge). Resolve the real linked stylist instead.
+    const stylist = await getOrCreateStylistForUser(authUser.userId);
+    if (!stylist) {
+      return NextResponse.json(
+        { error: 'No creator profile for this account.' },
+        { status: 400 }
+      );
+    }
+    const stylistId = stylist.id;
 
     const contentType = request.headers.get('content-type') || '';
 
