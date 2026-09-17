@@ -21,9 +21,9 @@ export async function GET(request: Request) {
     return NextResponse.json({
       user: {
         id: user.id,
-        username: user.first_name || user.username,
+        username: user.first_name || user.email,
         email: user.email,
-        salonName: user.first_name || user.username,
+        salonName: user.first_name || user.email,
       }
     });
   } catch {
