@@ -687,11 +687,24 @@ export default function ColorBarScreen({ navigation, route }: any) {
     setSearchQuery('');
   }, []);
 
-  // Connect scale
+  // Connect scale — failures surface via the scaleError effect below
+  // (the hook sets scaleError before throwing on every failure path).
   const handleConnectScale = useCallback(() => {
     if (scaleStatus === 'connected') return;
-    connectScale();
+    connectScale().catch(() => {});
   }, [scaleStatus, connectScale]);
+
+  // Surface scale errors (failed connect, lost Bluetooth, denied
+  // permissions, etc.) — the status badge alone only shows "ERROR" with
+  // no explanation of what went wrong or what to do about it.
+  const lastScaleErrorRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (scaleError && scaleError !== lastScaleErrorRef.current) {
+      lastScaleErrorRef.current = scaleError;
+      Alert.alert('Scale error', scaleError);
+    }
+    if (!scaleError) lastScaleErrorRef.current = undefined;
+  }, [scaleError]);
 
   // ─── Render: Search Mode ────────────────────────────────────────────────
 
