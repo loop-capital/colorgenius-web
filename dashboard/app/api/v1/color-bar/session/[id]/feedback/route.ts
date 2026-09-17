@@ -31,48 +31,37 @@ export async function POST(
       )
     }
 
-    // Build update payload
+    // feedback_submitted_at was referenced here but never existed as a real
+    // column — every update() threw, and the catch below silently claimed
+    // success anyway ("stored locally; sync pending") with nothing actually
+    // stored anywhere. Removed the phantom field; let real failures surface
+    // as a real error instead of a fabricated success.
     const updateData = {
       feedback_submitted: true,
       feedback_rating: body.rating,
       feedback_notes: body.notes ?? null,
       feedback_converted_to_brand: body.convertedToBrand ?? false,
       feedback_used_for_training: body.sentToTraining ?? false,
-      feedback_submitted_at: new Date(),
     }
 
-    // Update the session in Prisma
-    try {
-      const updatedSession = await prisma.color_bar_sessions.update({
-        where: { id },
-        data: updateData,
-      })
+    await prisma.color_bar_sessions.update({
+      where: { id },
+      data: updateData,
+    })
 
-      return NextResponse.json(
-        {
-          success: true,
-          sessionId: id,
-          feedback: {
-            rating: body.rating,
-            notes: body.notes ?? null,
-            convertedToBrand: body.convertedToBrand ?? false,
-            sentToTraining: body.sentToTraining ?? false,
-          },
+    return NextResponse.json(
+      {
+        success: true,
+        sessionId: id,
+        feedback: {
+          rating: body.rating,
+          notes: body.notes ?? null,
+          convertedToBrand: body.convertedToBrand ?? false,
+          sentToTraining: body.sentToTraining ?? false,
         },
-        { status: 200 }
-      )
-    } catch (dbError) {
-      console.error('Prisma feedback update error:', dbError)
-      // If table doesn't exist or row not found, still return success for offline mode
-      return NextResponse.json(
-        {
-          success: true,
-          sessionId: id,
-          warning: 'Feedback stored locally; database sync pending',
-        },
-        { status: 200 }
-      )
-    }
+      },
+      { status: 200 }
+    )
   } catch (error) {
     console.error('Color bar feedback error:', error)
     return NextResponse.json(

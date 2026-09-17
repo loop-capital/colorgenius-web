@@ -104,84 +104,64 @@ interface ColorBarSession {
 
 // ─── API Functions ─────────────────────────────────────────────────────────
 
+// These four all THROW on failure rather than silently substituting mock
+// data or a fake ID — a stylist weighing real product against a session that
+// silently never got saved is real client work lost with no indication
+// anything went wrong. Callers are responsible for surfacing the error.
+
 async function fetchClients(token: string): Promise<Client[]> {
-  try {
-    const res = await fetch(`${API_BASE}/clients`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Failed to fetch clients');
-    const data = await res.json();
-    return data.clients || [];
-  } catch (err) {
-    console.error('fetchClients error:', err);
-    return MOCK_CLIENTS;
-  }
+  const res = await fetch(`${API_BASE}/clients`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error(`Failed to fetch clients (${res.status})`);
+  const data = await res.json();
+  return data.clients || [];
 }
 
 async function fetchClientFormulas(clientId: string, token: string): Promise<Formula[]> {
-  try {
-    const res = await fetch(`${API_BASE}/formulas/${clientId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Failed to fetch formulas');
-    const data = await res.json();
-    return data.formulas || [];
-  } catch (err) {
-    console.error('fetchFormulas error:', err);
-    return [MOCK_FORMULA];
-  }
+  const res = await fetch(`${API_BASE}/formulas/${clientId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error(`Failed to fetch formulas (${res.status})`);
+  const data = await res.json();
+  return data.formulas || [];
 }
 
 async function createSession(clientId: string, formulaId: string | undefined, token: string): Promise<string> {
-  try {
-    const res = await fetch(`${API_BASE}/session`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ clientId, formulaId })
-    });
-    if (!res.ok) throw new Error('Failed to create session');
-    const data = await res.json();
-    return data.sessionId;
-  } catch (err) {
-    console.error('createSession error:', err);
-    return `cb_${Date.now()}`;
-  }
+  const res = await fetch(`${API_BASE}/session`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ clientId, formulaId })
+  });
+  if (!res.ok) throw new Error(`Failed to create session (${res.status})`);
+  const data = await res.json();
+  return data.sessionId;
 }
 
 async function completeSession(sessionId: string, steps: FormulaStep[], totalCost: number, token: string) {
-  try {
-    const res = await fetch(`${API_BASE}/session/${sessionId}/complete`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ steps, totalCost })
-    });
-    if (!res.ok) throw new Error('Failed to complete session');
-    return await res.json();
-  } catch (err) {
-    console.error('completeSession error:', err);
-    return null;
-  }
+  const res = await fetch(`${API_BASE}/session/${sessionId}/complete`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ steps, totalCost })
+  });
+  if (!res.ok) throw new Error(`Failed to complete session (${res.status})`);
+  return await res.json();
 }
 
-// ─── Mock Data (fallback when API fails) ───────────────────────────────────
+// ─── Starting formula for a client with none on file ────────────────────────
+// Used only when the API call succeeds but genuinely returns zero formulas
+// for this client (a real, legitimate case — not an error). API failures are
+// no longer silently mapped to fake data; see fetchClients/fetchClientFormulas.
 
-const MOCK_CLIENTS: Client[] = [
-  { id: '1', name: 'Sarah Mitchell', phone: '555-0123', lastVisit: '2025-05-15', preferredFormula: '6N + 20vol' },
-  { id: '2', name: 'Emily Chen', phone: '555-0456', lastVisit: '2025-05-20', preferredFormula: '7NG + 10vol' },
-  { id: '3', name: 'Jessica Torres', phone: '555-0789', lastVisit: '2025-05-22', preferredFormula: '5RV + 30vol' },
-  { id: '4', name: 'Amanda Brooks', phone: '555-0321', lastVisit: '2025-05-25', preferredFormula: '6WN + 20vol' },
-  { id: '5', name: 'Rachel Kim', phone: '555-0654', lastVisit: '2025-05-27', preferredFormula: '8NG + 10vol' },
-];
-
-const MOCK_FORMULA: Formula = {
+const BLANK_FORMULA_TEMPLATE: Formula = {
   id: 'f1',
-  clientName: 'Sarah Mitchell',
+  clientName: '',
   createdAt: '2025-05-28',
   steps: [
     { product: 'Demi-Permanent Color', shadeCode: '6N', brand: 'Davines', targetGrams: 45, actualGrams: 0, completed: false, role: 'color' },
@@ -193,7 +173,7 @@ const MOCK_FORMULA: Formula = {
   processingTime: 35,
   totalGrams: 127.5,
   totalCost: 12.50,
-  notes: 'Client prefers cooler tones. Patch test done 48h ago.',
+  notes: 'No formula on file yet — starting template. Adjust before mixing.',
 };
 
 // ─── Helper Functions ──────────────────────────────────────────────────────
@@ -513,21 +493,23 @@ export default function ColorBarScreen({ navigation, route }: any) {
 
   // Load clients from API on mount
   useEffect(() => {
-    if (token) {
-      setIsLoadingClients(true);
-      fetchClients(token)
-        .then(data => {
-          setClients(data);
-          setIsLoadingClients(false);
-        })
-        .catch(() => {
-          setClients(MOCK_CLIENTS);
-          setIsLoadingClients(false);
-        });
-    } else {
-      // No token, use mock data
-      setClients(MOCK_CLIENTS);
+    if (!token) {
+      Alert.alert('Not signed in', 'Log in to load your client list.');
+      return;
     }
+    setIsLoadingClients(true);
+    fetchClients(token)
+      .then(data => {
+        setClients(data);
+        setIsLoadingClients(false);
+      })
+      .catch((err) => {
+        setIsLoadingClients(false);
+        Alert.alert(
+          'Couldn’t load clients',
+          err instanceof Error ? err.message : 'Check your connection and try again.'
+        );
+      });
   }, [token]);
 
   // Filter clients
@@ -555,21 +537,25 @@ export default function ColorBarScreen({ navigation, route }: any) {
       const formulas = await fetchClientFormulas(client.id, token);
       
       // Use first formula or fallback to mock
+      // No formula on file yet is a legitimate case (new client) — start
+      // from a blank template. A failed *request* is different and is
+      // handled in the catch below, not folded into this fallback.
       const clientFormula = formulas.length > 0 ? {
         ...formulas[0],
         clientName: client.name,
         id: `f-${client.id}-${Date.now()}`,
       } : {
-        ...MOCK_FORMULA,
+        ...BLANK_FORMULA_TEMPLATE,
         clientName: client.name,
         id: `f-${client.id}-${Date.now()}`,
       };
-      
+
       setFormula(clientFormula);
       setSteps(clientFormula.steps.map(s => ({ ...s })));
       setCurrentStep(0);
-      
-      // Create session in backend
+
+      // Create session in backend — if this fails, there is no real session
+      // to weigh product against, so don't fabricate one.
       const sessionId = await createSession(client.id, clientFormula.id, token);
       setSession({
         id: sessionId,
@@ -580,22 +566,13 @@ export default function ColorBarScreen({ navigation, route }: any) {
       });
     } catch (err) {
       console.error('Error loading formula:', err);
-      // Fallback to mock
-      const clientFormula: Formula = {
-        ...MOCK_FORMULA,
-        clientName: client.name,
-        id: `f-${client.id}-${Date.now()}`,
-      };
-      setFormula(clientFormula);
-      setSteps(clientFormula.steps.map(s => ({ ...s })));
-      setCurrentStep(0);
-      setSession({
-        id: `session-${Date.now()}`,
-        client,
-        formula: clientFormula,
-        status: 'active',
-        startedAt: new Date().toISOString(),
-      });
+      setSelectedClient(null);
+      setFormula(null);
+      setSteps([]);
+      Alert.alert(
+        'Couldn’t start session',
+        err instanceof Error ? err.message : 'Check your connection and try again.'
+      );
     } finally {
       setIsLoadingFormula(false);
     }

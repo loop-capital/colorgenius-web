@@ -63,19 +63,32 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       },
     })
 
-    // ── UsageLog: record one formula_usage_log entry per salon session ───
-    if (salonId) {
-      await prisma.formula_usage_log.create({
-        data: {
-          salonId,
-          formulaId: formulaId || id,
-          stylistId: stylistId || undefined,
-          clientId: sessionClientId || undefined,
-          feeAmount: safeTotalCost,
-          creatorPayout: 0,
-          platformFee: 0,
-        },
-      })
+    // ── UsageLog: only for sessions built from a real marketplace listing ──
+    // formula_usage_log.formulaId has a real FK to formula_listings — a
+    // color-bar session's formulaId (when the mobile app sends one at all)
+    // is a synthetic client-side id, not a formula_listings row, and this
+    // previously fell back to the session's OWN id when absent. Both cases
+    // violated the FK and threw on every completion, 500ing the whole
+    // request and (per the mobile client bug fixed earlier) getting
+    // silently swallowed as a fake "success" toward the stylist. The
+    // session's own color_bar_sessions.update() above is the real record
+    // of what happened either way — this is supplementary marketplace
+    // bookkeeping, only meaningful when a real listing is actually involved.
+    if (salonId && formulaId) {
+      const listing = await prisma.formula_listings.findUnique({ where: { id: formulaId } })
+      if (listing) {
+        await prisma.formula_usage_log.create({
+          data: {
+            salonId,
+            formulaId,
+            stylistId: stylistId || undefined,
+            clientId: sessionClientId || undefined,
+            feeAmount: safeTotalCost,
+            creatorPayout: 0,
+            platformFee: 0,
+          },
+        })
+      }
     }
 
     // ── ClientFormulaUsage: create a reusable formula record if requested ─

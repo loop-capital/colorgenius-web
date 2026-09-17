@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyBearerToken } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
 
 // POST /api/v1/color-bar/square-order
 // Push completed formula to Square Register as an order
@@ -48,6 +49,22 @@ export async function POST(req: NextRequest) {
     const order = response.order
     if (!order) {
       throw new Error('Square order creation returned no order')
+    }
+
+    // Link the real Square order back to the session it came from — this
+    // column already existed in the live DB but was never written to,
+    // leaving no way to trace a Square charge back to the color-bar session
+    // that produced it.
+    if (sessionId && order.id) {
+      await prisma.color_bar_sessions.update({
+        where: { id: sessionId },
+        data: { square_order_id: order.id },
+      }).catch((err) => {
+        // Don't fail the whole request over this — the Square order is real
+        // and already created; losing the back-link is a lesser problem
+        // than telling the stylist the (successful) order failed.
+        console.error('Failed to link square_order_id to session:', err)
+      })
     }
 
     return NextResponse.json({

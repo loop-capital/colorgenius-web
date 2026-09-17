@@ -1,0 +1,14 @@
+-- app/api/v1/color-bar/session/route.ts has always written formula_id into
+-- the color_bar_sessions.create() call, but this column never existed.
+-- TypeScript didn't catch it (Prisma's generic XOR<> create-input types are
+-- a known blind spot for excess-property checking), so this would have
+-- thrown a PrismaClientValidationError at runtime on every real session
+-- creation the first time it was actually exercised end-to-end.
+--
+-- No FK: the mobile app currently sends a synthetic client-side id
+-- (`f-${clientId}-${Date.now()}`) here, not a real formulas.id, whether or
+-- not the session started from a real formula — see BLANK_FORMULA_TEMPLATE
+-- in mobile/src/screens/ColorBarScreen.tsx. An FK constraint would reject
+-- every session. Matches the existing unenforced client_id/stylist_id
+-- columns on this same table.
+ALTER TABLE "color_bar_sessions" ADD COLUMN "formula_id" UUID;
