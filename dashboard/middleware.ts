@@ -47,8 +47,15 @@ export async function middleware(request: NextRequest) {
   }
 
   const response = NextResponse.next();
-  response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
-  response.headers.set('Vercel-CDN-Cache-Control', 'public, max-age=0, must-revalidate');
+  if (pathname.startsWith('/api')) {
+    // API responses are per-user/session (auth/me, etc.) — never let a shared
+    // or edge cache serve one response body to a different caller.
+    response.headers.set('Cache-Control', 'private, no-store, must-revalidate');
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-store');
+  } else {
+    response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
+    response.headers.set('Vercel-CDN-Cache-Control', 'public, max-age=0, must-revalidate');
+  }
   return response;
 }
 
