@@ -3,14 +3,14 @@ import { getUserFromRequest } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
-  const user = await getUserFromRequest(request);
-  if (!user) {
+  const authUser = await getUserFromRequest(request);
+  if (!authUser) {
     return NextResponse.json({ user: null }, { status: 401 });
   }
 
   try {
     const user = await prisma.users.findUnique({
-      where: { id: user.userId },
+      where: { id: authUser.userId },
       select: { id: true, first_name: true, email: true },
     });
 
