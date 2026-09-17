@@ -34,6 +34,7 @@ import {
   RefreshCw,
   Beaker,
   X,
+  Smartphone,
 } from 'lucide-react-native';
 import { useAcaiaScale, useAcaiaCapture } from '../hooks/useAcaiaScale';
 
@@ -189,6 +190,48 @@ async function pushOrderToPos(sessionId: string, token: string): Promise<PosOrde
     throw new Error(data?.error || `Failed to push order (${res.status})`);
   }
   return data;
+}
+
+// ─── Phone Pairing ───────────────────────────────────────────────────────────
+// The iPad generates a short code; a stylist's own phone enters it, runs its
+// photo → AI formula flow there, and links the result back onto this code —
+// which shows up here as a real session ready to weigh.
+
+interface PairingStatus {
+  status: 'waiting' | 'claimed' | 'linked' | 'expired';
+  sessionId?: string;
+}
+
+interface RemoteSession {
+  id: string;
+  client: { id: string; name: string; phone?: string } | null;
+  formulaId: string | null;
+  steps: FormulaStep[];
+}
+
+async function startPairing(token: string): Promise<{ code: string; expiresAt: string }> {
+  const res = await fetch(`${API_BASE}/pairing`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to generate a code (${res.status})`);
+  return res.json();
+}
+
+async function getPairingStatus(code: string, token: string): Promise<PairingStatus> {
+  const res = await fetch(`${API_BASE}/pairing/${code}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to check pairing status (${res.status})`);
+  return res.json();
+}
+
+async function fetchRemoteSession(sessionId: string, token: string): Promise<RemoteSession> {
+  const res = await fetch(`${API_BASE}/session/${sessionId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error(`Failed to load session (${res.status})`);
+  return res.json();
 }
 
 // ─── Starting formula for a client with none on file ────────────────────────
@@ -519,6 +562,14 @@ export default function ColorBarScreen({ navigation, route }: any) {
   const [sessionCost, setSessionCost] = useState(0);
   const [showSearch, setShowSearch] = useState(true);
 
+  // Phone pairing — "Link a Phone" shows a code, polls until a phone links
+  // a real formula onto it, then jumps straight into weighing.
+  const [showPairing, setShowPairing] = useState(false);
+  const [pairingCode, setPairingCode] = useState('');
+  const [pairingStatus, setPairingStatus] = useState<PairingStatus['status'] | 'idle'>('idle');
+  const [pairingLoading, setPairingLoading] = useState(false);
+  const pairingPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   // Scale integration — live weight + connection management
   const {
     weight: scaleWeight,
@@ -577,6 +628,15 @@ export default function ColorBarScreen({ navigation, route }: any) {
       // No formula on file yet is a legitimate case (new client) — start
       // from a blank template. A failed *request* is different and is
       // handled in the catch below, not folded into this fallback.
+      //
+      // realFormulaId is the actual formulas.id (a real UUID) when one
+      // exists — this is what gets sent to the backend, which stores it in
+      // a @db.Uuid column. clientFormula.id below is a synthetic display/
+      // React-key id and must NEVER be sent as formulaId: every session
+      // creation for a client with a real formula, or none at all, was
+      // silently 500ing before this fix because the synthetic string
+      // isn't valid UUID input.
+      const realFormulaId = formulas.length > 0 ? formulas[0].id : undefined;
       const clientFormula = formulas.length > 0 ? {
         ...formulas[0],
         clientName: client.name,
@@ -593,7 +653,7 @@ export default function ColorBarScreen({ navigation, route }: any) {
 
       // Create session in backend — if this fails, there is no real session
       // to weigh product against, so don't fabricate one.
-      const sessionId = await createSession(client.id, clientFormula.id, token);
+      const sessionId = await createSession(client.id, realFormulaId, token);
       setSession({
         id: sessionId,
         client,
@@ -758,6 +818,89 @@ export default function ColorBarScreen({ navigation, route }: any) {
     if (!scaleError) lastScaleErrorRef.current = undefined;
   }, [scaleError]);
 
+  // ─── Phone Pairing ────────────────────────────────────────────────────────
+
+  const stopPairingPoll = useCallback(() => {
+    if (pairingPollRef.current) {
+      clearInterval(pairingPollRef.current);
+      pairingPollRef.current = null;
+    }
+  }, []);
+
+  const handleLinkedSession = useCallback(async (sessionId: string) => {
+    try {
+      const remote = await fetchRemoteSession(sessionId, token);
+      const remoteClient: Client = remote.client
+        ? { id: remote.client.id, name: remote.client.name, phone: remote.client.phone }
+        : { id: '', name: 'Client' };
+
+      const remoteFormula: Formula = {
+        ...BLANK_FORMULA_TEMPLATE,
+        id: remote.formulaId || `remote-${sessionId}`,
+        clientName: remoteClient.name,
+        steps: remote.steps.length > 0 ? remote.steps : BLANK_FORMULA_TEMPLATE.steps,
+      };
+
+      setSelectedClient(remoteClient);
+      setFormula(remoteFormula);
+      setSteps(remoteFormula.steps.map((s) => ({ ...s })));
+      setCurrentStep(0);
+      setSession({
+        id: sessionId,
+        client: remoteClient,
+        formula: remoteFormula,
+        status: 'active',
+        startedAt: new Date().toISOString(),
+      });
+      setShowSearch(false);
+      setShowPairing(false);
+      setPairingStatus('idle');
+    } catch (err) {
+      Alert.alert('Couldn’t load formula', err instanceof Error ? err.message : 'Check your connection and try again.');
+    }
+  }, [token]);
+
+  const handleOpenPairing = useCallback(async () => {
+    setShowPairing(true);
+    setPairingLoading(true);
+    setPairingStatus('idle');
+    stopPairingPoll();
+    try {
+      const { code } = await startPairing(token);
+      setPairingCode(code);
+      setPairingStatus('waiting');
+
+      pairingPollRef.current = setInterval(async () => {
+        try {
+          const result = await getPairingStatus(code, token);
+          setPairingStatus(result.status);
+          if (result.status === 'linked' && result.sessionId) {
+            stopPairingPoll();
+            await handleLinkedSession(result.sessionId);
+          } else if (result.status === 'expired') {
+            stopPairingPoll();
+          }
+        } catch {
+          // Transient network errors during polling — keep trying until expiry.
+        }
+      }, 2500);
+    } catch (err) {
+      Alert.alert('Couldn’t generate code', err instanceof Error ? err.message : 'Try again.');
+      setShowPairing(false);
+    } finally {
+      setPairingLoading(false);
+    }
+  }, [token, stopPairingPoll, handleLinkedSession]);
+
+  const handleClosePairing = useCallback(() => {
+    stopPairingPoll();
+    setShowPairing(false);
+    setPairingCode('');
+    setPairingStatus('idle');
+  }, [stopPairingPoll]);
+
+  useEffect(() => stopPairingPoll, [stopPairingPoll]);
+
   // ─── Render: Search Mode ────────────────────────────────────────────────
 
   if (showSearch) {
@@ -804,12 +947,50 @@ export default function ColorBarScreen({ navigation, route }: any) {
           }
         />
 
-        {/* Scale Connection Button */}
-        {scaleStatus !== 'connected' && (
-          <TouchableOpacity style={styles.connectBtn} onPress={handleConnectScale}>
-            <Bluetooth size={20} color={COLORS.purple} />
-            <Text style={styles.connectBtnText}>Connect Acaia Scale</Text>
+        {/* Bottom action buttons */}
+        <View style={styles.searchBottomActions}>
+          {scaleStatus !== 'connected' && (
+            <TouchableOpacity style={styles.connectBtnInline} onPress={handleConnectScale}>
+              <Bluetooth size={20} color={COLORS.purple} />
+              <Text style={styles.connectBtnText}>Connect Acaia Scale</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.connectBtnInline} onPress={handleOpenPairing}>
+            <Smartphone size={20} color={COLORS.purple} />
+            <Text style={styles.connectBtnText}>Link a Phone</Text>
           </TouchableOpacity>
+        </View>
+
+        {/* Pairing Modal */}
+        {showPairing && (
+          <View style={styles.pairingOverlay}>
+            <View style={styles.pairingCard}>
+              <Text style={styles.pairingTitle}>Link a Phone</Text>
+              {pairingLoading ? (
+                <ActivityIndicator color={COLORS.purple} style={{ marginVertical: 24 }} />
+              ) : pairingStatus === 'expired' ? (
+                <>
+                  <Text style={styles.pairingSubtitle}>That code expired.</Text>
+                  <TouchableOpacity style={styles.pairingRetryBtn} onPress={handleOpenPairing}>
+                    <Text style={styles.pairingRetryText}>Generate New Code</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.pairingCode}>{pairingCode}</Text>
+                  <Text style={styles.pairingSubtitle}>
+                    {pairingStatus === 'claimed'
+                      ? 'Phone linked — generating formula...'
+                      : 'Enter this code on your phone in the COLORgenius app'}
+                  </Text>
+                  <ActivityIndicator color={COLORS.purple} style={{ marginTop: 16 }} />
+                </>
+              )}
+              <TouchableOpacity style={styles.pairingCancelBtn} onPress={handleClosePairing}>
+                <Text style={styles.pairingCancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
       </SafeAreaView>
     );
@@ -1033,12 +1214,15 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
   },
 
-  // Connect Button
-  connectBtn: {
+  // Bottom action buttons (scale connect + phone link)
+  searchBottomActions: {
     position: 'absolute',
     bottom: 24,
     left: 24,
     right: 24,
+    gap: 10,
+  },
+  connectBtnInline: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1053,6 +1237,61 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.purple,
+  },
+
+  // Phone Pairing Modal
+  pairingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  pairingCard: {
+    width: '100%',
+    maxWidth: 420,
+    backgroundColor: COLORS.card,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+    padding: 28,
+    alignItems: 'center',
+  },
+  pairingTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+    marginBottom: 16,
+  },
+  pairingCode: {
+    fontSize: 48,
+    fontWeight: '800',
+    letterSpacing: 8,
+    color: COLORS.purple,
+    marginBottom: 12,
+  },
+  pairingSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  pairingRetryBtn: {
+    marginTop: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: COLORS.purpleLight,
+    borderRadius: 10,
+  },
+  pairingRetryText: {
+    color: COLORS.purple,
+    fontWeight: '600',
+  },
+  pairingCancelBtn: {
+    marginTop: 20,
+  },
+  pairingCancelText: {
+    color: COLORS.textMuted,
+    fontSize: 14,
   },
 
   // Loading

@@ -583,6 +583,58 @@ export async function sendFormulaToDevice(deviceId: string, formula: any): Promi
   });
 }
 
+// ─── Color Bar Pairing (phone generates formula, iPad weighs it) ─────
+// iPad calls startColorBarPairing() and displays the code; the stylist's
+// own phone calls claimColorBarPairingCode(code), then once its formula is
+// ready, sendFormulaToColorBar() links a real Color Bar session onto that
+// code, which the iPad picks up by polling getColorBarPairingStatus().
+
+export interface ColorBarPairingStep {
+  product: string;
+  shadeCode: string;
+  brand: string;
+  targetGrams: number;
+  role: string;
+}
+
+export async function startColorBarPairing(): Promise<{ code: string; expiresAt: string }> {
+  return apiRequest('/v1/color-bar/pairing', { method: 'POST' });
+}
+
+export async function getColorBarPairingStatus(code: string): Promise<{ status: string; sessionId?: string }> {
+  return apiRequest(`/v1/color-bar/pairing/${code}`);
+}
+
+export async function claimColorBarPairingCode(code: string): Promise<{ success: boolean; salonId: string }> {
+  return apiRequest(`/v1/color-bar/pairing/${code}/claim`, { method: 'POST' });
+}
+
+export async function sendFormulaToColorBar(params: {
+  clientId?: string;
+  steps: ColorBarPairingStep[];
+  pairingCode: string;
+}): Promise<{ sessionId: string }> {
+  return apiRequest('/v1/color-bar/session', {
+    method: 'POST',
+    body: {
+      clientId: params.clientId,
+      steps: params.steps.map((s) => ({ ...s, actualGrams: 0, completed: false })),
+      pairingCode: params.pairingCode,
+    },
+  });
+}
+
+export async function getColorBarSession(sessionId: string): Promise<{
+  id: string;
+  status: string;
+  client: { id: string; name: string; phone?: string } | null;
+  formulaId: string | null;
+  steps: ColorBarPairingStep[];
+  totalCost: number;
+}> {
+  return apiRequest(`/v1/color-bar/session/${sessionId}`);
+}
+
 // ─── History ─────────────────────────────────────────────────────
 
 export interface HistoryEntry {

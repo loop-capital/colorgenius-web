@@ -41,8 +41,9 @@ import {
   type FormulationResult,
   createSession,
   getSession,
-  sendFormulaToDevice,
-  getDevices,
+  claimColorBarPairingCode,
+  sendFormulaToColorBar,
+  type ColorBarPairingStep,
   saveFormulation,
 } from '../api/client';
 import {
@@ -1254,6 +1255,10 @@ const INITIAL_STATE: FormState = {
 export default function FormulateScreen({ navigation, route }: any) {
   const initialStep = route?.params?.initialStep;
   const autoPopulateData = route?.params?.autoPopulateData;
+  // Passed from NewServiceScreen when a client was selected first — was
+  // previously read nowhere in this screen, so the formula generated here
+  // was never actually attached to the client who was picked for it.
+  const clientId: string | undefined = route?.params?.clientId;
   const [step, setStep] = useState(typeof initialStep === 'number' && initialStep >= 1 && initialStep <= 6 ? initialStep : 1);
   const [formData, setFormData] = useState<FormState>(() => {
     if (autoPopulateData) {
@@ -1275,10 +1280,10 @@ export default function FormulateScreen({ navigation, route }: any) {
   const [uploadedPhotos, setUploadedPhotos] = useState<any[]>([]);
   const [pollInterval, setPollInterval] = useState<ReturnType<typeof setInterval> | null>(null);
 
-  // Device sending state
-  const [devices, setDevices] = useState<any[]>([]);
-  const [showDevicePicker, setShowDevicePicker] = useState(false);
-  const [sendingToDevice, setSendingToDevice] = useState(false);
+  // Color Bar pairing state — send this formula to a paired iPad
+  const [showPairingModal, setShowPairingModal] = useState(false);
+  const [pairingCodeInput, setPairingCodeInput] = useState('');
+  const [linkingToColorBar, setLinkingToColorBar] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
   const [savingFormula, setSavingFormula] = useState(false);
 
@@ -1402,7 +1407,8 @@ export default function FormulateScreen({ navigation, route }: any) {
     setSessionCode('');
     setSessionId('');
     setUploadedPhotos([]);
-    setShowDevicePicker(false);
+    setShowPairingModal(false);
+    setPairingCodeInput('');
     setSendSuccess(false);
     setShowManualEntry(false);
     if (pollInterval) {
@@ -1449,51 +1455,53 @@ export default function FormulateScreen({ navigation, route }: any) {
     };
   }, [pollInterval]);
 
-  // ─── Send to iPad Device ─────────────────────────────────────────────────
+  // ─── Send to a Paired Color Bar iPad ──────────────────────────────────────
+  // Previously this called getDevices()/sendFormulaToDevice() against a
+  // fingerprint-based "salon_devices" pairing that had no salonId on the
+  // request, no matching /formula route to receive it, and nothing on the
+  // ColorBarScreen side that ever polled for or displayed an incoming
+  // formula — every path here was a dead end. Replaced with the pairing
+  // code flow: the iPad displays a code (POST /v1/color-bar/pairing), the
+  // phone claims it here, then hands off the generated steps as a real
+  // color_bar_sessions row the iPad picks up by polling that same code.
 
-  const handleSendToDevice = useCallback(async () => {
+  const handleSendToDevice = useCallback(() => {
     if (!result) return;
-    setSendingToDevice(true);
-    setError(null);
-    try {
-      const devicesResponse = await getDevices();
-      const deviceList = devicesResponse.devices || [];
-      if (deviceList.length === 0) {
-        Alert.alert('No Devices', 'No Color Bar iPad devices are paired. Please pair a device first.');
-        return;
-      }
-      if (deviceList.length === 1) {
-        await sendFormulaToDevice(deviceList[0].id, result);
-        setSendSuccess(true);
-        Alert.alert('Success', `Formula sent to ${deviceList[0].name || 'Color Bar iPad'}`);
-      } else {
-        setDevices(deviceList);
-        setShowDevicePicker(true);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to send formula to device');
-      Alert.alert('Error', err.message || 'Failed to send formula to device');
-    } finally {
-      setSendingToDevice(false);
-    }
+    setShowPairingModal(true);
   }, [result]);
 
-  const handleSelectDevice = useCallback(async (deviceId: string) => {
+  const handleConfirmPairing = useCallback(async () => {
     if (!result) return;
-    setSendingToDevice(true);
-    setShowDevicePicker(false);
-    try {
-      await sendFormulaToDevice(deviceId, result);
-      setSendSuccess(true);
-      const device = devices.find((d) => d.id === deviceId);
-      Alert.alert('Success', `Formula sent to ${device?.name || 'Color Bar iPad'}`);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send formula');
-      Alert.alert('Error', err.message || 'Failed to send formula');
-    } finally {
-      setSendingToDevice(false);
+    const code = pairingCodeInput.trim().toUpperCase();
+    if (code.length < 4) {
+      Alert.alert('Enter the code', 'Type the code shown on the Color Bar iPad.');
+      return;
     }
-  }, [result, devices]);
+
+    setLinkingToColorBar(true);
+    try {
+      await claimColorBarPairingCode(code);
+
+      const steps: ColorBarPairingStep[] = result.steps.map((s) => ({
+        product: s.product?.name || s.product?.line || 'Product',
+        shadeCode: s.product?.shadeCode || s.product?.shade || '',
+        brand: s.product?.brand || '',
+        targetGrams: s.grams,
+        role: s.role,
+      }));
+
+      await sendFormulaToColorBar({ clientId, steps, pairingCode: code });
+
+      setSendSuccess(true);
+      setShowPairingModal(false);
+      setPairingCodeInput('');
+      Alert.alert('Sent', 'Formula sent to the Color Bar iPad. Head over to weigh it out.');
+    } catch (err: any) {
+      Alert.alert('Couldn’t link', err.message || 'Check the code and try again.');
+    } finally {
+      setLinkingToColorBar(false);
+    }
+  }, [result, pairingCodeInput, clientId]);
 
   // ─── Edit Formula Result ─────────────────────────────────────────────────
   const [editingResult, setEditingResult] = useState(false);
@@ -1832,31 +1840,51 @@ export default function FormulateScreen({ navigation, route }: any) {
             {/* Result shown after generation */}
             {result && !editingResult && <ResultCard result={result} onSendToDevice={handleSendToDevice} onEditFormula={handleEditResult} />}
 
-            {/* Device Picker Modal */}
-            {showDevicePicker && devices.length > 0 && (
+            {/* Pairing Code Modal */}
+            {showPairingModal && (
               <View style={stepStyles.devicePickerOverlay}>
                 <View style={stepStyles.devicePicker}>
-                  <Text style={stepStyles.devicePickerTitle}>Select Color Bar iPad</Text>
-                  {devices.map((device) => (
-                    <TouchableOpacity
-                      key={device.id}
-                      style={stepStyles.deviceOption}
-                      onPress={() => handleSelectDevice(device.id)}
-                      disabled={sendingToDevice}
-                    >
-                      <Bluetooth size={18} color={COLORS.purple} />
-                      <View style={{ flex: 1 }}>
-                        <Text style={stepStyles.deviceOptionName}>{device.name || 'Color Bar iPad'}</Text>
-                        {device.macAddress && (
-                          <Text style={stepStyles.deviceOptionMac}>{device.macAddress}</Text>
-                        )}
-                      </View>
-                      <ChevronRight size={16} color={COLORS.textMuted} />
-                    </TouchableOpacity>
-                  ))}
+                  <Text style={stepStyles.devicePickerTitle}>Link to Color Bar</Text>
+                  <Text style={{ color: COLORS.textMuted, fontSize: 13, marginBottom: 12 }}>
+                    Enter the code shown on the Color Bar iPad screen.
+                  </Text>
+                  <TextInput
+                    value={pairingCodeInput}
+                    onChangeText={(t) => setPairingCodeInput(t.toUpperCase())}
+                    placeholder="e.g. K7WQ2P"
+                    placeholderTextColor={COLORS.textMuted}
+                    autoCapitalize="characters"
+                    autoCorrect={false}
+                    maxLength={8}
+                    style={{
+                      borderWidth: 1,
+                      borderColor: COLORS.cardBorder,
+                      borderRadius: 10,
+                      padding: 14,
+                      fontSize: 20,
+                      letterSpacing: 4,
+                      textAlign: 'center',
+                      color: COLORS.textPrimary,
+                      marginBottom: 16,
+                    }}
+                  />
+                  <TouchableOpacity
+                    style={[stepStyles.deviceOption, { justifyContent: 'center' }]}
+                    onPress={handleConfirmPairing}
+                    disabled={linkingToColorBar}
+                  >
+                    {linkingToColorBar ? (
+                      <ActivityIndicator color={COLORS.purple} />
+                    ) : (
+                      <>
+                        <Bluetooth size={18} color={COLORS.purple} />
+                        <Text style={stepStyles.deviceOptionName}>Link &amp; Send</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={stepStyles.devicePickerCancel}
-                    onPress={() => setShowDevicePicker(false)}
+                    onPress={() => { setShowPairingModal(false); setPairingCodeInput(''); }}
                   >
                     <Text style={stepStyles.devicePickerCancelText}>Cancel</Text>
                   </TouchableOpacity>
