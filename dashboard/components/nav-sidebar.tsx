@@ -30,7 +30,7 @@ export function Sidebar() {
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    fetch('/api/auth/me').then(r => r.ok ? r.json() : null).then(d => setUser(d?.user)).catch(() => {})
+    fetch('/api/auth/me', { credentials: 'include' }).then(r => r.ok ? r.json() : null).then(d => setUser(d?.user)).catch(() => {})
   }, [])
 
   return (
