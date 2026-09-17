@@ -11,6 +11,7 @@ const PUBLIC_PATHS = [
   '/login',
   '/register',
   '/privacy',
+  '/tools',         // Free public calculator tools (SEO/lead-gen) — no login required
   '/api',           // All API routes are public (handle own auth via Bearer token)
   '/api/auth/register',
   '/api/auth/login',

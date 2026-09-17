@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, FlaskConical, Camera, ImageIcon, MessageCircle, BookOpen,
   Users, History, ClipboardList, Package, DollarSign, CreditCard, CirclePlus, Settings, Award,
-  ShieldCheck, Store, Banknote,
+  ShieldCheck, Store, Banknote, Droplets, Calculator, Sparkles, Palette, Droplet,
 } from 'lucide-react'
 import { LogoutButton } from '@/components/ui/logout-button'
 import { ColorGeniusLogo } from '@/components/icons/colorgenius-logo'
@@ -25,6 +25,14 @@ const navItems = [
   { href: '/dashboard/pricing', label: 'Pricing Rules', icon: DollarSign },
   { href: '/certification', label: 'Certification', icon: Award },
   { href: '/settings', label: 'Settings', icon: Settings },
+]
+
+const toolsNavItems = [
+  { href: '/tools/developer-mix', label: 'Developer Mix', icon: Droplets },
+  { href: '/tools/bleach-predictor', label: 'Bleach Predictor', icon: Sparkles },
+  { href: '/tools/color-correction', label: 'Color Correction', icon: Palette },
+  { href: '/tools/porosity-test', label: 'Porosity Test', icon: Droplet },
+  { href: '/tools/salon-pricing', label: 'Salon Pricing', icon: Calculator },
 ]
 
 const adminNavItems = [
@@ -61,6 +69,21 @@ export function Sidebar() {
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-150 hover:bg-[#161620] hover:text-[#F5F5F7]"
+              style={{ color: '#A1A1AA', borderRadius: '10px' }}
+            >
+              <item.icon className="w-[18px] h-[18px]" />
+              {item.label}
+            </Link>
+          ))}
+
+          <p className="px-3 pt-4 pb-1 text-[10px] uppercase tracking-wider font-semibold" style={{ color: '#71717A' }}>
+            Tools
+          </p>
+          {toolsNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}

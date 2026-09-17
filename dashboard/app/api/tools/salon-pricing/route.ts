@@ -6,7 +6,7 @@ export const salonPricingSchema = z.object({
   chairTimeMinutes: z.coerce.number().int().min(5).max(480),
   stylistHourlyRate: z.coerce.number().min(0).max(1000),
   salonOverheadPercent: z.coerce.number().min(0).max(200),
-  desiredProfitMargin: z.coerce.number().min(0).max(100),
+  desiredProfitMargin: z.coerce.number().min(0).max(95),
 });
 
 export type SalonPricingInput = z.infer<typeof salonPricingSchema>;

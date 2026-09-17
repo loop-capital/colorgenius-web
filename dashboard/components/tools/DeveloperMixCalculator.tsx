@@ -83,7 +83,6 @@ export function DeveloperMixCalculator({ className }: { className?: string }) {
         setApiResult(null);
       }
     });
-    subscription.unsubscribe = () => {};
     (async () => {
       const parsed = developerMixSchema.safeParse(form.getValues());
       if (!parsed.success) return;
