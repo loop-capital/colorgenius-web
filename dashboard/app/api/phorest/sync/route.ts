@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { performFullSync, performIncrementalSync, loadPhorestConnection, getActiveJobs, createPhorestClient } from '@/integrations/phorest';
 import { getUserFromRequest } from '@/lib/auth';
 import { getSalonIdForUser } from '@/lib/stylist';
+import { prisma } from '@/lib/prisma';
 
 async function requireSalonId(request: NextRequest): Promise<{ salonId: string } | { error: NextResponse }> {
   const authUser = await getUserFromRequest(request);
@@ -130,22 +131,19 @@ export async function GET(request: NextRequest) {
     // Get active jobs
     const jobs = getActiveJobs(salonId);
 
-    // Get last sync info from salon settings
-    const { prisma } = await import('@/lib/prisma');
-    const salon = await prisma.salons.findUnique({
-      where: { id: salonId },
-      select: { settings: true },
-    });
-
-    const phorestSettings = (salon?.settings as Record<string, any>)?.phorest || {};
+    // Get last sync info from the real phorest_connections row — this
+    // previously read salons.settings.phorest directly, a second read
+    // path independent of loadPhorestConnection's own storage, which
+    // could disagree about whether Phorest was even connected.
+    const connection = await prisma.phorest_connections.findUnique({ where: { salon_id: salonId } });
 
     return NextResponse.json({
       success: true,
       data: {
-        connected: !!phorestSettings.business_id,
-        last_sync: phorestSettings.last_sync || null,
-        auto_sync: phorestSettings.auto_sync_enabled || false,
-        sync_interval: phorestSettings.sync_interval_minutes || null,
+        connected: !!connection && connection.status === 'connected',
+        last_sync: connection?.last_sync_at || null,
+        auto_sync: connection?.auto_sync_enabled || false,
+        sync_interval: connection?.sync_interval_minutes || null,
         active_jobs: jobs.map((j) => ({
           id: j.id,
           type: j.type,

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { CheckCircle, XCircle, RefreshCw, Unlink, Package, CreditCard, ArrowRight, Users, ToggleLeft, ToggleRight } from 'lucide-react';
+import { CheckCircle, XCircle, RefreshCw, Unlink, Package, CreditCard, ArrowRight, Users, ToggleLeft, ToggleRight, Clock } from 'lucide-react';
+import PhorestCard from './phorest-card';
 
 interface SquareStatus {
   connected: boolean;
@@ -231,6 +232,36 @@ export default function SettingsContent() {
               <p className="text-[10px] mt-3" style={{ color: '#71717A' }}>You'll be redirected to Square to authorize COLORgenius. We only request read access to your inventory and catalog.</p>
             </div>
           )}
+        </div>
+
+        <h2 className="text-lg font-semibold mb-3 mt-2" style={{ color: '#F5F5F7' }}>Other Salon Software</h2>
+        <p className="text-xs mb-4" style={{ color: '#71717A' }}>
+          Use a different system than Square? Connect it here so Color Bar charges land on the right ticket.
+        </p>
+
+        <PhorestCard />
+
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {[
+            { name: 'GlossGenius', logo: 'G' },
+            { name: 'Vagaro', logo: 'V' },
+            { name: 'Zenoti', logo: 'Z' },
+            { name: 'Clover', logo: 'C' },
+            { name: 'Mindbody', logo: 'M' },
+          ].map((p) => (
+            <div key={p.name} className="rounded-xl p-4 flex items-center justify-between"
+              style={{ background: '#0F0F1A', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: '#A1A1AA' }}>{p.logo}</div>
+                <span className="text-sm font-medium" style={{ color: '#F5F5F7' }}>{p.name}</span>
+              </div>
+              <div className="flex items-center gap-1 px-2 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <Clock className="w-3 h-3" style={{ color: '#71717A' }} />
+                <span className="text-[10px] font-medium" style={{ color: '#71717A' }}>Coming soon</span>
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="rounded-2xl p-6" style={{ background: '#0F0F1A', border: '1px solid rgba(255,255,255,0.06)' }}>

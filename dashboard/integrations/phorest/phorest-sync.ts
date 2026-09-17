@@ -199,20 +199,18 @@ export async function performFullSync(options: FullSyncOptions): Promise<Phorest
 
   completeJob(job.id, allErrors.length === 0, allErrors);
 
-  // Update phorest connection sync timestamp in DB (if table exists)
-  try {
-    await prisma.$executeRaw`
-      UPDATE salons 
-      SET settings = jsonb_set(
-        COALESCE(settings, '{}'::jsonb),
-        '{phorest_last_sync}',
-        to_jsonb(${new Date().toISOString()})
-      )
-      WHERE id = ${salonId}::uuid
-    `;
-  } catch {
-    // Table or field may not exist yet — non-critical
-  }
+  // Update the real connection row's sync timestamp/error — this previously
+  // wrote to yet a third, independent settings JSON key (phorest_last_sync),
+  // never read by the GET /api/phorest/sync status endpoint.
+  await prisma.phorest_connections.updateMany({
+    where: { salon_id: salonId },
+    data: {
+      last_sync_at: new Date(),
+      sync_error: allErrors.length > 0 ? allErrors.join('; ').slice(0, 1000) : null,
+    },
+  }).catch(() => {
+    // Non-critical — the sync itself already succeeded/failed independently
+  })
 
   return result;
 }
@@ -529,58 +527,59 @@ export interface PhorestConnectionConfig {
 }
 
 /**
- * Save Phorest connection credentials (encrypt password in production)
+ * Save Phorest connection credentials — the real phorest_connections table.
+ * This previously wrote to salons.settings JSONB while a separate,
+ * independent route (app/api/v1/phorest/connect) wrote to this same
+ * phorest_connections table directly — two disconnected stores for the
+ * same connection, invisible to each other's status checks. This is now
+ * the single place either path lands.
  */
 export async function savePhorestConnection(config: PhorestConnectionConfig): Promise<void> {
-  // Store in salon settings JSONB
-  await prisma.$executeRaw`
-    UPDATE salons 
-    SET settings = jsonb_set(
-      jsonb_set(
-        COALESCE(settings, '{}'::jsonb),
-        '{phorest}',
-        '{}'::jsonb
-      ),
-      '{phorest}',
-      ${JSON.stringify({
-        business_id: config.business_id,
-        username: config.username,
-        password_encrypted: encryptPhorestPassword(config.password),
-        region: config.region,
-        default_branch_id: config.default_branch_id,
-        auto_sync_enabled: config.auto_sync_enabled ?? false,
-        sync_interval_minutes: config.sync_interval_minutes ?? 60,
-        connected_at: new Date().toISOString(),
-        status: 'connected',
-      })}::jsonb
-    )
-    WHERE id = ${config.salon_id}::uuid
-  `;
+  const encryptedPassword = encryptPhorestPassword(config.password);
+  await prisma.phorest_connections.upsert({
+    where: { salon_id: config.salon_id },
+    update: {
+      business_id: config.business_id,
+      branch_id: config.default_branch_id ?? undefined,
+      api_email: config.username,
+      api_password: encryptedPassword,
+      server_region: config.region,
+      status: 'connected',
+      auto_sync_enabled: config.auto_sync_enabled ?? false,
+      sync_interval_minutes: config.sync_interval_minutes ?? 60,
+      updated_at: new Date(),
+    },
+    create: {
+      salon_id: config.salon_id,
+      business_id: config.business_id,
+      branch_id: config.default_branch_id,
+      api_email: config.username,
+      api_password: encryptedPassword,
+      server_region: config.region,
+      status: 'connected',
+      auto_sync_enabled: config.auto_sync_enabled ?? false,
+      sync_interval_minutes: config.sync_interval_minutes ?? 60,
+    },
+  });
 }
 
 /**
- * Load Phorest connection from salon settings
+ * Load Phorest connection from the real phorest_connections table.
  */
 export async function loadPhorestConnection(salonId: string): Promise<PhorestConnectionConfig | null> {
   try {
-    const result = await prisma.$queryRaw<Array<{ settings: any }>>`
-      SELECT settings FROM salons WHERE id = ${salonId}::uuid
-    `;
-
-    if (!result || result.length === 0) return null;
-
-    const phorest = result[0].settings?.phorest;
-    if (!phorest?.business_id) return null;
+    const row = await prisma.phorest_connections.findUnique({ where: { salon_id: salonId } });
+    if (!row) return null;
 
     return {
       salon_id: salonId,
-      business_id: phorest.business_id,
-      username: phorest.username,
-      password: decryptPhorestPassword(phorest.password_encrypted),
-      region: phorest.region || 'us',
-      default_branch_id: phorest.default_branch_id,
-      auto_sync_enabled: phorest.auto_sync_enabled,
-      sync_interval_minutes: phorest.sync_interval_minutes,
+      business_id: row.business_id,
+      username: row.api_email,
+      password: decryptPhorestPassword(row.api_password),
+      region: row.server_region === 'eu' ? 'eu' : 'us',
+      default_branch_id: row.branch_id ?? undefined,
+      auto_sync_enabled: row.auto_sync_enabled,
+      sync_interval_minutes: row.sync_interval_minutes ?? undefined,
     };
   } catch {
     return null;
@@ -591,11 +590,7 @@ export async function loadPhorestConnection(salonId: string): Promise<PhorestCon
  * Remove Phorest connection
  */
 export async function removePhorestConnection(salonId: string): Promise<void> {
-  await prisma.$executeRaw`
-    UPDATE salons 
-    SET settings = settings - 'phorest'
-    WHERE id = ${salonId}::uuid
-  `;
+  await prisma.phorest_connections.deleteMany({ where: { salon_id: salonId } });
 }
 
 /**
