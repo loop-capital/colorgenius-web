@@ -9,10 +9,11 @@ import {
   ScrollView,
   Image,
   Alert,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrendingUp, Star, Sparkles, Heart, MessageCircle } from 'lucide-react-native';
-import { apiRequest } from '../api/client';
+import { apiRequest, purchaseFormula } from '../api/client';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -97,11 +98,25 @@ function PostCard({ post, onLike }: { post: CommunityPost; onLike: (id: string) 
 // ─── Marketplace Card ────────────────────────────────────────────────────────
 
 function MarketplaceCard({ item }: { item: MarketplaceListing }) {
+  const [buying, setBuying] = useState(false);
+
+  const handleBuy = async () => {
+    setBuying(true);
+    try {
+      const res = await purchaseFormula(item.id);
+      if (!res.success || !res.data?.checkout_url) {
+        throw new Error(res.error?.message || 'Failed to start checkout');
+      }
+      await Linking.openURL(res.data.checkout_url);
+    } catch (err) {
+      Alert.alert('Couldn’t start checkout', err instanceof Error ? err.message : 'Try again.');
+    } finally {
+      setBuying(false);
+    }
+  };
+
   return (
-    <TouchableOpacity
-      style={styles.marketCard}
-      onPress={() => Alert.alert(item.title, `Share code: ${item.share_code || 'N/A'}\nPrice: ${item.price_cents ? `$${(item.price_cents / 100).toFixed(2)}` : 'Free'}`)}
-    >
+    <TouchableOpacity style={styles.marketCard} onPress={handleBuy} disabled={buying}>
       <View style={styles.marketBadge}>
         <Text style={styles.marketBadgeText}>{item.category || 'Formula'}</Text>
       </View>
@@ -110,7 +125,7 @@ function MarketplaceCard({ item }: { item: MarketplaceListing }) {
         by {item.creator?.display_name || item.creator?.first_name || 'Community Stylist'}
       </Text>
       <Text style={styles.marketPrice}>
-        {item.price_cents ? `$${(item.price_cents / 100).toFixed(2)}` : 'Free'}
+        {buying ? 'Opening checkout...' : item.price_cents ? `$${(item.price_cents / 100).toFixed(2)}` : 'Free'}
       </Text>
     </TouchableOpacity>
   );

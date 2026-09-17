@@ -1,6 +1,9 @@
 /**
  * POST /api/marketplace/purchase
- * Purchase a template
+ * Purchase a formula listing — creates a pending purchase and a real Square
+ * Checkout link. Access to the formula is granted only once the Square
+ * webhook confirms payment (see app/api/square/webhook/route.ts), never
+ * on this request alone.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -8,6 +11,7 @@ import { validateOrThrow, purchaseSchema } from '@/lib/api/validation';
 import { prisma } from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
 import { getSalonIdForUser } from '@/lib/stylist';
+import { createPaymentLink } from '@/lib/square';
 import { ApiResponse } from '@/lib/api/types';
 
 export async function POST(request: NextRequest) {
@@ -45,9 +49,10 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Check if already purchased
+    // Check if already purchased (completed only — a stale pending/failed
+    // attempt shouldn't block trying again).
     const existing = await prisma.formula_purchases.findFirst({
-      where: { salonId, formulaId: listing.id },
+      where: { salonId, formulaId: listing.id, status: 'completed' },
     });
     if (existing) {
       return NextResponse.json<ApiResponse>({
@@ -56,38 +61,44 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const platformFeeCents = Math.round(listing.price_cents * 0.20); // 20% platform fee
-    const creatorEarningsCents = listing.price_cents - platformFeeCents;
+    const purchase = await prisma.formula_purchases.create({
+      data: {
+        salonId,
+        formulaId: listing.id,
+        totalUses: 0,
+        remainingUses: null, // one-time purchase = unlimited use, not metered
+        perUseFee: 0,
+        blockPrice: listing.price_cents / 100,
+        status: 'pending',
+      },
+    });
 
-    const purchase = await prisma.$transaction(async (tx) => {
-      const p = await tx.formula_purchases.create({
-        data: {
-          salonId,
-          formulaId: listing.id,
-          totalUses: 0,
-          remainingUses: null, // one-time purchase = unlimited use, not metered
-          perUseFee: 0,
-          blockPrice: listing.price_cents / 100,
-        },
-      });
-      await tx.formula_listings.update({
-        where: { id: listing.id },
-        data: { purchase_count: { increment: 1 } },
-      });
-      return p;
+    const appBaseUrl = process.env.APP_BASE_URL || 'https://colorgenius.co';
+    const paymentLink = await createPaymentLink({
+      referenceId: purchase.id,
+      name: listing.title,
+      amountCents: listing.price_cents,
+      redirectUrl: `${appBaseUrl}/marketplace/purchase-complete?purchaseId=${purchase.id}`,
+      note: `Marketplace formula purchase: ${listing.title}`,
+    });
+
+    if (!paymentLink?.url) {
+      throw new Error('Square did not return a checkout URL');
+    }
+
+    await prisma.formula_purchases.update({
+      where: { id: purchase.id },
+      data: { squareCheckoutId: paymentLink.id },
     });
 
     return NextResponse.json<ApiResponse>({
       success: true,
       data: {
         id: purchase.id,
-        buyer_id: salonId,
         template_id: listing.id,
-        price_paid_cents: listing.price_cents,
-        creator_earnings_cents: creatorEarningsCents,
-        platform_fee_cents: platformFeeCents,
-        status: 'completed',
-        created_at: purchase.purchasedAt,
+        price_cents: listing.price_cents,
+        status: 'pending',
+        checkout_url: paymentLink.url,
       },
     }, { status: 201 });
   } catch (error) {

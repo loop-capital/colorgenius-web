@@ -900,20 +900,26 @@ model formula_billing_invoices {
 }
 
 model formula_purchases {
-  id            String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  salonId       String           @db.Uuid
-  formulaId     String           @db.Uuid
-  purchasedAt   DateTime         @default(now()) @db.Timestamp(6)
-  totalUses     Int              @default(0)
-  remainingUses Int?
-  perUseFee     Decimal          @db.Decimal(10, 2)
-  blockPrice    Decimal?         @db.Decimal(10, 2)
-  salons        salons           @relation(fields: [salonId], references: [id])
-  listing       formula_listings @relation(fields: [formulaId], references: [id])
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salonId           String           @db.Uuid
+  formulaId         String           @db.Uuid
+  purchasedAt       DateTime         @default(now()) @db.Timestamp(6)
+  totalUses         Int              @default(0)
+  remainingUses     Int?
+  perUseFee         Decimal          @db.Decimal(10, 2)
+  blockPrice        Decimal?         @db.Decimal(10, 2)
+  // pending until the Square webhook confirms payment; access to the
+  // underlying formula must only be granted once status = 'completed'.
+  status            String           @default("pending") @db.VarChar(20)
+  squareCheckoutId  String?          @db.VarChar(255)
+  squarePaymentId   String?          @db.VarChar(255)
+  salons            salons           @relation(fields: [salonId], references: [id])
+  listing           formula_listings @relation(fields: [formulaId], references: [id])
 
   @@index([salonId], map: "idx_formula_purchases_salon")
   @@index([formulaId], map: "idx_formula_purchases_formula")
   @@index([salonId, formulaId], map: "idx_formula_purchases_salon_formula")
+  @@index([squareCheckoutId], map: "idx_formula_purchases_square_checkout")
 }
 
 model InventoryItem {

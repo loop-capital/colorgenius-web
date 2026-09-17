@@ -112,6 +112,45 @@ export async function createSquarePayment(params: {
   return response.payment;
 }
 
+// ── Create Payment Link (hosted checkout) ──
+// The real "let a buyer pay us" mechanism for both marketplace formula
+// purchases and (once catalog subscription plans exist) subscriptions —
+// avoids embedding Square's card-tokenization SDK in either the web
+// dashboard or the Expo mobile app. Square hosts the payment page; we get a
+// URL to redirect the buyer to and confirm the charge via webhook
+// afterward, never trusting the redirect alone as proof of payment.
+export async function createPaymentLink(params: {
+  referenceId: string; // our own row's id — read back via the order on webhook
+  name: string;
+  amountCents: number;
+  redirectUrl: string;
+  note?: string;
+}) {
+  const idempotencyKey = crypto.randomUUID();
+  const locationId = process.env.SQUARE_LOCATION_ID || '';
+
+  const response = await squareClient.checkout.paymentLinks.create({
+    idempotencyKey,
+    order: {
+      locationId,
+      referenceId: params.referenceId,
+      lineItems: [
+        {
+          name: params.name,
+          quantity: '1',
+          basePriceMoney: { amount: BigInt(params.amountCents), currency: 'USD' },
+        },
+      ],
+    },
+    checkoutOptions: {
+      redirectUrl: params.redirectUrl,
+    },
+    paymentNote: params.note,
+  });
+
+  return response.paymentLink;
+}
+
 // ── Inventory Counts ──
 export async function getInventoryCounts(catalogObjectIds: string[]): Promise<Map<string, number>> {
   const counts = new Map<string, number>();

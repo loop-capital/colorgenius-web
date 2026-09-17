@@ -517,6 +517,20 @@ export async function browseMarketplace(params?: {
   }>(`/marketplace/browse?${query.toString()}`);
 }
 
+// Creates a pending purchase + a real Square-hosted checkout link — open
+// checkout_url in a browser, payment is confirmed server-side via webhook,
+// never assume success just because this call returned.
+export async function purchaseFormula(templateId: string): Promise<{
+  success: boolean;
+  data?: { id: string; checkout_url: string; price_cents: number };
+  error?: { code: string; message: string };
+}> {
+  return apiRequest('/marketplace/purchase', {
+    method: 'POST',
+    body: { template_id: templateId },
+  });
+}
+
 // ─── Salon Devices (BLE Scale) ───────────────────────────────────
 
 export async function registerDevice(data: {
