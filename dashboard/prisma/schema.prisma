@@ -1303,6 +1303,7 @@ model inventory_items {
   quantity_committed       Int                      @default(0)
   unit_of_measure          String?                  @default("units") @db.VarChar(20)
   low_stock_threshold      Int                      @default(3)
+  typical_container_grams  Int?
   cost_per_unit            Decimal?                 @db.Decimal(10, 2)
   retail_price             Decimal?                 @db.Decimal(10, 2)
   reorder_point            Int?

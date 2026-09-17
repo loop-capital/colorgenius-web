@@ -24,7 +24,6 @@ interface SyncedProduct {
   category?: string;
   sku?: string;
   price_cents?: number;
-  quantity?: number;
 }
 
 /**
@@ -72,9 +71,16 @@ export async function POST(request: NextRequest) {
     }
 
     const connection = await getConnection(salonId);
-    const locationId = connection?.location_ids[0] || '';
 
-    // Fetch all catalog items from Square
+    // Note: we intentionally don't pull Square's inventory counts here.
+    // Square tracks whole retail units (bottles/tubes); ColorGenius tracks
+    // grams consumed via formula usage and the scale-bowl feature. Those are
+    // different, non-convertible units — writing Square's count into
+    // quantity_on_hand previously corrupted it (e.g. "12" bottles read as
+    // "12" grams, then real gram deductions drove it negative). Matches
+    // Vish's own model: a manual stock count/entry establishes the real
+    // gram baseline (see POST /api/v1/inventory/receive), catalog sync is
+    // metadata only.
     const products: SyncedProduct[] = [];
     let cursor: string | undefined;
 
@@ -91,25 +97,12 @@ export async function POST(request: NextRequest) {
         const variation = item.variations?.[0];
         const price = variation?.itemVariationData?.priceMoney;
 
-        // Get inventory for this item
-        let quantity = 0;
-        try {
-          const invResponse = await client.inventory.batchGet({
-            catalogObjectIds: [variation?.id || ''],
-            locationIds: [locationId],
-          });
-          quantity = Number(invResponse.counts?.[0]?.quantity || 0);
-        } catch {
-          // Inventory may not be tracked for this item
-        }
-
         products.push({
           square_catalog_id: obj.id || '',
           name: item.name || 'Unknown',
           category: item.categories?.[0]?.name,
           sku: variation?.itemVariationData?.sku || undefined,
           price_cents: price ? Number(price.amount) : undefined,
-          quantity,
         });
       }
 
@@ -134,17 +127,16 @@ export async function POST(request: NextRequest) {
             },
           },
           update: {
+            // quantity_on_hand is deliberately NOT set here — it's our own
+            // gram-native ledger (see POST /api/v1/inventory/receive and
+            // the scale-bowl deduction), not Square's whole-unit count.
+            // Re-syncing the catalog must never clobber real stock levels.
             source: 'square',
             square_catalog_object_id: product.square_catalog_id,
             square_variation_id: product.sku || null,
             shade_name: product.name,
             category: category,
-            quantity_on_hand: product.quantity || 0,
-            unit_of_measure: 'grams',
-            low_stock_threshold: 50,
             retail_price: retailPrice,
-            reorder_point: 25,
-            reorder_quantity: 100,
             last_synced_at: new Date(),
             updated_at: new Date(),
           },
@@ -158,7 +150,9 @@ export async function POST(request: NextRequest) {
             shade_code: shadeCode,
             shade_name: product.name,
             category: category,
-            quantity_on_hand: product.quantity || 0,
+            // Starts at 0 — a brand-new item has no known gram baseline
+            // until the salon does a Receive Stock entry or manual count.
+            quantity_on_hand: 0,
             unit_of_measure: 'grams',
             low_stock_threshold: 50,
             retail_price: retailPrice,

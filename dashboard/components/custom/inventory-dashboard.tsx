@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Package, AlertTriangle, Plus, Minus, RefreshCw, TrendingDown, Lock } from 'lucide-react';
+import { Package, AlertTriangle, Plus, Minus, RefreshCw, TrendingDown, Lock, PackagePlus } from 'lucide-react';
 import { useCanEdit } from '@/lib/user-context';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -162,6 +162,11 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
   const { canEdit } = useCanEdit();
   const { toast } = useToast();
 
+  const [receivingId, setReceivingId] = useState<string | null>(null);
+  const [receiveGrams, setReceiveGrams] = useState('');
+  const [receiveSaveDefault, setReceiveSaveDefault] = useState(false);
+  const [receiving, setReceiving] = useState(false);
+
   const mapApiToUi = useCallback((apiItems: ApiInventoryItem[]): InventoryItem[] => {
     return apiItems.map((it) => ({
       id: it.id,
@@ -270,6 +275,45 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
     } catch (e) {
       console.error('Cost update error:', e);
       toast({ title: 'Failed to save cost', variant: 'destructive' });
+    }
+  };
+
+  const handleOpenReceive = async (id: string) => {
+    setReceivingId(id);
+    setReceiveSaveDefault(false);
+    setReceiveGrams('');
+    try {
+      const res = await fetch(`/api/v1/inventory/receive?item_id=${id}`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setReceiveGrams(String(data.suggested_grams ?? ''));
+      }
+    } catch (e) {
+      console.error('Failed to fetch suggested container size:', e);
+    }
+  };
+
+  const handleReceiveSubmit = async (id: string) => {
+    const grams = parseFloat(receiveGrams);
+    if (!Number.isFinite(grams) || grams <= 0) return;
+
+    setReceiving(true);
+    try {
+      const res = await fetch('/api/v1/inventory/receive', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_id: id, grams, save_as_default: receiveSaveDefault }),
+      });
+      if (!res.ok) throw new Error('Failed to receive stock');
+      setReceivingId(null);
+      await loadItems();
+      toast({ title: `Received ${grams}g` });
+    } catch (e) {
+      console.error('Receive stock error:', e);
+      toast({ title: 'Failed to receive stock', variant: 'destructive' });
+    } finally {
+      setReceiving(false);
     }
   };
 
@@ -435,6 +479,16 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
                         <Plus className="w-3 h-3" style={{ color: 'var(--cg-text-secondary)' }}
                         />
                       </button>
+                      <button
+                        onClick={() => (receivingId === item.id ? setReceivingId(null) : handleOpenReceive(item.id))}
+                        title="Receive a new container"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center"
+                        style={{
+                          background: receivingId === item.id ? 'rgba(147,51,234,0.15)' : 'rgba(255,255,255,0.06)',
+                        }}
+                      >
+                        <PackagePlus className="w-3.5 h-3.5" style={{ color: receivingId === item.id ? '#A855F7' : 'var(--cg-text-secondary)' }} />
+                      </button>
                     </>
                   ) : (
                     <span className="text-sm font-mono font-bold w-14 text-center" style={{ color: 'var(--cg-text-primary)' }}>
@@ -446,6 +500,63 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
             );
           })
         )}
+
+        {/* Receive Stock inline form */}
+        {receivingId && (() => {
+          const item = items.find((i) => i.id === receivingId);
+          if (!item) return null;
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-xl p-3"
+              style={{ background: 'rgba(147,51,234,0.06)', border: '1px solid rgba(147,51,234,0.2)' }}
+            >
+              <p className="text-xs font-medium mb-2" style={{ color: 'var(--cg-text-primary)' }}>
+                Receive new container — {item.shadeCode} {item.shadeName}
+              </p>
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  value={receiveGrams}
+                  onChange={(e) => setReceiveGrams(e.target.value)}
+                  placeholder="grams"
+                  autoFocus
+                  className="flex-1 rounded-lg px-3 py-1.5 text-sm bg-transparent border"
+                  style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'var(--cg-text-primary)' }}
+                />
+                <span className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>grams</span>
+              </div>
+              <label className="flex items-center gap-1.5 mb-3 text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
+                <input
+                  type="checkbox"
+                  checked={receiveSaveDefault}
+                  onChange={(e) => setReceiveSaveDefault(e.target.checked)}
+                />
+                Remember this size for next time
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleReceiveSubmit(item.id)}
+                  disabled={receiving || !receiveGrams}
+                  className="flex-1 py-2 rounded-lg text-xs font-semibold disabled:opacity-50"
+                  style={{ background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: '#fff' }}
+                >
+                  {receiving ? 'Saving…' : 'Add to Stock'}
+                </button>
+                <button
+                  onClick={() => setReceivingId(null)}
+                  className="py-2 px-4 rounded-lg text-xs font-medium"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--cg-text-secondary)' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          );
+        })()}
       </div>
     </div>
   );

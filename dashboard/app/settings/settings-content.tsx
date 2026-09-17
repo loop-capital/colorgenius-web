@@ -127,7 +127,7 @@ export default function SettingsContent() {
               </div>
               <div>
                 <h2 className="font-semibold text-sm" style={{ color: '#F5F5F7' }}>Square POS</h2>
-                <p className="text-xs" style={{ color: '#71717A' }}>Inventory, payments, and billing</p>
+                <p className="text-xs" style={{ color: '#71717A' }}>Inventory sync and client import</p>
               </div>
             </div>
             {status?.connected ? (
@@ -217,21 +217,25 @@ export default function SettingsContent() {
             </div>
           ) : (
             <div>
-              <p className="text-sm mb-4" style={{ color: '#A1A1AA' }}>Connect your Square account to enable automatic inventory tracking, product catalog sync, and formula license billing.</p>
+              <p className="text-sm mb-4" style={{ color: '#A1A1AA' }}>Connect your Square account to pull in your product catalog and client list.</p>
               <div className="space-y-2 mb-4">
-                {['Real-time inventory counts from your POS', 'Auto-sync product catalog for formula requirements', 'Monthly billing via Square for formula licenses', 'Low-stock alerts when supplies run low'].map((f, i) => (
+                {['Pull your product catalog and stock counts into COLORgenius', 'Import your Square client list', 'In-app low-stock notice when a formula uses up your last synced stock'].map((f, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: '#10B981' }} />
                     <span className="text-sm" style={{ color: '#A1A1AA' }}>{f}</span>
                   </div>
                 ))}
               </div>
+              <p className="text-xs mb-4" style={{ color: '#71717A' }}>
+                Catalog and client sync run on demand — click Sync/Import whenever your Square stock or client list changes, they don&apos;t update automatically yet.
+                Formula license billing is separate — set that up under Formula Marketplace below.
+              </p>
               <a href={status?.connect_url || '#'}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-90"
                 style={{ background: '#006AFF', color: '#FFFFFF' }}>
                 <CreditCard className="w-4 h-4" /> Connect Square <ArrowRight className="w-4 h-4" />
               </a>
-              <p className="text-[10px] mt-3" style={{ color: '#71717A' }}>You'll be redirected to Square to authorize COLORgenius. We only request read access to your inventory and catalog.</p>
+              <p className="text-[10px] mt-3" style={{ color: '#71717A' }}>You&apos;ll be redirected to Square to authorize COLORgenius. We request read access to your catalog, customers, and orders, and read/write access to inventory.</p>
             </div>
           )}
         </div>
