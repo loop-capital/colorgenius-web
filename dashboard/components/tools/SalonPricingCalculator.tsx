@@ -18,7 +18,7 @@ import {
   type SalonPricingInput,
   type SalonPricingResult,
   calculateSalonPricing,
-} from "@/app/api/tools/salon-pricing/route";
+} from "@/lib/tools/salon-pricing";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

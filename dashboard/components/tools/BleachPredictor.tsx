@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Sun, Clock, AlertTriangle, CheckCircle2, ChevronDown, ShieldAlert, Sparkles } from "lucide-react";
-import { bleachPredictorSchema, type BleachPredictorInput, type BleachPredictorResult } from "@/app/api/tools/bleach-predictor/route";
+import { bleachPredictorSchema, type BleachPredictorInput, type BleachPredictorResult } from "@/lib/tools/bleach-predictor";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

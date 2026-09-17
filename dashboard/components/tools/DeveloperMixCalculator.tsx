@@ -11,7 +11,7 @@ import {
   CheckCircle2,
   ChevronDown,
 } from "lucide-react";
-import { developerMixSchema, type DeveloperMixInput, type DeveloperMixResult } from "@/app/api/tools/developer-mix/route";
+import { developerMixSchema, type DeveloperMixInput, type DeveloperMixResult } from "@/lib/tools/developer-mix";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

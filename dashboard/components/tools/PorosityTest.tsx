@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Droplets, RefreshCcw, ChevronRight, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
-import { porosityQuestions, type PorosityTestInput, type PorosityTestResult, type PorosityLevel } from "@/app/api/tools/porosity-test/route";
+import { porosityQuestions, type PorosityTestInput, type PorosityTestResult, type PorosityLevel } from "@/lib/tools/porosity-test";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";

@@ -125,7 +125,7 @@ export type StylistIdInput = z.infer<typeof stylistIdSchema>;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function validateOrThrow<T>(schema: z.ZodSchema<T>, data: unknown): T {
+export function validateOrThrow<T>(schema: z.ZodType<T, z.ZodTypeDef, any>, data: unknown): T {
   const result = schema.safeParse(data);
   if (!result.success) {
     const issues = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`);

@@ -16,7 +16,7 @@ import {
   type ColorCorrectionInput,
   type ColorCorrectionResult,
   calculateColorCorrection,
-} from "@/app/api/tools/color-correction/route";
+} from "@/lib/tools/color-correction";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
