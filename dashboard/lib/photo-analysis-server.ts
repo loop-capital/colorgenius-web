@@ -1,7 +1,6 @@
-// Server-side Photo Analysis — Kimi vision primary, GPT-4o-mini fallback,
-// k-means pixel pipeline as fallback/supplement to both
+// Server-side Photo Analysis — GPT-4o-mini vision, k-means pixel pipeline as
+// fallback/supplement
 
-// Kimi K2.6 via Ollama's native /api/chat, GPT-4o-mini via raw fetch — no SDK needed for either
 import sharp from 'sharp';
 import { HAIR_LEVELS, TONE_DESCRIPTORS, ToneFamily } from './products';
 
@@ -443,23 +442,23 @@ function kMeans(
     .sort((a, b) => b.count - a.count);
 }
 
-// ─── Vision Analysis (Kimi K2.6 primary, GPT-4o-mini fallback) ───────────────
+// ─── Vision Analysis (GPT-4o-mini) ───────────────────────────────────────────
+// Was Kimi K2.6 via a local Ollama instance, with GPT-4o-mini as fallback.
+// Dropped Kimi entirely: both the web app and the iOS app (mobile/src/api/
+// client.ts, API_BASE = colorgenius.co) run through this same Vercel-deployed
+// backend, which can never reach a local Ollama server (127.0.0.1) — so that
+// path could never succeed for any real user, only in local dev on the one
+// machine running Ollama. Not worth maintaining two providers for that.
 
 const VALID_TONES = new Set([
   'neutral','ash','golden','copper','red','violet','pearl','beige','mahogany','chocolate','warm','cool',
 ]);
 const VALID_CONDITIONS = new Set(['excellent','good','fair','damaged','severely_damaged']);
 
-// Env config — uses Ollama native /api/chat (image_url not supported by kimi-k2.6:cloud)
-const OLLAMA_URL   = process.env.OLLAMA_VISION_URL ?? 'http://127.0.0.1:11434/api/chat';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL      ?? 'kimi-k2.6:cloud';
-const OLLAMA_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 18000); // 18 s
-
-// Fallback model — reuses the same OPENAI_API_KEY already configured for the
-// AI Assistant feature (see ASSISTANT_MODEL in .env.local) rather than adding
-// a second provider key. gpt-4o-mini: vision-capable, $0.15/$0.60 per 1M
-// tokens — at this task's size (~1 photo + short JSON out) that's roughly
-// $0.0003/photo, and it's only ever hit when the primary Kimi path fails.
+// Reuses the same OPENAI_API_KEY already configured for the AI Assistant
+// feature (see ASSISTANT_MODEL in .env.local) rather than adding a second
+// provider key. gpt-4o-mini: vision-capable, $0.15/$0.60 per 1M tokens — at
+// this task's size (~1 photo + short JSON out) that's roughly $0.0003/photo.
 const OPENAI_VISION_MODEL = process.env.OPENAI_VISION_MODEL ?? 'gpt-4o-mini';
 const OPENAI_TIMEOUT_MS = Number(process.env.OPENAI_TIMEOUT_MS ?? 20000); // 20 s
 
@@ -513,46 +512,6 @@ function parseVisionJSON(text: string): VisionResult | null {
   }
 }
 
-// Primary: Kimi K2.6 via Ollama native /api/chat (images array format)
-async function analyzeWithKimi(jpegBase64: string): Promise<VisionResult | null> {
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), OLLAMA_TIMEOUT_MS);
-    const response = await fetch(OLLAMA_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(process.env.OLLAMA_API_KEY ? { Authorization: `Bearer ${process.env.OLLAMA_API_KEY}` } : {}),
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model: OLLAMA_MODEL,
-        stream: false,
-        // kimi-k2.6 is a reasoning model — left to default, it emits a huge
-        // chain-of-thought trace before answering (measured: ~89s / 2706
-        // thinking tokens for a single flat-color test image) and blows
-        // through OLLAMA_TIMEOUT_MS every time. With this set, the same
-        // request returns the same well-formed JSON in ~2.5s.
-        think: false,
-        messages: [{
-          role: 'user',
-          content: VISION_PROMPT,
-          images: [jpegBase64],
-        }],
-      }),
-    }).finally(() => clearTimeout(timer));
-
-    if (!response.ok) return null;
-    const data = await response.json();
-    // Native Ollama response: { message: { content: "..." } }
-    const text: string = data.message?.content?.trim() || '';
-    return text ? parseVisionJSON(text) : null;
-  } catch {
-    return null;
-  }
-}
-
-// Fallback: GPT-4o-mini (only when OPENAI_API_KEY is set and Kimi unavailable)
 async function analyzeWithOpenAI(jpegBase64: string): Promise<VisionResult | null> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey || apiKey === 'placeholder') return null;
@@ -588,17 +547,11 @@ async function analyzeWithOpenAI(jpegBase64: string): Promise<VisionResult | nul
   }
 }
 
-// Orchestrator: Kimi first, GPT-4o-mini fallback
-async function analyzeWithVision(jpegBase64: string): Promise<VisionResult | null> {
-  const kimiResult = await analyzeWithKimi(jpegBase64);
-  if (kimiResult) return kimiResult;
-  return analyzeWithOpenAI(jpegBase64);
-}
 
 // ─── Main Server-side Entry Point ─────────────────────────────────────────────
 
 export async function analyzeImageBuffer(buffer: Buffer): Promise<HairAnalysisResult> {
-  // 1. Decode & resize with sharp — produce both raw pixels AND a JPEG for Claude
+  // 1. Decode & resize with sharp — produce both raw pixels AND a JPEG for GPT-4o-mini
   const [pixelResult, jpegBuffer] = await Promise.all([
     sharp(buffer)
       .raw()
@@ -664,11 +617,11 @@ export async function analyzeImageBuffer(buffer: Buffer): Promise<HairAnalysisRe
   const { level: pixelLevel, confidence: levelConf } = detectLevel(dominant.r, dominant.g, dominant.b);
   const { tone: pixelTone, warmthRatio, confidence: toneConf } = detectTone(dominant.r, dominant.g, dominant.b, pixelLevel);
 
-  // 3. Claude vision — runs in parallel (already started above via Promise.all on sharp)
+  // 3. GPT-4o-mini vision (jpegBuffer already produced above via Promise.all on sharp)
   const jpegBase64 = jpegBuffer.toString('base64');
-  const vision = await analyzeWithVision(jpegBase64);
+  const vision = await analyzeWithOpenAI(jpegBase64);
 
-  // 4. Merge: Claude wins on semantic fields when available; k-means fills pixel metrics
+  // 4. Merge: vision wins on semantic fields when available; k-means fills pixel metrics
   const currentLevel = vision?.level ?? pixelLevel;
   const currentTone = vision?.tone ?? pixelTone;
   const grayPercent = vision?.grayPercent ?? Math.round(pixelGrayPercent);
@@ -677,12 +630,12 @@ export async function analyzeImageBuffer(buffer: Buffer): Promise<HairAnalysisRe
     ? { excellent: 90, good: 77, fair: 62, damaged: 47, severely_damaged: 25 }[condition] ?? pixelConditionScore
     : pixelConditionScore;
 
-  // Porosity: Claude's read overrides pixel estimate when available
+  // Porosity: GPT-4o-mini's read overrides pixel estimate when available
   if (vision?.porosity) {
     indicators.porosityEstimate = vision.porosity;
   }
 
-  // 5. Recommendations: Claude's are more nuanced; append pixel-derived ones only if unique
+  // 5. Recommendations: GPT-4o-mini's are more nuanced; append pixel-derived ones only if unique
   const recommendations: string[] = vision ? [...vision.recommendations] : [];
 
   if (!vision) {
@@ -700,7 +653,7 @@ export async function analyzeImageBuffer(buffer: Buffer): Promise<HairAnalysisRe
     recommendations.push('Face not clearly detected — for best results, use a front-facing photo with good lighting');
   }
 
-  // 6. Confidence: Claude gives 0.92 baseline; k-means fallback gives its own score
+  // 6. Confidence: GPT-4o-mini gives 0.92 baseline; k-means fallback gives its own score
   const confidence = vision
     ? 0.92 * (hairRegionFound ? 1 : 0.9)
     : Math.min(0.95, ((levelConf + toneConf) / 2) * (hairRegionFound ? 1 : 0.7));
