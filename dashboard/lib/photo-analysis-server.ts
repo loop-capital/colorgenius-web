@@ -1,6 +1,7 @@
-// Server-side Photo Analysis — Kimi vision primary, k-means pixel pipeline as fallback/supplement
+// Server-side Photo Analysis — Kimi vision primary, GPT-4o-mini fallback,
+// k-means pixel pipeline as fallback/supplement to both
 
-// Kimi K2.6 vision via Ollama OpenAI-compatible endpoint (no SDK needed)
+// Kimi K2.6 via Ollama's native /api/chat, GPT-4o-mini via raw fetch — no SDK needed for either
 import sharp from 'sharp';
 import { HAIR_LEVELS, TONE_DESCRIPTORS, ToneFamily } from './products';
 
@@ -442,7 +443,7 @@ function kMeans(
     .sort((a, b) => b.count - a.count);
 }
 
-// ─── Vision Analysis (Kimi K2.6 primary, Claude Haiku fallback) ───────────────
+// ─── Vision Analysis (Kimi K2.6 primary, GPT-4o-mini fallback) ───────────────
 
 const VALID_TONES = new Set([
   'neutral','ash','golden','copper','red','violet','pearl','beige','mahogany','chocolate','warm','cool',
@@ -453,6 +454,14 @@ const VALID_CONDITIONS = new Set(['excellent','good','fair','damaged','severely_
 const OLLAMA_URL   = process.env.OLLAMA_VISION_URL ?? 'http://127.0.0.1:11434/api/chat';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL      ?? 'kimi-k2.6:cloud';
 const OLLAMA_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 18000); // 18 s
+
+// Fallback model — reuses the same OPENAI_API_KEY already configured for the
+// AI Assistant feature (see ASSISTANT_MODEL in .env.local) rather than adding
+// a second provider key. gpt-4o-mini: vision-capable, $0.15/$0.60 per 1M
+// tokens — at this task's size (~1 photo + short JSON out) that's roughly
+// $0.0003/photo, and it's only ever hit when the primary Kimi path fails.
+const OPENAI_VISION_MODEL = process.env.OPENAI_VISION_MODEL ?? 'gpt-4o-mini';
+const OPENAI_TIMEOUT_MS = Number(process.env.OPENAI_TIMEOUT_MS ?? 20000); // 20 s
 
 const VISION_PROMPT = `You are a professional colorist. Analyze this hair photo and respond with ONLY a JSON object — no prose, no markdown fences.
 
@@ -543,35 +552,47 @@ async function analyzeWithKimi(jpegBase64: string): Promise<VisionResult | null>
   }
 }
 
-// Fallback: Claude Haiku (only when ANTHROPIC_API_KEY is set and Kimi unavailable)
-async function analyzeWithClaude(jpegBase64: string): Promise<VisionResult | null> {
-  if (!process.env.ANTHROPIC_API_KEY) return null;
+// Fallback: GPT-4o-mini (only when OPENAI_API_KEY is set and Kimi unavailable)
+async function analyzeWithOpenAI(jpegBase64: string): Promise<VisionResult | null> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey || apiKey === 'placeholder') return null;
   try {
-    const { default: Anthropic } = await import('@anthropic-ai/sdk');
-    const client = new Anthropic();
-    const msg = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 512,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: jpegBase64 } },
-          { type: 'text', text: VISION_PROMPT },
-        ],
-      }],
-    });
-    const text = msg.content[0]?.type === 'text' ? msg.content[0].text.trim() : '';
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: OPENAI_VISION_MODEL,
+        response_format: { type: 'json_object' },
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: VISION_PROMPT },
+            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${jpegBase64}` } },
+          ],
+        }],
+      }),
+    }).finally(() => clearTimeout(timer));
+
+    if (!response.ok) return null;
+    const data = await response.json();
+    const text: string = data.choices?.[0]?.message?.content?.trim() || '';
     return text ? parseVisionJSON(text) : null;
   } catch {
     return null;
   }
 }
 
-// Orchestrator: Kimi first, Claude fallback
+// Orchestrator: Kimi first, GPT-4o-mini fallback
 async function analyzeWithVision(jpegBase64: string): Promise<VisionResult | null> {
   const kimiResult = await analyzeWithKimi(jpegBase64);
   if (kimiResult) return kimiResult;
-  return analyzeWithClaude(jpegBase64);
+  return analyzeWithOpenAI(jpegBase64);
 }
 
 // ─── Main Server-side Entry Point ─────────────────────────────────────────────
