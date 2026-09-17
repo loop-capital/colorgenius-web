@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { verifyBearerToken } from '@/lib/auth'
+import { requireAdmin } from '@/lib/admin'
 
 interface UpdateAccountTypeBody {
   stylistId: string
@@ -12,13 +12,14 @@ interface UpdateAccountTypeBody {
 // Admin-only: update a stylist's account type
 export async function POST(req: NextRequest) {
   try {
-    const user = await verifyBearerToken(req)
-    if (!user) {
+    // The admin check here was never actually implemented — this endpoint
+    // accepted any authenticated user and let them view/modify every
+    // stylist's account tier platform-wide. Real check now enforced.
+    const admin = await requireAdmin(req)
+    if (!admin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check if requester is admin (stylist with admin flag or service role)
-    // For now, use service_role key which bypasses RLS
     const body = (await req.json()) as UpdateAccountTypeBody
 
     if (!body.stylistId || !body.accountType) {
@@ -91,8 +92,8 @@ export async function POST(req: NextRequest) {
 // List all stylists with their account types
 export async function GET(req: NextRequest) {
   try {
-    const user = await verifyBearerToken(req)
-    if (!user) {
+    const admin = await requireAdmin(req)
+    if (!admin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

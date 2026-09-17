@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   try {
     const user = await prisma.users.findUnique({
       where: { id: authUser.userId },
-      select: { id: true, first_name: true, email: true },
+      select: { id: true, first_name: true, email: true, role: true },
     });
 
     if (!user) {
@@ -35,6 +35,7 @@ export async function GET(request: Request) {
         username: user.first_name || user.email,
         email: user.email,
         salonName: user.first_name || user.email,
+        role: user.role,
       }
     });
   } catch (err: any) {
