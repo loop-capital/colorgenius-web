@@ -676,6 +676,7 @@ model stylists {
   formula_listings         formula_listings[]
   formula_client_requests  formula_client_requests[]
   api_keys                 api_keys[]
+  creator_payouts          creator_payouts[]
   clients                  clients[]
   community_posts          community_posts[]
   formula_history          formula_history[]
@@ -911,6 +912,31 @@ model formula_billing_invoices {
 
   @@unique([salon_id, billing_period], map: "uniq_formula_billing_invoice_period")
   @@index([status], map: "idx_formula_billing_invoices_status")
+}
+
+// Manual creator payouts — Square has no product for automatically sending
+// money out to many independent third parties (it's a one-merchant tool,
+// not a marketplace-payout platform like Stripe Connect). This tracks what
+// each creator is actually owed (computed from formula_usage_log for usage
+// that's been successfully billed and collected from the paying salon) and
+// records that Jason paid it manually (Venmo/Zelle/ACH/check — his choice),
+// rather than fabricating an automated transfer that doesn't exist.
+model creator_payouts {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  creator_id       String    @db.Uuid
+  billing_period   String    @db.VarChar(7)
+  total_cents      Int
+  status           String    @default("pending") @db.VarChar(20)
+  paid_at          DateTime?
+  payout_method    String?   @db.VarChar(50)
+  payout_reference String?   @db.VarChar(255)
+  notes            String?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @default(now())
+  creator          stylists  @relation(fields: [creator_id], references: [id])
+
+  @@unique([creator_id, billing_period], map: "uniq_creator_payout_period")
+  @@index([status], map: "idx_creator_payouts_status")
 }
 
 model formula_purchases {
