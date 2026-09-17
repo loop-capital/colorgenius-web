@@ -2,11 +2,11 @@ import { z } from "zod";
 import { parseToolBody, toolResponse, toolError } from "@/lib/tools/calculator-utils";
 
 export const salonPricingSchema = z.object({
-  productCost: z.coerce.number().min(0).max(10000),
+  productCostPerService: z.coerce.number().min(0).max(10000),
   chairTimeMinutes: z.coerce.number().int().min(5).max(480),
   stylistHourlyRate: z.coerce.number().min(0).max(1000),
-  overheadPercent: z.coerce.number().min(0).max(200),
-  desiredMargin: z.coerce.number().min(0).max(100),
+  salonOverheadPercent: z.coerce.number().min(0).max(200),
+  desiredProfitMargin: z.coerce.number().min(0).max(100),
 });
 
 export type SalonPricingInput = z.infer<typeof salonPricingSchema>;
@@ -18,57 +18,50 @@ export interface SalonPricingResult {
   productCost: number;
   totalCost: number;
   profitPerService: number;
-  marginPercent: number;
+  profitMarginPercent: number;
   priceBreakdown: {
     label: string;
     amount: number;
     percentOfPrice: number;
   }[];
-  notes: string[];
 }
 
 export function calculateSalonPricing(input: SalonPricingInput): SalonPricingResult {
   const {
-    productCost,
+    productCostPerService,
     chairTimeMinutes,
     stylistHourlyRate,
-    overheadPercent,
-    desiredMargin,
+    salonOverheadPercent,
+    desiredProfitMargin,
   } = input;
 
   const laborCost = (chairTimeMinutes / 60) * stylistHourlyRate;
-  const overheadCost = (laborCost + productCost) * (overheadPercent / 100);
-  const totalCost = productCost + laborCost + overheadCost;
+  const overheadCost = (laborCost + productCostPerService) * (salonOverheadPercent / 100);
+  const totalCost = productCostPerService + laborCost + overheadCost;
 
   const targetPrice =
-    desiredMargin >= 100
+    desiredProfitMargin >= 100
       ? totalCost * 100
-      : totalCost / (1 - desiredMargin / 100);
+      : totalCost / (1 - desiredProfitMargin / 100);
 
   const recommendedPrice = Math.max(Number(targetPrice.toFixed(2)), Number(totalCost.toFixed(2)) + 0.01);
   const profitPerService = Number((recommendedPrice - totalCost).toFixed(2));
-  const marginPercent = Number(((profitPerService / recommendedPrice) * 100).toFixed(2));
-
-  const notes: string[] = [];
-  if (marginPercent < desiredMargin - 5) notes.push("Actual margin is below target — review costs or increase price.");
-  if (overheadPercent > 50) notes.push("High overhead percentage; consider cost-control measures.");
-  if (recommendedPrice < totalCost * 1.2) notes.push("Thin margin — any discounting will erase profit.");
+  const profitMarginPercent = Number(((profitPerService / recommendedPrice) * 100).toFixed(2));
 
   return {
     recommendedPrice,
     laborCost: Number(laborCost.toFixed(2)),
     overheadCost: Number(overheadCost.toFixed(2)),
-    productCost: Number(productCost.toFixed(2)),
+    productCost: Number(productCostPerService.toFixed(2)),
     totalCost: Number(totalCost.toFixed(2)),
     profitPerService,
-    marginPercent,
+    profitMarginPercent,
     priceBreakdown: [
-      { label: "Product Cost", amount: Number(productCost.toFixed(2)), percentOfPrice: Number(((productCost / recommendedPrice) * 100).toFixed(2)) },
+      { label: "Product Cost", amount: Number(productCostPerService.toFixed(2)), percentOfPrice: Number(((productCostPerService / recommendedPrice) * 100).toFixed(2)) },
       { label: "Labor Cost", amount: Number(laborCost.toFixed(2)), percentOfPrice: Number(((laborCost / recommendedPrice) * 100).toFixed(2)) },
       { label: "Overhead Cost", amount: Number(overheadCost.toFixed(2)), percentOfPrice: Number(((overheadCost / recommendedPrice) * 100).toFixed(2)) },
-      { label: "Profit", amount: profitPerService, percentOfPrice: marginPercent },
+      { label: "Profit", amount: profitPerService, percentOfPrice: profitMarginPercent },
     ],
-    notes,
   };
 }
 

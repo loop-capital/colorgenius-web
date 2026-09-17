@@ -3,10 +3,10 @@ import { SalonPricingCalculator } from "@/components/tools/SalonPricingCalculato
 
 export const metadata: Metadata = {
   title: "Salon Pricing Calculator | ColorGenius",
-  description: "Calculate recommended hair service pricing from product cost, chair time, stylist rate, overhead, and desired profit margin. Free salon tool by ColorGenius.",
+  description: "Calculate service pricing, profit margins, and cost breakdowns for professional hair color and salon services. Free tool by ColorGenius.",
   openGraph: {
     title: "Salon Pricing Calculator | ColorGenius",
-    description: "Set profitable prices for every salon service.",
+    description: "Price your salon services with confidence.",
   },
 };
 
@@ -22,7 +22,7 @@ export default function SalonPricingPage() {
             Salon Pricing Calculator
           </h1>
           <p className="mt-1 text-sm" style={{ color: "var(--cg-text-secondary)" }}>
-            Input your real costs and target margin to get a recommended service price with a full cost breakdown.
+            Enter product cost, chair time, stylist rate, overhead, and desired margin to find the right service price.
           </p>
         </div>
         <SalonPricingCalculator />
