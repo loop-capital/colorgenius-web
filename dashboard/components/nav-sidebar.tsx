@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, FlaskConical, Camera, ImageIcon, MessageCircle, BookOpen,
   Users, History, ClipboardList, Package, DollarSign, CreditCard, CirclePlus, Settings, Award,
+  ShieldCheck, Store, Banknote,
 } from 'lucide-react'
 import { LogoutButton } from '@/components/ui/logout-button'
 import { ColorGeniusLogo } from '@/components/icons/colorgenius-logo'
@@ -24,6 +25,12 @@ const navItems = [
   { href: '/dashboard/pricing', label: 'Pricing Rules', icon: DollarSign },
   { href: '/certification', label: 'Certification', icon: Award },
   { href: '/settings', label: 'Settings', icon: Settings },
+]
+
+const adminNavItems = [
+  { href: '/admin/salons', label: 'Salons & Stylists', icon: Store },
+  { href: '/admin/account-types', label: 'Account Types', icon: ShieldCheck },
+  { href: '/admin/creator-payouts', label: 'Creator Payouts', icon: Banknote },
 ]
 
 export function Sidebar() {
@@ -64,6 +71,25 @@ export function Sidebar() {
               {item.label}
             </Link>
           ))}
+
+          {user?.role === 'admin' && (
+            <>
+              <p className="px-3 pt-4 pb-1 text-[10px] uppercase tracking-wider font-semibold" style={{ color: '#71717A' }}>
+                Admin
+              </p>
+              {adminNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all duration-150 hover:bg-[#161620] hover:text-[#F5F5F7]"
+                  style={{ color: '#A1A1AA', borderRadius: '10px' }}
+                >
+                  <item.icon className="w-[18px] h-[18px]" />
+                  {item.label}
+                </Link>
+              ))}
+            </>
+          )}
         </nav>
 
         <div className="p-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
