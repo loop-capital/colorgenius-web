@@ -141,17 +141,51 @@ async function createSession(clientId: string, formulaId: string | undefined, to
   return data.sessionId;
 }
 
-async function completeSession(sessionId: string, steps: FormulaStep[], totalCost: number, token: string) {
+interface CompleteSessionResult {
+  totalCost: number;
+  wholesaleCost: number;
+  pricingWarnings: string[];
+  [key: string]: unknown;
+}
+
+// totalCost is no longer sent — the server computes and stores the real
+// charge from the salon's own pricing rules (grams weighed × per-product
+// cost × markup), never from a client-supplied number. See
+// dashboard/lib/pricing.ts.
+async function completeSession(sessionId: string, steps: FormulaStep[], token: string): Promise<CompleteSessionResult> {
   const res = await fetch(`${API_BASE}/session/${sessionId}/complete`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ steps, totalCost })
+    body: JSON.stringify({ steps })
   });
   if (!res.ok) throw new Error(`Failed to complete session (${res.status})`);
   return await res.json();
+}
+
+interface SquareOrderResult {
+  squareOrderId: string;
+  totalCost: number;
+  pricingWarnings: string[];
+  message: string;
+}
+
+async function pushOrderToSquare(sessionId: string, token: string): Promise<SquareOrderResult> {
+  const res = await fetch(`${API_BASE}/square-order`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ sessionId }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data?.error || `Failed to push order to Square (${res.status})`);
+  }
+  return data;
 }
 
 // ─── Starting formula for a client with none on file ────────────────────────
@@ -644,36 +678,50 @@ export default function ColorBarScreen({ navigation, route }: any) {
     });
   }, []);
 
-  // Handle push to Square
+  // Handle push to Square — completes the session (server computes the real
+  // charge from actual pricing rules) then pushes that exact amount onto
+  // the salon's own connected Square account as a real order. Previously
+  // this only called completeSession and showed a fake "Order created"
+  // alert — no Square order was ever actually created.
   const handlePushToSquare = useCallback(async () => {
     if (!session.id || !formula) return;
-    
+
     try {
-      // Complete session in backend
-      await completeSession(session.id, steps, sessionCost, token);
-      
+      const completed = await completeSession(session.id, steps, token);
+      setSessionCost(completed.totalCost);
+
+      const order = await pushOrderToSquare(session.id, token);
+
+      const warnings = [...(completed.pricingWarnings || []), ...(order.pricingWarnings || [])];
       Alert.alert(
         'Pushed to Square',
-        'Order created in Square Register. Complete payment at the register.'
+        `${formatCost(order.totalCost)} added to Square Register.${warnings.length ? '\n\n' + warnings.join('\n') : ''} Complete payment at the register.`
       );
     } catch (err) {
       console.error('Push to Square error:', err);
-      Alert.alert('Error', 'Failed to push to Square. Try again.');
+      const message = err instanceof Error ? err.message : 'Failed to push to Square. Try again.';
+      if (message.includes('SQUARE_NOT_CONNECTED') || message.toLowerCase().includes("hasn")) {
+        Alert.alert('Square not connected', 'Connect Square for this salon in Settings first.');
+      } else {
+        Alert.alert('Error', message);
+      }
     }
-  }, [session.id, formula, steps, sessionCost, token]);
+  }, [session.id, formula, steps, token]);
 
   // Handle save to history
   const handleSaveToHistory = useCallback(async () => {
     if (!session.id || !formula) return;
-    
+
     try {
-      await completeSession(session.id, steps, sessionCost, token);
-      Alert.alert('Saved', 'Formula saved to client history.');
+      const completed = await completeSession(session.id, steps, token);
+      setSessionCost(completed.totalCost);
+      const warning = completed.pricingWarnings?.length ? '\n\n' + completed.pricingWarnings.join('\n') : '';
+      Alert.alert('Saved', `Formula saved to client history.${warning}`);
     } catch (err) {
       console.error('Save error:', err);
       Alert.alert('Error', 'Failed to save formula.');
     }
-  }, [session.id, formula, steps, sessionCost, token]);
+  }, [session.id, formula, steps, token]);
 
   // Handle new session
   const handleNewSession = useCallback(() => {

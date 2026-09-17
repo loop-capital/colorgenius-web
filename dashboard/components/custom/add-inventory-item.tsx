@@ -49,23 +49,47 @@ export function AddInventoryItem({ onAdded }: { onAdded?: () => void }) {
     setSelectedProducts(prev => prev.filter(p => p.id !== id));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const existing: InventoryItem[] = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     const existingCodes = new Set(existing.map(i => `${i.brand}-${i.shadeCode}`));
 
-    const newItems: InventoryItem[] = selectedProducts
-      .filter(p => !existingCodes.has(`${p.brand}-${p.shadeCode}`))
-      .map(p => ({
-        id: 'inv-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
-        brand: p.brand,
-        line: p.line,
-        shadeCode: p.shadeCode,
-        shadeName: p.shadeName,
-        currentGrams: 100, // default starting stock
-        reorderPoint: DEFAULT_REORDER,
-        lastUsed: '',
-        costPerGram: DEFAULT_COST_PER_GRAM,
-      }));
+    const toAdd = selectedProducts.filter(p => !existingCodes.has(`${p.brand}-${p.shadeCode}`));
+
+    // Persist to the real inventory (this previously only wrote localStorage —
+    // items added here never reached the database, and the next successful
+    // API fetch in InventoryDashboard would silently overwrite the cache and
+    // make them disappear).
+    await Promise.all(
+      toAdd.map((p) =>
+        fetch('/api/v1/inventory', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            brand: p.brand,
+            product_line: p.line,
+            shade_code: p.shadeCode,
+            shade_name: p.shadeName,
+            quantity_on_hand: 100,
+            unit_of_measure: 'g',
+            low_stock_threshold: DEFAULT_REORDER,
+            cost_per_unit: DEFAULT_COST_PER_GRAM,
+          }),
+        }).catch((e) => console.error('Failed to add inventory item:', p.shadeCode, e))
+      )
+    );
+
+    const newItems: InventoryItem[] = toAdd.map(p => ({
+      id: 'inv-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+      brand: p.brand,
+      line: p.line,
+      shadeCode: p.shadeCode,
+      shadeName: p.shadeName,
+      currentGrams: 100, // default starting stock
+      reorderPoint: DEFAULT_REORDER,
+      lastUsed: '',
+      costPerGram: DEFAULT_COST_PER_GRAM,
+    }));
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...existing, ...newItems]));
     setSelectedProducts([]);

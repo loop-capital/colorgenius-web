@@ -2,6 +2,7 @@ import { Decimal } from '@prisma/client/runtime/library'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
+import { priceCompletedSession } from '@/lib/pricing'
 
 interface CompletedStep {
   product: string
@@ -14,7 +15,10 @@ interface CompletedStep {
 
 interface CompletedBody {
   steps: CompletedStep[]
-  totalCost: number
+  // Accepted but no longer trusted for the stored/charged amount — see
+  // priceCompletedSession(). Money has to come from the server's own
+  // pricing rules, not a number the client happened to send.
+  totalCost?: number
   formulaId?: string
   clientId?: string
   createClientFormula?: boolean // opt-in to create a reusable formula record
@@ -32,7 +36,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const { id } = await params
     const body = (await req.json()) as CompletedBody
-    const { steps, totalCost, formulaId, clientId, createClientFormula } = body
+    const { steps, formulaId, clientId, createClientFormula } = body
 
     if (!steps || !Array.isArray(steps)) {
       return NextResponse.json({ error: 'Steps array is required' }, { status: 400 })
@@ -50,7 +54,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const stylistId = session?.stylist_id || user.userId
     const sessionClientId = session?.client_id || clientId
 
-    const safeTotalCost = typeof totalCost === 'number' && !Number.isNaN(totalCost) ? totalCost : 0
+    // The charged amount is computed here from the salon's own pricing
+    // rules (per-product cost × grams actually weighed, marked up per
+    // costPlusPricing) — never from a client-supplied number. A salon with
+    // no cost set yet for a product gets a $0 contribution for that
+    // portion (surfaced via `pricingWarnings` below) rather than silently
+    // trusting whatever the device sent.
+    const pricing = salonId
+      ? await priceCompletedSession(salonId, steps)
+      : { totalCost: 0, wholesaleCost: 0, markupPercent: 0, missingCost: [], steps: [] }
+    const safeTotalCost = pricing.totalCost
 
     // ── Update the session record ───────────────────────────────────────
     await prisma.color_bar_sessions.update({
@@ -218,6 +231,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       transactionId: id,
       receiptUrl,
       totalCost: safeTotalCost,
+      wholesaleCost: pricing.wholesaleCost,
+      markupPercent: pricing.markupPercent,
+      pricingWarnings: pricing.missingCost.map(
+        (m) => `No cost set for ${m.brand} ${m.shadeCode} — charged $0 for that portion. Set it in Inventory.`
+      ),
       stepsCount: steps.length,
       totalGrams: steps.reduce((sum: number, s: CompletedStep) => sum + s.actualGrams, 0),
       stockUpdates,

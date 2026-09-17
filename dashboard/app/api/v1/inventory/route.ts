@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/auth";
+import { getSalonIdForUser } from "@/lib/stylist";
 import { inventoryItemSchema, inventoryListQuerySchema } from "@/lib/vish/schemas";
 
 function authError(status: number, message: string) {
@@ -13,7 +14,10 @@ export async function GET(req: NextRequest) {
     if (!user) {
       return authError(401, "Authentication required");
     }
-    const salon_id = user.userId;
+    const salon_id = await getSalonIdForUser(user.userId);
+    if (!salon_id) {
+      return NextResponse.json({ items: [], total: 0, page: 1, limit: 0, pages: 0 }, { status: 200 });
+    }
 
     const { searchParams } = new URL(req.url);
     const query = Object.fromEntries(searchParams.entries());
@@ -57,7 +61,10 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return authError(401, "Authentication required");
     }
-    const salon_id = user.userId;
+    const salon_id = await getSalonIdForUser(user.userId);
+    if (!salon_id) {
+      return authError(400, "Your account isn't linked to a salon yet.");
+    }
 
     const body = await req.json();
     const parsed = inventoryItemSchema.safeParse(body);

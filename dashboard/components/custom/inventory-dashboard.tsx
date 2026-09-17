@@ -20,16 +20,18 @@ export interface InventoryItem {
   costPerGram: number;
 }
 
+// Matches the raw Prisma row shape returned by GET /api/v1/inventory.
 interface ApiInventoryItem {
   id: string;
-  salonId: string;
-  brand: string;
-  shadeCode: string;
-  shadeName: string | null;
-  quantity: number;
-  unit: string | null;
-  lowStockThreshold: number | null;
-  lastUpdated: string | null;
+  salon_id: string;
+  brand: string | null;
+  shade_code: string | null;
+  shade_name: string | null;
+  quantity_on_hand: number;
+  unit_of_measure: string | null;
+  low_stock_threshold: number | null;
+  cost_per_unit: number | string | null;
+  updated_at: string | null;
 }
 
 const STORAGE_KEY = 'cg-inventory';
@@ -51,18 +53,25 @@ function setCachedInventory(items: InventoryItem[]) {
 
 // ─── API Helpers ───────────────────────────────────────────────────────────────
 
-async function fetchInventory(salonId: string): Promise<ApiInventoryItem[]> {
-  const res = await fetch(`/api/v1/inventory?salonId=${encodeURIComponent(salonId)}&limit=500`);
+async function fetchInventory(): Promise<ApiInventoryItem[]> {
+  const res = await fetch(`/api/v1/inventory?limit=500`, { credentials: 'include' });
   if (!res.ok) throw new Error('Failed to fetch inventory');
   const data = await res.json();
   return data.items || [];
 }
 
+// salonId is accepted for backward compatibility with existing callers but
+// no longer used to gate the API call — the server derives the salon from
+// the authenticated user's own session cookie, never from client input.
+// cacheOnly skips the API call entirely — used by deductFormulaFromInventory
+// below, which already made one batch API call for these same steps and
+// only needs this for the optimistic localStorage update.
 export async function deductFromInventory(
   shadeCode: string,
   grams: number,
   brand: string,
-  salonId?: string
+  _salonId?: string,
+  cacheOnly = false
 ): Promise<{ success: boolean; remaining?: number; lowStock?: boolean }> {
   // Always update localStorage cache immediately (optimistic)
   const cached = getCachedInventory();
@@ -73,17 +82,16 @@ export async function deductFromInventory(
     setCachedInventory(cached);
   }
 
-  // If no salonId, stop at localStorage (offline mode)
-  if (!salonId) {
+  if (cacheOnly) {
     return { success: true };
   }
 
   try {
     const res = await fetch('/api/v1/inventory/deduct', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        salonId,
         items: [{ shadeCode, brand, grams }],
       }),
     });
@@ -103,39 +111,37 @@ export async function deductFromInventory(
 
 export async function deductFormulaFromInventory(
   steps: Array<{ product: { shadeCode: string; brand?: string }; grams: number }>,
-  salonId?: string
+  _salonId?: string
 ): Promise<Array<{ shadeCode: string; brand: string; lowStock?: boolean }>> {
   const lowStockItems: Array<{ shadeCode: string; brand: string; lowStock?: boolean }> = [];
 
-  // Batch API call if salonId present
-  if (salonId) {
-    const items = steps.map((step) => ({
-      shadeCode: step.product.shadeCode,
-      brand: step.product.brand || '',
-      grams: step.grams,
-    }));
-    try {
-      const res = await fetch('/api/v1/inventory/deduct', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ salonId, items }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        for (const r of data.results || []) {
-          if (r.lowStock) {
-            lowStockItems.push({ shadeCode: r.shadeCode, brand: r.brand, lowStock: true });
-          }
+  const items = steps.map((step) => ({
+    shadeCode: step.product.shadeCode,
+    brand: step.product.brand || '',
+    grams: step.grams,
+  }));
+  try {
+    const res = await fetch('/api/v1/inventory/deduct', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      for (const r of data.results || []) {
+        if (r.lowStock) {
+          lowStockItems.push({ shadeCode: r.shadeCode, brand: r.brand, lowStock: true });
         }
       }
-    } catch (e) {
-      console.error('deductFormulaFromInventory batch API error:', e);
     }
+  } catch (e) {
+    console.error('deductFormulaFromInventory batch API error:', e);
   }
 
-  // Always update localStorage cache
+  // Always update localStorage cache (API deduction already happened above)
   steps.forEach((step) => {
-    deductFromInventory(step.product.shadeCode, step.grams, step.product.brand || '', undefined);
+    deductFromInventory(step.product.shadeCode, step.grams, step.product.brand || '', undefined, true);
   });
 
   return lowStockItems;
@@ -145,10 +151,11 @@ export async function deductFormulaFromInventory(
 
 interface InventoryDashboardProps {
   className?: string;
+  /** @deprecated no longer used — the server derives the salon from the auth cookie */
   salonId?: string;
 }
 
-export function InventoryDashboard({ className, salonId }: InventoryDashboardProps) {
+export function InventoryDashboard({ className }: InventoryDashboardProps) {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState<'all' | 'low' | 'out'>('all');
@@ -158,14 +165,14 @@ export function InventoryDashboard({ className, salonId }: InventoryDashboardPro
   const mapApiToUi = useCallback((apiItems: ApiInventoryItem[]): InventoryItem[] => {
     return apiItems.map((it) => ({
       id: it.id,
-      brand: it.brand,
-      line: it.brand,
-      shadeCode: it.shadeCode,
-      shadeName: it.shadeName || it.shadeCode,
-      currentGrams: it.quantity || 0,
-      reorderPoint: it.lowStockThreshold || 0,
-      lastUsed: it.lastUpdated || new Date().toISOString(),
-      costPerGram: 0,
+      brand: it.brand || '',
+      line: it.brand || '',
+      shadeCode: it.shade_code || '',
+      shadeName: it.shade_name || it.shade_code || '',
+      currentGrams: it.quantity_on_hand || 0,
+      reorderPoint: it.low_stock_threshold || 0,
+      lastUsed: it.updated_at || new Date().toISOString(),
+      costPerGram: it.cost_per_unit != null ? Number(it.cost_per_unit) : 0,
     }));
   }, []);
 
@@ -174,22 +181,20 @@ export function InventoryDashboard({ className, salonId }: InventoryDashboardPro
     const cached = getCachedInventory();
     if (cached.length > 0) setItems(cached);
 
-    // 2. If salonId provided, fetch from API and merge
-    if (salonId) {
-      setLoading(true);
-      try {
-        const apiItems = await fetchInventory(salonId);
-        const mapped = mapApiToUi(apiItems);
-        setItems(mapped);
-        setCachedInventory(mapped);
-      } catch (e) {
-        console.error('Failed to load inventory from API:', e);
-        // Keep cached items on error
-      } finally {
-        setLoading(false);
-      }
+    // 2. Fetch from API and merge — auth cookie identifies the salon
+    setLoading(true);
+    try {
+      const apiItems = await fetchInventory();
+      const mapped = mapApiToUi(apiItems);
+      setItems(mapped);
+      setCachedInventory(mapped);
+    } catch (e) {
+      console.error('Failed to load inventory from API:', e);
+      // Keep cached items on error
+    } finally {
+      setLoading(false);
     }
-  }, [salonId, mapApiToUi]);
+  }, [mapApiToUi]);
 
   useEffect(() => {
     loadItems();
@@ -218,25 +223,53 @@ export function InventoryDashboard({ className, salonId }: InventoryDashboardPro
     setItems(updated);
     setCachedInventory(updated);
 
-    // Sync adjustment to API if salonId present
-    if (salonId) {
-      try {
-        await fetch('/api/v1/inventory', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            salonId,
-            brand: item.brand,
-            shadeCode: item.shadeCode,
-            shadeName: item.shadeName,
-            quantity: Math.max(0, item.currentGrams + delta),
-            unit: 'g',
-            lowStockThreshold: item.reorderPoint > 0 ? item.reorderPoint : undefined,
-          }),
-        });
-      } catch (e) {
-        console.error('Inventory adjustment sync error:', e);
-      }
+    try {
+      await fetch('/api/v1/inventory', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brand: item.brand,
+          shade_code: item.shadeCode,
+          shade_name: item.shadeName,
+          quantity_on_hand: Math.max(0, item.currentGrams + delta),
+          unit_of_measure: 'g',
+          low_stock_threshold: item.reorderPoint > 0 ? item.reorderPoint : undefined,
+          cost_per_unit: item.costPerGram > 0 ? item.costPerGram : undefined,
+        }),
+      });
+    } catch (e) {
+      console.error('Inventory adjustment sync error:', e);
+    }
+  };
+
+  const handleSetCost = async (id: string, costPerGram: number) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+
+    const updated = items.map((i) => (i.id === id ? { ...i, costPerGram } : i));
+    setItems(updated);
+    setCachedInventory(updated);
+
+    try {
+      const res = await fetch('/api/v1/inventory', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brand: item.brand,
+          shade_code: item.shadeCode,
+          shade_name: item.shadeName,
+          quantity_on_hand: item.currentGrams,
+          unit_of_measure: 'g',
+          low_stock_threshold: item.reorderPoint > 0 ? item.reorderPoint : undefined,
+          cost_per_unit: costPerGram,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to save cost');
+    } catch (e) {
+      console.error('Cost update error:', e);
+      toast({ title: 'Failed to save cost', variant: 'destructive' });
     }
   };
 
@@ -339,9 +372,36 @@ export function InventoryDashboard({ className, salonId }: InventoryDashboardPro
                     {isOut && <AlertTriangle className="w-3.5 h-3.5 text-[#EF4444] flex-shrink-0" />}
                     {isLow && !isOut && <TrendingDown className="w-3.5 h-3.5 text-[#F59E0B] flex-shrink-0" />}
                   </div>
-                  <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
-                    {item.brand} · {item.line}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
+                      {item.brand} · {item.line}
+                    </p>
+                    {canEdit ? (
+                      <label className="flex items-center gap-1 text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
+                        $
+                        <input
+                          type="number"
+                          min={0}
+                          step={0.01}
+                          defaultValue={item.costPerGram || ''}
+                          placeholder="cost/g"
+                          onBlur={(e) => {
+                            const val = parseFloat(e.target.value);
+                            if (!Number.isNaN(val) && val !== item.costPerGram) handleSetCost(item.id, val);
+                          }}
+                          className="w-14 rounded px-1 py-0.5 bg-transparent border"
+                          style={{ borderColor: 'rgba(255,255,255,0.1)', color: 'var(--cg-text-secondary)' }}
+                        />
+                        /g
+                      </label>
+                    ) : (
+                      item.costPerGram > 0 && (
+                        <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
+                          ${item.costPerGram.toFixed(2)}/g
+                        </p>
+                      )
+                    )}
+                  </div>
                   <div className="mt-1.5 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                     <div
                       className="h-full rounded-full transition-all"

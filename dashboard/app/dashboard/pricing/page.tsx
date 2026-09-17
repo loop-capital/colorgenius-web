@@ -217,8 +217,13 @@ export default function PricingPage() {
         >
           <div className="flex items-center gap-2 mb-4">
             <DollarSign className="w-4 h-4 text-[#9333EA]" />
-            <h3 className="text-sm font-semibold" style={{ color: 'var(--cg-text-primary)' }}>Price Preview by Brand</h3>
+            <h3 className="text-sm font-semibold" style={{ color: 'var(--cg-text-primary)' }}>Example Price Preview</h3>
           </div>
+          <p className="text-xs mb-3" style={{ color: 'var(--cg-text-tertiary)' }}>
+            Illustrative industry-average costs, not your actual product costs. Set real per-product
+            cost in <a href="/dashboard/inventory" className="underline">Inventory</a> — that's what
+            each Color Bar session actually charges from.
+          </p>
 
           <div className="space-y-2">
             {/* Header */}
@@ -289,8 +294,9 @@ export default function PricingPage() {
           <div>
             <p className="text-xs font-medium" style={{ color: '#A855F7' }}>Cost-Plus Pricing</p>
             <p className="text-xs mt-1" style={{ color: 'var(--cg-text-secondary)' }}>
-              Product cost is automatically calculated from your formula. Your markup is applied on top, 
-              giving you a transparent, fair pricing model that adjusts with every formulation.
+              When a Color Bar session completes, the actual grams weighed are matched against the
+              per-product cost you've set in Inventory, and this markup is applied on top — that
+              total is what gets charged to the client's ticket.
             </p>
           </div>
         </div>

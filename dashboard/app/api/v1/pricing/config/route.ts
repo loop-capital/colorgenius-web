@@ -16,13 +16,17 @@ async function getSalonId(request: NextRequest): Promise<string | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    // Look up user's salon via stylists table
+    // payload.userId is users.id — this previously looked it up as if it
+    // were a stylists.id (they're different rows, linked via
+    // stylists.user_id), so this never matched and every real salon
+    // silently fell back to defaults on GET and got "No salon linked to
+    // your account" on every PUT.
     const userId = payload.userId as string;
-    const stylist = await prisma.stylists.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: userId },
       select: { salon_id: true },
     });
-    return stylist?.salon_id || null;
+    return user?.salon_id || null;
   } catch {
     return null;
   }

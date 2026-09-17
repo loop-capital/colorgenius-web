@@ -5,6 +5,7 @@
  */
 
 import { prisma } from './prisma';
+import { encryptSecret, decryptSecret } from './secrets';
 
 const SQUARE_APP_ID = process.env.SQUARE_APP_ID || '';
 const SQUARE_APP_SECRET = process.env.SQUARE_APP_SECRET || '';
@@ -53,12 +54,15 @@ export interface SalonSquareConnection {
  * Store a salon's Square connection in the database
  */
 export async function saveConnection(connection: SalonSquareConnection): Promise<void> {
+  const accessTokenEncrypted = encryptSecret(connection.access_token);
+  const refreshTokenEncrypted = encryptSecret(connection.refresh_token);
+
   await prisma.square_connections.upsert({
     where: { salon_id: connection.salon_id },
     update: {
       square_merchant_id: connection.merchant_id,
-      access_token_encrypted: connection.access_token,
-      refresh_token_encrypted: connection.refresh_token,
+      access_token_encrypted: accessTokenEncrypted,
+      refresh_token_encrypted: refreshTokenEncrypted,
       token_expires_at: new Date(connection.expires_at),
       status: 'connected',
       square_location_id: connection.location_ids[0] || null,
@@ -69,8 +73,8 @@ export async function saveConnection(connection: SalonSquareConnection): Promise
     create: {
       salon_id: connection.salon_id,
       square_merchant_id: connection.merchant_id,
-      access_token_encrypted: connection.access_token,
-      refresh_token_encrypted: connection.refresh_token,
+      access_token_encrypted: accessTokenEncrypted,
+      refresh_token_encrypted: refreshTokenEncrypted,
       token_expires_at: new Date(connection.expires_at),
       status: 'connected',
       square_location_id: connection.location_ids[0] || null,
@@ -92,8 +96,8 @@ export async function getConnection(salonId: string): Promise<SalonSquareConnect
 
   return {
     salon_id: row.salon_id,
-    access_token: row.access_token_encrypted || '',
-    refresh_token: row.refresh_token_encrypted || '',
+    access_token: row.access_token_encrypted ? safeDecrypt(row.access_token_encrypted) : '',
+    refresh_token: row.refresh_token_encrypted ? safeDecrypt(row.refresh_token_encrypted) : '',
     expires_at: row.token_expires_at?.toISOString() || '',
     merchant_id: row.square_merchant_id || '',
     location_ids: row.square_location_id ? [row.square_location_id] : [],
@@ -101,6 +105,16 @@ export async function getConnection(salonId: string): Promise<SalonSquareConnect
     connected_at: row.created_at?.toISOString() || '',
     catalog_synced_at: row.last_sync_at?.toISOString() || undefined,
   };
+}
+
+// Tokens saved before encryption was added (or via a raw DB write) won't
+// decrypt cleanly — treat those as unusable rather than crashing the caller.
+function safeDecrypt(value: string): string {
+  try {
+    return decryptSecret(value);
+  } catch {
+    return '';
+  }
 }
 
 /**
@@ -199,7 +213,10 @@ export async function refreshAccessToken(refreshToken: string): Promise<{
 export function getAuthUrl(salonId: string, redirectUri: string): string {
   const params = new URLSearchParams({
     client_id: SQUARE_APP_ID,
-    scope: 'ITEMS_READ INVENTORY_READ INVENTORY_WRITE MERCHANT_PROFILE_READ PAYMENTS_READ CUSTOMERS_READ',
+    // ORDERS_WRITE/READ were missing entirely — without them, an already-
+    // "connected" salon's token still gets a 403 the first time we try to
+    // push a Color Bar formula charge as a Square order.
+    scope: 'ITEMS_READ INVENTORY_READ INVENTORY_WRITE MERCHANT_PROFILE_READ PAYMENTS_READ CUSTOMERS_READ ORDERS_READ ORDERS_WRITE',
     session: 'false',
     state: salonId,
   });
@@ -215,8 +232,8 @@ export async function listConnections(): Promise<SalonSquareConnection[]> {
   });
   return rows.map((row) => ({
     salon_id: row.salon_id,
-    access_token: row.access_token_encrypted || '',
-    refresh_token: row.refresh_token_encrypted || '',
+    access_token: row.access_token_encrypted ? safeDecrypt(row.access_token_encrypted) : '',
+    refresh_token: row.refresh_token_encrypted ? safeDecrypt(row.refresh_token_encrypted) : '',
     expires_at: row.token_expires_at?.toISOString() || '',
     merchant_id: row.square_merchant_id || '',
     location_ids: row.square_location_id ? [row.square_location_id] : [],

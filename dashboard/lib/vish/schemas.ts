@@ -26,7 +26,9 @@ export const formulaListQuerySchema = z.object({
 });
 
 export const inventoryItemSchema = z.object({
-  salon_id: z.string().min(1),
+  // salon_id is intentionally NOT accepted from the client — it's derived
+  // server-side from the authenticated user so one salon can't write (or
+  // even address) another salon's inventory by passing a different id.
   brand: z.string().min(1).max(100),
   product_line: z.string().max(100).optional(),
   shade_code: z.string().min(1).max(50),
@@ -42,7 +44,6 @@ export const inventoryItemSchema = z.object({
 });
 
 export const inventoryListQuerySchema = z.object({
-  salon_id: z.string().min(1),
   brand: z.string().optional(),
   category: z.enum(["color", "developer", "treatment", "other"]).optional(),
   lowStock: z.coerce.boolean().optional(),

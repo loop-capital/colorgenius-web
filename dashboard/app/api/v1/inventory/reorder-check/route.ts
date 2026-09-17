@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/auth";
+import { getSalonIdForUser } from "@/lib/stylist";
 import { z } from "zod";
 
 const querySchema = z.object({
@@ -14,7 +15,10 @@ export async function GET(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
-    const salon_id = user.userId;
+    const salon_id = await getSalonIdForUser(user.userId);
+    if (!salon_id) {
+      return NextResponse.json({ items: [], page: 1, limit: 0 }, { status: 200 });
+    }
 
     const { searchParams } = new URL(req.url);
     const query = Object.fromEntries(searchParams.entries());
