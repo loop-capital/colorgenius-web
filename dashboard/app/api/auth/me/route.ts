@@ -4,8 +4,16 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
   const authUser = await getUserFromRequest(request);
+  
+  // Debug: log what we got
+  console.log('[auth/me] authUser:', authUser ? 'found' : 'null');
+  console.log('[auth/me] headers:', Object.fromEntries(request.headers.entries()));
+  
   if (!authUser) {
-    return NextResponse.json({ user: null }, { status: 401 });
+    return NextResponse.json({ 
+      user: null, 
+      debug: { cookie: 'missing or invalid', bearer: request.headers.get('authorization') ? 'present' : 'missing' }
+    }, { status: 401 });
   }
 
   try {
@@ -15,7 +23,7 @@ export async function GET(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ user: null }, { status: 401 });
+      return NextResponse.json({ user: null, debug: { userId: authUser.userId, found: false } }, { status: 401 });
     }
 
     return NextResponse.json({
@@ -26,7 +34,7 @@ export async function GET(request: Request) {
         salonName: user.first_name || user.email,
       }
     });
-  } catch {
-    return NextResponse.json({ user: null }, { status: 401 });
+  } catch (err: any) {
+    return NextResponse.json({ user: null, debug: { error: err.message } }, { status: 500 });
   }
 }
