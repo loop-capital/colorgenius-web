@@ -103,7 +103,17 @@ export async function getUserFromRequest(
 ): Promise<{ userId: string; username: string; email: string } | null> {
   const cookieToken = await getTokenFromCookie();
   const bearerToken = request.headers.get('authorization')?.replace('Bearer ', '');
-  const token = cookieToken || bearerToken;
-  if (!token) return null;
-  return verifyToken(token);
+  
+  // Try bearer token first (from localStorage), then cookie
+  if (bearerToken) {
+    const bearerUser = await verifyToken(bearerToken);
+    if (bearerUser) return bearerUser;
+  }
+  
+  if (cookieToken) {
+    const cookieUser = await verifyToken(cookieToken);
+    if (cookieUser) return cookieUser;
+  }
+  
+  return null;
 }
