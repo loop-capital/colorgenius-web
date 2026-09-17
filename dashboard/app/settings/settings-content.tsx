@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { CheckCircle, XCircle, RefreshCw, Unlink, Package, CreditCard, ArrowRight, Users, ToggleLeft, ToggleRight, Clock } from 'lucide-react';
 import PhorestCard from './phorest-card';
 import CloverCard from './clover-card';
+import BillingCard from './billing-card';
 
 interface SquareStatus {
   connected: boolean;
@@ -267,6 +268,9 @@ export default function SettingsContent() {
             </div>
           ))}
         </div>
+
+        <h2 className="text-lg font-semibold mb-3 mt-2" style={{ color: '#F5F5F7' }}>Formula Marketplace</h2>
+        <BillingCard />
 
         <div className="rounded-2xl p-6" style={{ background: '#0F0F1A', border: '1px solid rgba(255,255,255,0.06)' }}>
           <h2 className="font-semibold text-sm mb-4" style={{ color: '#F5F5F7' }}>Account</h2>

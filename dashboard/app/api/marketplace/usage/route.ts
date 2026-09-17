@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Previously this logged (and billed) usage against ANY active listing,
     // with no check the salon had ever actually acquired it — a real gap
     // for a "per-use licensing is the core paid model" system. A free
-    // formula (per_use_cents === 0) needs no license on file.
+    // formula (per_use_cents === 0) needs no license and no card at all.
     if (listing.per_use_cents > 0) {
       const license = await prisma.formula_purchases.findFirst({
         where: { salonId, formulaId: listing.id, status: 'completed' },
@@ -70,6 +70,17 @@ export async function POST(request: NextRequest) {
           success: false,
           error: { code: 'NOT_LICENSED', message: 'Add this formula to your library before using it' },
         }, { status: 403 });
+      }
+
+      // Without this, a salon could rack up unbilled usage indefinitely —
+      // monthly billing already refuses to run with no card on file
+      // (formula_purchases stays licensed, but nothing would ever collect).
+      const salon = await prisma.salons.findUnique({ where: { id: salonId }, select: { square_card_id: true } });
+      if (!salon?.square_card_id) {
+        return NextResponse.json<ApiResponse>({
+          success: false,
+          error: { code: 'NO_CARD_ON_FILE', message: 'Add a card on file in Settings before using licensed formulas' },
+        }, { status: 402 });
       }
     }
 

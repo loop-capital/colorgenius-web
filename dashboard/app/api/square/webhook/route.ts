@@ -4,16 +4,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifySquareWebhookSignature, squareClient } from '@/lib/square';
+import { verifySquareWebhookSignature, squareClient, listCustomerCards } from '@/lib/square';
 import { prisma } from '@/lib/prisma';
 
 /**
  * A payment.created/payment.updated event only tells us Square processed
  * SOME payment — we have to fetch the order it belongs to and read back the
- * referenceId we set at checkout-link creation time (our own
- * formula_purchases.id) to know which pending purchase to complete. This is
- * the only place a purchase is ever marked 'completed' — never the purchase
- * request itself, which only creates the pending row + checkout link.
+ * referenceId we set at checkout-link creation time to know what this
+ * payment was actually for. Dispatches on the referenceId's shape:
+ *   - "bs:<salonId>" — a card-verification charge; save the
+ *     card Square captured against the salon's customer.
+ *   - a formula_purchases.id (bare UUID) — legacy path from when
+ *     marketplace purchases went through Checkout Links directly; kept for
+ *     any purchase still mid-flight, though acquiring a license no longer
+ *     creates one of these.
  */
 async function handleSquarePayment(payment: any) {
   const status = payment?.status; // 'COMPLETED' | 'FAILED' | 'CANCELED' | ...
@@ -24,7 +28,28 @@ async function handleSquarePayment(payment: any) {
   const referenceId = orderResponse.order?.referenceId;
   if (!referenceId) return;
 
-  const purchase = await prisma.formula_purchases.findUnique({ where: { id: referenceId } });
+  if (referenceId.startsWith('bs:')) {
+    if (status !== 'COMPLETED') return;
+    const salonId = referenceId.slice('bs:'.length);
+    const salon = await prisma.salons.findUnique({ where: { id: salonId } });
+    if (!salon?.square_customer_id) return;
+
+    const cards = await listCustomerCards(salon.square_customer_id);
+    const card = cards?.[0];
+    if (!card?.id) return;
+
+    await prisma.salons.update({
+      where: { id: salonId },
+      data: {
+        square_card_id: card.id,
+        billing_card_last4: card.last4 || null,
+        billing_card_brand: card.cardBrand || null,
+      },
+    });
+    return;
+  }
+
+  const purchase = await prisma.formula_purchases.findUnique({ where: { id: referenceId } }).catch(() => null);
   if (!purchase || purchase.status === 'completed') return;
 
   if (status === 'COMPLETED') {
