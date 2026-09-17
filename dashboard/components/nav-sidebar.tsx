@@ -30,7 +30,11 @@ export function Sidebar() {
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    fetch('/api/auth/me', { credentials: 'include' }).then(r => r.ok ? r.json() : null).then(d => setUser(d?.user)).catch(() => {})
+    const token = localStorage.getItem('colorgenius_token')
+    fetch('/api/auth/me', { 
+      credentials: 'include',
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    }).then(r => r.ok ? r.json() : null).then(d => setUser(d?.user)).catch(() => {})
   }, [])
 
   return (

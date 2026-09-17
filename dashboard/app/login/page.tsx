@@ -47,6 +47,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok && data.success) {
+        localStorage.setItem("colorgenius_token", data.token);
         window.location.href = "/formulate";
       } else {
         setError(data.error || "Login failed");
