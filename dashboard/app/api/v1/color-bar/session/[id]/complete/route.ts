@@ -1,3 +1,4 @@
+import { Decimal } from '@prisma/client/runtime/library'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
@@ -11,7 +12,17 @@ interface CompletedStep {
   role: string
 }
 
+interface CompletedBody {
+  steps: CompletedStep[]
+  totalCost: number
+  formulaId?: string
+  clientId?: string
+  createClientFormula?: boolean // opt-in to create a reusable formula record
+}
+
 // POST /api/v1/color-bar/session/:id/complete
+// Mark a Color Bar session as completed, consume inventory, record formula usage,
+// create reusable formula history (ClientFormulaUsage), and write stock audit logs.
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await verifyBearerToken(req)
@@ -20,26 +31,171 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     const { id } = await params
-    const body = await req.json()
-    const { steps, totalCost } = body as { steps: CompletedStep[]; totalCost: number }
+    const body = (await req.json()) as CompletedBody
+    const { steps, totalCost, formulaId, clientId, createClientFormula } = body
 
     if (!steps || !Array.isArray(steps)) {
       return NextResponse.json({ error: 'Steps array is required' }, { status: 400 })
     }
+    if (steps.length === 0) {
+      return NextResponse.json({ error: 'Steps cannot be empty' }, { status: 400 })
+    }
 
-    // Try to update in Prisma (will fail if table doesn't exist)
-    try {
-      await prisma.color_bar_sessions.update({
-        where: { id },
+    // Load existing session to tie everything together.
+    const session = await prisma.color_bar_sessions.findUnique({
+      where: { id },
+    })
+
+    const salonId = session?.salon_id || undefined
+    const stylistId = session?.stylist_id || user.userId
+    const sessionClientId = session?.client_id || clientId
+
+    const safeTotalCost = typeof totalCost === 'number' && !Number.isNaN(totalCost) ? totalCost : 0
+
+    // ── Update the session record ───────────────────────────────────────
+    await prisma.color_bar_sessions.update({
+      where: { id },
+      data: {
+        status: 'completed',
+        steps: steps as any,
+        total_cost: safeTotalCost,
+        completed_at: new Date(),
+      },
+    })
+
+    // ── UsageLog: record one formula_usage_log entry per salon session ───
+    if (salonId) {
+      await prisma.formula_usage_log.create({
         data: {
-          status: 'completed',
-          steps: steps as any,
-          total_cost: totalCost || 0,
-          completed_at: new Date(),
+          salonId,
+          formulaId: formulaId || id,
+          stylistId: stylistId || undefined,
+          clientId: sessionClientId || undefined,
+          feeAmount: safeTotalCost,
+          creatorPayout: 0,
+          platformFee: 0,
         },
       })
-    } catch (dbError) {
-      console.warn('color_bar_sessions table not found, session not persisted')
+    }
+
+    // ── ClientFormulaUsage: create a reusable formula record if requested ─
+    if (createClientFormula && sessionClientId) {
+      // Build a formula name based on the primary brand + first shade.
+      const primaryBrand = steps[0]?.brand || 'Custom'
+      const primaryShade = steps[0]?.shadeCode || 'Mix'
+      const formulaName = `${primaryBrand} ${primaryShade}`
+
+      const formula = await prisma.formulas.create({
+        data: {
+          client_id: sessionClientId,
+          stylist_id: stylistId,
+          name: formulaName,
+          product_brand: primaryBrand,
+          product_line: steps[0]?.product || undefined,
+          product_shade: primaryShade,
+          notes: `Auto-saved from Color Bar session ${id}.`,
+        },
+      })
+
+      // Persist each step as a formulation_component.
+      await Promise.all(
+        steps.map((step, index) =>
+          prisma.formulation_components.create({
+            data: {
+              formulation_id: formula.id,
+              component_type: step.role === 'developer' ? 'developer' : 'color',
+              brand: step.brand,
+              product_line: step.product,
+              shade_code: step.shadeCode,
+              amount_ml: new Decimal(step.actualGrams || 0),
+              purpose: step.role,
+              sequence_order: index + 1,
+            },
+          })
+        )
+      )
+    }
+
+    // ── Inventory + StockTransaction audit per used item ─────────────────
+    const stockUpdates: {
+      brand: string
+      shadeCode: string
+      quantityUsed: number
+      quantityBefore: number
+      quantityAfter: number
+      itemId: string
+    }[] = []
+
+    for (const step of steps) {
+      if (!step.brand || !step.shadeCode) continue
+
+      const gramsUsed = Math.max(step.actualGrams || step.targetGrams || 0, 0)
+      if (gramsUsed <= 0) continue
+
+      // Find or initialize inventory item for this salon/brand/shade.
+      let item = salonId
+        ? await prisma.inventory_items.findUnique({
+            where: {
+              salon_id_brand_shade_code: {
+                salon_id: salonId,
+                brand: step.brand,
+                shade_code: step.shadeCode,
+              },
+            },
+          })
+        : null
+
+      if (!item && salonId) {
+        item = await prisma.inventory_items.create({
+          data: {
+            salon_id: salonId,
+            brand: step.brand,
+            product_line: step.product || undefined,
+            shade_code: step.shadeCode,
+            shade_name: `${step.brand} ${step.shadeCode}`,
+            source: 'color-bar',
+            quantity_on_hand: 0,
+          },
+        })
+      }
+
+      if (item) {
+        const quantityBefore = item.quantity_on_hand
+        const quantityAfter = Math.max(quantityBefore - gramsUsed, 0)
+
+        await prisma.inventory_items.update({
+          where: { id: item.id },
+          data: {
+            quantity_on_hand: quantityAfter,
+            updated_at: new Date(),
+          },
+        })
+
+        await prisma.inventory_transactions.create({
+          data: {
+            salon_id: item.salon_id,
+            item_id: item.id,
+            transaction_type: 'usage',
+            quantity_change: -gramsUsed,
+            quantity_before: quantityBefore,
+            quantity_after: quantityAfter,
+            reason: 'Color Bar session usage',
+            reference_type: 'color_bar_session',
+            reference_id: id,
+            performed_by: stylistId || undefined,
+            notes: `Used ${gramsUsed}g of ${step.brand} ${step.shadeCode} (${step.role}).`,
+          },
+        })
+
+        stockUpdates.push({
+          brand: step.brand,
+          shadeCode: step.shadeCode,
+          quantityUsed: gramsUsed,
+          quantityBefore,
+          quantityAfter,
+          itemId: item.id,
+        })
+      }
     }
 
     // Build receipt URL
@@ -48,9 +204,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({
       transactionId: id,
       receiptUrl,
-      totalCost: totalCost || 0,
+      totalCost: safeTotalCost,
       stepsCount: steps.length,
       totalGrams: steps.reduce((sum: number, s: CompletedStep) => sum + s.actualGrams, 0),
+      stockUpdates,
+      formulaSaved: createClientFormula && !!sessionClientId,
+      usageLogged: !!salonId,
     })
   } catch (error) {
     console.error('Color bar session complete error:', error)

@@ -21,38 +21,46 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Items array is required' }, { status: 400 })
     }
 
-    // Square Orders API integration
-    // In production, this uses the Square SDK:
-    // import { Client, Environment } from 'square'
-    //
-    // const client = new Client({
-    //   accessToken: process.env.SQUARE_ACCESS_TOKEN,
-    //   environment: Environment.Production,
-    // })
-    //
-    // const { result } = await client.ordersApi.createOrder({
-    //   order: {
-    //     locationId: process.env.SQUARE_LOCATION_ID,
-    //     lineItems: items.map(item => ({
-    //       name: item.name,
-    //       quantity: '1',
-    //       basePriceMoney: { amount: BigInt(Math.round(item.price * 100)), currency: 'USD' },
-    //     })),
-    //     state: 'PROPOSED',
-    //   },
-    //   idempotencyKey: `colorbar-${sessionId}-${Date.now()}`,
-    // })
+    // Use Square SDK to create order
+    const { squareClient } = await import('@/lib/square')
+    
+    const lineItems = items.map(item => ({
+      name: item.name,
+      quantity: item.quantity.toString(),
+      basePriceMoney: { 
+        amount: BigInt(Math.round(item.price * 100)), 
+        currency: 'USD' as const,
+      },
+    }))
 
-    // For now, return mock Square order
-    const squareOrderId = `sq_${Math.random().toString(36).substr(2, 12)}`
+    const idempotencyKey = `colorbar-${sessionId}-${Date.now()}`
+
+    const response = await squareClient.orders.create({
+      order: {
+        locationId: process.env.SQUARE_LOCATION_ID || '',
+        lineItems,
+        state: 'OPEN',
+        source: { name: 'COLORgenius Color Bar' },
+      },
+      idempotencyKey,
+    })
+
+    const order = response.order
+    if (!order) {
+      throw new Error('Square order creation returned no order')
+    }
 
     return NextResponse.json({
-      squareOrderId,
-      status: 'PROPOSED',
+      squareOrderId: order.id,
+      status: order.state,
+      totalMoney: order.totalMoney,
       message: 'Order pushed to Square Register. Complete payment at the register.',
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Square order POST error:', error)
-    return NextResponse.json({ error: 'Failed to create Square order' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Failed to create Square order', 
+      details: error?.message || String(error),
+    }, { status: 500 })
   }
 }
