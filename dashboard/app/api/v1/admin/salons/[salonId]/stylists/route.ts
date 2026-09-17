@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
-import { requireAdmin } from '@/lib/admin';
+import { requireAdmin, generatePassword } from '@/lib/admin';
 
 function slugifyHandle(name: string): string {
   return name
@@ -13,10 +12,48 @@ function slugifyHandle(name: string): string {
     .slice(0, 25) || 'stylist';
 }
 
-function generatePassword(): string {
-  // 12 random bytes, base64url — readable enough to hand off, no ambiguous
-  // characters problem since it's copy-pasted, not hand-typed off a screen.
-  return crypto.randomBytes(12).toString('base64url');
+/**
+ * GET /api/v1/admin/salons/:salonId/stylists — list the real accounts at a
+ * salon, so the admin UI can show more than a count and offer a per-account
+ * password reset.
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ salonId: string }> }
+) {
+  const admin = await requireAdmin(request);
+  if (!admin) {
+    return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED' } }, { status: 401 });
+  }
+
+  const { salonId } = await params;
+  const users = await prisma.users.findMany({
+    where: { salon_id: salonId },
+    orderBy: { created_at: 'asc' },
+    select: {
+      id: true,
+      email: true,
+      first_name: true,
+      last_name: true,
+      role: true,
+      created_at: true,
+      stylist: { select: { handle: true } },
+    },
+  });
+
+  return NextResponse.json({
+    success: true,
+    data: {
+      accounts: users.map((u) => ({
+        userId: u.id,
+        email: u.email,
+        name: [u.first_name, u.last_name].filter(Boolean).join(' ') || u.email,
+        role: u.role,
+        handle: u.stylist?.handle ?? null,
+        createdAt: u.created_at,
+      })),
+    },
+  });
 }
 
 const createStylistSchema = z.object({

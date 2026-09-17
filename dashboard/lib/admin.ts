@@ -1,5 +1,15 @@
+import crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
+
+/**
+ * Shared with the stylist-creation and password-reset routes — 12 random
+ * bytes, base64url. Readable enough to hand off, no ambiguous-character
+ * problem since it's copy-pasted, not hand-typed off a screen.
+ */
+export function generatePassword(): string {
+  return crypto.randomBytes(12).toString('base64url');
+}
 
 /**
  * Platform-admin check — distinct from a salon owner/manager (who can only

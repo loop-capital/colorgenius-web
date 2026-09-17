@@ -18,6 +18,15 @@ interface NewAccount {
   temporaryPassword?: string;
 }
 
+interface Account {
+  userId: string;
+  email: string;
+  name: string;
+  role: string;
+  handle: string | null;
+  createdAt: string;
+}
+
 export default function AdminSalonsPage() {
   const [salons, setSalons] = useState<Salon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +39,25 @@ export default function AdminSalonsPage() {
   const [stylistForm, setStylistForm] = useState({ email: '', displayName: '', role: 'owner' as 'owner' | 'stylist' });
   const [creatingStylist, setCreatingStylist] = useState(false);
   const [newAccount, setNewAccount] = useState<NewAccount | null>(null);
+
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [loadingAccounts, setLoadingAccounts] = useState(false);
+  const [resettingUserId, setResettingUserId] = useState<string | null>(null);
+  const [resetResult, setResetResult] = useState<{ userId: string; email: string; password: string } | null>(null);
+
+  const fetchAccounts = useCallback(async (salonId: string) => {
+    setLoadingAccounts(true);
+    try {
+      const res = await fetch(`/api/v1/admin/salons/${salonId}/stylists`, { credentials: 'include' });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error?.message || 'Failed to load accounts');
+      setAccounts(data.data.accounts);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load accounts');
+    } finally {
+      setLoadingAccounts(false);
+    }
+  }, []);
 
   const fetchSalons = useCallback(async () => {
     setLoading(true);
@@ -93,10 +121,39 @@ export default function AdminSalonsPage() {
       });
       setStylistForm({ email: '', displayName: '', role: 'stylist' });
       await fetchSalons();
+      await fetchAccounts(salonId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create account');
     } finally {
       setCreatingStylist(false);
+    }
+  }
+
+  function toggleExpand(salonId: string) {
+    const next = expandedSalonId === salonId ? null : salonId;
+    setExpandedSalonId(next);
+    setNewAccount(null);
+    setResetResult(null);
+    setAccounts([]);
+    if (next) fetchAccounts(next);
+  }
+
+  async function handleResetPassword(userId: string, email: string) {
+    setResettingUserId(userId);
+    setResetResult(null);
+    setError('');
+    try {
+      const res = await fetch(`/api/v1/admin/users/${userId}/reset-password`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error?.message || 'Failed to reset password');
+      setResetResult({ userId, email, password: data.data.temporaryPassword });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reset password');
+    } finally {
+      setResettingUserId(null);
     }
   }
 
@@ -136,7 +193,7 @@ export default function AdminSalonsPage() {
           {salons.map((salon) => (
             <div key={salon.id} style={{ background: '#161620', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-                onClick={() => setExpandedSalonId(expandedSalonId === salon.id ? null : salon.id)}>
+                onClick={() => toggleExpand(salon.id)}>
                 <div>
                   <div style={{ fontWeight: 600 }}>{salon.name}</div>
                   <div style={{ fontSize: 12, color: '#71717A' }}>
@@ -148,6 +205,37 @@ export default function AdminSalonsPage() {
 
               {expandedSalonId === salon.id && (
                 <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  {loadingAccounts ? (
+                    <p style={{ color: '#71717A', fontSize: 13 }}>Loading accounts…</p>
+                  ) : accounts.length > 0 ? (
+                    <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {accounts.map((acct) => (
+                        <div key={acct.userId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', background: '#0F0F1A', borderRadius: 6, fontSize: 13 }}>
+                          <div>
+                            <div>{acct.name} {acct.handle && <span style={{ color: '#71717A' }}>@{acct.handle}</span>}</div>
+                            <div style={{ color: '#71717A', fontSize: 12 }}>{acct.email} &middot; {acct.role}</div>
+                          </div>
+                          <button
+                            onClick={() => handleResetPassword(acct.userId, acct.email)}
+                            disabled={resettingUserId === acct.userId}
+                            style={{ padding: '6px 10px', borderRadius: 6, background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: '#F5F5F7', fontSize: 12, cursor: 'pointer', opacity: resettingUserId === acct.userId ? 0.6 : 1 }}
+                          >
+                            {resettingUserId === acct.userId ? 'Resetting…' : 'Reset Password'}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p style={{ color: '#71717A', fontSize: 13, marginBottom: 16 }}>No accounts yet at this salon.</p>
+                  )}
+
+                  {resetResult && (
+                    <div style={{ marginBottom: 16, padding: 12, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 8, fontSize: 13 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 6 }}>Password reset for {resetResult.email} &mdash; share this now, it won&apos;t be shown again:</div>
+                      <div>Password: <code>{resetResult.password}</code></div>
+                    </div>
+                  )}
+
                   <form onSubmit={(e) => handleCreateStylist(e, salon.id)} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <input
                       value={stylistForm.displayName}
