@@ -35,6 +35,7 @@ import {
   Beaker,
   X,
   Smartphone,
+  ArrowLeft,
 } from 'lucide-react-native';
 import { useAcaiaScale, useAcaiaCapture } from '../hooks/useAcaiaScale';
 import { getAuthToken } from '../api/client';
@@ -919,6 +920,12 @@ export default function ColorBarScreen({ navigation, route }: any) {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
+            <TouchableOpacity
+              onPress={() => (navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Dashboard'))}
+              style={styles.backBtn}
+            >
+              <ArrowLeft size={24} color={COLORS.textSecondary} />
+            </TouchableOpacity>
             <Beaker size={28} color={COLORS.purple} />
             <Text style={styles.headerTitle}>Color Bar</Text>
           </View>
