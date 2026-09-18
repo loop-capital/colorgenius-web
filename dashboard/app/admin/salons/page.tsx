@@ -25,7 +25,19 @@ interface Account {
   role: string;
   handle: string | null;
   createdAt: string;
+  stylistId: string | null;
+  formulaSalesCount: number;
+  marketplaceTierOverride: string | null;
+  marketplaceTier: string | null;
 }
+
+const TIER_COLORS: Record<string, string> = {
+  community: '#71717A',
+  professional: '#38BDF8',
+  master: '#A855F7',
+  signature: '#F59E0B',
+  elite: '#EC4899',
+};
 
 export default function AdminSalonsPage() {
   const [salons, setSalons] = useState<Salon[]>([]);
@@ -44,6 +56,7 @@ export default function AdminSalonsPage() {
   const [loadingAccounts, setLoadingAccounts] = useState(false);
   const [resettingUserId, setResettingUserId] = useState<string | null>(null);
   const [resetResult, setResetResult] = useState<{ userId: string; email: string; password: string } | null>(null);
+  const [settingTierId, setSettingTierId] = useState<string | null>(null);
 
   const fetchAccounts = useCallback(async (salonId: string) => {
     setLoadingAccounts(true);
@@ -157,6 +170,26 @@ export default function AdminSalonsPage() {
     }
   }
 
+  async function handleSetTier(stylistId: string, salonId: string, tier: string | null) {
+    setSettingTierId(stylistId);
+    setError('');
+    try {
+      const res = await fetch(`/api/v1/admin/stylists/${stylistId}/tier`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error?.message || 'Failed to set tier');
+      await fetchAccounts(salonId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to set tier');
+    } finally {
+      setSettingTierId(null);
+    }
+  }
+
   return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: '40px 20px', fontFamily: 'system-ui, sans-serif', color: '#F5F5F7', background: '#0A0A0F', minHeight: '100vh' }}>
       <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Salons</h1>
@@ -210,18 +243,49 @@ export default function AdminSalonsPage() {
                   ) : accounts.length > 0 ? (
                     <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {accounts.map((acct) => (
-                        <div key={acct.userId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', background: '#0F0F1A', borderRadius: 6, fontSize: 13 }}>
+                        <div key={acct.userId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 10px', background: '#0F0F1A', borderRadius: 6, fontSize: 13, gap: 8 }}>
                           <div>
-                            <div>{acct.name} {acct.handle && <span style={{ color: '#71717A' }}>@{acct.handle}</span>}</div>
-                            <div style={{ color: '#71717A', fontSize: 12 }}>{acct.email} &middot; {acct.role}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              {acct.name} {acct.handle && <span style={{ color: '#71717A' }}>@{acct.handle}</span>}
+                              {acct.marketplaceTier && (
+                                <span style={{
+                                  fontSize: 10, fontWeight: 600, textTransform: 'uppercase', padding: '2px 6px', borderRadius: 999,
+                                  color: TIER_COLORS[acct.marketplaceTier] || '#71717A',
+                                  background: `${TIER_COLORS[acct.marketplaceTier] || '#71717A'}22`,
+                                }}>
+                                  {acct.marketplaceTier}
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ color: '#71717A', fontSize: 12 }}>
+                              {acct.email} &middot; {acct.role}
+                              {acct.stylistId && <> &middot; {acct.formulaSalesCount} career purchases</>}
+                            </div>
                           </div>
-                          <button
-                            onClick={() => handleResetPassword(acct.userId, acct.email)}
-                            disabled={resettingUserId === acct.userId}
-                            style={{ padding: '6px 10px', borderRadius: 6, background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: '#F5F5F7', fontSize: 12, cursor: 'pointer', opacity: resettingUserId === acct.userId ? 0.6 : 1 }}
-                          >
-                            {resettingUserId === acct.userId ? 'Resetting…' : 'Reset Password'}
-                          </button>
+                          <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                            {acct.stylistId && (
+                              <button
+                                onClick={() => handleSetTier(acct.stylistId!, salon.id, acct.marketplaceTierOverride === 'elite' ? null : 'elite')}
+                                disabled={settingTierId === acct.stylistId}
+                                style={{
+                                  padding: '6px 10px', borderRadius: 6, fontSize: 12, cursor: 'pointer',
+                                  background: acct.marketplaceTierOverride === 'elite' ? 'rgba(236,72,153,0.15)' : 'transparent',
+                                  border: `1px solid ${acct.marketplaceTierOverride === 'elite' ? 'rgba(236,72,153,0.4)' : 'rgba(255,255,255,0.15)'}`,
+                                  color: acct.marketplaceTierOverride === 'elite' ? '#EC4899' : '#F5F5F7',
+                                  opacity: settingTierId === acct.stylistId ? 0.6 : 1,
+                                }}
+                              >
+                                {settingTierId === acct.stylistId ? 'Saving…' : acct.marketplaceTierOverride === 'elite' ? 'Remove Elite' : 'Set Elite'}
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleResetPassword(acct.userId, acct.email)}
+                              disabled={resettingUserId === acct.userId}
+                              style={{ padding: '6px 10px', borderRadius: 6, background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: '#F5F5F7', fontSize: 12, cursor: 'pointer', opacity: resettingUserId === acct.userId ? 0.6 : 1 }}
+                            >
+                              {resettingUserId === acct.userId ? 'Resetting…' : 'Reset Password'}
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>

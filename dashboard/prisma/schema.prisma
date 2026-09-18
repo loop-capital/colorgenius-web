@@ -657,6 +657,7 @@ model stylists {
   creator_tier             String?                    @default("community") @db.VarChar(20)
   follower_count           Int?                       @default(0)
   formula_sales_count      Int?                       @default(0)
+  marketplace_tier_override String?                   @db.VarChar(20)
   instagram_handle         String?                    @db.VarChar(100)
   tiktok_handle            String?                    @db.VarChar(100)
   website_url              String?                    @db.VarChar(500)

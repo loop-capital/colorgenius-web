@@ -15,7 +15,7 @@ import { prisma } from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
 import { getOrCreateStylistForUser } from '@/lib/stylist';
 import { generateShareCode } from '@/lib/share-code';
-import { FormulaTier, getTierForScore } from '@/lib/api/types';
+import { computeCreatorTier, TIER_PER_USE_CENTS, TIER_PURCHASE_THRESHOLDS } from '@/lib/marketplace/creator-tier';
 import { z } from 'zod';
 
 // creator_id/creator_name/creator_avatar removed from input — the creator is
@@ -52,13 +52,6 @@ function scoreFormula(data: z.infer<typeof publishSchema>): number {
 
   return Math.min(score, 100);
 }
-
-const TIER_PER_USE_CENTS: Record<FormulaTier, number> = {
-  community: 0,
-  professional: 299,
-  master: 499,
-  signature: 799,
-};
 
 export async function POST(request: NextRequest) {
   try {
@@ -102,9 +95,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Score the formula
+    // Score is still computed as a quality indicator shown to browsers,
+    // but no longer sets price — price/tier are earned by the creator's
+    // career purchase total across their whole catalog (see
+    // lib/marketplace/creator-tier.ts), not any one formula's own merit.
     const score = scoreFormula(data);
-    const tier = getTierForScore(score);
+    const creatorRow = await prisma.stylists.findUnique({
+      where: { id: stylist.id },
+      select: { formula_sales_count: true, marketplace_tier_override: true },
+    });
+    const tier = computeCreatorTier(creatorRow?.formula_sales_count ?? 0, creatorRow?.marketplace_tier_override);
     const perUseCents = TIER_PER_USE_CENTS[tier];
 
     const listing = await prisma.formula_listings.create({
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         formula: { ...listing, share_code: shareCode },
-        message: `Published! Your formula scored ${score}/100 and earned the "${tier}" tier.`,
+        message: `Published! Priced at your creator tier: "${tier}".`,
         tier_info: {
           tier,
           score,
@@ -164,15 +164,17 @@ export async function GET() {
     success: true,
     data: {
       tiers: [
-        { tier: 'community', score_range: '0-49', per_use: 'Free', description: 'Basic formula, limited testing' },
-        { tier: 'professional', score_range: '50-69', per_use: '$2.99/use', description: 'Verified results, good chemistry' },
-        { tier: 'master', score_range: '70-84', per_use: '$4.99/use', description: 'High-scoring, multiple client validations' },
-        { tier: 'signature', score_range: '85-100', per_use: '$7.99/use', description: 'Top-tier, exceptional results' },
+        { tier: 'community', career_purchases: `${TIER_PURCHASE_THRESHOLDS.community}+`, per_use: 'Free', description: 'Every new creator starts here' },
+        { tier: 'professional', career_purchases: `${TIER_PURCHASE_THRESHOLDS.professional}+`, per_use: `$${(TIER_PER_USE_CENTS.professional / 100).toFixed(2)}/use`, description: 'Proven catalog, repeat salon demand' },
+        { tier: 'master', career_purchases: `${TIER_PURCHASE_THRESHOLDS.master}+`, per_use: `$${(TIER_PER_USE_CENTS.master / 100).toFixed(2)}/use`, description: 'Consistently purchased across your catalog' },
+        { tier: 'signature', career_purchases: `${TIER_PURCHASE_THRESHOLDS.signature}+`, per_use: `$${(TIER_PER_USE_CENTS.signature / 100).toFixed(2)}/use`, description: 'Top-tier, widely licensed creator' },
+        { tier: 'elite', career_purchases: 'By invitation', per_use: `$${(TIER_PER_USE_CENTS.elite / 100).toFixed(2)}/use`, description: 'Hand-picked by ColorGenius' },
       ],
+      pricing_note: 'Your tier is earned by total career purchases across ALL of your published formulas, not any single formula’s own sales — every formula you publish shares your current tier and price.',
       revenue_split: { creator: '70%', platform: '30%' },
       billing: 'Monthly in arrears — stylists pay at end of month for actual usage',
       requirements: [
-        'Result photo recommended (increases score)',
+        'Result photo recommended (increases quality score, shown to buyers)',
         'Detailed description of technique',
         'Relevant tags for discoverability',
       ],

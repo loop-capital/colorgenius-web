@@ -3,6 +3,7 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, generatePassword } from '@/lib/admin';
+import { computeCreatorTier } from '@/lib/marketplace/creator-tier';
 
 function slugifyHandle(name: string): string {
   return name
@@ -37,7 +38,7 @@ export async function GET(
       last_name: true,
       role: true,
       created_at: true,
-      stylist: { select: { handle: true } },
+      stylist: { select: { id: true, handle: true, formula_sales_count: true, marketplace_tier_override: true } },
     },
   });
 
@@ -51,6 +52,12 @@ export async function GET(
         role: u.role,
         handle: u.stylist?.handle ?? null,
         createdAt: u.created_at,
+        stylistId: u.stylist?.id ?? null,
+        formulaSalesCount: u.stylist?.formula_sales_count ?? 0,
+        marketplaceTierOverride: u.stylist?.marketplace_tier_override ?? null,
+        marketplaceTier: u.stylist
+          ? computeCreatorTier(u.stylist.formula_sales_count ?? 0, u.stylist.marketplace_tier_override)
+          : null,
       })),
     },
   });

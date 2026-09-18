@@ -17,6 +17,7 @@ import { validateOrThrow, purchaseSchema } from '@/lib/api/validation';
 import { prisma } from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
 import { getSalonIdForUser } from '@/lib/stylist';
+import { recomputeCreatorPricing } from '@/lib/marketplace/creator-tier';
 import { ApiResponse } from '@/lib/api/types';
 
 export async function POST(request: NextRequest) {
@@ -80,8 +81,19 @@ export async function POST(request: NextRequest) {
         where: { id: listing.id },
         data: { purchase_count: { increment: 1 } },
       });
+      // Career purchase count across the creator's WHOLE catalog — this is
+      // what earns their marketplace tier, not this one formula's sales.
+      await tx.stylists.update({
+        where: { id: listing.creator_id },
+        data: { formula_sales_count: { increment: 1 } },
+      });
       return l;
     });
+
+    // Push the creator's (possibly just-changed) tier and price onto every
+    // formula they've published — outside the transaction since it's a
+    // follow-up cascade, not part of the purchase itself.
+    await recomputeCreatorPricing(listing.creator_id);
 
     return NextResponse.json<ApiResponse>({
       success: true,
