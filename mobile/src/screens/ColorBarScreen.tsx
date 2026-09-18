@@ -37,6 +37,7 @@ import {
   Smartphone,
 } from 'lucide-react-native';
 import { useAcaiaScale, useAcaiaCapture } from '../hooks/useAcaiaScale';
+import { getAuthToken } from '../api/client';
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 
@@ -543,9 +544,17 @@ function StepCard({
 // ─── Main Screen ───────────────────────────────────────────────────────────
 
 export default function ColorBarScreen({ navigation, route }: any) {
-  // Get auth token from route params or context
-  const token = route?.params?.token || '';
-  
+  // Auth token — nothing ever navigates here with a route param, so read the
+  // real stored session token the same way every other screen does.
+  const [token, setToken] = useState('');
+  const [tokenLoaded, setTokenLoaded] = useState(false);
+  useEffect(() => {
+    getAuthToken().then((t) => {
+      setToken(t || '');
+      setTokenLoaded(true);
+    });
+  }, []);
+
   // State
   const [session, setSession] = useState<ColorBarSession>({ id: '', status: 'idle' });
   const [searchQuery, setSearchQuery] = useState('');
@@ -581,6 +590,7 @@ export default function ColorBarScreen({ navigation, route }: any) {
 
   // Load clients from API on mount
   useEffect(() => {
+    if (!tokenLoaded) return;
     if (!token) {
       Alert.alert('Not signed in', 'Log in to load your client list.');
       return;
@@ -598,7 +608,7 @@ export default function ColorBarScreen({ navigation, route }: any) {
           err instanceof Error ? err.message : 'Check your connection and try again.'
         );
       });
-  }, [token]);
+  }, [token, tokenLoaded]);
 
   // Filter clients
   const filteredClients = searchQuery.length > 0
