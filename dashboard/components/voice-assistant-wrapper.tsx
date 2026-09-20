@@ -3,14 +3,15 @@
 import { usePathname } from 'next/navigation'
 import { VoiceAssistant } from '@/components/custom/voice-assistant'
 
-// Don't show on auth pages
-const EXCLUDED_PATHS = ['/login', '/register', '/api']
+// Only the actual bowl-side workflow pages — every question costs real
+// OpenAI money, so this doesn't render globally across the whole
+// dashboard (admin pages, settings, subscription, etc. never needed it).
+const INCLUDED_PATHS = ['/service', '/formulate']
 
 export function VoiceAssistantWrapper() {
   const pathname = usePathname()
 
-  // Hide on auth pages
-  if (EXCLUDED_PATHS.some(p => pathname.startsWith(p))) {
+  if (!INCLUDED_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'))) {
     return null
   }
 

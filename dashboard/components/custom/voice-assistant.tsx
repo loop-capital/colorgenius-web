@@ -63,6 +63,7 @@ export function VoiceAssistant({ clientId, context, position = 'bottom-right' }:
   const [expanded, setExpanded] = useState(false)
   const [enabled, setEnabled] = useState<boolean | null>(null)
   const [billing, setBilling] = useState<{ billedMinutes: number; billedCents: number; monthlyTotal: number } | null>(null)
+  const [voiceDisabledMidUse, setVoiceDisabledMidUse] = useState(false)
 
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -82,26 +83,6 @@ export function VoiceAssistant({ clientId, context, position = 'bottom-right' }:
       })
       .catch(() => setEnabled(false))
   }, [])
-
-  // ── Toggle assistant ──
-  const toggleAssistant = useCallback(async () => {
-    const newState = !enabled
-    try {
-      const res = await fetch('/api/assistant', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enabled: newState }),
-      })
-      const data = await res.json()
-      if (data.success) {
-        setEnabled(newState)
-        setResponse(newState ? 'Voice assistant enabled' : 'Voice assistant disabled')
-        setTimeout(() => setResponse(''), 2000)
-      }
-    } catch {
-      setResponse('Failed to toggle')
-    }
-  }, [enabled])
 
   // ── Start listening ──
   const startListening = useCallback(() => {
@@ -173,7 +154,7 @@ export function VoiceAssistant({ clientId, context, position = 'bottom-right' }:
       if (!res.ok) {
         if (data.code === 'VOICE_DISABLED') {
           setEnabled(false)
-          setResponse('Voice assistant was disabled.')
+          setVoiceDisabledMidUse(true)
           setExpanded(true)
           setState('idle')
           return
@@ -278,16 +259,16 @@ export function VoiceAssistant({ clientId, context, position = 'bottom-right' }:
 
   return (
     <div className={`fixed ${positionClasses[position]} z-50`}>
-      {/* Disabled panel */}
+      {/* Disabled panel — enabling this is admin-only, not self-service */}
       {enabled === false && expanded && (
         <div className="mb-3 max-w-[220px] rounded-2xl border border-white/[0.06] p-4 shadow-xl"
           style={{ background: 'rgba(20, 20, 35, 0.95)', backdropFilter: 'blur(16px)' }}>
           <p className="text-sm text-[#F5F5F7] mb-1">Voice Assistant is off</p>
-          <p className="text-xs text-[#71717A] mb-3">Enable to use bowl-side consultation. Charged per minute.</p>
-          <button onClick={toggleAssistant}
-            className="w-full py-2 rounded-lg text-xs font-medium text-[#0A0A0F] bg-[#9333EA] hover:opacity-90">
-            Enable Voice Assistant
-          </button>
+          <p className="text-xs text-[#71717A]">
+            {voiceDisabledMidUse
+              ? 'This salon’s voice assistant was turned off.'
+              : 'Ask ColorGenius to turn this on for your salon — it’s billed per question.'}
+          </p>
         </div>
       )}
 
@@ -329,15 +310,6 @@ export function VoiceAssistant({ clientId, context, position = 'bottom-right' }:
           </div>
         )}
 
-        {/* Toggle switch (when expanded) */}
-        {expanded && enabled !== null && (
-          <button onClick={toggleAssistant}
-            className={`w-10 h-5 rounded-full relative transition-colors ${enabled ? 'bg-[#9333EA]' : 'bg-[#71717A]'}`}
-            title={enabled ? 'Disable voice assistant' : 'Enable voice assistant'}>
-            <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${enabled ? 'left-5' : 'left-0.5'}`} />
-          </button>
-        )}
-
         {/* Main button */}
         <button
           onMouseDown={handlePressStart}
@@ -355,7 +327,7 @@ export function VoiceAssistant({ clientId, context, position = 'bottom-right' }:
                 ? '0 4px 20px rgba(113, 113, 122, 0.2)'
                 : '0 4px 20px rgba(147, 51, 234, 0.3)',
           }}
-          title={enabled === false ? 'Enable in settings' : speechSupported ? 'Hold to speak' : 'Voice not supported'}
+          title={enabled === false ? 'Not enabled for your salon' : speechSupported ? 'Hold to speak' : 'Voice not supported'}
         >
           {enabled === false ? <LockIcon /> : stateIcons[state]}
         </button>

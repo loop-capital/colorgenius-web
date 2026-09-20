@@ -9,6 +9,7 @@ interface Salon {
   inviteCode: string | null;
   staffCount: number;
   createdAt: string;
+  voiceAssistantEnabled: boolean;
 }
 
 interface NewAccount {
@@ -57,6 +58,7 @@ export default function AdminSalonsPage() {
   const [resettingUserId, setResettingUserId] = useState<string | null>(null);
   const [resetResult, setResetResult] = useState<{ userId: string; email: string; password: string } | null>(null);
   const [settingTierId, setSettingTierId] = useState<string | null>(null);
+  const [settingVoiceAssistantId, setSettingVoiceAssistantId] = useState<string | null>(null);
 
   const fetchAccounts = useCallback(async (salonId: string) => {
     setLoadingAccounts(true);
@@ -190,6 +192,26 @@ export default function AdminSalonsPage() {
     }
   }
 
+  async function handleToggleVoiceAssistant(salonId: string, enabled: boolean) {
+    setSettingVoiceAssistantId(salonId);
+    setError('');
+    try {
+      const res = await fetch(`/api/v1/admin/salons/${salonId}/voice-assistant`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error?.message || 'Failed to update voice assistant');
+      await fetchSalons();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update voice assistant');
+    } finally {
+      setSettingVoiceAssistantId(null);
+    }
+  }
+
   return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: '40px 20px', fontFamily: 'system-ui, sans-serif', color: '#F5F5F7', background: '#0A0A0F', minHeight: '100vh' }}>
       <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Salons</h1>
@@ -238,6 +260,25 @@ export default function AdminSalonsPage() {
 
               {expandedSalonId === salon.id && (
                 <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#0F0F1A', borderRadius: 8, marginBottom: 16 }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600 }}>Voice Assistant</div>
+                      <div style={{ fontSize: 11, color: '#71717A' }}>Bowl-side AI Q&amp;A &mdash; billed per question. Admin-controlled only.</div>
+                    </div>
+                    <button
+                      onClick={() => handleToggleVoiceAssistant(salon.id, !salon.voiceAssistantEnabled)}
+                      disabled={settingVoiceAssistantId === salon.id}
+                      style={{
+                        padding: '6px 12px', borderRadius: 6, fontSize: 12, cursor: 'pointer', fontWeight: 600,
+                        background: salon.voiceAssistantEnabled ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.06)',
+                        border: `1px solid ${salon.voiceAssistantEnabled ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.15)'}`,
+                        color: salon.voiceAssistantEnabled ? '#10B981' : '#A1A1AA',
+                        opacity: settingVoiceAssistantId === salon.id ? 0.6 : 1,
+                      }}
+                    >
+                      {settingVoiceAssistantId === salon.id ? 'Saving…' : salon.voiceAssistantEnabled ? 'On — Turn Off' : 'Off — Turn On'}
+                    </button>
+                  </div>
                   {loadingAccounts ? (
                     <p style={{ color: '#71717A', fontSize: 13 }}>Loading accounts…</p>
                   ) : accounts.length > 0 ? (

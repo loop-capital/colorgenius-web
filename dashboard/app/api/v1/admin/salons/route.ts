@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
       slug: true,
       invite_code: true,
       created_at: true,
+      features_enabled: true,
       _count: { select: { users: true } },
     },
   });
@@ -50,6 +51,7 @@ export async function GET(request: NextRequest) {
         inviteCode: s.invite_code,
         staffCount: s._count.users,
         createdAt: s.created_at,
+        voiceAssistantEnabled: (s.features_enabled as Record<string, unknown> | null)?.voice_assistant === true,
       })),
     },
   });
