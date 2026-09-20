@@ -216,7 +216,11 @@ export function getAuthUrl(salonId: string, redirectUri: string): string {
     // ORDERS_WRITE/READ were missing entirely — without them, an already-
     // "connected" salon's token still gets a 403 the first time we try to
     // push a Color Bar formula charge as a Square order.
-    scope: 'ITEMS_READ INVENTORY_READ INVENTORY_WRITE MERCHANT_PROFILE_READ PAYMENTS_READ CUSTOMERS_READ ORDERS_READ ORDERS_WRITE',
+    // INVENTORY_WRITE dropped — nothing in this app writes Square inventory
+    // (we deliberately don't: see the gram-native inventory system, which
+    // treats Square's per-unit counts as a different, incompatible unit
+    // from our own — least-privilege now that that decision is settled).
+    scope: 'ITEMS_READ INVENTORY_READ MERCHANT_PROFILE_READ PAYMENTS_READ CUSTOMERS_READ ORDERS_READ ORDERS_WRITE',
     session: 'false',
     state: salonId,
   });

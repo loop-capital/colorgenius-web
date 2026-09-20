@@ -235,7 +235,7 @@ export default function SettingsContent() {
                 style={{ background: '#006AFF', color: '#FFFFFF' }}>
                 <CreditCard className="w-4 h-4" /> Connect Square <ArrowRight className="w-4 h-4" />
               </a>
-              <p className="text-[10px] mt-3" style={{ color: '#71717A' }}>You&apos;ll be redirected to Square to authorize COLORgenius. We request read access to your catalog, customers, and orders, and read/write access to inventory.</p>
+              <p className="text-[10px] mt-3" style={{ color: '#71717A' }}>You&apos;ll be redirected to Square to authorize COLORgenius. We request read access to your catalog, inventory, customers, and orders, and write access to orders (for Color Bar checkout).</p>
             </div>
           )}
         </div>
