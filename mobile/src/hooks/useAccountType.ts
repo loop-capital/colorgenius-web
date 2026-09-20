@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_BASE, getAuthToken } from '../api/client';
+import { API_BASE, getAuthToken, notifyUnauthorized } from '../api/client';
 
 export type AccountType =
   | 'stylist'
@@ -83,6 +83,7 @@ export function useAccountType(): {
       });
 
       if (!res.ok) {
+        if (res.status === 401) await notifyUnauthorized();
         throw new Error(`HTTP ${res.status}: Failed to fetch account type`);
       }
 

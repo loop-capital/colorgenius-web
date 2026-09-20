@@ -31,6 +31,25 @@ export async function setAuthToken(token: string): Promise<void> {
   await AsyncStorage.setItem(TOKEN_KEY, token);
 }
 
+// ─── Global 401 handling ─────────────────────────────────────────
+// apiRequest below has no access to React navigation/state, so it calls
+// this if set — App.tsx registers it once on mount to flip back to the
+// login screen. Without this, an invalid/expired token (e.g. after a
+// server-side JWT_SECRET rotation) just produced scattered "HTTP 401"
+// error alerts on whatever screen the user happened to be on, with no
+// path back to a working state.
+let onUnauthorized: (() => void) | null = null;
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler;
+}
+// For call sites (like ColorBarScreen) that make their own fetch() calls
+// instead of going through apiRequest below — same cleanup, callable
+// directly on any 401.
+export async function notifyUnauthorized(): Promise<void> {
+  await clearAuthToken();
+  onUnauthorized?.();
+}
+
 export async function clearAuthToken(): Promise<void> {
   await AsyncStorage.removeItem(TOKEN_KEY);
 }
@@ -134,6 +153,9 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ error: 'Request failed' }));
+    if (response.status === 401) {
+      await notifyUnauthorized();
+    }
     throw new Error(`HTTP ${response.status}: ${error.error || 'Request failed'}`);
   }
 

@@ -30,7 +30,7 @@ import {
   Image as ImageIcon,
   Check,
 } from 'lucide-react-native';
-import { apiRequest, getAuthToken, loginBeta, uploadPhotoMultipart, API_BASE } from '../api/client';
+import { apiRequest, getAuthToken, loginBeta, uploadPhotoMultipart, API_BASE, notifyUnauthorized } from '../api/client';
 
 // ─── Theme ───────────────────────────────────────────────────────────────────
 
@@ -260,6 +260,7 @@ export default function GalleryUploadScreen({ navigation }: any) {
       });
 
       if (!response.ok) {
+        if (response.status === 401) await notifyUnauthorized();
         const err = await response.json().catch(() => ({ error: 'Upload failed' }));
         throw new Error(err.error || `Upload failed: HTTP ${response.status}`);
       }

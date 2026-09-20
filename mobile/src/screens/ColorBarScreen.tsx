@@ -38,7 +38,7 @@ import {
   ArrowLeft,
 } from 'lucide-react-native';
 import { useAcaiaScale, useAcaiaCapture } from '../hooks/useAcaiaScale';
-import { getAuthToken } from '../api/client';
+import { getAuthToken, notifyUnauthorized } from '../api/client';
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 
@@ -112,11 +112,21 @@ interface ColorBarSession {
 // silently never got saved is real client work lost with no indication
 // anything went wrong. Callers are responsible for surfacing the error.
 
+// None of these go through api/client.ts's shared apiRequest (they predate
+// it and build their own headers), so a 401 here was previously invisible
+// to the rest of the app — the token could go dead (e.g. a server-side
+// JWT_SECRET rotation) and this screen would just show a generic "Failed
+// to fetch clients (401)" error forever, with no path back to login.
+async function checkAuthResponse(res: Response, errorPrefix: string): Promise<void> {
+  if (res.status === 401) await notifyUnauthorized();
+  if (!res.ok) throw new Error(`${errorPrefix} (${res.status})`);
+}
+
 async function fetchClients(token: string): Promise<Client[]> {
   const res = await fetch(`${API_BASE}/clients`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error(`Failed to fetch clients (${res.status})`);
+  await checkAuthResponse(res, 'Failed to fetch clients');
   const data = await res.json();
   return data.clients || [];
 }
@@ -125,7 +135,7 @@ async function fetchClientFormulas(clientId: string, token: string): Promise<For
   const res = await fetch(`${API_BASE}/formulas/${clientId}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  if (!res.ok) throw new Error(`Failed to fetch formulas (${res.status})`);
+  await checkAuthResponse(res, 'Failed to fetch formulas');
   const data = await res.json();
   return data.formulas || [];
 }
@@ -139,7 +149,7 @@ async function createSession(clientId: string, formulaId: string | undefined, to
     },
     body: JSON.stringify({ clientId, formulaId })
   });
-  if (!res.ok) throw new Error(`Failed to create session (${res.status})`);
+  await checkAuthResponse(res, 'Failed to create session');
   const data = await res.json();
   return data.sessionId;
 }
@@ -164,7 +174,7 @@ async function completeSession(sessionId: string, steps: FormulaStep[], token: s
     },
     body: JSON.stringify({ steps })
   });
-  if (!res.ok) throw new Error(`Failed to complete session (${res.status})`);
+  await checkAuthResponse(res, 'Failed to complete session');
   return await res.json();
 }
 
@@ -188,6 +198,7 @@ async function pushOrderToPos(sessionId: string, token: string): Promise<PosOrde
     body: JSON.stringify({ sessionId }),
   });
   const data = await res.json();
+  if (res.status === 401) await notifyUnauthorized();
   if (!res.ok) {
     throw new Error(data?.error || `Failed to push order (${res.status})`);
   }
@@ -216,7 +227,7 @@ async function startPairing(token: string): Promise<{ code: string; expiresAt: s
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error(`Failed to generate a code (${res.status})`);
+  await checkAuthResponse(res, 'Failed to generate a code');
   return res.json();
 }
 
@@ -224,7 +235,7 @@ async function getPairingStatus(code: string, token: string): Promise<PairingSta
   const res = await fetch(`${API_BASE}/pairing/${code}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error(`Failed to check pairing status (${res.status})`);
+  await checkAuthResponse(res, 'Failed to check pairing status');
   return res.json();
 }
 
@@ -232,7 +243,7 @@ async function fetchRemoteSession(sessionId: string, token: string): Promise<Rem
   const res = await fetch(`${API_BASE}/session/${sessionId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error(`Failed to load session (${res.status})`);
+  await checkAuthResponse(res, 'Failed to load session');
   return res.json();
 }
 

@@ -4,7 +4,7 @@ import { NavigationContainer, createNavigationContainerRef } from '@react-naviga
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getAuthToken, clearAuthToken } from './src/api/client';
+import { getAuthToken, clearAuthToken, setUnauthorizedHandler } from './src/api/client';
 import { Menu } from 'lucide-react-native';
 
 import DashboardScreen from './src/screens/DashboardScreen';
@@ -143,6 +143,15 @@ function AppContent() {
   // Check auth on mount
   useEffect(() => {
     checkAuth();
+  }, []);
+
+  // Any API call that gets a 401 (dead/invalid token — e.g. a server-side
+  // JWT_SECRET rotation) clears the token and flips back to the login
+  // screen here, instead of leaving the user stuck on whatever screen they
+  // were on with a generic error and no way back in.
+  useEffect(() => {
+    setUnauthorizedHandler(() => setIsAuthenticated(false));
+    return () => setUnauthorizedHandler(null);
   }, []);
 
   async function checkAuth() {
