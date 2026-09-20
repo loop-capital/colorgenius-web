@@ -41,7 +41,18 @@ export async function billSalonForPeriod(
   });
 
   const billable = periodEvents.filter((e) => Number(e.feeAmount) > 0);
-  if (billable.length === 0) {
+
+  // Voice assistant cost — no creator split (100% platform pass-through),
+  // billed alongside formula usage on the same monthly invoice/charge
+  // rather than a separate one, so a salon gets one bill, not two.
+  const voiceAssistantEvents = await prisma.voice_assistant_usage.findMany({
+    where: { salon_id: salonId, billing_invoice_id: null, created_at: { gte: periodStart, lt: periodEnd } },
+  });
+  const voiceAssistantCents = Math.round(
+    voiceAssistantEvents.reduce((sum, e) => sum + Number(e.cost_cents), 0)
+  );
+
+  if (billable.length === 0 && voiceAssistantEvents.length === 0) {
     return { success: false, error: { code: 'NO_USAGE', message: 'No unbilled usage found for this period' }, status: 400 };
   }
 
@@ -79,6 +90,16 @@ export async function billSalonForPeriod(
 
   const totalCreatorEarnings = lineItems.reduce((sum, l) => sum + l.creator_earnings_cents, 0);
   const totalPlatformFee = lineItems.reduce((sum, l) => sum + l.platform_fee_cents, 0);
+  const combinedTotalCents = totalCents + voiceAssistantCents;
+
+  // Only possible when there's no formula usage and voice-assistant cost
+  // for the period is real but rounds to less than a cent (e.g. one or two
+  // questions) — leave those usage rows unbilled so they roll forward and
+  // accumulate with next month's, rather than creating an invoice and
+  // attempting an actual $0.00 Square charge.
+  if (combinedTotalCents <= 0) {
+    return { success: false, error: { code: 'NO_USAGE', message: 'Unbilled usage this period rounds to less than a cent — carried to next month' }, status: 400 };
+  }
 
   const salon = await prisma.salons.findUnique({
     where: { id: salonId },
@@ -97,17 +118,26 @@ export async function billSalonForPeriod(
       data: {
         salon_id: salonId,
         billing_period: period,
-        total_cents: totalCents,
+        total_cents: combinedTotalCents,
         total_creator_earnings_cents: totalCreatorEarnings,
         total_platform_fee_cents: totalPlatformFee,
+        voice_assistant_cents: voiceAssistantCents,
         line_items: lineItems as any,
         status: 'pending',
       },
     });
-    await tx.formula_usage_log.updateMany({
-      where: { id: { in: billable.map((e) => e.id) } },
-      data: { billingInvoiceId: inv.id },
-    });
+    if (billable.length > 0) {
+      await tx.formula_usage_log.updateMany({
+        where: { id: { in: billable.map((e) => e.id) } },
+        data: { billingInvoiceId: inv.id },
+      });
+    }
+    if (voiceAssistantEvents.length > 0) {
+      await tx.voice_assistant_usage.updateMany({
+        where: { id: { in: voiceAssistantEvents.map((e) => e.id) } },
+        data: { billing_invoice_id: inv.id },
+      });
+    }
     return inv;
   });
 
@@ -119,7 +149,7 @@ export async function billSalonForPeriod(
     const payment = await createSquarePayment({
       sourceId: salon.square_card_id,
       customerId: salon.square_customer_id || undefined,
-      amountCents: totalCents,
+      amountCents: combinedTotalCents,
       note: `ColorGenius formula licenses — ${period}`,
     });
 

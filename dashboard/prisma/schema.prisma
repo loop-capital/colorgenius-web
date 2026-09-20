@@ -504,16 +504,23 @@ model salons {
 /// cost tracking for a feature that's gated on (and billed against)
 /// salons.features_enabled.voice_assistant, admin-toggled per salon.
 model voice_assistant_usage {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  salon_id    String   @db.Uuid
-  question    String?
-  cost_cents  Decimal  @db.Decimal(10, 4)
-  est_minutes Decimal  @db.Decimal(10, 2)
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
-  salon       salons   @relation(fields: [salon_id], references: [id], onDelete: Cascade)
+  id                String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  salon_id          String                    @db.Uuid
+  // Informational only — who on the salon's team asked, for THEIR own
+  // reporting. Billing is always salon-level (see billing_invoice_id); we
+  // never bill or report to a stylist individually.
+  stylist_id        String?                   @db.Uuid
+  question          String?
+  cost_cents        Decimal                   @db.Decimal(10, 4)
+  est_minutes       Decimal                   @db.Decimal(10, 2)
+  billing_invoice_id String?                  @db.Uuid
+  created_at        DateTime                  @default(now()) @db.Timestamptz(6)
+  salon             salons                    @relation(fields: [salon_id], references: [id], onDelete: Cascade)
+  billing_invoice   formula_billing_invoices? @relation(fields: [billing_invoice_id], references: [id])
 
   @@index([salon_id], map: "idx_voice_assistant_usage_salon")
   @@index([created_at], map: "idx_voice_assistant_usage_created")
+  @@index([billing_invoice_id], map: "idx_voice_assistant_usage_invoice")
 }
 
 model schema_migrations {
@@ -920,6 +927,10 @@ model formula_billing_invoices {
   total_cents                  Int
   total_creator_earnings_cents Int
   total_platform_fee_cents     Int
+  // Voice assistant cost has no creator split (100% platform pass-through,
+  // unlike formula usage) — tracked separately for invoice transparency
+  // rather than folded into the marketplace earnings/fee fields.
+  voice_assistant_cents        Int?                @default(0)
   status                       String              @default("pending") @db.VarChar(20)
   paid_at                      DateTime?
   square_payment_id            String?
@@ -927,6 +938,7 @@ model formula_billing_invoices {
   created_at                   DateTime            @default(now())
   salon                        salons              @relation(fields: [salon_id], references: [id])
   usage_events                 formula_usage_log[]
+  voice_assistant_usage        voice_assistant_usage[]
 
   @@unique([salon_id, billing_period], map: "uniq_formula_billing_invoice_period")
   @@index([status], map: "idx_formula_billing_invoices_status")

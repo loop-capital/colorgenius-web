@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
   await prisma.voice_assistant_usage.create({
     data: {
       salon_id: salonId,
+      stylist_id: authUser.userId,
       question: parsed.data.question,
       cost_cents: result.costCents,
       est_minutes: result.estMinutes,

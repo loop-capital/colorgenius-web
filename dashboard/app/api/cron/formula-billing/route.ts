@@ -29,14 +29,25 @@ export async function GET(request: NextRequest) {
   const periodStart = priorMonth;
   const periodEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
 
-  const salonsWithUsage = await prisma.formula_usage_log.findMany({
-    where: { billingInvoiceId: null, usedAt: { gte: periodStart, lt: periodEnd }, feeAmount: { gt: 0 } },
-    select: { salonId: true },
-    distinct: ['salonId'],
-  });
+  const [formulaUsageSalons, voiceAssistantSalons] = await Promise.all([
+    prisma.formula_usage_log.findMany({
+      where: { billingInvoiceId: null, usedAt: { gte: periodStart, lt: periodEnd }, feeAmount: { gt: 0 } },
+      select: { salonId: true },
+      distinct: ['salonId'],
+    }),
+    prisma.voice_assistant_usage.findMany({
+      where: { billing_invoice_id: null, created_at: { gte: periodStart, lt: periodEnd }, cost_cents: { gt: 0 } },
+      select: { salon_id: true },
+      distinct: ['salon_id'],
+    }),
+  ]);
+  const salonIds = new Set([
+    ...formulaUsageSalons.map((s) => s.salonId),
+    ...voiceAssistantSalons.map((s) => s.salon_id),
+  ]);
 
   const results: { salonId: string; success: boolean; error?: string }[] = [];
-  for (const { salonId } of salonsWithUsage) {
+  for (const salonId of salonIds) {
     try {
       const result = await billSalonForPeriod(salonId, period);
       results.push({ salonId, success: result.success, error: result.success ? undefined : result.error.message });
