@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyBearerToken } from '@/lib/auth'
 import { priceCompletedSession } from '@/lib/pricing'
+import { recordFormulaOutcome } from '@/lib/formula-memory'
 
 interface CompletedStep {
   product: string
@@ -75,6 +76,27 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         completed_at: new Date(),
       },
     })
+
+    // ── Formula memory: log real target-vs-actual per ingredient ─────────
+    // This is what a future visit's GET /color-bar/formulas/:clientId reads
+    // to suggest a smaller mix (see lib/formula-memory.ts) — Vish's actual
+    // "reweigh and learn" behavior, not a leftover-product-reuse concept.
+    if (sessionClientId) {
+      await Promise.all(
+        steps
+          .filter((s) => s.brand && s.shadeCode && s.targetGrams > 0 && s.actualGrams > 0)
+          .map((s) =>
+            recordFormulaOutcome({
+              clientId: sessionClientId,
+              brand: s.brand,
+              shadeCode: s.shadeCode,
+              targetGrams: s.targetGrams,
+              actualGrams: s.actualGrams,
+              source: 'color_bar',
+            })
+          )
+      )
+    }
 
     // ── UsageLog: only for sessions built from a real marketplace listing ──
     // formula_usage_log.formulaId has a real FK to formula_listings — a

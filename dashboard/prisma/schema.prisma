@@ -1563,3 +1563,23 @@ model color_bar_sessions {
   @@index([client_id], map: "idx_color_bar_sessions_client")
   @@index([status], map: "idx_color_bar_sessions_status")
 }
+
+/// Formula memory — real target-vs-actual grams per client+shade, from
+/// either surface that weighs a formula (Color Bar iPad or the web
+/// Formulate page). This is what lets us suggest a smaller/adjusted mix
+/// size next time, the same way Vish's bowl-reweigh feature does. One row
+/// per ingredient per completed weighing, not an aggregate — aggregation
+/// happens at read time in lib/formula-memory.ts so the averaging window
+/// can change without a backfill.
+model formula_outcome_history {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  client_id    String   @db.Uuid
+  brand        String   @db.VarChar(100)
+  shade_code   String   @db.VarChar(50)
+  target_grams Decimal  @db.Decimal(10, 2)
+  actual_grams Decimal  @db.Decimal(10, 2)
+  source       String   @db.VarChar(20) // 'color_bar' | 'web_formulate'
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([client_id, brand, shade_code], map: "idx_formula_outcome_history_lookup")
+}

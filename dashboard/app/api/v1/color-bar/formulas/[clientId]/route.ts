@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserFromRequest } from '@/lib/auth'
+import { getFormulaAdjustment } from '@/lib/formula-memory'
 
 const PRICE_RULES: Record<string, { color: number; developer: number; markup: number }> = {
   davines:      { color: 0.12, developer: 0.04, markup: 2.5 },
@@ -44,12 +45,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
       take: limit,
     })
 
-    const formattedFormulas = (visits ?? []).map((visit) => {
+    const formattedFormulas = await Promise.all((visits ?? []).map(async (visit) => {
       const formula = formulas?.find(f => f.id === visit.formula_id)
 
       const [colorRatio, devRatio] = parseMixingRatio(formula?.mixing_ratio)
-      const colorGrams = Math.round(totalWeight * colorRatio / (colorRatio + devRatio))
-      const devGrams = totalWeight - colorGrams
+      const baseColorGrams = Math.round(totalWeight * colorRatio / (colorRatio + devRatio))
+      const baseDevGrams = totalWeight - baseColorGrams
+
+      // Formula memory (Vish's reweigh-and-learn behavior): if this client
+      // consistently uses less than the recipe calls for, suggest a
+      // smaller mix instead of the same fixed target every time.
+      const colorShade = formula?.product_shade || ''
+      const devShade = `${formula?.developer_vol || 20}V`
+      const brand = formula?.product_brand || ''
+      const [colorAdjustment, devAdjustment] = formula
+        ? await Promise.all([
+            getFormulaAdjustment(clientId, brand, colorShade),
+            getFormulaAdjustment(clientId, brand, devShade),
+          ])
+        : [null, null]
+
+      const colorGrams = colorAdjustment ? Math.round(baseColorGrams * colorAdjustment.ratio) : baseColorGrams
+      const devGrams = devAdjustment ? Math.round(baseDevGrams * devAdjustment.ratio) : baseDevGrams
 
       const prices = PRICE_RULES[(formula?.product_brand ?? '').toLowerCase()] ?? PRICE_RULES.default
       const totalCost = Math.round(
@@ -62,21 +79,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
               product: [formula.product_brand, formula.product_line, formula.product_shade]
                 .filter(Boolean)
                 .join(' '),
-              shadeCode: formula.product_shade || '',
-              brand: formula.product_brand || '',
+              shadeCode: colorShade,
+              brand,
               targetGrams: colorGrams,
               actualGrams: 0,
               completed: false,
               role: 'color',
+              suggestedFromHistory: !!colorAdjustment,
+              basedOnVisits: colorAdjustment?.basedOnVisits,
             },
             {
               product: `${formula.developer_vol || 20}vol Developer`,
-              shadeCode: `${formula.developer_vol || 20}V`,
-              brand: formula.product_brand || '',
+              shadeCode: devShade,
+              brand,
               targetGrams: devGrams,
               actualGrams: 0,
               completed: false,
               role: 'developer',
+              suggestedFromHistory: !!devAdjustment,
+              basedOnVisits: devAdjustment?.basedOnVisits,
             },
           ]
         : []
@@ -93,7 +114,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ clie
         totalCost,
         notes: formula?.notes || '',
       }
-    })
+    }))
 
     return NextResponse.json({ formulas: formattedFormulas })
   } catch (error) {

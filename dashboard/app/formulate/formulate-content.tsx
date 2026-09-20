@@ -1216,6 +1216,7 @@ export default function FormulatePage() {
             ) : (
               <ScaleBowl
                 ingredients={formulaIngredients.map((i, idx) => ({ ...i, order: idx })) as BowlIngredient[]}
+                clientId={clientId}
                 onComplete={(weights) => console.log('Final weights:', weights)}
               />
             )}

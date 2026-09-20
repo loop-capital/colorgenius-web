@@ -27,6 +27,8 @@ interface BowlState {
 interface ScaleBowlProps {
   ingredients: BowlIngredient[];
   salonId?: string;
+  /** For formula memory (see lib/formula-memory.ts) — without it, target-vs-actual can't be tied to a returning client. */
+  clientId?: string | null;
   onComplete?: (weights: Record<string, number>) => void;
   onReweigh?: () => void;
   showUnitToggle?: boolean;
@@ -109,6 +111,7 @@ const LIQUID_BOTTOM_Y = BOWL_BOTTOM_Y - 4;
 export function ScaleBowl({
   ingredients,
   salonId,
+  clientId,
   onComplete,
   onReweigh,
   showUnitToggle = true,
@@ -159,29 +162,36 @@ export function ScaleBowl({
           console.error('Inventory deduction failed:', e);
         }
       }
-      if (totalTarget > totalCurrent) {
-        try {
-          await fetch('/api/v1/bowls/remainder', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              salonId,
-              formulaGrams: totalTarget,
-              remainderGrams: totalCurrent,
-              ingredients: bowl.ingredients.map((ing) => ({
-                shadeCode: ing.shadeCode,
-                brand: ing.brand,
-                targetGrams: ing.targetGrams,
-                actualGrams: weights[ing.id] || 0,
-              })),
-            }),
-          });
-        } catch (e) {
-          console.error('Bowl remainder API call failed:', e);
+      // Formula memory (Vish's reweigh-and-learn behavior) — log real
+      // target-vs-actual per ingredient so a future visit can suggest a
+      // smaller mix instead of the same fixed target every time. Replaces
+      // an earlier, never-working call to a "bowl remainder" endpoint that
+      // modeled leftover mixed color as reusable stock, which doesn't
+      // match how color chemistry actually works (it oxidizes once mixed)
+      // or what Vish itself does with a reweigh.
+      if (clientId) {
+        const outcomes = bowl.ingredients
+          .filter((ing) => ing.targetGrams > 0 && weights[ing.id] > 0)
+          .map((ing) => ({
+            brand: ing.brand,
+            shadeCode: ing.shadeCode,
+            targetGrams: ing.targetGrams,
+            actualGrams: weights[ing.id],
+          }));
+        if (outcomes.length > 0) {
+          try {
+            await fetch('/api/v1/formula-outcomes', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ clientId, ingredients: outcomes }),
+            });
+          } catch (e) {
+            console.error('Formula outcome logging failed:', e);
+          }
         }
       }
     },
-    [salonId, bowl.ingredients, totalTarget, totalCurrent]
+    [salonId, clientId, bowl.ingredients]
   );
 
   // ─── Capture Weight ──────────────────────────────────────────────────────
