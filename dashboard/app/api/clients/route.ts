@@ -91,6 +91,9 @@ export async function POST(request: NextRequest) {
         email: body.email?.trim() || null,
         phone: body.phone?.trim() || null,
         general_notes: body.notes?.trim() || null,
+        // Persist questionnaire hair data when provided (questionnaire sends hairProfile/allergies)
+        ...(body.hairProfile ? { hair_profile: body.hairProfile } : {}),
+        ...(body.allergies ? { allergies: body.allergies } : {}),
       },
     });
 

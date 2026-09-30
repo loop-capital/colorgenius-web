@@ -1,8 +1,7 @@
 // Photo Analysis Pipeline — OpenCV-based hair color analysis
 // Detects: hair color level (1-10), tone, condition, gray %
-// Uses colorthief for dominant color + custom pixel processing for gray/damage
+// Dominant color via custom pixel processing (k-means) + heuristics for gray/damage
 
-import * as ColorThief from 'colorthief';
 import { HAIR_LEVELS, TONE_DESCRIPTORS, ToneFamily } from './products';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
