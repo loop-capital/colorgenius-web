@@ -1,10 +1,1 @@
-{
-  "framework": "nextjs",
-  "outputDirectory": ".next",
-  "crons": [
-    {
-      "path": "/api/cron/formula-billing",
-      "schedule": "0 6 * * *"
-    }
-  ]
-}
+{"crons":[{"path":"/api/cron/formula-billing","schedule":"0 6 * * *"},{"path":"/api/v1/admin/marketplace/recalc-tiers","schedule":"0 0 1 * *"}],"framework":"nextjs","outputDirectory":".next"}

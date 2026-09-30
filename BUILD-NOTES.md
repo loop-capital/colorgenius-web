@@ -52,3 +52,74 @@
 - Real per-section hair sampling (labeled as estimated instead)
 - Stylist-facing Muse OAuth/skill (Track B — dictation API is the capability it will distribute)
 - Production OPENAI_API_KEY (empty as of 2026-09-20 — vision + voice 502 until fixed; blocks any live demo of dictation/vision)
+
+## Tier-recalc cron wiring (monthly) — Worker 2, 2026-09-30
+
+- **Endpoint:** `GET`/`POST /api/v1/admin/marketplace/recalc-tiers`
+  (`dashboard/app/api/v1/admin/marketplace/recalc-tiers/route.ts`).
+- **Scheduling (production):** Vercel Cron via `dashboard/vercel.json`:
+  `{ "path": "/api/v1/admin/marketplace/recalc-tiers", "schedule": "0 0 1 * *" }`
+  (00:00 UTC on the 1st). `GET` was added because Vercel Cron can only issue
+  GET requests; `POST` is retained for admin manual runs.
+- **Auth:** platform-admin JWT (`requireAdmin`) **or** `Authorization: Bearer
+  <CRON_SECRET>` compared with `crypto.timingSafeEqual` (constant time).
+  Documented in `dashboard/.env.example` — generate with `openssl rand
+  -base64 32` and set the same value in the Vercel env dashboard (Production).
+  If `CRON_SECRET` is empty, only admin JWTs are accepted (fail closed).
+  Existing cron routes use plain `!==` comparison for the same secret
+  (`formula-billing`, `square/clients/sync-cron`) — drive-by hardening of those
+  was left alone, consider aligning in a follow-up.
+- **Idempotency:** the trailing window is the 12 full calendar months BEFORE the
+  current month, so any re-run within the same calendar month computes identical
+  tiers for every creator; the demotion streak is guarded by
+  `stylists.preferences.marketplace.last_eval_month` — re-running cannot
+  double-count the streak or compound a demotion. The endpoint also no-ops
+  unless the UTC day-of-month is 1 (`?force=1` overrides for admin/cron callers).
+- **Logging:** console lines (`[tier-recalc] start/skip/…/done`, per-change lines
+  only for upgrades/demotions/pending) — captured in Vercel function logs —
+  plus full per-creator detail in the JSON response body. No DB log row: there
+  is no `cron_runs`/`admin_audit` model in the prisma schema; adding one needs a
+  migration (left for migration workstream W3, which owns schema changes).
+- **Local fallback — systemd timer on the office box (DOCUMENTED ONLY, NOT
+  ENABLED; no persistent state was created on the box):** curls the production
+  Vercel URL (the endpoint runs where the DB connection lives). Secrets live in
+  a mode-600 curl config file, never in the unit.
+  - `/etc/systemd/system/colorgenius-tier-recalc.service`:
+    ```
+    [Unit]
+    Description=COLORgenius monthly creator-tier recalculation (Vercel Cron fallback)
+    After=network-online.target
+    Wants=network-online.target
+
+    [Service]
+    Type=oneshot
+    # /etc/colorgenius/tier-recalc.curl (mode 600) contains:
+    #   header = "Authorization: Bearer <CRON_SECRET>"
+    #   url = "https://<prod-app-url>/api/v1/admin/marketplace/recalc-tiers"
+    ExecStart=/usr/bin/curl -fsS --max-time 120 -K /etc/colorgenius/tier-recalc.curl
+    ```
+  - `/etc/systemd/system/colorgenius-tier-recalc.timer`:
+    ```
+    [Unit]
+    Description=Run COLORgenius tier recalc on the 1st of each month
+
+    [Timer]
+    OnCalendar=monthly
+    Persistent=true
+    Unit=colorgenius-tier-recalc.service
+
+    [Install]
+    WantedBy=timers.target
+    ```
+  - Enablement commands (run once on the box when the fallback is wanted):
+    ```
+    sudo install -m 600 /dev/null /etc/colorgenius/tier-recalc.curl
+    # edit /etc/colorgenius/tier-recalc.curl to set the header and url lines above
+    sudo cp colorgenius-tier-recalc.service colorgenius-tier-recalc.timer /etc/systemd/system/
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now colorgenius-tier-recalc.timer
+    systemctl list-timers | grep tier-recalc
+    ```
+- Typecheck after changes: `npx tsc --noEmit` in dashboard/ → 20 errors, all
+  pre-existing in untouched files (same list as before this work); 0 errors in
+  any file touched here.
