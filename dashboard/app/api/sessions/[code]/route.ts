@@ -40,7 +40,6 @@ export async function GET(
         status: session.status,
         photoUrl: session.photoUrl,
         createdAt: session.createdAt,
-        updatedAt: session.updatedAt,
         completedAt: session.completedAt,
       },
     });

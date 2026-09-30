@@ -1,7 +1,8 @@
 /**
  * Bowl-side voice assistant — text answering via OpenAI chat completions.
- * Reuses the same OPENAI_API_KEY already configured for photo analysis
- * (lib/photo-analysis-server.ts) rather than a second provider key.
+ * Uses OPENAI_ASSISTANT_KEY (falls back to OPENAI_API_KEY) — kept separate
+ * from the vision key so assistant/dictation spend and rate limits are
+ * isolated from photo analysis.
  */
 
 const ASSISTANT_MODEL = process.env.ASSISTANT_MODEL ?? 'gpt-4o-mini';
@@ -31,7 +32,7 @@ export interface AssistantAnswer {
 const SYSTEM_PROMPT = `You are the ColorGenius bowl-side voice assistant — a professional colorist's quick-reference assistant, used hands-on while mixing formulas at the color bar. Answer in 1-3 short sentences, spoken-style (this gets read aloud via text-to-speech). Be direct and practical: developer volumes, mix ratios, processing times, safety notes, and fixes for common mistakes. If a question is unsafe (e.g. ignoring an allergy warning) or outside hair color, say so briefly and redirect.`;
 
 export async function askAssistant(question: string, context?: AssistantContext): Promise<AssistantAnswer | null> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_ASSISTANT_KEY ?? process.env.OPENAI_API_KEY;
   if (!apiKey || apiKey === 'placeholder') return null;
 
   const contextLines: string[] = [];

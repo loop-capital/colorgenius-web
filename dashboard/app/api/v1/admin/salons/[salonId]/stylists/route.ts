@@ -3,7 +3,6 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, generatePassword } from '@/lib/admin';
-import { computeCreatorTier } from '@/lib/marketplace/creator-tier';
 
 function slugifyHandle(name: string): string {
   return name
@@ -38,7 +37,7 @@ export async function GET(
       last_name: true,
       role: true,
       created_at: true,
-      stylist: { select: { id: true, handle: true, formula_sales_count: true, marketplace_tier_override: true } },
+      stylist: { select: { id: true, handle: true, formula_sales_count: true, creator_tier: true, marketplace_tier_override: true } },
     },
   });
 
@@ -55,9 +54,10 @@ export async function GET(
         stylistId: u.stylist?.id ?? null,
         formulaSalesCount: u.stylist?.formula_sales_count ?? 0,
         marketplaceTierOverride: u.stylist?.marketplace_tier_override ?? null,
-        marketplaceTier: u.stylist
-          ? computeCreatorTier(u.stylist.formula_sales_count ?? 0, u.stylist.marketplace_tier_override)
-          : null,
+        // Persisted creator_tier — the single source of truth. It is written
+        // by recomputeCreatorPricing (immediate upgrades) and
+        // monthlyRecalcCreatorTier (1st-of-month, with demotion hysteresis).
+        marketplaceTier: u.stylist?.creator_tier ?? 'community',
       })),
     },
   });

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { classifyFormula } from '@/lib/formula-classifier'
+import { PublishForm } from '@/components/publish-form'
 
 /* Inline custom components — no shadcn Card/Badge/Button */
 
@@ -336,6 +337,78 @@ export default function LibraryPage() {
   const [activeTab, setActiveTab] = useState<'my-formulas' | 'marketplace'>('my-formulas')
   const [marketplaceFormulas, setMarketplaceFormulas] = useState<any[]>([])
   const [marketplaceLoading, setMarketplaceLoading] = useState(false)
+  const [marketplaceLicensed, setMarketplaceLicensed] = useState<Set<string>>(new Set())
+  const [licensingId, setLicensingId] = useState<string | null>(null)
+  const [licenseMsg, setLicenseMsg] = useState<string | null>(null)
+  const [showPublishModal, setShowPublishModal] = useState(false)
+  const [mpDetail, setMpDetail] = useState<any | null>(null)
+
+  const perUseDisplay = (cents: number) => (Number(cents) === 0 ? 'Free' : `$${(Number(cents) / 100).toFixed(2)}/use`)
+
+  const tierBadgeStyle = (tier: string): React.CSSProperties => {
+    switch (tier) {
+      case 'elite': return { background: 'rgba(250,204,21,0.12)', color: '#FACC15', border: '1px solid rgba(250,204,21,0.3)' }
+      case 'signature': return { background: 'rgba(236,72,153,0.12)', color: '#EC4899', border: '1px solid rgba(236,72,153,0.3)' }
+      case 'master': return { background: 'rgba(147,51,234,0.12)', color: '#A855F7', border: '1px solid rgba(147,51,234,0.3)' }
+      case 'professional': return { background: 'rgba(59,130,246,0.12)', color: '#60A5FA', border: '1px solid rgba(59,130,246,0.3)' }
+      default: return { background: 'rgba(20,184,166,0.1)', color: 'var(--cg-teal)', border: '1px solid rgba(20,184,166,0.2)' }
+    }
+  }
+
+  const mpCreatorName = (f: any) => f.creator?.display_name || f.creator?.first_name || 'Community'
+
+  // Marketplace: browse listings + which ones this salon has already licensed
+  const loadMarketplace = async () => {
+    setMarketplaceLoading(true)
+    setLicenseMsg(null)
+    try {
+      const [browseRes, licRes] = await Promise.all([
+        fetch('/api/marketplace/browse?limit=50'),
+        fetch('/api/marketplace/purchases'),
+      ])
+      if (browseRes.ok) {
+        const data = await browseRes.json()
+        setMarketplaceFormulas(data.data || [])
+      }
+      if (licRes.ok) {
+        const data = await licRes.json()
+        setMarketplaceLicensed(new Set((data.data || []).map((l: any) => l.formula_id)))
+      }
+    } catch {
+      setLicenseMsg('Could not load the marketplace — please try again.')
+    }
+    setMarketplaceLoading(false)
+  }
+
+  // License (acquire) a marketplace formula — free or per-use. Acquiring is
+  // free; money only moves when the formula is actually USED, metered and
+  // billed monthly in arrears.
+  const licenseFormula = async (f: any) => {
+    if (marketplaceLicensed.has(f.id) || licensingId) return
+    setLicensingId(f.id)
+    setLicenseMsg(null)
+    try {
+      const res = await fetch('/api/marketplace/purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ template_id: f.id }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setMarketplaceLicensed((prev) => new Set(prev).add(f.id))
+        setLicenseMsg(
+          data.data?.is_free
+            ? `"${f.title}" added to your library — free formulas need no license.`
+            : `"${f.title}" added to your library. Usage is billed ${perUseDisplay(f.per_use_cents)}.`,
+        )
+      } else {
+        setLicenseMsg(data.error?.message || 'Could not add this formula to your library.')
+      }
+    } catch {
+      setLicenseMsg('Could not add this formula to your library.')
+    }
+    setLicensingId(null)
+  }
   const [desiredResultQuery, setDesiredResultQuery] = useState('')
   const [dynamicTrends, setDynamicTrends] = useState<string[]>([])
 
@@ -546,19 +619,9 @@ export default function LibraryPage() {
             style={activeTab === 'my-formulas' ? { background: 'var(--cg-gradient-teal)', color: '#0A0A0A' } : { color: 'var(--cg-text-tertiary)' }}
           >My Formulas</button>
           <button
-            onClick={async () => {
+            onClick={() => {
               setActiveTab('marketplace')
-              if (marketplaceFormulas.length === 0) {
-                setMarketplaceLoading(true)
-                try {
-                  const res = await fetch('/api/marketplace/browse')
-                  if (res.ok) {
-                    const data = await res.json()
-                    setMarketplaceFormulas(data.formulas || data.data || [])
-                  }
-                } catch { /* silent */ }
-                setMarketplaceLoading(false)
-              }
+              if (marketplaceFormulas.length === 0) loadMarketplace()
             }}
             className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
             style={activeTab === 'marketplace' ? { background: 'var(--cg-gradient-teal)', color: '#0A0A0A' } : { color: 'var(--cg-text-tertiary)' }}
@@ -954,6 +1017,20 @@ export default function LibraryPage() {
         </>) : (
         /* Marketplace Tab */
         <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-bold" style={{ color: 'var(--cg-text-primary)' }}>Marketplace</h2>
+              <p className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>License formulas from top creators — billed per use, only when you use them.</p>
+            </div>
+            <ActionButton variant="outline" className="!text-xs !px-3 !py-1.5" onClick={() => setShowPublishModal(true)}>
+              <Plus className="h-3.5 w-3.5 mr-1" /> Publish Formula
+            </ActionButton>
+          </div>
+          {licenseMsg && (
+            <div className="text-xs mb-4 px-4 py-3 rounded-xl" style={{ background: 'rgba(20,184,166,0.08)', border: '1px solid rgba(20,184,166,0.2)', color: 'var(--cg-text-secondary)' }}>
+              {licenseMsg}
+            </div>
+          )}
           {marketplaceLoading ? (
             <div className="text-center py-16" style={{ color: 'var(--cg-text-tertiary)' }}>
               <div className="animate-spin h-8 w-8 border-2 border-t-transparent rounded-full mx-auto mb-4" style={{ borderColor: 'var(--cg-teal)', borderTopColor: 'transparent' }}></div>
@@ -961,31 +1038,60 @@ export default function LibraryPage() {
             </div>
           ) : marketplaceFormulas.length === 0 ? (
             <div className="text-center py-16" style={{ color: 'var(--cg-text-tertiary)' }}>
-              <p className="text-lg font-medium mb-2">Marketplace Coming Soon</p>
-              <p className="text-sm">Community formulas will appear here once published.</p>
+              <p className="text-lg font-medium mb-2">No formulas published yet</p>
+              <p className="text-sm">Be the first to publish a formula to the marketplace.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {marketplaceFormulas.map((f: any, i: number) => (
-                <motion.div
-                  key={f.id || i}
-                  className="rounded-xl p-5 cursor-pointer"
-                  style={{ background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)' }}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold" style={{ color: 'var(--cg-text-primary)' }}>{f.name || f.brand + ' Formula'}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(20,184,166,0.1)', color: 'var(--cg-teal)', border: '1px solid rgba(20,184,166,0.2)' }}>{f.brand}</span>
-                  </div>
-                  <div className="text-xs mb-3" style={{ color: 'var(--cg-text-tertiary)' }}>{f.line} • Level {f.level || '?'}</div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>by {f.creator || 'Community'}</span>
-                    <ActionButton variant="primary" className="!text-xs !px-3 !py-1.5">Use Formula</ActionButton>
-                  </div>
-                </motion.div>
-              ))}
+              {marketplaceFormulas.map((f: any, i: number) => {
+                const licensed = marketplaceLicensed.has(f.id)
+                const busy = licensingId === f.id
+                const isFree = Number(f.per_use_cents) === 0
+                return (
+                  <motion.div
+                    key={f.id || i}
+                    className="rounded-xl p-5 cursor-pointer"
+                    style={{ background: 'rgba(30,30,45,0.6)', border: '1px solid rgba(255,255,255,0.06)' }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    onClick={() => setMpDetail(f)}
+                  >
+                    {f.photo_url && (
+                      <div className="rounded-lg overflow-hidden mb-3">
+                        <img src={f.photo_url} alt={f.title} className="w-full h-32 object-cover" />
+                      </div>
+                    )}
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <span className="text-sm font-semibold" style={{ color: 'var(--cg-text-primary)' }}>{f.title}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full capitalize whitespace-nowrap" style={tierBadgeStyle(f.tier || 'community')}>{f.tier || 'community'}</span>
+                    </div>
+                    <div className="text-xs mb-1" style={{ color: 'var(--cg-text-tertiary)' }}>{f.category}</div>
+                    {f.description && (
+                      <p className="text-xs mb-3 line-clamp-2" style={{ color: 'var(--cg-text-secondary)' }}>{f.description}</p>
+                    )}
+                    <div className="flex items-center justify-between text-xs mb-3">
+                      <span style={{ color: 'var(--cg-text-tertiary)' }}>by {mpCreatorName(f)}{f.creator?.is_verified ? ' ✓' : ''}</span>
+                      <span className="font-semibold" style={{ color: 'var(--cg-text-primary)' }}>{perUseDisplay(f.per_use_cents)}</span>
+                    </div>
+                    {(Number(f.usage_count) > 0 || Number(f.purchase_count) > 0) && (
+                      <div className="text-[10px] mb-3" style={{ color: 'var(--cg-text-tertiary)' }}>
+                        {Number(f.usage_count) || 0} uses • {Number(f.purchase_count) || 0} salons licensed
+                      </div>
+                    )}
+                    <div className="flex items-center justify-end">
+                      <ActionButton
+                        variant="primary"
+                        className="!text-xs !px-3 !py-1.5"
+                        disabled={licensed || busy}
+                        onClick={(e) => { e.stopPropagation(); licenseFormula(f) }}
+                      >
+                        {licensed ? 'In your library ✓' : busy ? 'Adding…' : isFree ? 'Add free formula' : `License · ${perUseDisplay(f.per_use_cents)}`}
+                      </ActionButton>
+                    </div>
+                  </motion.div>
+                )
+              })}
             </div>
           )}
         </div>
@@ -1129,6 +1235,96 @@ export default function LibraryPage() {
                   </ActionButton>
                   <ActionButton onClick={() => {}}>
                     Use Formula <ChevronRight className="h-4 w-4 ml-1" />
+                  </ActionButton>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Marketplace Publish Modal */}
+      {showPublishModal && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: 'rgba(0,0,0,0.7)', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', padding: 24,
+        }} onClick={() => setShowPublishModal(false)}>
+          <div style={{ maxWidth: 560, width: '100%', maxHeight: '90vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
+            <PublishForm
+              onSuccess={() => { setShowPublishModal(false); loadMarketplace() }}
+              onCancel={() => setShowPublishModal(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Marketplace Listing Detail Modal */}
+      <AnimatePresence>
+        {mpDetail && (
+          <motion.div
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+            style={{ backdropFilter: 'blur(8px)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMpDetail(null)}
+          >
+            <motion.div
+              className="rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              style={{ background: 'var(--cg-bg-primary)', border: '1px solid rgba(255,255,255,0.06)' }}
+              initial={{ scale: 0.96, y: 12 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.96, y: 12 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 space-y-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-xl font-bold" style={{ color: 'var(--cg-text-primary)' }}>{mpDetail.title}</h2>
+                    <p className="text-xs mt-1" style={{ color: 'var(--cg-text-tertiary)' }}>
+                      {mpDetail.category} • by {mpCreatorName(mpDetail)}{mpDetail.creator?.is_verified ? ' ✓' : ''}
+                    </p>
+                  </div>
+                  <button onClick={() => setMpDetail(null)} className="p-1.5 rounded-lg hover:bg-white/5" style={{ color: 'var(--cg-text-tertiary)' }}>
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                {mpDetail.photo_url && (
+                  <img src={mpDetail.photo_url} alt={mpDetail.title} className="w-full h-56 object-cover rounded-xl" />
+                )}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full capitalize" style={tierBadgeStyle(mpDetail.tier || 'community')}>
+                    {mpDetail.tier || 'community'} tier
+                  </span>
+                  <span className="text-xs font-semibold" style={{ color: 'var(--cg-text-primary)' }}>{perUseDisplay(mpDetail.per_use_cents)}</span>
+                  <span className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>• billed per use, only when you use it</span>
+                </div>
+                {mpDetail.description && (
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--cg-text-secondary)' }}>{mpDetail.description}</p>
+                )}
+                {mpDetail.tags?.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {mpDetail.tags.map((tag: string) => <TagPill key={tag} label={tag} />)}
+                  </div>
+                )}
+                <div className="text-xs" style={{ color: 'var(--cg-text-tertiary)' }}>
+                  {Number(mpDetail.usage_count) || 0} uses • {Number(mpDetail.purchase_count) || 0} salons licensed
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <ActionButton variant="outline" onClick={() => setMpDetail(null)}>Close</ActionButton>
+                  <ActionButton
+                    disabled={marketplaceLicensed.has(mpDetail.id) || licensingId === mpDetail.id}
+                    onClick={() => licenseFormula(mpDetail)}
+                  >
+                    {marketplaceLicensed.has(mpDetail.id)
+                      ? 'In your library ✓'
+                      : licensingId === mpDetail.id
+                        ? 'Adding…'
+                        : Number(mpDetail.per_use_cents) === 0
+                          ? 'Add free formula'
+                          : `License · ${perUseDisplay(mpDetail.per_use_cents)}`}
+                    <ChevronRight className="h-4 w-4 ml-1" />
                   </ActionButton>
                 </div>
               </div>

@@ -67,18 +67,24 @@ export async function GET(
       grayPercent: r.grayPercent,
       recommendations: r.recommendations,
       colorProfile: {
+        // HONESTY NOTE: per-section colors below are DERIVED ESTIMATES, not independently
+        // sampled regions. roots/mid/ends apply fixed multipliers (x0.88 / x1.0 / x1.12) to the
+        // single dominant color, with regionPixels split 30/40/30 by convention. Each section
+        // carries estimated: true. Implement genuine region sampling before presenting as measured.
         sections: {
           roots: {
             rgb: { r: Math.round(rgbR * 0.88), g: Math.round(rgbG * 0.88), b: Math.round(rgbB * 0.88) },
             hex: r.dominantHex,
             confidence: r.confidence,
             regionPixels: Math.round(r.rawMetrics.sampleSize * 0.3),
+            estimated: true,
           },
           mid: {
             rgb: { r: rgbR, g: rgbG, b: rgbB },
             hex: r.dominantHex,
             confidence: r.confidence,
             regionPixels: Math.round(r.rawMetrics.sampleSize * 0.4),
+            estimated: true,
           },
           ends: {
             rgb: {
@@ -89,6 +95,7 @@ export async function GET(
             hex: r.secondaryHex || r.dominantHex,
             confidence: r.confidence * 0.9,
             regionPixels: Math.round(r.rawMetrics.sampleSize * 0.3),
+            estimated: true,
           },
         },
         overall: {

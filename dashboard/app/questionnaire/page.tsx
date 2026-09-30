@@ -183,16 +183,27 @@ export default function QuestionnairePage() {
         grayPercent: formData.grayPercent,
         scalpType: formData.scalpType || undefined,
         sensitivities: formData.sensitivities,
+        // Shaped for the clients table: hair_profile + allergies are JSON columns
+        hairProfile: {
+          texture: formData.texture || null,
+          density: formData.density || null,
+          porosity: formData.porosity || 'normal',
+          natural_tone: null,
+          natural_level: null,
+          scalp_condition: formData.scalpType || 'normal',
+        },
+        allergies: {
+          ppd: formData.sensitivities.includes('ppd_allergy'),
+          ammonia: formData.sensitivities.includes('ammonia_sensitivity'),
+          other: formData.sensitivities.filter(
+            (s) => s !== 'ppd_allergy' && s !== 'ammonia_sensitivity'
+          ),
+        },
       }
       const res = await fetch('/api/clients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.clientName,
-          email: formData.email,
-          phone: formData.phone,
-          notes: formData.salonNotes,
-        }),
+        body: JSON.stringify(payload),
       })
       const data = await res.json()
       if (res.ok && data.client) {

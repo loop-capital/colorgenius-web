@@ -2,7 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useToast } from '@/components/ui/use-toast'
 import { HAIR_LEVELS, BRANDS, LINES_BY_BRAND } from '@/lib/products'
 import { HairSwatch } from '@/components/ui/hair-swatch'
@@ -19,6 +20,7 @@ import { StockCheck } from '@/components/stock-check'
 import VisualOutcomeSimulator from '@/components/visual-outcome/VisualOutcomeSimulator'
 import ContextualEducation from '@/components/education/ContextualEducation'
 import CorrectiveColorPanel, { CorrectiveBadge } from '@/lib/corrective-color/CorrectiveColorPanel'
+import DictationWidget from '@/components/custom/dictation-widget'
 import { diagnose, type CorrectiveIssue, type HairState } from '@/lib/corrective-color/engine'
 import type { ToneFamily } from '@/lib/products'
 
@@ -148,10 +150,86 @@ function blendColor(levelHex: string, toneHex: string, toneWeight = 0.35): strin
 const btnPrimary = { padding: '12px 24px', background: 'linear-gradient(135deg, #9333EA, #EC4899)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 'bold' as const, cursor: 'pointer' as const, fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 const btnOutline = { padding: '12px 24px', border: '1px solid rgba(255,255,255,0.12)', color: '#A1A1AA', borderRadius: 12, cursor: 'pointer' as const, background: 'transparent', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 4 }
 
-export default function FormulatePage() {
+// Merge a flat object of dotted-key updates (e.g. { 'condition.grayPercent': 40 })
+// into state immutably, creating nested objects as needed.
+function applyDottedUpdates<T>(prev: T, updates: Record<string, unknown>): T {
+  let next: any = prev
+  for (const [path, value] of Object.entries(updates)) {
+    const keys = path.split('.')
+    const setDeep = (obj: any, ks: string[]): any => {
+      if (ks.length === 0) return value
+      const [head, ...rest] = ks
+      const base = obj && typeof obj === 'object' ? obj : {}
+      return { ...base, [head]: setDeep(base[head], rest) }
+    }
+    next = setDeep(next, keys)
+  }
+  return next as T
+}
+
+const TONE_CODES = ['N', 'A', 'G', 'K', 'R', 'V', 'P', 'B', 'M', 'Ch', 'W', 'C']
+
+// Normalize a tone value from a previous consultation into a wizard tone letter.
+function normalizeToneCode(t: unknown): string | null {
+  if (typeof t !== 'string' || t.length === 0) return null
+  if (TONE_CODES.includes(t)) return t
+  const mapped = revToneMap[t] || revToneMap[t.toLowerCase()]
+  if (mapped) return mapped
+  if (t.toLowerCase() === 'natural') return 'N'
+  return null
+}
+
+// Map GET /api/clients/[id]/last-consultation response fields onto fd updates.
+// Only emits dotted keys for values that validate against the wizard options;
+// unknown/missing fields are ignored.
+function consultationToFd(c: any): Record<string, unknown> {
+  const updates: Record<string, unknown> = {}
+  if (!c || typeof c !== 'object') return updates
+  const inList = (v: unknown, list: string[]): v is string => typeof v === 'string' && list.includes(v)
+  const level = (v: unknown) => (typeof v === 'number' && v >= 1 && v <= 10 ? v : null)
+
+  if (inList(c.texture, TEXTURES.map((t) => t.value))) updates.texture = c.texture
+  if (inList(c.hairPattern, HAIR_PATTERNS.map((t) => t.value))) updates.hairPattern = c.hairPattern
+  if (inList(c.density, DENSITIES.map((t) => t.value))) updates.density = c.density
+
+  const cl = level(c.currentLevel); if (cl !== null) updates.currentLevel = cl
+  const tl = level(c.targetLevel); if (tl !== null) updates.targetLevel = tl
+  const ct = normalizeToneCode(c.currentTone); if (ct) updates.currentTone = ct
+  const tt = normalizeToneCode(c.targetTone); if (tt) updates.targetTone = tt
+
+  const svc = c.serviceType || c.lastServiceType
+  if (inList(svc, SERVICE_TYPES.map((o) => o.value))) updates.serviceType = svc
+  if (inList(c.lastChemicalService, LAST_CHEMICAL_TIMES.map((o) => o.value))) updates.lastChemicalService = c.lastChemicalService
+
+  const chemValues = CHEMICAL_HISTORY_ITEMS.map((o) => o.value)
+  if (Array.isArray(c.chemicalHistory)) {
+    updates.chemicalHistory = c.chemicalHistory.filter((v: unknown) => chemValues.includes(v as string))
+  }
+  const sensValues = SENSITIVITIES.map((o) => o.value)
+  if (Array.isArray(c.sensitivities)) {
+    updates.sensitivities = c.sensitivities.filter((v: unknown) => sensValues.includes(v as string))
+  }
+
+  // Nested condition fields as dotted keys
+  if (inList(c.conditionType, CONDITION_TYPES.map((o) => o.value))) updates['condition.type'] = c.conditionType
+  if (inList(c.porosity, ['low', 'normal', 'high'])) updates['condition.porosity'] = c.porosity
+  if (typeof c.grayPercent === 'number' && c.grayPercent >= 0 && c.grayPercent <= 100) updates['condition.grayPercent'] = c.grayPercent
+  const problemFields = PROBLEM_INDICATORS.map((o) => o.field)
+  if (Array.isArray(c.problemIndicators)) {
+    for (const p of c.problemIndicators) {
+      if (typeof p === 'string' && problemFields.includes(p)) updates[`condition.${p}`] = true
+    }
+  }
+  return updates
+}
+
+function FormulatePageContent() {
   const { toast } = useToast()
+  const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [photo, setPhoto] = useState<string | null>(null)
+  const photoRef = useRef<string | null>(null)
+  photoRef.current = photo
   const [analyzing, setAnalyzing] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<any>(null)
 
@@ -215,6 +293,8 @@ export default function FormulatePage() {
   const [shades, setShades] = useState<Array<{shadeCode: string; shadeName: string; quantity: number; line?: string | null}>>([])
   const [showProductSearch, setShowProductSearch] = useState(false)
   const [sessionCode, setSessionCode] = useState<string | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [checkingPhoto, setCheckingPhoto] = useState(false)
   const [salonId, setSalonId] = useState<string>('')
   const [clientId, setClientId] = useState<string | null>(null)
   const [clientName, setClientName] = useState('')
@@ -250,6 +330,51 @@ export default function FormulatePage() {
     }
   }, [fd.brandPreference])
 
+  // Prefill from URL params (receiving end of the questionnaire's "Save & Formulate").
+  // Only params matching real fd fields are mapped; unknown params are ignored.
+  useEffect(() => {
+    const run = async () => {
+      const cid = searchParams.get('clientId')
+      if (cid) {
+        setClientId(cid)
+        const cname = searchParams.get('clientName')
+        if (cname) setClientName(cname)
+        // Prior-visit baseline first; fresh questionnaire params below take precedence
+        await loadLastConsultation(cid)
+      }
+      const updates: Record<string, unknown> = {}
+      const pick = (param: string, allowed: string[]): string | null => {
+        const v = searchParams.get(param)
+        return v && allowed.includes(v) ? v : null
+      }
+      const texture = pick('texture', TEXTURES.map((t) => t.value))
+      if (texture) updates.texture = texture
+      const hairPattern = pick('hairPattern', HAIR_PATTERNS.map((t) => t.value))
+      if (hairPattern) updates.hairPattern = hairPattern
+      const density = pick('density', DENSITIES.map((t) => t.value))
+      if (density) updates.density = density
+      const porosity = pick('porosity', ['low', 'normal', 'high'])
+      if (porosity) updates['condition.porosity'] = porosity
+      const grayRaw = searchParams.get('grayPercent')
+      if (grayRaw !== null) {
+        const g = parseInt(grayRaw, 10)
+        if (!isNaN(g) && g >= 0 && g <= 100) updates['condition.grayPercent'] = g
+      }
+      const scalpType = searchParams.get('scalpType')
+      if (scalpType && CONDITION_TYPES.some((o) => o.value === scalpType)) updates['condition.type'] = scalpType
+      const sensRaw = searchParams.get('sensitivities')
+      if (sensRaw) {
+        const known = SENSITIVITIES.map((o) => o.value)
+        updates.sensitivities = sensRaw.split(',').map((s) => s.trim()).filter((s) => known.includes(s))
+      }
+      if (Object.keys(updates).length > 0) {
+        setFd((prev) => applyDottedUpdates(prev, updates))
+      }
+    }
+    run()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Search clients
   useEffect(() => {
     if (!clientSearch || clientSearch.length < 2) { setClientResults([]); return }
@@ -263,6 +388,27 @@ export default function FormulatePage() {
     return () => clearTimeout(timer)
   }, [clientSearch])
 
+  // Load a repeat client's most recent consultation and prefill the wizard.
+  // Zero callers existed before this; wired into selectClient and URL prefill.
+  const loadLastConsultation = async (id: string) => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('colorgenius_token') : null
+      const res = await fetch(`/api/clients/${id}/last-consultation`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      const data = await res.json()
+      if (res.ok && data?.consultation) {
+        const updates = consultationToFd(data.consultation)
+        if (Object.keys(updates).length > 0) {
+          setFd((prev) => applyDottedUpdates(prev, updates))
+          toast({ title: 'Last visit loaded', description: 'Consultation prefilled from the client\u2019s previous visit.' })
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load last consultation:', e)
+    }
+  }
+
   const selectClient = (c: { id: string; name: string; phone?: string }) => {
     setClientId(c.id)
     setClientName(c.name)
@@ -270,6 +416,7 @@ export default function FormulatePage() {
     setShowClientSearch(false)
     setClientSearch('')
     setClientResults([])
+    loadLastConsultation(c.id)
   }
 
   const handleSaveFormula = async () => {
@@ -307,14 +454,70 @@ export default function FormulatePage() {
     setSaving(false)
   }
 
+  // Voice dictation: merge the widget's dotted-key updates into the wizard state
+  const handleDictationUpdate = (updates: Record<string, unknown>) => {
+    setFd((prev) => applyDottedUpdates(prev, updates))
+  }
+
   // Generate session code for phone upload
   const generateSessionCode = async () => {
     try {
       const res = await fetch('/api/sessions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ salonId: 'default' }) })
       const data = await res.json()
-      if (data.code) setSessionCode(data.code)
+      // POST /api/sessions returns { success, data: { sessionId, code, expiresAt } }
+      const payload = data?.data || data
+      if (payload?.code) {
+        setSessionCode(payload.code)
+        if (payload.sessionId) setSessionId(payload.sessionId)
+      }
     } catch (e) { console.error('Failed to generate session code:', e) }
   }
+
+  // Read the phone-uploaded photo back into the photo step.
+  // Uses the session id (the 4-digit code is marked used after upload, so the
+  // code lookup would 404 — the id lookup keeps working).
+  const fetchSessionPhoto = async (): Promise<boolean> => {
+    if (!sessionId || photoRef.current) return false
+    try {
+      const res = await fetch(`/api/sessions/${encodeURIComponent(sessionId)}`)
+      const data = await res.json()
+      const url = data?.data?.photoUrl
+      if (res.ok && url) {
+        setPhoto(url)
+        toast({ title: 'Phone photo received', description: 'The uploaded photo is ready for analysis.' })
+        return true
+      }
+    } catch (e) {
+      console.error('Phone upload check failed:', e)
+    }
+    return false
+  }
+
+  const checkPhoneUpload = async () => {
+    setCheckingPhoto(true)
+    try {
+      const found = await fetchSessionPhoto()
+      if (!found) toast({ title: 'No photo yet', description: 'Upload from the phone first, then check again.' })
+    } finally {
+      setCheckingPhoto(false)
+    }
+  }
+
+  // Auto-poll for the phone upload while a session is active and no photo yet
+  useEffect(() => {
+    if (!sessionId) return
+    let cancelled = false
+    let attempts = 0
+    const poll = async () => {
+      if (cancelled || photoRef.current) return
+      attempts++
+      const found = await fetchSessionPhoto()
+      if (!cancelled && !found && attempts < 40) setTimeout(poll, 3000)
+    }
+    poll()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId])
 
   // Handle product selection from ProductSearch
   const handleProductSelect = (product: SelectedProduct) => {
@@ -395,6 +598,12 @@ export default function FormulatePage() {
             <p style={{ color: '#A1A1AA', fontSize: 14 }}>Formulate with absolute precision in 6 steps</p>
           </div>
           <button type="button" onClick={() => { setFd({ currentLevel: 5, currentTone: 'N', targetLevel: 7, targetTone: 'N', hairType: 'normal', texture: 'medium', hairPattern: 'straight', density: 'medium', serviceType: 'full_head', chemicalHistory: [], sensitivities: [], lastChemicalService: 'never', condition: { type: 'previously_colored', porosity: 'normal', grayPercent: 0, highlights: false, highlightedPercent: 0, banding: false, hotRoots: false, previousLightener: false, multipleColors: false, greenCast: false, muddyToner: false, overAshy: false, colorGrab: false, hollowEnds: false }, brandPreference: '', linePreference: '' }); setResult(null); setPhoto(null); setStep(1) }} style={btnOutline}><RotateCcw size={14} /> Reset</button>
+        </div>
+
+        {/* Voice Dictation */}
+        <div style={{ ...card, marginBottom: 16, padding: '12px 20px' }}>
+          <p style={{ fontSize: 11, color: '#71717A', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, margin: '0 0 8px 0' }}>Voice dictation</p>
+          <DictationWidget onFieldsUpdate={handleDictationUpdate} currentFields={fd as unknown as Record<string, unknown>} />
         </div>
 
         {/* Client Picker */}
@@ -530,10 +739,13 @@ export default function FormulatePage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Smartphone size={14} style={{ color: '#71717A' }} />
                   {sessionCode ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 12, color: '#71717A' }}>Phone upload code:</span>
                       <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: 4, color: '#9333EA', fontFamily: 'monospace' }}>{sessionCode}</span>
                       <span style={{ fontSize: 11, color: '#71717A' }}>→ colorgenius.co/c</span>
+                      <button type="button" onClick={checkPhoneUpload} disabled={checkingPhoto} style={{ fontSize: 12, color: '#9333EA', background: 'none', border: 'none', cursor: checkingPhoto ? 'wait' : 'pointer', textDecoration: 'underline' }}>
+                        {checkingPhoto ? 'Checking…' : 'Check for upload'}
+                      </button>
                     </div>
                   ) : (
                     <button type="button" onClick={generateSessionCode} style={{ fontSize: 12, color: '#9333EA', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
@@ -1089,5 +1301,13 @@ export default function FormulatePage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function FormulatePage() {
+  return (
+    <Suspense fallback={null}>
+      <FormulatePageContent />
+    </Suspense>
   )
 }
