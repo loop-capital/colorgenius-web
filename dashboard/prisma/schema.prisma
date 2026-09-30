@@ -268,6 +268,8 @@ model formulations {
   action_type             String?                  @db.VarChar(50)
   brand                   String?                  @db.VarChar(50)
   product_line            String?                  @db.VarChar(100)
+  target_level            String?
+  target_tone             String?
   primary_formula         Json                     @default("{}")
   toning_formula          Json?
   processing_instructions Json                     @default("{}")
@@ -1226,9 +1228,13 @@ model community_posts {
   stylist_id    String                  @db.Uuid
   type          String                  @db.VarChar(20)
   content       String
+  title         String?
   formula_id    String?                 @db.Uuid
   formula_label String?                 @db.VarChar(500)
   tags          String[]
+  images        String[]
+  is_anonymous  Boolean                 @default(false)
+  moderation_status String              @default("pending")
   like_count    Int                     @default(0)
   comment_count Int                     @default(0)
   view_count    Int                     @default(0)
