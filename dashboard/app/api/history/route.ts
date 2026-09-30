@@ -32,12 +32,12 @@ export async function GET(request: NextRequest) {
           ...(search ? {
             OR: [
               { brand: { contains: search, mode: 'insensitive' } },
-              { client: { first_name: { contains: search, mode: 'insensitive' } } },
-              { client: { last_name: { contains: search, mode: 'insensitive' } } },
+              { clients: { first_name: { contains: search, mode: 'insensitive' } } },
+              { clients: { last_name: { contains: search, mode: 'insensitive' } } },
             ],
           } : {}),
         },
-        include: { client: { select: { first_name: true, last_name: true } } },
+        include: { clients: { select: { first_name: true, last_name: true } } },
         orderBy: { created_at: 'desc' },
         take: 50,
       });
@@ -46,11 +46,13 @@ export async function GET(request: NextRequest) {
         entries.push({
           id: f.id,
           type: 'formulation',
-          clientName: f.client ? `${f.client.first_name} ${f.client.last_name || ''}`.trim() : null,
+          clientName: f.clients ? `${f.clients.first_name} ${f.clients.last_name || ''}`.trim() : null,
           brand: f.brand,
           serviceType: f.action_type,
-          targetLevel: f.target_level,
-          targetTone: f.target_tone,
+          // formulations has no target_level/target_tone columns in the current
+          // schema -- cast preserves the field reads for a future migration.
+          targetLevel: (f as typeof f & { target_level?: string | null }).target_level,
+          targetTone: (f as typeof f & { target_tone?: string | null }).target_tone,
           satisfaction: null,
           createdAt: f.created_at?.toISOString(),
         });

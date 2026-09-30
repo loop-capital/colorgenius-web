@@ -15,15 +15,15 @@ export async function GET(request: Request) {
     // Find all salons with Square connected and auto-import enabled
     const connections = await prisma.square_connections.findMany({
       where: {
-        access_token: { not: null },
-        salons: {
+        access_token_encrypted: { not: null },
+        salon: {
           features_enabled: {
             path: ['square_client_sync'],
             equals: true,
           },
         },
       },
-      include: { salons: true },
+      include: { salon: true },
     });
 
     const results = [];
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
         const syncData = await syncRes.json();
         results.push({
           salon_id: conn.salon_id,
-          salon_name: conn.salons?.name,
+          salon_name: conn.salon?.name,
           success: syncData.success,
           imported: syncData.data?.imported || 0,
           updated: syncData.data?.updated || 0,
@@ -49,7 +49,7 @@ export async function GET(request: Request) {
       } catch (err) {
         results.push({
           salon_id: conn.salon_id,
-          salon_name: conn.salons?.name,
+          salon_name: conn.salon?.name,
           success: false,
           error: err instanceof Error ? err.message : 'Sync failed',
         });

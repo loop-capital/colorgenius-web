@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { generatePortalToken } from '@/lib/portal-token'
 
-// POST /api/v1/clients/[clientId]/send-portal-link — generate token & send SMS
+// POST /api/v1/clients/[id]/send-portal-link — generate token & send SMS
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ clientId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { clientId } = await params
+    const { id: clientId } = await params
     const body = await req.json()
     const { phone, stylistId } = body
 
