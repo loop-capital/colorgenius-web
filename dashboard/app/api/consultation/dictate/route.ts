@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_ASSISTANT_KEY ?? process.env.OPENAI_API_KEY;
   if (!apiKey || apiKey === 'placeholder') {
     return NextResponse.json(
       {

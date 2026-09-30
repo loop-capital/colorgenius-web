@@ -455,10 +455,11 @@ const VALID_TONES = new Set([
 ]);
 const VALID_CONDITIONS = new Set(['excellent','good','fair','damaged','severely_damaged']);
 
-// Reuses the same OPENAI_API_KEY already configured for the AI Assistant
-// feature (see ASSISTANT_MODEL in .env.local) rather than adding a second
-// provider key. gpt-4o-mini: vision-capable, $0.15/$0.60 per 1M tokens — at
-// this task's size (~1 photo + short JSON out) that's roughly $0.0003/photo.
+// Vision uses its own key (OPENAI_VISION_KEY) so photo-analysis spend and rate
+// limits stay separate from the assistant/dictation key. Falls back to
+// OPENAI_API_KEY for single-key setups. gpt-4o-mini: vision-capable,
+// $0.15/$0.60 per 1M tokens — at this task's size (~1 photo + short JSON out)
+// that's roughly $0.0003/photo.
 const OPENAI_VISION_MODEL = process.env.OPENAI_VISION_MODEL ?? 'gpt-4o-mini';
 const OPENAI_TIMEOUT_MS = Number(process.env.OPENAI_TIMEOUT_MS ?? 20000); // 20 s
 
@@ -513,7 +514,7 @@ function parseVisionJSON(text: string): VisionResult | null {
 }
 
 async function analyzeWithOpenAI(jpegBase64: string): Promise<VisionResult | null> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_VISION_KEY ?? process.env.OPENAI_API_KEY;
   if (!apiKey || apiKey === 'placeholder') return null;
   try {
     const controller = new AbortController();
