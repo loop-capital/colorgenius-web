@@ -1,29 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { prisma } from '@/lib/prisma';
 
 /**
  * POST /api/sessions/[code]/complete
- * Finalize a photo session and generate a formulation from the combined analysis.
  *
- * This endpoint:
- * 1. Validates that all required angles (roots, mid, ends) have been uploaded
- * 2. Checks that all photos have completed analysis
- * 3. Aggregates color profiles from all angles
- * 4. Generates a formulation recommendation
- * 5. Updates session status to "completed"
+ * NOT IMPLEMENTED (501). This endpoint previously returned hardcoded fake data
+ * (level 3, tone 'warm', shade '5WR', fabricated per-section hexes) as if it were
+ * real analysis. That placeholder behavior was removed — this stub now answers
+ * 501 rather than present invented values as formulation output.
  *
- * Request body (optional):
- *   - generateFormulation: boolean (default true)
- *   - targetLevel: number (1-10, overrides estimated target)
- *   - targetTone: string (overrides estimated target)
- *   - brandPreference: string (preferred brand)
+ * To implement for real, this endpoint must:
+ * 1. Load the session by its code and validate required angles (roots, mid, ends)
+ *    have been uploaded
+ * 2. Confirm every photo has a completed analysis row
+ * 3. Aggregate per-angle color profiles (see lib/photo-analysis-server.ts)
+ * 4. Generate a formulation from the aggregated profile
+ * 5. Mark the session 'completed'
  *
- * Response:
- *   200: { success: true, data: { session, formulation? } }
- *   400: { error: "Missing required photos. Need: roots, mid, ends" }
- *   404: { error: "Session not found" }
- *   409: { error: "Session already completed" }
- *   422: { error: "Not all photos have completed analysis" }
+ * Returns:
+ *   501: { error, message } — session completion is not implemented yet.
  */
 export async function POST(
   request: NextRequest,
@@ -31,55 +25,17 @@ export async function POST(
 ) {
   try {
     const { code } = await params;
-    const body = await request.json().catch(() => ({}));
-    const generateFormulation = body.generateFormulation !== false;
-    const targetLevel = body.targetLevel;
-    const targetTone = body.targetTone;
-    const brandPreference = body.brandPreference;
-
-    // Validate target level if provided
-    if (targetLevel && (targetLevel < 1 || targetLevel > 10)) {
-      return NextResponse.json(
-        { error: 'Target level must be between 1 and 10' },
-        { status: 400 }
-      );
-    }
-
-    const result = {
-      session: {
-        id: code,
-        status: 'completed',
-        updatedAt: new Date().toISOString(),
+    return NextResponse.json(
+      {
+        error: 'Not implemented',
+        message:
+          'Session completion for session ' + code + ' is not implemented yet. ' +
+          'A previous placeholder returned hardcoded fake data as analysis; ' +
+          'that stub has been removed. Implement session validation, analysis ' +
+          'aggregation, and formulation generation before enabling this endpoint.',
       },
-      aggregatedProfile: {
-        overall: {
-          dominantHex: '#3d2b1f',
-          dominantName: 'Dark Brown',
-          level: 3,
-          tone: 'warm',
-          warmthIndex: 1.35,
-          porosity: 'medium',
-          damageLevel: 'minimal',
-        },
-        sections: {
-          roots: { hex: '#2d1e14', confidence: 0.85 },
-          mid: { hex: '#3d2b1f', confidence: 0.88 },
-          ends: { hex: '#4e3726', confidence: 0.82 },
-        },
-      },
-      formulation: generateFormulation
-        ? {
-            id: crypto.randomUUID(),
-            recommendedShade: '5WR',
-            developerVolume: 20,
-            processingTime: 30,
-            ratio: '1:1',
-            brand: brandPreference || 'Redken',
-          }
-        : null,
-    };
-
-    return NextResponse.json({ success: true, data: result });
+      { status: 501 }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to complete session';
     return NextResponse.json({ error: message }, { status: 500 });

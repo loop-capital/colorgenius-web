@@ -122,6 +122,9 @@ model clients {
   @@index([square_customer_id], map: "idx_clients_square_customer_id")
 }
 
+/// Schema-only table: currently has ZERO writers in the codebase
+/// (no code inserts/updates; verified by grep). Keep the table and
+/// migrations; wire up writers when real color-extraction output exists.
 model color_extractions {
   id                   String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   analysis_id          String         @db.Uuid
@@ -298,6 +301,9 @@ model formulations {
   @@index([stylist_id, created_at(sort: Desc)], map: "idx_formulations_stylist_date")
 }
 
+/// Schema-only table: currently has ZERO writers in the codebase
+/// (no code inserts/updates; verified by grep). Keep the table and
+/// migrations; wire up writers when real segmentation output exists.
 model hair_segmentations {
   id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   analysis_id         String         @db.Uuid
@@ -748,6 +754,9 @@ model subscriptions {
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// Schema-only table: currently has ZERO writers in the codebase
+/// (no code inserts/updates; verified by grep). Keep the table and
+/// migrations; wire up writers when real texture-analysis output exists.
 model texture_analyses {
   id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   analysis_id         String         @db.Uuid
