@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useToast } from '@/components/ui/use-toast'
 import { HAIR_LEVELS, BRANDS, LINES_BY_BRAND } from '@/lib/products'
@@ -223,7 +223,7 @@ function consultationToFd(c: any): Record<string, unknown> {
   return updates
 }
 
-export default function FormulatePage() {
+function FormulatePageContent() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
@@ -1301,5 +1301,13 @@ export default function FormulatePage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function FormulatePage() {
+  return (
+    <Suspense fallback={null}>
+      <FormulatePageContent />
+    </Suspense>
   )
 }
