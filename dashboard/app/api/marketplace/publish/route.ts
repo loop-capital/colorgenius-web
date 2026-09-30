@@ -15,7 +15,7 @@ import { prisma } from '@/lib/prisma';
 import { getUserFromRequest } from '@/lib/auth';
 import { getOrCreateStylistForUser } from '@/lib/stylist';
 import { generateShareCode } from '@/lib/share-code';
-import { computeCreatorTier, TIER_PER_USE_CENTS, TIER_PURCHASE_THRESHOLDS } from '@/lib/marketplace/creator-tier';
+import { computeCreatorTier, getCreatorRankingStats, TIER_PER_USE_CENTS } from '@/lib/marketplace/creator-tier';
 import { z } from 'zod';
 
 // creator_id/creator_name/creator_avatar removed from input — the creator is
@@ -97,14 +97,22 @@ export async function POST(request: NextRequest) {
 
     // Score is still computed as a quality indicator shown to browsers,
     // but no longer sets price — price/tier are earned by the creator's
-    // career purchase total across their whole catalog (see
-    // lib/marketplace/creator-tier.ts), not any one formula's own merit.
+    // trailing-12mo monthly-average licensed uses across their whole catalog
+    // (see lib/marketplace/creator-tier.ts), not any one formula's own merit.
     const score = scoreFormula(data);
     const creatorRow = await prisma.stylists.findUnique({
       where: { id: stylist.id },
-      select: { formula_sales_count: true, marketplace_tier_override: true },
+      select: { marketplace_tier_override: true },
     });
-    const tier = computeCreatorTier(creatorRow?.formula_sales_count ?? 0, creatorRow?.marketplace_tier_override);
+    // Tier is earned by trailing-12mo monthly-average LICENSED USES across the
+    // creator's whole catalog (ranked by sales, never likes) — see
+    // lib/marketplace/creator-tier.ts for metric, exclusions, and anti-gaming.
+    const rankingStats = await getCreatorRankingStats(stylist.id);
+    const tier = computeCreatorTier(
+      rankingStats.monthlyAverageUses,
+      rankingStats.tenureDays,
+      creatorRow?.marketplace_tier_override,
+    );
     const perUseCents = TIER_PER_USE_CENTS[tier];
 
     const listing = await prisma.formula_listings.create({
@@ -164,13 +172,13 @@ export async function GET() {
     success: true,
     data: {
       tiers: [
-        { tier: 'community', career_purchases: `${TIER_PURCHASE_THRESHOLDS.community}+`, per_use: 'Free', description: 'Every new creator starts here' },
-        { tier: 'professional', career_purchases: `${TIER_PURCHASE_THRESHOLDS.professional}+`, per_use: `$${(TIER_PER_USE_CENTS.professional / 100).toFixed(2)}/use`, description: 'Proven catalog, repeat salon demand' },
-        { tier: 'master', career_purchases: `${TIER_PURCHASE_THRESHOLDS.master}+`, per_use: `$${(TIER_PER_USE_CENTS.master / 100).toFixed(2)}/use`, description: 'Consistently purchased across your catalog' },
-        { tier: 'signature', career_purchases: `${TIER_PURCHASE_THRESHOLDS.signature}+`, per_use: `$${(TIER_PER_USE_CENTS.signature / 100).toFixed(2)}/use`, description: 'Top-tier, widely licensed creator' },
-        { tier: 'elite', career_purchases: 'By invitation', per_use: `$${(TIER_PER_USE_CENTS.elite / 100).toFixed(2)}/use`, description: 'Hand-picked by ColorGenius' },
+        { tier: 'community', monthly_uses: '0–9', per_use: 'Free', description: 'Every new creator starts here' },
+        { tier: 'professional', monthly_uses: '10–49', per_use: `$${(TIER_PER_USE_CENTS.professional / 100).toFixed(2)}/use`, description: 'Proven catalog, repeat salon demand' },
+        { tier: 'master', monthly_uses: '50–149', per_use: `$${(TIER_PER_USE_CENTS.master / 100).toFixed(2)}/use`, description: 'Consistently used across your catalog' },
+        { tier: 'signature', monthly_uses: '150–499', per_use: `$${(TIER_PER_USE_CENTS.signature / 100).toFixed(2)}/use`, description: 'Top-tier, widely used creator' },
+        { tier: 'elite', monthly_uses: '500+', per_use: `$${(TIER_PER_USE_CENTS.elite / 100).toFixed(2)}/use`, description: 'The most-used creators on COLORgenius' },
       ],
-      pricing_note: 'Your tier is earned by total career purchases across ALL of your published formulas, not any single formula’s own sales — every formula you publish shares your current tier and price.',
+      pricing_note: 'Your tier is earned by your trailing-12-month monthly average of licensed formula uses across ALL of your published formulas — ranked by sales, never likes. Free Community uses count toward your ranking; your own uses and refunded uses do not. Signature/Elite require 90+ days since your first listing. Recalculated on the 1st of each month; upgrades apply immediately, demotions require 2 consecutive months below threshold.',
       revenue_split: { creator: '70%', platform: '30%' },
       billing: 'Monthly in arrears — stylists pay at end of month for actual usage',
       requirements: [

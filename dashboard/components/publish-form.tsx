@@ -42,15 +42,15 @@ export function PublishForm({ formulaId, formulaTitle, onSuccess, onCancel }: Pu
       const res = await fetch('/api/marketplace/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // creator is always the authenticated caller server-side; only send
+        // source_formula_id when publishing from an existing formula record.
         body: JSON.stringify({
-          source_formula_id: formulaId || 'manual',
+          ...(formulaId ? { source_formula_id: formulaId } : {}),
           title: form.get('title'),
           description: form.get('description'),
           category: form.get('category'),
           tags: (form.get('tags') as string)?.split(',').map(t => t.trim()).filter(Boolean) || [],
           photo_url: photoUrl || undefined,
-          creator_id: 'current-user',
-          creator_name: 'Current User',
         }),
       });
       const data = await res.json();

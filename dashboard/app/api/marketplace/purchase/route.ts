@@ -81,8 +81,10 @@ export async function POST(request: NextRequest) {
         where: { id: listing.id },
         data: { purchase_count: { increment: 1 } },
       });
-      // Career purchase count across the creator's WHOLE catalog — this is
-      // what earns their marketplace tier, not this one formula's sales.
+      // Legacy career counter (display only). Marketplace tier is NOT earned
+      // by license acquisitions — it is earned by metered LICENSED USES
+      // (trailing-12mo monthly average), recomputed here as a fast-path
+      // upgrade check; demotions go through the monthly recalc's hysteresis.
       await tx.stylists.update({
         where: { id: listing.creator_id },
         data: { formula_sales_count: { increment: 1 } },
