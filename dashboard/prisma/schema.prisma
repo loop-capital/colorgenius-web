@@ -290,6 +290,7 @@ model formulations {
   stylists                stylists                 @relation(fields: [stylist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   stylist_feedback        stylist_feedback[]
 
+  transformations transformations[]
   @@index([action_type], map: "idx_formulations_action_type")
   @@index([brand], map: "idx_formulations_brand")
   @@index([client_id], map: "idx_formulations_client")
@@ -723,6 +724,7 @@ model stylists {
   stylist_feedback         stylist_feedback[]
   salons                   salons?                    @relation(fields: [salon_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  transformations transformations[]
   @@index([email], map: "idx_stylists_email")
   @@index([salon_id], map: "idx_stylists_salon")
   @@index([subscription_tier], map: "idx_stylists_subscription")
@@ -896,6 +898,7 @@ model formula_listings {
   usage_log         formula_usage_log[]
   client_requests   formula_client_requests[]
 
+  transformations transformations[]
   @@index([category], map: "idx_formula_listings_category")
   @@index([creator_id], map: "idx_formula_listings_creator")
   @@index([is_active], map: "idx_formula_listings_active")
@@ -1597,4 +1600,34 @@ model formula_outcome_history {
   created_at   DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([client_id, brand, shade_code], map: "idx_formula_outcome_history_lookup")
+}
+
+/// Transformation journey: licensed starting formula -> AI-personalized
+/// formulation -> before/after photos -> published post. Born as a draft at
+/// formulation time so the full chain exists by construction. Lifecycle:
+/// draft -> enriched -> published. Publishing requires a separate marketing
+/// consent record; the draft's existence never implies posting permission.
+model transformations {
+  id                 String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  stylist_id         String            @db.Uuid
+  status             String            @default("draft") @db.VarChar(20)
+  source_formula_id  String?           @db.Uuid
+  formulation_id     String            @db.Uuid
+  before_photo_ref   String            @db.VarChar(1000)
+  after_photo_ref    String?           @db.VarChar(1000)
+  shade_story        String?
+  shades             Json?
+  client_consent     Json?
+  published_post_ref String?           @db.VarChar(500)
+  created_at         DateTime          @default(now()) @db.Timestamp(6)
+  enriched_at        DateTime?         @db.Timestamp(6)
+  published_at       DateTime?         @db.Timestamp(6)
+  stylist            stylists          @relation(fields: [stylist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  source_formula     formula_listings? @relation(fields: [source_formula_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  formulation        formulations      @relation(fields: [formulation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([stylist_id], map: "idx_transformations_stylist")
+  @@index([status], map: "idx_transformations_status")
+  @@index([source_formula_id], map: "idx_transformations_source_formula")
+  @@index([formulation_id], map: "idx_transformations_formulation")
 }

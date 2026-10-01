@@ -123,3 +123,76 @@
 - Typecheck after changes: `npx tsc --noEmit` in dashboard/ → 20 errors, all
   pre-existing in untouched files (same list as before this work); 0 errors in
   any file touched here.
+
+---
+
+# BUILD NOTES — Transformations Endpoint (AgentSocial × COLORgenius, Direction A)
+
+**Branch:** `eiza/transformations-endpoint` (from `ed3e6b0` main — NEVER merge to main)
+**Date:** 2026-09-30 · **Built by:** Eiza
+**Specs:** `~/workspace/product/transformations-endpoint-spec.md` (endpoint) +
+`~/workspace/user/files/agentsocial-colorgenius-integration-spec.md` (seam, Sienna)
+
+## What was built
+
+- **Prisma model `transformations`** (dashboard/prisma/schema.prisma): id uuid PK,
+  stylist_id → stylists, status ('draft'|'enriched'|'published', validated in code),
+  source_formula_id → formula_listings (nullable), formulation_id → formulations,
+  before_photo_ref (required), after_photo_ref (nullable), shade_story (text),
+  shades (Json), client_consent (Json, shape per spec), published_post_ref,
+  created_at/enriched_at/published_at. Back-relations added to stylists,
+  formulations, formula_listings.
+- **Migration `20260930_add_transformations`** — hand-written SQL (CREATE TABLE IF
+  NOT EXISTS + 4 indexes), applied via genuine `prisma migrate deploy` against
+  live Supabase through a CONNECT tunnel (office box can't reach Supabase IPv6
+  directly; ran from a localhost forward). Verified in information_schema +
+  `_prisma_migrations`. Pre-existing state confirmed first:
+  `20260930_add_missing_columns` was the last common migration.
+- **API routes** (dashboard/app/api/v1/transformations/):
+  - `POST /` — create draft (formulation_id + before_photo_ref required; formulation
+    must belong to the stylist; source_formula_id validated when given).
+  - `GET /` — list with ?status=&formula_id=&stylist_id= + pagination. Visibility:
+    own (any status) + published. Non-owners never see client_consent.
+  - `GET /:id` — read; **returns short-lived (15 min) signed R2 URLs**
+    (before_photo_url/after_photo_url) per seam §3.1.
+  - `PATCH /:id` — enrich (after_photo_ref, shade_story, shades, source_formula_id,
+    client_consent, published_post_ref); draft→enriched when after photo present.
+    On published records only published_post_ref may change (seam §3.2).
+  - `POST /:id/publish` — **hard 422 CONSENT_REQUIRED without a marketing consent
+    record** (the bright line, in code); 422 AFTER_PHOTO_REQUIRED without after
+    photo; **idempotent** — republish returns the record, updates post ref, never
+    409/duplicate (founder note + seam §3.2).
+- **Auth** (dashboard/lib/transformation-auth.ts): session/JWT (existing
+  getUserFromRequest + getOrCreateStylistForUser) OR per-stylist API token
+  (`Authorization: Bearer`). Tokens reuse the existing **`api_keys`** table
+  (owner_type='stylist', sha256 key_hash, scopes) — no new table needed.
+  `POST/GET /api/v1/auth/tokens` (issue — session only, no privilege escalation;
+  plaintext returned ONCE), `DELETE /api/v1/auth/tokens/:id` (revoke). Scopes:
+  `transformations:write` (read+write) / `transformations:read`; write routes
+  require the write scope. OAuth `transformations:write` (Track B) plugs into the
+  same check later.
+- **Draft auto-creation**: `POST /api/formulations/save` now creates a
+  transformation draft (best-effort, never breaks the save; skips when no photoUrl;
+  idempotent per formulation; prefers the formulation's own stylist_id when it
+  resolves).
+- **lib/r2.ts**: added `getPresignedDownloadUrl` (GetObject signed URLs) +
+  `extractR2Key` (normalizes full-URL or bare-key refs).
+
+## Verification
+- `npx prisma validate` OK · `npx tsc --noEmit` 0 errors · `npm run build` passes.
+- Full E2E on :3101 with throwaway stylist identities (minted JWT): **34/34 PASS** —
+  create/enrich/publish loop, 422 consent + after-photo gates, idempotent republish,
+  IMMUTABLE_AFTER_PUBLISH, post-ref patch on published, token issue/use/revoke,
+  draft auto-create via formulations/save. **Zero residue** (all throwaway rows deleted).
+
+## Deviations / notes
+- Reused existing `api_keys` table instead of a new `api_tokens` table (it was
+  schema-only, zero writers — built the first issuance/verification around it;
+  scopes column already supports the Track B model).
+- `api_keys` has no `name` column — token list shows key_prefix/scopes/usage instead.
+  Add a name column in a later migration if wanted.
+- Consent `attested_by`/`attested_at` default to the calling stylist / now when omitted.
+- Pre-existing: `JWT_SECRET` is not set in dashboard/.env (auth falls back to the
+  hardcoded dev secret — worth setting a real one before beta).
+- Pre-existing drift (untouched): DB has migration `20260514040000_add_formula_gallery`
+  not present in local prisma/migrations history.
