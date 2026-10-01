@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """COLORgenius Explainer Video — Veo 3.1 Generator"""
 import os, sys, time, base64, json
-os.environ['GEMINI_API_KEY'] = 'AIzaSyAlO3itPiNSovL0uZMCRQ3WKMr086IoJHo'
+# Key comes from ~/.openclaw/.env (never hardcode it in scripts)
+for _l in open(os.path.expanduser('~/.openclaw/.env')):
+    if _l.startswith('GEMINI_API_KEY='):
+        os.environ['GEMINI_API_KEY'] = _l.split('=', 1)[1].strip()
 
 from google import genai
 client = genai.Client()

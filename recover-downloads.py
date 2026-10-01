@@ -2,7 +2,10 @@
 """Recover downloads for all Veo operations using proper auth"""
 import os, json, time, base64, urllib.request, sys
 
-os.environ['GEMINI_API_KEY'] = 'AIzaSyAlO3itPiNSovL0uZMCRQ3WKMr086IoJHo'
+# Key comes from ~/.openclaw/.env (never hardcode it in scripts)
+for _l in open(os.path.expanduser('~/.openclaw/.env')):
+    if _l.startswith('GEMINI_API_KEY='):
+        os.environ['GEMINI_API_KEY'] = _l.split('=', 1)[1].strip()
 from google import genai
 client = genai.Client()
 

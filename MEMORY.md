@@ -426,4 +426,13 @@ Remaining: Analyze, Library, History, Questionnaire
 
 ---
 
+## Recent Research
+- 2026-09-28: Research (categories 3, 6), 5 findings - LorealxOpenAI partnership, Wella IPO, Beauty Genius 400K consultations, no new journal/regulatory changes, see research/findings-2026-09-28.md
+- 2026-09-21: Research (categories 5, 6), 4 findings, see research/findings-2026-09-21.md
+- 2026-09-16: Research (categories 1, 2, 3), 0 findings — no new journal/regulatory/patent activity detected in last 30 days
+- 2026-09-14: Research (categories 4, 5), 3 findings — CIELAB standard stable, Pantone Cloud Dancer noted, WGSN warm tones confirmed
+- 2026-09-10: Research (categories 3, 6), 2 findings — ReFa still Japan-only, YouCam Makeup expanded hair filters
+
+---
+
 _This file was last rebuilt on 2026-09-16. Keep it updated after every major milestone._
