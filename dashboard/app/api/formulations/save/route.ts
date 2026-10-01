@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyBearerToken } from '@/lib/auth';
+import { getOrCreateStylistForUser } from '@/lib/stylist';
+import { createTransformationDraft } from '@/lib/transformations';
 
 export async function POST(request: NextRequest) {
   const user = await verifyBearerToken(request);
@@ -57,6 +59,31 @@ export async function POST(request: NextRequest) {
         status: 'generated',
       },
     });
+
+    // Auto-create a transformation draft (born at formulation time — spec).
+    // Best-effort: never breaks the formulation save.
+    try {
+      if (photoUrl) {
+        const hookStylist = await getOrCreateStylistForUser(user.userId);
+        let draftStylistId = hookStylist ? hookStylist.id : null;
+        // Prefer the formulation's own stylist_id when it resolves to a real stylist.
+        if (formulation.stylist_id) {
+          const fStylist = await prisma.stylists
+            .findUnique({ where: { id: formulation.stylist_id } })
+            .catch(() => null);
+          if (fStylist) draftStylistId = fStylist.id;
+        }
+        if (draftStylistId) {
+          await createTransformationDraft({
+            stylistId: draftStylistId,
+            formulationId: formulation.id,
+            beforePhotoRef: photoUrl,
+          });
+        }
+      }
+    } catch (hookErr) {
+      console.error('[transformations] draft auto-create failed:', hookErr);
+    }
 
     // Save formula components (the individual shades in the formula)
     if (ingredients && ingredients.length > 0) {
