@@ -15,7 +15,8 @@ import {
 // - idempotent: an already-published record is returned as-is (with an
 //   updated published_post_ref when one is supplied) — never 409, never a
 //   duplicate. Agents retry; the seam's failure modes depend on this.
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const stylist = await resolveStylist(req);
   if (!stylist) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 
   const t = await prisma.transformations.findFirst({
-    where: { id: params.id, stylist_id: stylist.id },
+    where: { id: id, stylist_id: stylist.id },
     include: { stylist: { select: PUBLIC_STYLIST_SELECT } },
   });
   if (!t) return NextResponse.json({ error: 'Not found' }, { status: 404 });

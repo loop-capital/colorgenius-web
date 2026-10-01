@@ -4,7 +4,8 @@ import { getUserFromRequest } from '@/lib/auth';
 import { getOrCreateStylistForUser } from '@/lib/stylist';
 
 // DELETE /api/v1/auth/tokens/:id — revoke a stylist API token (soft revoke via is_active).
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const user = await getUserFromRequest(req);
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -15,7 +16,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   }
 
   const key = await prisma.api_keys.findFirst({
-    where: { id: params.id, owner_type: 'stylist', owner_id: stylist.id },
+    where: { id: id, owner_type: 'stylist', owner_id: stylist.id },
   });
   if (!key) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });

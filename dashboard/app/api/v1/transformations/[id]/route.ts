@@ -20,7 +20,8 @@ async function findOwned(id: string, stylistId: string) {
 
 // GET /api/v1/transformations/:id — read. Owner sees everything (incl. consent
 // and signed photo URLs); anyone else only sees published records, consent stripped.
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const stylist = await resolveStylist(req);
   if (!stylist) return unauthorized();
   if (!canRead(stylist)) {
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 
   const t = await prisma.transformations.findUnique({
-    where: { id: params.id },
+    where: { id: id },
     include: { stylist: { select: PUBLIC_STYLIST_SELECT } },
   });
   if (!t) return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -48,14 +49,15 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 // client_consent, published_post_ref. draft -> enriched when after_photo_ref
 // is present. On published records only published_post_ref may change
 // (seam §3.2: lets the agent attach the post ref after a late social publish).
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const stylist = await resolveStylist(req);
   if (!stylist) return unauthorized();
   if (!canWrite(stylist)) {
     return NextResponse.json({ error: 'Insufficient scope' }, { status: 403 });
   }
 
-  const t = await findOwned(params.id, stylist.id);
+  const t = await findOwned(id, stylist.id);
   if (!t) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   let body: any;
