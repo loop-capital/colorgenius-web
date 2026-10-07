@@ -22,6 +22,8 @@ const PUBLIC_PATHS = [
   '/api/auth/google/callback',
   '/api/health',
   '/monitoring',
+  '/openapi.json',   // Muse connector: public API spec (Muse fetches this unauthenticated)
+  '/llms.txt',       // Muse connector: public service description
 ];
 
 export async function middleware(request: NextRequest) {
